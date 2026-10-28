@@ -1,0 +1,4462 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wright-okamura-1977-makaopuhi-cooling.yaml
+observations:
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '75'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$SiO_{2}$; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '75.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$SiO_{2}$; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '75.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r03_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$SiO_{2}$; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '12.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Al_{2}O_{3}$; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '12.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Al_{2}O_{3}$; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '11.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r04_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Al_{2}O_{3}$; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.76'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=FeO; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=FeO; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r05_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=FeO; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=MgO; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=MgO; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r06_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=MgO; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=CaO; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.43'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=CaO; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.54'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r07_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=CaO; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.25'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Na_{2}O$; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.44'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Na_{2}O$; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r08_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$Na_{2}O$; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '5.82'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$K_{2}O$; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '5.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$K_{2}O$; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '5.99'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r09_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$K_{2}O$; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c02
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c02
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$TiO_{2}$; column_header=Makaopuhlava lake 68-1-7Depth 26.0 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c03
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.33'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c03
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$TiO_{2}$; column_header=Makaopuhlava lake 68-1-14Depth 39.8 $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c04
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Electron-microprobe residual-glass analysis by R. T. Helz; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_1977_makaopuhi_cooling_p042_t32_r10_c04
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 42
+    published_page: 37
+    pdf_page_index: 41
+    table: '17'
+    note: row_label=$TiO_{2}$; column_header=Alae lava lake A12-9(probe) $^{1}$
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: No temperature of the glass analyses is printed.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 42
+        published_page: 37
+        pdf_page_index: 41
+        table: '17'
+        note: The table does not state the quench history of the analyzed glass.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_al2o3
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '12.97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_al2o3
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=Al2O3; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_cao
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '9.38'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_cao
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=CaO; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_cl
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cl
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_cl
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=Cl; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_co2
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_co2
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=CO2; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_f
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: F
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.06'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_f
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=F; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe2o3
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '1.65'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe2o3
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=Fe2O3; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe_valence_ratio
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.122'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - valence_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe_valence_ratio
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: The denominator is printed on the following row as .9 Fe2O3 + FeO.; row_label=.9 Fe2O3; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+  derived_from:
+  - wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe2o3
+  - wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_feo
+  derivation:
+    relation: Printed .9 Fe2O3/(.9 Fe2O3 + FeO) oxidation ratio; retained as printed without recalculation.
+    inputs:
+    - wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_fe2o3
+    - wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_feo
+    parameters: []
+    output_unit: fraction
+    references: []
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_feo
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '11.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_feo
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=FeO; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_h2o
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: H2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_h2o
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=H2O; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_k2o
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_k2o
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=K2O; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_mgo
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '5.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_mgo
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=MgO; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_mno
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_mno
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=MnO; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_na2o
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '2.73'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_na2o
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=Na2O; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_p2o5
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: P2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.41'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_p2o5
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=P2O5; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_sio2
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '50.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_sio2
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=SiO2; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.
+- observation_id: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_tio2
+  experiment_id: 8c3cb3cf690a17f53d7afde3c8d85ee947d4281e62f1ca0340fb1202c2b50335::wright-okamura-1977-makaopuhi-cooling
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: Table 11 analysis; text describes crystal- and vesicle-free glass that flowed into the core barrel; wt% as printed.
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '3.89'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wright-okamura-1977-makaopuhi-cooling::wright_okamura_table11_69_1_22_tio2
+  source_id: wright-okamura-1977-makaopuhi-cooling
+  locator:
+    page: 33
+    published_page: 28
+    pdf_page_index: 32
+    table: '11'
+    note: row_label=TiO2; column_header=69-1-22
+  read_from: pdf:wright-okamura-1977-makaopuhi-cooling
+  point_conditions:
+    T_C:
+      state:
+        tag: unknown
+        reason: range_not_point
+      locator:
+        page: 31
+        published_page: 26
+        pdf_page_index: 30
+        table: '9'
+        note: 1,080–1,100? °C as printed; retained as a range, with no point temperature assigned.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 57
+        published_page: 52
+        pdf_page_index: 56
+        figure: '26'
+        note: Figure 26D identifies glass (quenched melt); the quench method and redox preservation are not stated.

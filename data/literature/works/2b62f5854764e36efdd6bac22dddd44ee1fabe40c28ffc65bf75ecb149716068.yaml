@@ -1,0 +1,100 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 2b62f5854764e36efdd6bac22dddd44ee1fabe40c28ffc65bf75ecb149716068
+  citation: Semkow, K. W. and Haskin, L. A. (1984). Redox equilibria in diopsidic melt. 15th Lunar and Planetary Science Conference,
+    Abstracts of Papers Submitted, part 2, 752–753 (LPSC XV).
+  source_ids:
+  - semkow-haskin-1984-redox-diopsidic-melt
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:semkow-haskin-1984-redox-diopsidic-melt
+      role: pdf
+      path: raw/semkow-haskin-1984-redox-diopsidic-melt/semkow-haskin-1984-redox-diopsidic-melt.pdf
+      sha256:
+        tag: value
+        value: f9d1793a4023cccf0060bba7024bb72c9b349f3d7b14e2ee602e15b4aff1fa7a
+    - asset_id: pdftotext:semkow-haskin-1984-redox-diopsidic-melt
+      role: pdftotext
+      path: text/semkow-haskin-1984-redox-diopsidic-melt
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:semkow-haskin-1984-redox-diopsidic-melt
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: semkow1984_table1_thermodynamic_parameters
+  type: experiment_series
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 753
+    table: '1'
+  units: printed units per field
+  reason: 'No token matches standard cell potential, this reaction''s equilibrium constant, or standard reaction ΔG, ΔH, and
+    ΔS. Candidate tokens checked: valence_ratio, log10_Kf, delta_fG, delta_fH, S, partial_molar_enthalpy; none describes these
+    quantities on the printed reaction and standard basis.'
+  values:
+    quantity: standard_cell_potential_equilibrium_constant_and_reaction_thermodynamics
+    method_class: measured_reduced
+    reaction_as_printed: M0(diop) + 1/2 O2(g) = M2+(diop) + O2-(diop)
+    reference_state: standard state, abstract's reaction (1); diopside melt
+    temperature_C: 1450
+    atmosphere: air; pO2 referenced to 1 atm for the separate E* statement
+    points:
+    - species: Fe
+      E0_V: -0.218 ± 0.014
+      K_mol_L_atm: 0.054 ± 0.010
+      delta_G0_kcal_mol: 10.0 ± 0.7
+      delta_H0_kcal_mol: -56.0 ± 4.1
+      delta_S0_eu: -38.3 ± 2.0
+    - species: Co
+      E0_V: -0.208 ± 0.014
+      K_mol_L_atm: 0.062 ± 0.012
+      delta_G0_kcal_mol: 9.6 ± 0.7
+      delta_H0_kcal_mol: -57.5 ± 7.4
+      delta_S0_eu: -38.9 ± 3.9
+    - species: Ni
+      E0_V: -0.330 ± 0.004
+      K_mol_L_atm: 0.012 ± 0.001
+      delta_G0_kcal_mol: 15.2 ± 0.2
+      delta_H0_kcal_mol: -47.9 ± 3.6
+      delta_S0_eu: -36.6 ± 2.0
+    - species: Zn
+      E0_V: -0.128 ± 0.004
+      K_mol_L_atm: 0.180 ± 0.011
+      delta_G0_kcal_mol: 5.9 ± 0.2
+      delta_H0_kcal_mol: -61.2 ± 3.8
+      delta_S0_eu: -38.9 ± 2.1
+  context_id: semkow-haskin-1984-redox-diopsidic-melt::context::semkow1984_table1_thermodynamic_parameters
+  work_id: 2b62f5854764e36efdd6bac22dddd44ee1fabe40c28ffc65bf75ecb149716068
+  source_id: semkow-haskin-1984-redox-diopsidic-melt
+  species: paper_context
+- observation_id: semkow1984_text_standard_reduction_potential
+  type: experiment_series
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 752
+    section: Abstract
+  units: V
+  reason: No standard reduction-potential quantity token is available.
+  values:
+    quantity: standard_reduction_potential_E_star
+    method_class: measured_reduced
+    reaction_as_printed: O2(g) + 4e = 2O2-(diop)
+    value: -0.73 ± 0.02
+    temperature_C: 1450
+    reference: oxygen electrode equilibrated with oxygen at 1 atm
+  context_id: semkow-haskin-1984-redox-diopsidic-melt::context::semkow1984_text_standard_reduction_potential
+  work_id: 2b62f5854764e36efdd6bac22dddd44ee1fabe40c28ffc65bf75ecb149716068
+  source_id: semkow-haskin-1984-redox-diopsidic-melt
+  species: paper_context

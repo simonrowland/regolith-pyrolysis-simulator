@@ -1,0 +1,803 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.31.1389
+  citation: R. Inoue, H. Inoue, and H. Suito (1991), "Partitions of Nitrogen and Sulfur between CaO-Al2O3 Melts and Liquid
+    Iron", ISIJ International 31(12), 1389-1395.
+  source_ids:
+  - inoue-1991-n-s-partition-cao-al2o3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:inoue-1991-n-s-partition-cao-al2o3
+      role: pdf
+      path: raw/inoue-1991-n-s-partition-cao-al2o3/inoue-1991-n-s-partition-cao-al2o3.pdf
+      sha256:
+        tag: value
+        value: 5e6060187fabddf6765f8e28d89affe82b9209d9e4ebbdac11121f564f812ed2
+    - asset_id: pdftotext:inoue-1991-n-s-partition-cao-al2o3
+      role: pdftotext
+      path: text/inoue-1991-n-s-partition-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:inoue-1991-n-s-partition-cao-al2o3
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.31.1389
+experiments:
+- experiment_id: 10.2355/isijinternational.31.1389::inoue-1991-n-s-partition-cao-al2o3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.31.1389
+  locator:
+    page: 2
+    published_page: 1390
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, printed sample A-001, Metal Al soluble (mass%)
+context:
+- observation_id: inoue_1991_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1392
+    note: Figure 1 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: nitrogen distribution ratio LN
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1873 K
+    axes:
+      x: log[mass% Al]Total
+      y: ' log LN'
+    panel: main
+    caption: Logarithms of LN plotted against log[mass% Al]Total at 1873 K. The marks denote stirring and temperature-change
+      experiments.
+    series:
+    - name: Al2O3 crucible, present work
+      marker_as_printed: open and filled circles
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, present work
+      marker_as_printed: open squares
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: stirring experiment mark
+      marker_as_printed: circled mark
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: temperature-change experiment mark
+      marker_as_printed: letter e mark
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_1_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1392
+    note: Figure 2 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: nitrogen concentration in slag, CN3−
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1823 K under Al2O3 crucible; 1873 K under CaO crucible
+    axes:
+      x: time (min)
+      y: ' log CN3−'
+    panel: main
+    caption: Time dependence of log CN3− under Al2O3 and CaO crucibles; nitrogen initially in slag or metal.
+    series:
+    - name: Al2O3 crucible, nitrogen initially in slag
+      marker_as_printed: open circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: Al2O3 crucible, nitrogen initially in metal
+      marker_as_printed: filled circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, nitrogen initially in slag
+      marker_as_printed: open circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, nitrogen initially in metal
+      marker_as_printed: filled circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_2_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1392
+    note: Figure 3 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: nitrogen concentration in slag, CN3−
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1873 K
+    axes:
+      x: log[mass% Al]Total
+      y: ' log CN3−'
+    panel: main
+    caption: Logarithms of CN3− plotted against log[mass% Al]Total at 1873 K.
+    series:
+    - name: Al2O3 crucible, present work
+      marker_as_printed: open and filled circles
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, present work
+      marker_as_printed: open squares
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: Ozturk and Fruehan comparison
+      marker_as_printed: broken line
+      marker_count: 0
+      attribution: Ozturk and Fruehan [4]
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_3_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_figure_4_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1393
+    note: Figure 4 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: nitrogen concentration in slag, CN3−
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1823 K, 1873 K, 1923 K
+    axes:
+      x: 10^4/T (K−1)
+      y: ' log CN3−'
+    panel: main
+    caption: Temperature dependence of log CN3−. The broken line recalculates the present CaO-crucible data using revised
+      aAl2O3 = 0.0006.
+    series:
+    - name: Al2O3 crucible, present work
+      marker_as_printed: open and filled circles
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, present work
+      marker_as_printed: open squares
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: gas-slag equilibrium
+      marker_as_printed: solid line
+      marker_count: 0
+      attribution: comparison
+    - name: revised aAl2O3 calculation
+      marker_as_printed: broken line
+      marker_count: 0
+      attribution: model_derived
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_4_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_figure_5_deferred
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1393
+    note: Figure 5 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: AlN activity coefficient gamma_AlN
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1823 K, 1873 K, 1923 K
+    axes:
+      x: XAl2O3
+      y: ' log gamma_AlN'
+    panel: main
+    caption: Dependence of log gamma_AlN on Al2O3 content in slag.
+    series:
+    - name: 1823 K
+      marker_as_printed: open circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: 1873 K
+      marker_as_printed: open square
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: 1923 K
+      marker_as_printed: open triangle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: gas-slag equilibrium
+      marker_as_printed: dashed line
+      marker_count: 0
+      attribution: model_derived
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_5_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1394
+    note: Figure 6 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: sulfur distribution ratio LS
+    method_class: figure_only
+    admission_status: figure_only
+    species: S-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1873 K
+    axes:
+      x: total Al content in metal
+      y: ' log sulfur distribution ratio'
+    panel: main
+    caption: Sulfur distribution ratios plotted against total Al content in logarithmic scales.
+    series:
+    - name: Al2O3 crucible, present work
+      marker_as_printed: open and filled circles
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, present work
+      marker_as_printed: open squares
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: literature comparison
+      marker_as_printed: line
+      marker_count: 0
+      attribution: as labeled in figure
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_6_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: S
+- observation_id: inoue_1991_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1394
+    note: Figure 7 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: sulfide capacity CS2−
+    method_class: figure_only
+    admission_status: figure_only
+    species: S-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1873 K
+    axes:
+      x: total Al content in metal
+      y: ' log sulfide capacity'
+    panel: main
+    caption: Sulfide capacities plotted against total Al contents in logarithmic scales.
+    series:
+    - name: Al2O3 crucible, present work
+      marker_as_printed: open and filled circles
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: CaO crucible, present work
+      marker_as_printed: open squares
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: literature comparison
+      marker_as_printed: line
+      marker_count: 0
+      attribution: as labeled in figure
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_7_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: S
+- observation_id: inoue_1991_figure_8_deferred
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1395
+    note: Figure 8 caption and 600-dpi render
+  units: as printed on axes
+  values:
+    quantity: activity of Al2O3
+    method_class: figure_only
+    admission_status: figure_only
+    species: N-bearing slag/iron system
+    phase: CaO-Al2O3 slag and liquid iron
+    temperature: 1873 K
+    axes:
+      x: log[mass% Al]Total
+      y: ' log aAl2O3'
+    panel: main
+    caption: Activity of Al2O3 assessed from gas-slag (CN3−, CS2−) and slag-metal (LN, LS) experiments.
+    series:
+    - name: present work nitrogen, open circle
+      marker_as_printed: open circle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: present work sulfur, filled triangle
+      marker_as_printed: filled triangle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: present work
+    - name: Ozturk and Turkdogan sulfur, open triangle
+      marker_as_printed: open triangle
+      marker_count: unresolved_due_to_overlapping_symbols
+      attribution: Ozturk and Turkdogan [3]
+    - name: Rein and Chipman reference
+      marker_as_printed: arrow
+      marker_count: 1
+      attribution: Rein and Chipman [5]
+    points: []
+    attribution: present work, with cited comparison series as labeled
+    digitisation: deferred to a figure pass
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_figure_8_deferred
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_model_assessed_cao_saturated_activities
+  type: model_derived_quantity_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1395
+    section: '3.5'
+    note: a(Al2O3) in CaO-saturated CaO-Al2O3 melts
+  units: dimensionless activity
+  values:
+    quantity: a(Al2O3) in CaO-saturated CaO-Al2O3 melts
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: These values are estimated from Eq. (9) using nitride and sulfide capacities; retain as model-derived context,
+      not measured activity points. The standard/reference state is not stated in this paper.
+    candidate_tokens_checked:
+    - activity
+    - activity_coefficient
+    values_as_printed:
+      1823 K: '0.0012'
+      1873 K: '0.0006'
+      1923 K: '0.0003'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_model_assessed_cao_saturated_activities
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: Al2O3
+- observation_id: inoue_1991_model_derived_aln_dissolution_terms_x03_x04
+  type: model_derived_quantity_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1393
+    section: '3.3'
+    note: AlN heat of dissolution and excess entropy at XAl2O3 0.3 and 0.4
+  units: kJ/mol; J/(mol K)
+  values:
+    quantity: AlN heat of dissolution and excess entropy at XAl2O3 0.3 and 0.4
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: The authors estimate these fit quantities from the temperature dependence of gamma_AlN using Eq. (12); they are
+      model-derived fit context.
+    candidate_tokens_checked:
+    - activity
+    - activity_coefficient
+    - interaction_parameter
+    values_as_printed:
+      XAl2O3=0.3:
+        heat_of_dissolution_kJ_mol: '419'
+        excess_entropy_J_mol_K: '209'
+      XAl2O3=0.4:
+        heat_of_dissolution_kJ_mol: '309'
+        excess_entropy_J_mol_K: '145'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_model_derived_aln_dissolution_terms_x03_x04
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: AlN
+- observation_id: inoue_1991_model_derived_aln_dissolution_terms_x045
+  type: model_derived_quantity_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1394
+    section: '3.3'
+    note: AlN heat of dissolution and excess entropy at XAl2O3 0.45
+  units: kJ/mol; J/(mol K)
+  values:
+    quantity: AlN heat of dissolution and excess entropy at XAl2O3 0.45
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: This continuation of the Eq. (12) fit result is model-derived context, not a formation enthalpy or absolute entropy.
+    candidate_tokens_checked:
+    - delta_fH
+    - S
+    - activity_coefficient
+    - interaction_parameter
+    values_as_printed:
+      XAl2O3=0.45:
+        heat_of_dissolution_kJ_mol: '253'
+        excess_entropy_J_mol_K: '113'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_model_derived_aln_dissolution_terms_x045
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: AlN
+- observation_id: inoue_1991_model_derived_aln_solubility
+  type: model_derived_quantity_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1394
+    section: '3.3'
+    note: AlN solubility in CaO-Al2O3 slag under Henry law
+  units: mass% AlN
+  values:
+    quantity: AlN solubility in CaO-Al2O3 slag under Henry law
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: These values are explicitly evaluated under the Henry-law assumption and are model-derived; no AlN-solubility
+      quantity token exists.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - sulfur_solubility_and_sulfate_capacity_series
+    values_as_printed:
+      Al2O3 crucible:
+        1823 K: '2.5'
+        1873 K: '2.8'
+        1923 K: '3.2'
+      CaO crucible:
+        1823 K: '4.4'
+        1873 K: '15'
+        1923 K: '25'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_model_derived_aln_solubility
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_n_capacity_and_partition_schema_gap
+  type: unscored_quantity_schema_gap
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1392
+    section: '3.1'
+  units: dimensionless capacity / distribution ratio as defined in the paper
+  values:
+    quantity: nitride capacity CN3− and nitrogen distribution ratio LN
+    method_class: model_derived_or_figure_only
+    admission_status: typed_unavailable
+    reason: The paper discusses these quantities and plots them, but the printed numerical values are not tabulated; figure
+      digitisation is deferred. No quantity token represents nitride capacity or a metal/slag nitrogen distribution ratio.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - activity
+    - activity_coefficient
+    - sulfur_solubility_and_sulfate_capacity_series
+    printed_values_as_text: The text defines the quantities and equations; no exact numerical table values are printed.
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_n_capacity_and_partition_schema_gap
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_printed_cao_al2o3_molar_ratios
+  type: model_derived_quantity_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1393
+    section: '3.2'
+    note: CaO/Al2O3 molar ratios in the table compositions
+  units: molar ratio
+  values:
+    quantity: CaO/Al2O3 molar ratios in the table compositions
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: The ratio is derived from the printed assay/composition information and has no dedicated store quantity token.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - composition_series
+    values_as_printed:
+      Al2O3 crucible:
+        1823 K: '1.19'
+        1873 K: '1.00'
+        1923 K: '0.86'
+      CaO crucible:
+        1823 K: '2.40'
+        1873 K: '2.55'
+        1923 K: '2.65'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_printed_cao_al2o3_molar_ratios
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_s_capacity_and_partition_schema_gap
+  type: unscored_quantity_schema_gap
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1394
+    section: '3.4'
+  units: dimensionless capacity / distribution ratio as defined in the paper
+  values:
+    quantity: sulfide capacity CS2− and sulfur distribution ratio LS
+    method_class: model_derived_or_figure_only
+    admission_status: typed_unavailable
+    reason: The paper plots these quantities but prints no numerical table of values. Sulfide capacity is not sulfate capacity,
+      and no token represents a metal/slag sulfur distribution ratio; figure digitisation is deferred.
+    candidate_tokens_checked:
+    - sulfur_solubility_and_sulfate_capacity_series
+    - equilibrium_phase_composition
+    - activity
+    - activity_coefficient
+    printed_values_as_text: The text defines the quantities and equations; no exact numerical table values are printed.
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_s_capacity_and_partition_schema_gap
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: S
+- observation_id: inoue_1991_table_1_replicate_counts
+  type: table_auxiliary_measurement
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1390
+    table: '1'
+    note: Table 1 printed sample-level replicate count n
+  units: count
+  values:
+    quantity: printed replicate count n
+    method_class: measured_tabulated
+    admission_status: typed_unavailable
+    reason: Replicate count is not a chemical composition quantity and has no matching store token.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - concentration_series
+    - composition_series
+    rows_as_printed:
+    - sample_no: A-001
+      time_min_as_printed: '180'
+      n_as_printed: '6'
+    - sample_no: A-002
+      time_min_as_printed: '215'
+      n_as_printed: '9'
+    - sample_no: A-003
+      time_min_as_printed: '156'
+      n_as_printed: '6'
+    - sample_no: A-004
+      time_min_as_printed: '208'
+      n_as_printed: '5'
+    - sample_no: A-005
+      time_min_as_printed: '261'
+      n_as_printed: '8'
+    - sample_no: A-006
+      time_min_as_printed: '184'
+      n_as_printed: '10'
+    - sample_no: A-007
+      time_min_as_printed: '241'
+      n_as_printed: '4'
+    - sample_no: A-008
+      time_min_as_printed: '168'
+      n_as_printed: '9'
+    - sample_no: A-009
+      time_min_as_printed: '241'
+      n_as_printed: '4'
+    - sample_no: A-010
+      time_min_as_printed: '240'
+      n_as_printed: '9'
+    - sample_no: A-011
+      time_min_as_printed: '240'
+      n_as_printed: '5'
+    - sample_no: A-012
+      time_min_as_printed: '240'
+      n_as_printed: '5'
+    - sample_no: A-013
+      time_min_as_printed: '240'
+      n_as_printed: '4'
+    - sample_no: A-014
+      time_min_as_printed: '239'
+      n_as_printed: '4'
+    - sample_no: C-001
+      time_min_as_printed: '61'
+      n_as_printed: '9'
+    - sample_no: C-002
+      time_min_as_printed: '60'
+      n_as_printed: '4'
+    - sample_no: C-003
+      time_min_as_printed: '62'
+      n_as_printed: '4'
+    - sample_no: C-004
+      time_min_as_printed: '100'
+      n_as_printed: '6'
+    - sample_no: C-005
+      time_min_as_printed: '99'
+      n_as_printed: '5'
+    - sample_no: C-006
+      time_min_as_printed: '98'
+      n_as_printed: '5'
+    - sample_no: C-007
+      time_min_as_printed: '100'
+      n_as_printed: '5'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_table_1_replicate_counts
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_table_2_replicate_counts
+  type: table_auxiliary_measurement
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1391
+    table: '2'
+    note: Table 2 printed sample-level replicate count n
+  units: count
+  values:
+    quantity: printed replicate count n
+    method_class: measured_tabulated
+    admission_status: typed_unavailable
+    reason: Replicate count is not a chemical composition quantity and has no matching store token.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - concentration_series
+    - composition_series
+    rows_as_printed:
+    - sample_no: A-201
+      time_min_as_printed: '180'
+      n_as_printed: '8'
+    - sample_no: A-202
+      time_min_as_printed: '180'
+      n_as_printed: '6'
+    - sample_no: A-203
+      time_min_as_printed: '180'
+      n_as_printed: '4'
+    - sample_no: A-204
+      time_min_as_printed: '178'
+      n_as_printed: '5'
+    - sample_no: A-205
+      time_min_as_printed: '176'
+      n_as_printed: '6'
+    - sample_no: A-206
+      time_min_as_printed: '210'
+      n_as_printed: '6'
+    - sample_no: A-207
+      time_min_as_printed: '210'
+      n_as_printed: '6'
+    - sample_no: A-208
+      time_min_as_printed: '212'
+      n_as_printed: '4'
+    - sample_no: A-209
+      time_min_as_printed: '210'
+      n_as_printed: '4'
+    - sample_no: C-201
+      time_min_as_printed: '60'
+      n_as_printed: '6'
+    - sample_no: C-202
+      time_min_as_printed: '61'
+      n_as_printed: '5'
+    - sample_no: C-203
+      time_min_as_printed: '50'
+      n_as_printed: '4'
+    - sample_no: C-204
+      time_min_as_printed: '60'
+      n_as_printed: '4'
+    - sample_no: C-205
+      time_min_as_printed: '71'
+      n_as_printed: '3'
+    - sample_no: C-206
+      time_min_as_printed: '70'
+      n_as_printed: '5'
+    - sample_no: C-207
+      time_min_as_printed: '70'
+      n_as_printed: '5'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_table_2_replicate_counts
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: N
+- observation_id: inoue_1991_table_3_replicate_counts
+  type: table_auxiliary_measurement
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1391
+    table: '3'
+    note: Table 3 printed sample-level replicate count n
+  units: count
+  values:
+    quantity: printed replicate count n
+    method_class: measured_tabulated
+    admission_status: typed_unavailable
+    reason: Replicate count is not a chemical composition quantity and has no matching store token.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - concentration_series
+    - composition_series
+    rows_as_printed:
+    - sample_no: A-118S
+      time_min_as_printed: '210'
+      n_as_printed: '3'
+    - sample_no: A-119S
+      time_min_as_printed: '209'
+      n_as_printed: '3'
+    - sample_no: A-120S
+      time_min_as_printed: '210'
+      n_as_printed: '7'
+    - sample_no: C-113S
+      time_min_as_printed: '99'
+      n_as_printed: '5'
+    - sample_no: C-114S
+      time_min_as_printed: '100'
+      n_as_printed: '4'
+    - sample_no: C-115S
+      time_min_as_printed: '100'
+      n_as_printed: '5'
+    - sample_no: C-116S
+      time_min_as_printed: '101'
+      n_as_printed: '5'
+  context_id: inoue-1991-n-s-partition-cao-al2o3::context::inoue_1991_table_3_replicate_counts
+  work_id: 10.2355/isijinternational.31.1389
+  source_id: inoue-1991-n-s-partition-cao-al2o3
+  species: S

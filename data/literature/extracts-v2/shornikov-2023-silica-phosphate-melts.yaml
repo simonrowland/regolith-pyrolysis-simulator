@@ -1,0 +1,829 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2023-silica-phosphate-melts.yaml
+observations:
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig2_curve_1
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 1. Calculated lg a(SiO2) at 1100 K.
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 5
+    published_page: 59
+    pdf_page_index: 4
+    figure: '2'
+    note: Curve 1. Calculated lg a(SiO2) at 1100 K.
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 1. Calculated lg a(SiO2) at 1100 K.
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig2_p4o10_curve_2
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 2. Calculated lg a(P4O10) at 1100 K.
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 5
+    published_page: 59
+    pdf_page_index: 4
+    figure: '2'
+    note: Curve 2. Calculated lg a(P4O10) at 1100 K.
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 2. Calculated lg a(P4O10) at 1100 K.
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig3_curve_1
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+        note: Curve 1. Calculated lg a(SiO2) at 1873 K.; panel=A
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 5
+    published_page: 59
+    pdf_page_index: 4
+    figure: '3'
+    note: Curve 1. Calculated lg a(SiO2) at 1873 K.; panel=A
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+        note: Curve 1. Calculated lg a(SiO2) at 1873 K.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig3_p4o10_curve_3
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study for curve 3; Rahman et al. (2013) for curve 4
+  admission:
+    status: rejected
+    reason: Curve 3 is a continuous calculated line. Curve 4 is Rahman et al. (2013), also continuous. No numeric points are
+      sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+        note: Curve 3. Calculated lg a(P4O10) at 1873 K. Curve 4 on the same panel is Rahman et al. (2013).; panel=A
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 5
+    published_page: 59
+    pdf_page_index: 4
+    figure: '3'
+    note: Curve 3. Calculated lg a(P4O10) at 1873 K. Curve 4 on the same panel is Rahman et al. (2013).; panel=A
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+        note: Curve 3. Calculated lg a(P4O10) at 1873 K. Curve 4 on the same panel is Rahman et al. (2013).; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '3'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig4_partial_pressures
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: The panel is the compound SiP2O7, not a composition series.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, reason,
+      attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study for lines 1, 2, 4–8; Lopatin and Semenov (1995) for symbol 3
+  admission:
+    status: rejected
+    reason: 'Lines 1, 2 and 4–8 are continuous calculated curves. Symbol 3 is five open circles and one error bar on a short
+      line, assigned by the caption to Lopatin and Semenov (1995). Hole centres on the 600 dpi page, PDF page 5: (2004.8,
+      4601.0), (2019.0, 4629.1), (2059.4, 4619.9), (2121.8, 4617.8), (2189.4, 4574.1). The first two holes overlap. No pressure
+      was read.'
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '4'
+        note: Lines 1, 2 and 4–8 are calculated partial pressures over SiP2O7. Symbol 3 is the Knudsen series of Lopatin and
+          Semenov (1995).
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 5
+    published_page: 59
+    pdf_page_index: 4
+    figure: '4'
+    note: Lines 1, 2 and 4–8 are calculated partial pressures over SiP2O7. Symbol 3 is the Knudsen series of Lopatin and Semenov
+      (1995).
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Fig. 4 spans about 1300–1500 K. The cited Knudsen range in the text is 1400–1484 K.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: The panel is the compound SiP2O7, not a composition series.
+      locator:
+        page: 5
+        published_page: 59
+        pdf_page_index: 4
+        figure: '4'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig5_curve_3
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve. Color separation at 600 dpi shows no marker on the blue line thicker than the line
+      itself. No numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'
+        note: Curve 3. Calculated lg a(SiO2) at 2000 K. The blue line has no discrete markers.; panel=A
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 6
+    published_page: 60
+    pdf_page_index: 5
+    figure: '5'
+    note: Curve 3. Calculated lg a(SiO2) at 2000 K. The blue line has no discrete markers.; panel=A
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'
+        note: Curve 3. Calculated lg a(SiO2) at 2000 K. The blue line has no discrete markers.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'
+- observation_id: shornikov-2023-silica-phosphate-melts::shornikov_2023_sio2_fig5_p4o10_curve_6
+  experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 58: the initial values of the Gibbs energies of SiO2 and
+        P4O10 formation in the crystalline and liquid state. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Blue curve 6 is continuous. The open circles near it are the red series 4 and the black series 5, which the caption
+      assigns to Shornikov et al. (1996) and Stolyarova et al. (1990). Each of those circles is its own refused row.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'
+        note: Curve 6. Calculated lg a(P4O10) in the SiO2–P4O10 melt at 2000 K.; panel=A
+  notices: []
+  source_id: shornikov-2023-silica-phosphate-melts
+  locator:
+    page: 6
+    published_page: 60
+    pdf_page_index: 5
+    figure: '5'
+    note: Curve 6. Calculated lg a(P4O10) in the SiO2–P4O10 melt at 2000 K.; panel=A
+  read_from: pdf:shornikov-2023-silica-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'
+        note: Curve 6. Calculated lg a(P4O10) in the SiO2–P4O10 melt at 2000 K.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 6
+        published_page: 60
+        pdf_page_index: 5
+        figure: '5'

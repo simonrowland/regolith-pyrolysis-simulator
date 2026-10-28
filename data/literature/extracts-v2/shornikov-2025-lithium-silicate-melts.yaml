@@ -1,0 +1,436 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2025-lithium-silicate-melts.yaml
+observations:
+- observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig2a_series5
+  experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Li
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      over, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 60
+        pdf_page_index: 3
+        figure: '2'
+        note: 'Caption series 5, Li pressure over Li2SiO3, calculated in the present study. 600 dpi render: continuous stroke,
+          no marker centre. Series 1, 2 and 3 are cited measurements and are not stored.; panel=A'
+  notices: []
+  source_id: shornikov-2025-lithium-silicate-melts
+  locator:
+    page: 4
+    published_page: 60
+    pdf_page_index: 3
+    figure: '2'
+    note: 'Caption series 5, Li pressure over Li2SiO3, calculated in the present study. 600 dpi render: continuous stroke,
+      no marker centre. Series 1, 2 and 3 are cited measurements and are not stored.; panel=A'
+  read_from: pdf:shornikov-2025-lithium-silicate-melts
+- observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig2b_series8
+  experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Li
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      over, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 60
+        pdf_page_index: 3
+        figure: '2'
+        note: Caption series 8, Li pressure over Li4SiO4, calculated in the present study. Continuous stroke, no marker centre.
+          Series 4, 6 and 7 are cited measurements and are not stored.; panel=B
+  notices: []
+  source_id: shornikov-2025-lithium-silicate-melts
+  locator:
+    page: 4
+    published_page: 60
+    pdf_page_index: 3
+    figure: '2'
+    note: Caption series 8, Li pressure over Li4SiO4, calculated in the present study. Continuous stroke, no marker centre.
+      Series 4, 6 and 7 are cited measurements and are not stored.; panel=B
+  read_from: pdf:shornikov-2025-lithium-silicate-melts
+- observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3a_series6
+  experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Li2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 59 (PDF page 3): the standard Gibbs energies of formation
+        of the simple oxides are taken in the crystalline and liquid states (Barin, 1995). The paper does not state which
+        of those phases is the reference of the plotted Li2O activity. The same page says Schultz et al. (1986) normalized
+        their EMF data to Li2SiO3 lithium metasilicate. That sentence describes the cited EMF work. It is not stated as the
+        reference of this study''s calculated activities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K_as_printed_for_this_study, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre. The caption temperature clause is inconsistent and was not used
+      to invent a point.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 60
+        pdf_page_index: 3
+        figure: '3'
+        note: 'Caption series 6, calculated in the present study. 600 dpi render of PDF page 4: continuous stroke, no marker
+          centre. The caption''s temperature clause conflicts with itself and with the body. The opening clause puts Schultz
+          et al. (1986) at 1473 K as series 1 and Ikeda et al. (1982) at 1600 K as series 2. The closing clause says "at 1600
+          (1) and 1673 (2–8) K" and does not mention series 9. The body says the Li2O activities of this study (Fig. 3A) are
+          at 1673 K. Series 6 is inside the closing clause''s 2–8 group. No temperature was chosen in order to digitize a
+          point.; panel=A'
+  notices: []
+  source_id: shornikov-2025-lithium-silicate-melts
+  locator:
+    page: 4
+    published_page: 60
+    pdf_page_index: 3
+    figure: '3'
+    note: 'Caption series 6, calculated in the present study. 600 dpi render of PDF page 4: continuous stroke, no marker centre.
+      The caption''s temperature clause conflicts with itself and with the body. The opening clause puts Schultz et al. (1986)
+      at 1473 K as series 1 and Ikeda et al. (1982) at 1600 K as series 2. The closing clause says "at 1600 (1) and 1673 (2–8)
+      K" and does not mention series 9. The body says the Li2O activities of this study (Fig. 3A) are at 1673 K. Series 6
+      is inside the closing clause''s 2–8 group. No temperature was chosen in order to digitize a point.; panel=A'
+  read_from: pdf:shornikov-2025-lithium-silicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 4
+        published_page: 60
+        pdf_page_index: 3
+        figure: '3'
+        note: 'Caption series 6, calculated in the present study. 600 dpi render of PDF page 4: continuous stroke, no marker
+          centre. The caption''s temperature clause conflicts with itself and with the body. The opening clause puts Schultz
+          et al. (1986) at 1473 K as series 1 and Ikeda et al. (1982) at 1600 K as series 2. The closing clause says "at 1600
+          (1) and 1673 (2–8) K" and does not mention series 9. The body says the Li2O activities of this study (Fig. 3A) are
+          at 1673 K. Series 6 is inside the closing clause''s 2–8 group. No temperature was chosen in order to digitize a
+          point.; panel=A'
+- observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3b_series9
+  experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 59 (PDF page 3): the standard Gibbs energies of formation
+        of the simple oxides are taken in the crystalline and liquid states (Barin, 1995). The paper does not state which
+        of those phases is the reference of the plotted SiO2 activity. It does not name one pure-oxide phase. The Li2SiO3
+        normalization on the same page belongs to Schultz et al. (1986), not to this calculated curve.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre. The caption does not assign series 9 a temperature, so none was
+      invented.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 60
+        pdf_page_index: 3
+        figure: '3'
+        note: 'Caption series 9, calculated in the present study. 600 dpi render: continuous stroke, no symbols on panel B.
+          The caption''s closing temperature clause stops at series 8 ("1673 (2–8) K") and does not assign a temperature to
+          series 9. The body discusses Fig. 3B without a separate temperature. No T_range_K is stored.; panel=B'
+  notices: []
+  source_id: shornikov-2025-lithium-silicate-melts
+  locator:
+    page: 4
+    published_page: 60
+    pdf_page_index: 3
+    figure: '3'
+    note: 'Caption series 9, calculated in the present study. 600 dpi render: continuous stroke, no symbols on panel B. The
+      caption''s closing temperature clause stops at series 8 ("1673 (2–8) K") and does not assign a temperature to series
+      9. The body discusses Fig. 3B without a separate temperature. No T_range_K is stored.; panel=B'
+  read_from: pdf:shornikov-2025-lithium-silicate-melts

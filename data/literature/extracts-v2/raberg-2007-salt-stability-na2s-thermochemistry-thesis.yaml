@@ -1,0 +1,462 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/raberg-2007-salt-stability-na2s-thermochemistry-thesis.yaml
+observations:
+- observation_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_S298_text
+  experiment_id: ecec91de4b38bcebdf5bf769efb76ed3356eb3a59e13b95993fefbc00bc23640::raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2S
+      phase:
+        tag: unknown
+        reason: phase string 's' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '97'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_J_per_mol_K: '2'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_S298_text
+  source_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  locator:
+    page: 37
+    published_page: 27
+    pdf_page_index: 36
+    section: 3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements
+  read_from: pdf:raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 37
+        published_page: 27
+        pdf_page_index: 36
+        section: 3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements
+- observation_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_delta_fH298_text
+  experiment_id: ecec91de4b38bcebdf5bf769efb76ed3356eb3a59e13b95993fefbc00bc23640::raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2S
+      phase:
+        tag: unknown
+        reason: phase string 's' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-369'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '1'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_delta_fH298_text
+  source_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  locator:
+    page: 37
+    published_page: 27
+    pdf_page_index: 36
+    section: 3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements
+  read_from: pdf:raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 37
+        published_page: 27
+        pdf_page_index: 36
+        section: 3.4 Determination of thermodynamic properties of Na2S using solid-state EMF measurements
+- observation_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_melting_transition
+  experiment_id: ecec91de4b38bcebdf5bf769efb76ed3356eb3a59e13b95993fefbc00bc23640::raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2SO3
+      phase:
+        tag: unknown
+        reason: phase string 'solid Na2SO3' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1023.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_melting_transition
+  source_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  locator:
+    page: 33
+    published_page: 23
+    pdf_page_index: 32
+    section: 3.3 Thermal stability of Na2SO3
+  read_from: pdf:raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1023.15'
+      locator:
+        page: 33
+        published_page: 23
+        pdf_page_index: 32
+        section: 3.3 Thermal stability of Na2SO3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '750'
+            locator:
+              page: 33
+              published_page: 23
+              pdf_page_index: 32
+              section: 3.3 Thermal stability of Na2SO3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 33
+              published_page: 23
+              pdf_page_index: 32
+              section: 3.3 Thermal stability of Na2SO3
+        output_unit: K
+        references: []
+- observation_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_solid_solid_transition
+  experiment_id: ecec91de4b38bcebdf5bf769efb76ed3356eb3a59e13b95993fefbc00bc23640::raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2SO3
+      phase:
+        tag: unknown
+        reason: phase string 'solid Na2SO3' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_solid_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '948.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: 10
+      units: °C
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_solid_solid_transition
+  source_id: raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  locator:
+    page: 3
+    pdf_page_index: 2
+    section: Abstract
+  read_from: pdf:raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '948.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Abstract
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '675'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              section: Abstract
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              section: Abstract
+        output_unit: K
+        references: []

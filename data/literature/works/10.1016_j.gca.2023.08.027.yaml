@@ -78,6 +78,7 @@ experiments:
               table: '2'
               note: Printed initial weight 79.1 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -149,6 +150,7 @@ experiments:
               page: 4
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -211,6 +213,7 @@ experiments:
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
+          references: []
   fO2_control:
     channel:
       tag: value
@@ -263,6 +266,7 @@ experiments:
               table: '2'
               note: Printed initial weight 72.92 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -334,6 +338,7 @@ experiments:
               page: 4
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -396,6 +401,7 @@ experiments:
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
+          references: []
   fO2_control:
     channel:
       tag: value
@@ -448,6 +454,7 @@ experiments:
               table: '2'
               note: Printed initial weight 38.69 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -519,6 +526,7 @@ experiments:
               page: 4
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -581,6 +589,7 @@ experiments:
                 paragraph: a lid with a 0.4 mm orifice at its centre
                 section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
           output_unit: m
+          references: []
   fO2_control:
     channel:
       tag: value
@@ -632,6 +641,7 @@ experiments:
               pdf_page_index: 3
               table: S2
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -649,7 +659,7 @@ experiments:
           amount_basis: mole_fraction
       locator:
         page: 4
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: 2.1 Sample preparation
         note: lines 110-111; derived from nominal recipe wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j)
       inference:
@@ -660,6 +670,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -670,7 +681,7 @@ experiments:
           CaO: '23.46'
       locator:
         page: 4
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: 2.1 Sample preparation
         note: lines 110-111; nominal composition SiO2=50.34, Al2O3=15.40, MgO=10.80, CaO=23.46 wt%; An-Di eutectic 42 wt%
           anorthite / 58 wt% diopside with run-varying Ga/In/Tl traces
@@ -748,6 +759,7 @@ experiments:
               page: 4
               note: KC chamber about 10^-6 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable

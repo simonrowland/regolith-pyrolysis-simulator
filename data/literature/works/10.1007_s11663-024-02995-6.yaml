@@ -93,6 +93,7 @@ experiments:
               table: I
               note: Initial CaO masses 49.51 and 53.93 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -173,6 +174,7 @@ experiments:
                 section: III. Experimental
                 note: Printed 0.3 mm lid-orifice diameter; unit conversion only
           output_unit: m
+          references: []
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -254,6 +256,7 @@ experiments:
               table: I
               note: Initial MgO masses 51.58 and 53.67 mg; unit conversion only
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -348,6 +351,7 @@ experiments:
                 section: III. Experimental
                 note: Printed 0.3 mm lid-orifice diameter; unit conversion only
           output_unit: m
+          references: []
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -498,9 +502,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1007/s11663-024-02995-6
   locator:
-    page: 830
+    page: 10
     published_page: 830
-    pdf_page_index: 10
+    pdf_page_index: 9
     table: IV
     source_path: tables/kems-031-halwax-2024/t4.csv
   apparatus:
@@ -510,7 +514,7 @@ experiments:
           tag: value
           value: '70'
         locator:
-          page: 826
+          page: 6
           published_page: 826
           pdf_page_index: 5
           table: III
@@ -526,12 +530,13 @@ experiments:
                 tag: value
                 value: '70'
               locator:
-                page: 826
+                page: 6
                 published_page: 826
                 pdf_page_index: 5
                 table: III
                 source_path: tables/kems-031-halwax-2024/t3.csv
           output_unit: '1'
+          references: []
 benches:
 - id: 10.1007/s11663-024-02995-6::bench::julich-ir-kems
   work_id: 10.1007/s11663-024-02995-6

@@ -1,0 +1,397 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/rb86-capobianco-navrotsky-1982.yaml
+observations:
+- observation_id: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_ge_albite_melting_point_quoted
+  experiment_id: e9f6af87546276e5e38800fa9235497d2b1173ad6453830fe074aef7c9653015::rb86-capobianco-navrotsky-1982
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlGe3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1341.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Goldsmith (1950)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_ge_albite_melting_point_quoted
+  source_id: rb86-capobianco-navrotsky-1982
+  locator:
+    page: 4
+    published_page: 721
+    pdf_page_index: 3
+    paragraph: melting points of the crystalline phases
+    section: Viscosity comparison
+  read_from: pdf:rb86-capobianco-navrotsky-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1341.15'
+      locator:
+        page: 4
+        published_page: 721
+        pdf_page_index: 3
+        paragraph: melting points of the crystalline phases
+        section: Viscosity comparison
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1068'
+            locator:
+              page: 4
+              published_page: 721
+              pdf_page_index: 3
+              paragraph: melting points of the crystalline phases
+              section: Viscosity comparison
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 721
+              pdf_page_index: 3
+              paragraph: melting points of the crystalline phases
+              section: Viscosity comparison
+        output_unit: K
+        references: []
+- observation_id: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_si_albite_heat_fusion_quoted
+  experiment_id: e9f6af87546276e5e38800fa9235497d2b1173ad6453830fe074aef7c9653015::rb86-capobianco-navrotsky-1982
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '65.6888'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Navrotsky et al. (1980)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_si_albite_heat_fusion_quoted
+  source_id: rb86-capobianco-navrotsky-1982
+  locator:
+    page: 5
+    published_page: 722
+    pdf_page_index: 4
+    paragraph: temperature dependence of the heat of fusion
+    section: Geochemical implications and conclusions
+  read_from: pdf:rb86-capobianco-navrotsky-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 5
+        published_page: 722
+        pdf_page_index: 4
+        paragraph: temperature dependence of the heat of fusion
+        section: Geochemical implications and conclusions
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 5
+              published_page: 722
+              pdf_page_index: 4
+              paragraph: temperature dependence of the heat of fusion
+              section: Geochemical implications and conclusions
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 722
+              pdf_page_index: 4
+              paragraph: temperature dependence of the heat of fusion
+              section: Geochemical implications and conclusions
+        output_unit: K
+        references: []
+- observation_id: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_si_albite_melting_point_quoted
+  experiment_id: e9f6af87546276e5e38800fa9235497d2b1173ad6453830fe074aef7c9653015::rb86-capobianco-navrotsky-1982
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1373.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Boettcher et al. (1982)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: rb86-capobianco-navrotsky-1982::rb86_capobianco_1982_si_albite_melting_point_quoted
+  source_id: rb86-capobianco-navrotsky-1982
+  locator:
+    page: 4
+    published_page: 721
+    pdf_page_index: 3
+    paragraph: melting points of the crystalline phases
+    section: Viscosity comparison
+  read_from: pdf:rb86-capobianco-navrotsky-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 4
+        published_page: 721
+        pdf_page_index: 3
+        paragraph: melting points of the crystalline phases
+        section: Viscosity comparison
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 4
+              published_page: 721
+              pdf_page_index: 3
+              paragraph: melting points of the crystalline phases
+              section: Viscosity comparison
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 721
+              pdf_page_index: 3
+              paragraph: melting points of the crystalline phases
+              section: Viscosity comparison
+        output_unit: K
+        references: []

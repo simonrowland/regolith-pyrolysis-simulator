@@ -115,7 +115,7 @@ experiments:
         locator:
           paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
           line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         inference:
           relation: extract_inference
           inputs:
@@ -132,8 +132,9 @@ experiments:
               locator:
                 paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
                 line_range: '32'
-                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -144,7 +145,7 @@ experiments:
         locator:
           paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
           line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         inference:
           relation: identity:m
           inputs:
@@ -158,8 +159,9 @@ experiments:
               locator:
                 paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
                 line_range: '32'
-                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
           output_unit: m
+          references: []
   fO2_control:
     channel:
       tag: unknown
@@ -196,8 +198,8 @@ experiments:
   locator:
     table: '1'
     paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
-    line_range: 103-105
-    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    line_range: 106-108
+    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
   apparatus:
     cell_material_and_liner:
       state:
@@ -218,7 +220,7 @@ experiments:
         locator:
           paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
           line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         inference:
           relation: extract_inference
           inputs:
@@ -235,8 +237,9 @@ experiments:
               locator:
                 paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
                 line_range: '32'
-                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
           output_unit: m2
+          references: []
       orifice_diameter_m:
         state:
           tag: value
@@ -247,7 +250,7 @@ experiments:
         locator:
           paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
           line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         inference:
           relation: identity:m
           inputs:
@@ -261,8 +264,9 @@ experiments:
               locator:
                 paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
                 line_range: '32'
-                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
           output_unit: m
+          references: []
     temperature_measurement:
       temperature_calibration:
         state:

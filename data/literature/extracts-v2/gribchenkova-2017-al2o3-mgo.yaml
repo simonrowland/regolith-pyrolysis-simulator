@@ -1,0 +1,355 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml
+observations:
+- observation_id: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgAl2O4+Al2O3_pMg_peff
+  experiment_id: 10.1134/s0020168517050077::gribchenkova-2017-al2o3-mgo
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.03237'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgAl2O4+Al2O3_pMg_peff
+  source_id: gribchenkova-2017-al2o3-mgo
+  locator:
+    page: 3
+    published_page: 516
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=MgAl2O4 + Al2O3
+  read_from: pdf:gribchenkova-2017-al2o3-mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+        note: row_label=MgAl2O4 + Al2O3
+    composition:
+      state:
+        tag: value
+        value: MgAl2O4 + Al2O3
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:gribchenkova-2017-al2o3-mgo
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO+MgAl2O4_pMg_peff
+  experiment_id: 10.1134/s0020168517050077::gribchenkova-2017-al2o3-mgo
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.20863'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO+MgAl2O4_pMg_peff
+  source_id: gribchenkova-2017-al2o3-mgo
+  locator:
+    page: 3
+    published_page: 516
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=MgO + MgAl2O4
+  read_from: pdf:gribchenkova-2017-al2o3-mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+        note: row_label=MgO + MgAl2O4
+    composition:
+      state:
+        tag: value
+        value: MgO + MgAl2O4
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:gribchenkova-2017-al2o3-mgo
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO_pMg_peff
+  experiment_id: 10.1134/s0020168517050077::gribchenkova-2017-al2o3-mgo
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.20863'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO_pMg_peff
+  source_id: gribchenkova-2017-al2o3-mgo
+  locator:
+    page: 3
+    published_page: 516
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=MgO
+  read_from: pdf:gribchenkova-2017-al2o3-mgo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+        note: row_label=MgO
+    composition:
+      state:
+        tag: value
+        value: MgO
+      locator:
+        page: 3
+        published_page: 516
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:gribchenkova-2017-al2o3-mgo
+    parameters: []
+    output_unit: Pa
+    references: []

@@ -1,0 +1,488 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml
+observations:
+- observation_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_cro2oh2_delta_fh_298
+  experiment_id: 411528e8e18baa1a5e1d1dc4d8d6ae332cd0bf1c384571ae716f6c78dc5e9323::myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CrO2(OH)2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-741'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 6
+      units: kJ/mol
+      value_as_printed: ±6
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam34-1020
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=CrO2(OH)2(g)
+  notices: []
+  source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: Enthalpies of Formation
+    note: row=CrO2(OH)2(g)
+  read_from: pdf:myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=CrO2(OH)2(g)
+  derivation:
+    relation: Transpiration, Third Law
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Measurement of Equilibrium Pressures of Volatile Hydroxides
+        record: 'CrO2(OH)2 row method: transpiration, third law'
+    references: []
+- observation_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_sioh4_delta_fh_298
+  experiment_id: 411528e8e18baa1a5e1d1dc4d8d6ae332cd0bf1c384571ae716f6c78dc5e9323::myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Si(OH)4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1351.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.7'
+      units: kJ/mol
+      value_as_printed: ±1.7
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam34-1020
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=Si(OH)4(g)
+  notices: []
+  source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: Enthalpies of Formation
+    note: row=Si(OH)4(g)
+  read_from: pdf:myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=Si(OH)4(g)
+  derivation:
+    relation: Transpiration, Third Law
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Measurement of Equilibrium Pressures of Volatile Hydroxides
+        record: 'Si(OH)4 row method: transpiration, third law'
+    references: []
+- observation_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_siooh2_delta_fh_298
+  experiment_id: 411528e8e18baa1a5e1d1dc4d8d6ae332cd0bf1c384571ae716f6c78dc5e9323::myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: SiO(OH)2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-836'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 40
+      units: kJ/mol
+      value_as_printed: ±40
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam34-1020
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=SiO(OH)2(g)
+  notices: []
+  source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: Enthalpies of Formation
+    note: row=SiO(OH)2(g)
+  read_from: pdf:myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=SiO(OH)2(g)
+  derivation:
+    relation: Transpiration, Second Law
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Measurement of Equilibrium Pressures of Volatile Hydroxides
+        record: 'SiO(OH)2 row method: transpiration, second law'
+    references: []
+- observation_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_tiooh2_delta_fh_298
+  experiment_id: 411528e8e18baa1a5e1d1dc4d8d6ae332cd0bf1c384571ae716f6c78dc5e9323::myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: TiO(OH)2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-403'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 13
+      units: kJ/mol
+      value_as_printed: ±13
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam34-1020
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=TiO(OH)2(g)
+  notices: []
+  source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: Enthalpies of Formation
+    note: row=TiO(OH)2(g)
+  read_from: pdf:myers-jacobson-2015-volatile-metal-hydroxides-presentation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: Enthalpies of Formation
+        note: row=TiO(OH)2(g)
+  derivation:
+    relation: Transpiration, Third Law
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Measurement of Equilibrium Pressures of Volatile Hydroxides
+        record: 'TiO(OH)2 row method: transpiration, third law'
+    references: []

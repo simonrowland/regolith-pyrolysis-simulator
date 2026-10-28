@@ -1,0 +1,145 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c0eb30d51024038a0ddcabd2a3865cd9b4bb8bfc13927bff926c7a77dc133427
+  citation: Colson, R. O., & Keedy, C. R. (1990). Redox relationships in silicate melts and silicate melt structure. Lunar
+    and Planetary Science Conference XXI, 216–217.
+  source_ids:
+  - colson-keedy-1990-lpsc-redox-relationships
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:colson-keedy-1990-lpsc-redox-relationships
+      role: pdf
+      path: raw/colson-keedy-1990-lpsc-redox-relationships/colson-keedy-1990-lpsc-redox-relationships.pdf
+      sha256:
+        tag: value
+        value: ad5577210f9711e2b3f78ea8b429869c2f8097c533afdf1a6df97f95f9bb386d
+    - asset_id: pdftotext:colson-keedy-1990-lpsc-redox-relationships
+      role: pdftotext
+      path: text/colson-keedy-1990-lpsc-redox-relationships
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:colson-keedy-1990-lpsc-redox-relationships
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: colson_keedy_1990_figures_1_2
+  type: figure
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 217
+    figure: '1'
+  units: figure-only; no numeric points
+  reason: Figures contain plotted reduction potentials; digitisation is deferred by the family rule.
+  values:
+    quantity: redox_potential_comparison_and_polymerization_dependence
+    method_class: figure_only
+    figures:
+    - figure: '1'
+      caption: Change in reduction potential for several cations between diopsidic and basalt-like melts.
+      panel: main
+      species: Cr
+      phase: melt
+      T: 1450°C
+      axes_as_printed:
+        x: E*(diopsidic)
+        y: avg(E*(diopsidic)−E*(composition))
+      series:
+      - Cr
+      - Ni
+      - In
+      - Eu
+      marker_counts: not_counted
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 217
+      attribution: this_work
+      digitisation: deferred to a figure pass
+    - figure: '2'
+      caption: Dependence of reduction potential on melt polymerization.
+      panel: main
+      species: Cr
+      phase: melt
+      T: 1450°C
+      axes_as_printed:
+        x: ln[(nbo)^2/(bo)]
+        y: avg(E*(diopsidic)−E*(composition))
+      series:
+      - this study
+      - FAD [10]
+      - FAS [10]
+      - diopsidic melt
+      marker_counts: not_counted
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 217
+      attribution: mixed
+      digitisation: deferred to a figure pass
+    digitisation: deferred to a figure pass
+  context_id: colson-keedy-1990-lpsc-redox-relationships::context::colson_keedy_1990_figures_1_2
+  work_id: c0eb30d51024038a0ddcabd2a3865cd9b4bb8bfc13927bff926c7a77dc133427
+  source_id: colson-keedy-1990-lpsc-redox-relationships
+  species: Cr
+- observation_id: colson_keedy_1990_table1_redox_reaction_thermodynamics
+  type: measured_table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 217
+    table: '1'
+  units: ΔH* kcal/mol; ΔS* cal/mol; 1450°C; pO2=1 atm
+  reason: 'Candidate tokens considered: partial_molar_enthalpy, heat_of_fusion, and entropy_of_fusion. None describes the
+    composition-dependent reduction-reaction ΔH*/ΔS* in this table. The abstract identifies the values as reaction properties;
+    no species thermodynamic value is inferred.'
+  values:
+    quantity_as_printed: reduction_reaction_enthalpy_and_entropy_change_between_diopsidic_and_basalt_like_compositions
+    conditions_as_printed: 1450°C and pO2=1 atm
+    compositions_as_printed:
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 216
+        section: Abstract
+      basalt_like_wt_percent:
+        SiO2: '55.3'
+        Al2O3: '20.2'
+        MgO: '15.3'
+        CaO: '9.3'
+      note: MgO substituted for FeO; MinerU page 1 transcription.
+    rows:
+    - cation: Cr
+      basalt_like_delta_H_kcal_mol: 34.5±13
+      basalt_like_delta_S_cal_mol: 9.6±7
+      diopsidic_delta_H_kcal_mol: 28.9±3
+      diopsidic_delta_S_cal_mol: 6.7±2
+    - cation: Ni
+      basalt_like_delta_H_kcal_mol: 31.8±12
+      basalt_like_delta_S_cal_mol: 10.6±7
+      diopsidic_delta_H_kcal_mol: '47.6'
+      diopsidic_delta_S_cal_mol: 17.0¹
+    - cation: In
+      basalt_like_delta_H_kcal_mol: 51.0±12
+      basalt_like_delta_S_cal_mol: 19.5±7
+      diopsidic_delta_H_kcal_mol: 78.3±8
+      diopsidic_delta_S_cal_mol: 32.6±5
+    - cation: Eu
+      basalt_like_delta_H_kcal_mol: 33.4±13
+      basalt_like_delta_S_cal_mol: 10.3±7
+      diopsidic_delta_H_kcal_mol: 30.7±5
+      diopsidic_delta_S_cal_mol: 5.3±3
+    quoted_attribution: 'Ni diopsidic ΔS*: data from reference [4]'
+  context_id: colson-keedy-1990-lpsc-redox-relationships::context::colson_keedy_1990_table1_redox_reaction_thermodynamics
+  work_id: c0eb30d51024038a0ddcabd2a3865cd9b4bb8bfc13927bff926c7a77dc133427
+  source_id: colson-keedy-1990-lpsc-redox-relationships
+  species: Cr

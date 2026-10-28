@@ -1,0 +1,201 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s1087659622600909
+  citation: 'Tyurnina, N. G., Lopatin, S. I., Shugurov, S. M., Tyurnina, Z. G., Polyakova, I. G. & Balabanova, E. A. (2023).
+    Vapor Formation and the Thermodynamic Properties of the SrO–Al2O3–SiO2 System. Glass Physics and Chemistry, 49(1), 41–49.
+    DOI: 10.1134/S1087659622600909.'
+  source_ids:
+  - tyurnina-2023-sro-al2o3-sio2-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:tyurnina-2023-sro-al2o3-sio2-vaporization
+      role: pdf
+      path: raw/tyurnina-2023-sro-al2o3-sio2-vaporization/tyurnina-2023-sro-al2o3-sio2-vaporization.pdf
+      sha256:
+        tag: value
+        value: 77b2f6240b09a3ed3b432da37776211c17c36cd101b0fc69d7e95260a6883757
+    - asset_id: pdftotext:tyurnina-2023-sro-al2o3-sio2-vaporization
+      role: pdftotext
+      path: text/tyurnina-2023-sro-al2o3-sio2-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:tyurnina-2023-sro-al2o3-sio2-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s1087659622600909
+experiments:
+- experiment_id: 10.1134/s1087659622600909::experiment::tyurnina-2023-sas-kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s1087659622600909
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+- experiment_id: 10.1134/s1087659622600909::tyurnina-2023-sro-al2o3-sio2-vaporization
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.69'
+          approximate: false
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 row bound to sample number and printed oxide mole percentages.; row_label=sample 9; column_header=$p_i$
+          , Pa Sr
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=2.69 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.69'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 row bound to sample number and printed oxide mole percentages.; row_label=sample 9; column_header=$p_i$
+                , Pa Sr
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s1087659622600909
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 row bound to sample number and printed oxide mole percentages.; row_label=sample 10; column_header=$p_i$
+      , Pa SiO
+context:
+- observation_id: tyurnina_2023_mullite_enthalpy_context
+  type: thermochemical_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: Discussion
+  units: kJ and kJ/mol as printed
+  values:
+    reaction_18_at_1995_K: 2108 ± 155 kJ
+    reaction_18_at_298_K: 2143 ± 158 kJ
+    formation_from_oxides_at_1995_K: −96 ± 160 kJ/mol
+    formation_from_oxides_at_298_K: −20 ± 160 kJ/mol
+    formation_enthalpy_mullite: −6869 ± 160 kJ/mol
+    handbook_comparison: −6819.2 kJ/mol
+    note: The paper prints no temperature for −6869; no temperature is inferred.
+  context_id: tyurnina-2023-sro-al2o3-sio2-vaporization::context::tyurnina_2023_mullite_enthalpy_context
+  work_id: 10.1134/s1087659622600909
+  source_id: tyurnina-2023-sro-al2o3-sio2-vaporization
+  species: unknown
+- observation_id: tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c08_context
+  type: activity_boundary
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    row_label: sample 10
+    column_header: $a_i$  SrO
+    note: Table 3 row bound to sample number and printed oxide mole percentages.
+  values:
+    quantity: activity
+    printed_value: 0
+    reason: 'Printed zero at x(SrO)=0 is the Gibbs-Duhem boundary; no same-sample Sr partial-pressure observation exists.
+      Candidate token: activity; retained as unscored boundary because measured ancestry is absent.'
+  units: dimensionless
+  context_id: tyurnina-2023-sro-al2o3-sio2-vaporization::context::tyurnina_2023_sro_al2o3_sio2_vaporization_p006_t02_r03_c08_context
+  work_id: 10.1134/s1087659622600909
+  source_id: tyurnina-2023-sro-al2o3-sio2-vaporization
+  species: SrO
+- observation_id: tyurnina_2023_table3_gibbs_energy_context
+  type: thermodynamic_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+  units: kJ
+  values:
+    description: Printed Gibbs and excess Gibbs energies of mixing; not formation Gibbs energies.
+    rows:
+    - sample: 10
+      minus_delta_G: '12.9'
+      minus_delta_G_excess: '1.7'
+    - sample: 1
+      minus_delta_G: '20.3'
+      minus_delta_G_excess: '12.6'
+    - sample: 2
+      minus_delta_G: '32.3'
+      minus_delta_G_excess: '23.6'
+    - sample: 3
+      minus_delta_G: '43.9'
+      minus_delta_G_excess: '34.9'
+    - sample: 4
+      minus_delta_G: '47.6'
+      minus_delta_G_excess: '38.7'
+    - sample: 5
+      minus_delta_G: '56.5'
+      minus_delta_G_excess: '48.0'
+    - sample: 6
+      minus_delta_G: '62.3'
+      minus_delta_G_excess: '54.5'
+    - sample: 7
+      minus_delta_G: '65.4'
+      minus_delta_G_excess: '58.9'
+  context_id: tyurnina-2023-sro-al2o3-sio2-vaporization::context::tyurnina_2023_table3_gibbs_energy_context
+  work_id: 10.1134/s1087659622600909
+  source_id: tyurnina-2023-sro-al2o3-sio2-vaporization
+  species: unknown
