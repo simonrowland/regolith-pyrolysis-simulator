@@ -10,25 +10,40 @@ extraction:
   date: '2026-10-28'
   worker: w1028naF-kelley53-alsil
   provenance_path: text/kelley-1953-alkali-aluminosilicate-thermodynamics/pdftotext-layout.txt
-  source_note: Temperatures, heat capacities and heat-content increments retained
-    in printed cal-based units. Table 26 separates the present measurements from W.
-    P. White comparison values. Composition-corrected tables whose inputs are not
-    tabulated are quoted_attributed; smooth series from stored measurements are measured_reduced
-    and link to those tables.
+  source_note: 'Heat capacities and heat-content increments remain in printed calorie
+    units (cal/mol/K and cal/mol). Table 26 separates the present measurements from
+    W. P. White comparison values. Tables 9, 15, 17, 19 and 20 are the authors’ composition-corrected
+    measurements with raw_inputs: not_printed; smooth Cp tables 10, 16, 18 and 21
+    are measured_reduced from their stored parents. Table 25 stores absolute S°298.16
+    plus its printed extrapolated and measured components; the component columns and
+    high-temperature S_T−S_298.16 columns remain descriptive quantity-unknown values.
+    No table of this report gives heats of formation or solution for a named mineral.
+    The paper defines 1 cal. = 4.1833 international joules; values remain in printed
+    calories. Reaction ΔH and ΔF tables 34, 36, and 37 are retained as unscored context
+    because the closed observation schema has no reaction-level type; no value is
+    assigned to one mineral.'
 review_status: draft
 fidelity_samples:
 - path: species.NaAlSi3O8.observations[kelley_1953_table09_cp].values.points[0].value
   value: 8.77
-  locator: {page: 16, table: '9'}
+  locator:
+    page: 16
+    table: '9'
 - path: species.NaAlSi2O6.observations[kelley_1953_table11_cp].values.points[0].value
   value: 3.155
-  locator: {page: 17, table: '11'}
+  locator:
+    page: 17
+    table: '11'
 - path: species.NaAlSi3O8.observations[kelley_1953_table26_heat_content].values.points[0].value
   value: 9660.0
-  locator: {page: 28, table: '26'}
+  locator:
+    page: 28
+    table: '26'
 - path: species.NaAlSiO4.observations[kelley_1953_table32_heat_content_delta].values.points[0].value
   value: 2755.0
-  locator: {page: 33, table: '32'}
+  locator:
+    page: 33
+    table: '32'
 species:
   NaAlSi3O8:
     observations:
@@ -45,11 +60,11 @@ species:
         mineral: albite
       units: cal/mol/K
       per: mol_species
-      method_as_published: corrected experimental heat-capacity results reported by
-        the authors
+      method_as_published: Authors’ composition-corrected experimental heat-capacity
+        measurements; pre-correction numeric cells are not printed.
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 53.92
@@ -313,8 +328,17 @@ species:
             row: 206.29 K; MinerU row 11 col 3
           table_row_number: 11
           phase: null
-        attribution: Kelley et al. (1953), corrected experimental values as published;
-          pre-correction cells are not tabulated
+      derivation:
+        relation: The reported heat capacities are the authors’ composition-corrected
+          experimental values; the uncorrected numerical measurements are not printed.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 16
+            table: '9'
+            note: Pre-correction measurement cells are not tabulated.
     - observation_id: kelley_1953_table10_cp
       type: heat_capacity_and_heat_content_series
       locator:
@@ -331,7 +355,7 @@ species:
       method_as_published: smooth values from author-corrected results
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 50.0
@@ -734,6 +758,267 @@ species:
       derived_from:
       - kelley_1953_table26_heat_content
       - kelley_1953_table26_white_comparison
+    - observation_id: kelley_1953_table25_s51_extrapolated_albite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Albite (NaAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '4.83'
+        points:
+        - T_K: 298.16
+          value: 4.83
+          as_published: '4.83'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Albite (NaAlSi3O8); column 2
+          table_row_number: 2
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_albite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Albite (NaAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '45.37'
+        points:
+        - T_K: 298.16
+          value: 45.37
+          as_published: '45.37'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Albite (NaAlSi3O8); column 3
+          table_row_number: 2
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_albite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Albite (NaAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.4 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_albite
+      - kelley_1953_table25_s298_minus_s51_measured_albite
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_albite
+        - kelley_1953_table25_s298_minus_s51_measured_albite
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 50.2
+          as_published: 50.2 ± 0.4
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Albite (NaAlSi3O8); final entropy and uncertainty
+          table_row_number: 2
+          table_phase_column: 4
+          phase: null
+    - observation_id: kelley_1953_table27_entropy_increment
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        pdf_page_index: 27
+        table: '27'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: albite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table26_heat_content
+      - kelley_1953_table26_white_comparison
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table26_heat_content
+        - kelley_1953_table26_white_comparison
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 400.0
+          value: 15.55
+          as_published: '15.55'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 15.55 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 3
+          phase: null
+        - T_K: 1000.0
+          value: 76.74
+          as_published: '76.74'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 76.74 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 6
+          phase: null
+        - T_K: 500.0
+          value: 28.87
+          as_published: '28.87'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 28.87 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 3
+          phase: null
+        - T_K: 1100.0
+          value: 83.88
+          as_published: '83.88'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 83.88 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 6
+          phase: null
+        - T_K: 600.0
+          value: 40.73
+          as_published: '40.73'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 40.73 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 3
+          phase: null
+        - T_K: 1200.0
+          value: 90.51
+          as_published: '90.51'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 90.51 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 6
+          phase: null
+        - T_K: 700.0
+          value: 51.2
+          as_published: '51.20'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 51.20 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 3
+          phase: null
+        - T_K: 1300.0
+          value: 96.69
+          as_published: '96.69'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 96.69 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 6
+          phase: null
+        - T_K: 800.0
+          value: 60.54
+          as_published: '60.54'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 60.54 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 3
+          phase: null
+        - T_K: 1400.0
+          value: 102.47
+          as_published: '102.47'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 102.47 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 6
+          phase: null
+        - T_K: 900.0
+          value: 68.99
+          as_published: '68.99'
+          locator:
+            page: 28
+            pdf_page_index: 27
+            table: '27'
+            row: 68.99 K; entropy increment
+          table_row_number: 7
+          table_phase_column: 3
+          phase: null
   NaAlSi2O6:
     observations:
     - observation_id: kelley_1953_table11_cp
@@ -1396,6 +1681,243 @@ species:
             table.
       derived_from:
       - kelley_1953_table28_heat_content
+    - observation_id: kelley_1953_table25_s51_extrapolated_jadeite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Jadeite (NaAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '1.10'
+        points:
+        - T_K: 298.16
+          value: 1.1
+          as_published: '1.10'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Jadeite (NaAlSi2O6); column 2
+          table_row_number: 3
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_jadeite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Jadeite (NaAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '30.81'
+        points:
+        - T_K: 298.16
+          value: 30.81
+          as_published: '30.81'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Jadeite (NaAlSi2O6); column 3
+          table_row_number: 3
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_jadeite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Jadeite (NaAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.3 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_jadeite
+      - kelley_1953_table25_s298_minus_s51_measured_jadeite
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_jadeite
+        - kelley_1953_table25_s298_minus_s51_measured_jadeite
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 31.9
+          as_published: 31.9 ± 0.3
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Jadeite (NaAlSi2O6); final entropy and uncertainty
+          table_row_number: 3
+          table_phase_column: 4
+          phase: null
+    - observation_id: kelley_1953_table29_entropy_increment
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        pdf_page_index: 28
+        table: '29'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: jadeite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table28_heat_content
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table28_heat_content
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 400.0
+          value: 12.2
+          as_published: '12.20'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 12.20 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 3
+          phase: null
+        - T_K: 900.0
+          value: 54.12
+          as_published: '54.12'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 54.12 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 6
+          phase: null
+        - T_K: 500.0
+          value: 22.72
+          as_published: '22.72'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 22.72 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 3
+          phase: null
+        - T_K: 1000.0
+          value: 60.18
+          as_published: '60.18'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 60.18 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 6
+          phase: null
+        - T_K: 600.0
+          value: 31.96
+          as_published: '31.96'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 31.96 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 3
+          phase: null
+        - T_K: 1100.0
+          value: 65.78
+          as_published: '65.78'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 65.78 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 6
+          phase: null
+        - T_K: 700.0
+          value: 40.15
+          as_published: '40.15'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 40.15 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 3
+          phase: null
+        - T_K: 1200.0
+          value: 71.04
+          as_published: '71.04'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 71.04 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 6
+          phase: null
+        - T_K: 800.0
+          value: 47.49
+          as_published: '47.49'
+          locator:
+            page: 29
+            pdf_page_index: 28
+            table: '29'
+            row: 47.49 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 3
+          phase: null
   NaAlSiO4:
     observations:
     - observation_id: kelley_1953_table13_cp
@@ -1833,11 +2355,11 @@ species:
         mineral: natural nephelite
       units: cal/mol/K
       per: mol_species
-      method_as_published: corrected experimental heat-capacity results reported by
-        the authors
+      method_as_published: Authors’ composition-corrected experimental heat-capacity
+        measurements; pre-correction numeric cells are not printed.
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 54.07
@@ -2101,8 +2623,17 @@ species:
             row: 206.26 K; MinerU row 11 col 3
           table_row_number: 11
           phase: null
-        attribution: Kelley et al. (1953), corrected experimental values as published;
-          pre-correction cells are not tabulated
+      derivation:
+        relation: The reported heat capacities are the authors’ composition-corrected
+          experimental values; the uncorrected numerical measurements are not printed.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 18
+            table: '15'
+            note: Pre-correction measurement cells are not tabulated.
     - observation_id: kelley_1953_table16_cp
       type: heat_capacity_and_heat_content_series
       locator:
@@ -2119,7 +2650,7 @@ species:
       method_as_published: smooth values from author-corrected results
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 50.0
@@ -3206,6 +3737,9 @@ species:
           phase: null
           derivation_note: Author-smoothed value; derived from the listed experimental
             table.
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
         - T_K: 1300.0
           value: 42590.0
           locator:
@@ -3217,6 +3751,9 @@ species:
           phase: null
           derivation_note: Author-smoothed value; derived from the listed experimental
             table.
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
         - T_K: 1400.0
           value: 47070.0
           locator:
@@ -3228,6 +3765,9 @@ species:
           phase: null
           derivation_note: Author-smoothed value; derived from the listed experimental
             table.
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
         - T_K: 1500.0
           value: 51560.0
           locator:
@@ -3274,6 +3814,659 @@ species:
             table.
       derived_from:
       - kelley_1953_table32_heat_content_beta
+    - observation_id: kelley_1953_table25_s51_extrapolated_nephelite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Nephelite (NaAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '2.71'
+        points:
+        - T_K: 298.16
+          value: 2.71
+          as_published: '2.71'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Nephelite (NaAlSiO4); column 2
+          table_row_number: 4
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_nephelite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Nephelite (NaAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '27.01'
+        points:
+        - T_K: 298.16
+          value: 27.01
+          as_published: '27.01'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Nephelite (NaAlSiO4); column 3
+          table_row_number: 4
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_nephelite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Nephelite (NaAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: nephelite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.3 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_nephelite
+      - kelley_1953_table25_s298_minus_s51_measured_nephelite
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_nephelite
+        - kelley_1953_table25_s298_minus_s51_measured_nephelite
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 29.7
+          as_published: 29.7 ± 0.3
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Nephelite (NaAlSiO4); final entropy and uncertainty
+          table_row_number: 4
+          table_phase_column: 4
+          phase: null
+    - observation_id: kelley_1953_table31_entropy_increment_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: delta
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table30_heat_content_delta
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table30_heat_content_delta
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 350.0
+          value: 4.73
+          as_published: '4.73'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 4.73 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 3
+          phase: null
+        - T_K: 400.0
+          value: 8.9
+          as_published: '8.90'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 8.90 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 3
+          phase: null
+        - T_K: 450.0
+          value: 13.18
+          as_published: '13.18'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 13.18 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 3
+          phase: null
+        - T_K: 467.0
+          value: 14.85
+          as_published: '14.85'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 14.85 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table31_entropy_increment_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: beta
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table30_heat_content_beta
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table30_heat_content_beta
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 1000.0
+          value: 43.62
+          as_published: '43.62'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 43.62 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 6
+          phase: null
+        - T_K: 1100.0
+          value: 47.74
+          as_published: '47.74'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 47.74 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 6
+          phase: null
+        - T_K: 1180.0
+          value: 51.1
+          as_published: '51.10'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 51.10 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 6
+          phase: null
+        - T_K: 467.0
+          value: 14.85
+          as_published: '14.85'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 14.85 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 3
+          phase: null
+        - T_K: 500.0
+          value: 17.21
+          as_published: '17.21'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 17.21 K; entropy increment
+          table_row_number: 7
+          table_phase_column: 3
+          phase: null
+        - T_K: 600.0
+          value: 23.77
+          as_published: '23.77'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 23.77 K; entropy increment
+          table_row_number: 8
+          table_phase_column: 3
+          phase: null
+        - T_K: 700.0
+          value: 29.51
+          as_published: '29.51'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 29.51 K; entropy increment
+          table_row_number: 9
+          table_phase_column: 3
+          phase: null
+        - T_K: 800.0
+          value: 34.65
+          as_published: '34.65'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 34.65 K; entropy increment
+          table_row_number: 10
+          table_phase_column: 3
+          phase: null
+        - T_K: 900.0
+          value: 39.33
+          as_published: '39.33'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 39.33 K; entropy increment
+          table_row_number: 11
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table31_entropy_increment_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 33
+        pdf_page_index: 32
+        table: '31'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: synthetic nephelite
+        polymorph: gamma
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table30_heat_content_gamma
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table30_heat_content_gamma
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 1180.0
+          value: 51.1
+          as_published: '51.10'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 51.10 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 6
+          phase: null
+        - T_K: 1200.0
+          value: 51.81
+          as_published: '51.81'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 51.81 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 6
+          phase: null
+        - T_K: 1300.0
+          value: 55.24
+          as_published: '55.24'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 55.24 K; entropy increment
+          table_row_number: 7
+          table_phase_column: 6
+          phase: null
+        - T_K: 1400.0
+          value: 58.42
+          as_published: '58.42'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 58.42 K; entropy increment
+          table_row_number: 8
+          table_phase_column: 6
+          phase: null
+        - T_K: 1500.0
+          value: 61.39
+          as_published: '61.39'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 61.39 K; entropy increment
+          table_row_number: 9
+          table_phase_column: 6
+          phase: null
+        - T_K: 1525.0
+          value: 62.1
+          as_published: '62.10'
+          locator:
+            page: 33
+            pdf_page_index: 32
+            table: '31'
+            row: 62.10 K; entropy increment
+          table_row_number: 10
+          table_phase_column: 6
+          phase: null
+    - observation_id: kelley_1953_table33_entropy_increment_delta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 34
+        pdf_page_index: 33
+        table: '33'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: delta
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table32_heat_content_delta
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table32_heat_content_delta
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 400.0
+          value: 8.94
+          as_published: '8.94'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 8.94 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 3
+          phase: null
+        - T_K: 500.0
+          value: 16.58
+          as_published: '16.58'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 16.58 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 3
+          phase: null
+        - T_K: 600.0
+          value: 23.35
+          as_published: '23.35'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 23.35 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 3
+          phase: null
+        - T_K: 700.0
+          value: 29.44
+          as_published: '29.44'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 29.44 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 3
+          phase: null
+        - T_K: 800.0
+          value: 34.96
+          as_published: '34.96'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 34.96 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 3
+          phase: null
+        - T_K: 900.0
+          value: 40.04
+          as_published: '40.04'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 40.04 K; entropy increment
+          table_row_number: 7
+          table_phase_column: 3
+          phase: null
+        - T_K: 980.0
+          value: 43.87
+          as_published: '43.87'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 43.87 K; entropy increment
+          table_row_number: 8
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table33_entropy_increment_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 34
+        pdf_page_index: 33
+        table: '33'
+        row: all printed entropy-increment rows
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: carnegieite
+        polymorph: beta
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Smooth entropy increments derived by the Kelley method
+        from the heat-capacity fit.
+      derived_from:
+      - kelley_1953_table32_heat_content_beta
+      derivation:
+        relation: The authors derive entropy increments by the Kelley method from
+          the stored measured heat-content series.
+        inputs:
+        - kelley_1953_table32_heat_content_beta
+      values:
+        quantity: entropy_increment_above_298_16K
+        method_class: measured_reduced
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+          while these columns print S_T−S_298.16 increments. No exact quantity token
+          represents an entropy increment.
+        points:
+        - T_K: 1000.0
+          value: 46.85
+          as_published: '46.85'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 46.85 K; entropy increment
+          table_row_number: 2
+          table_phase_column: 6
+          phase: null
+        - T_K: 1100.0
+          value: 51.1
+          as_published: '51.10'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 51.10 K; entropy increment
+          table_row_number: 3
+          table_phase_column: 6
+          phase: null
+        - T_K: 1200.0
+          value: 54.98
+          as_published: '54.98'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 54.98 K; entropy increment
+          table_row_number: 4
+          table_phase_column: 6
+          phase: null
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
+        - T_K: 1300.0
+          value: 58.56
+          as_published: '58.56'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 58.56 K; entropy increment
+          table_row_number: 5
+          table_phase_column: 6
+          phase: null
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
+        - T_K: 1400.0
+          value: 61.89
+          as_published: '61.89'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 61.89 K; entropy increment
+          table_row_number: 6
+          table_phase_column: 6
+          phase: null
+          note: The authors print this smooth branch at 1200–1400 K inside the 1191.2–1500.0
+            K interval where measured carnegieite values were discarded after reversion
+            to nephelite (report p. 16; PDF p. 34).
+        - T_K: 1500.0
+          value: 64.99
+          as_published: '64.99'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 64.99 K; entropy increment
+          table_row_number: 7
+          table_phase_column: 6
+          phase: null
+        - T_K: 1600.0
+          value: 67.9
+          as_published: '67.90'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 67.90 K; entropy increment
+          table_row_number: 8
+          table_phase_column: 6
+          phase: null
+        - T_K: 980.0
+          value: 45.95
+          as_published: '45.95'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 45.95 K; entropy increment
+          table_row_number: 9
+          table_phase_column: 3
+          phase: null
+        - T_K: 1700.0
+          value: 70.64
+          as_published: '70.64'
+          locator:
+            page: 34
+            pdf_page_index: 33
+            table: '33'
+            row: 70.64 K; entropy increment
+          table_row_number: 9
+          table_phase_column: 6
+          phase: null
   KAlSi3O8:
     observations:
     - observation_id: kelley_1953_table17_cp
@@ -3289,11 +4482,11 @@ species:
         mineral: adularia
       units: cal/mol/K
       per: mol_species
-      method_as_published: corrected experimental heat-capacity results reported by
-        the authors
+      method_as_published: Authors’ composition-corrected experimental heat-capacity
+        measurements; pre-correction numeric cells are not printed.
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 54.07
@@ -3557,8 +4750,17 @@ species:
             row: 206.14 K; MinerU row 11 col 3
           table_row_number: 11
           phase: null
-        attribution: Kelley et al. (1953), corrected experimental values as published;
-          pre-correction cells are not tabulated
+      derivation:
+        relation: The reported heat capacities are the authors’ composition-corrected
+          experimental values; the uncorrected numerical measurements are not printed.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 19
+            table: '17'
+            note: Pre-correction measurement cells are not tabulated.
     - observation_id: kelley_1953_table18_cp
       type: heat_capacity_and_heat_content_series
       locator:
@@ -3575,7 +4777,7 @@ species:
       method_as_published: smooth values from author-corrected results
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 50.0
@@ -3716,11 +4918,13 @@ species:
         mineral: ferriferous orthoclase
       units: cal/mol/K
       per: mol_species
-      method_as_published: corrected experimental heat-capacity results reported by
-        the authors
+      method_as_published: 'Authors’ composition-corrected experimental heat-capacity
+        measurements; pre-correction numeric cells are not printed. Sodium only: the
+        sample correction uses 94.0 mol% KAlSi3O8 + 6.0 mol% NaAlSi3O8; iron is left
+        in, and the table gives mol wt 278.35 for pure KAlSi3O8.'
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 53.99
@@ -3984,8 +5188,128 @@ species:
             row: 206.31 K; MinerU row 11 col 3
           table_row_number: 11
           phase: null
-        attribution: Kelley et al. (1953), corrected experimental values as published;
-          pre-correction cells are not tabulated
+        composition_correction_as_printed: Na only; 94.0 mol% KAlSi3O8 + 6.0 mol%
+          NaAlSi3O8; Fe left in; mol wt 278.35 for pure KAlSi3O8.
+      derivation:
+        relation: The reported heat capacities are the authors’ composition-corrected
+          experimental values; the uncorrected numerical measurements are not printed.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 19
+            table: '19'
+            note: Pre-correction measurement cells are not tabulated.
+    - observation_id: kelley_1953_table25_s51_extrapolated_adularia
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Adularia (KAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: adularia
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '5.82'
+        points:
+        - T_K: 298.16
+          value: 5.82
+          as_published: '5.82'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Adularia (KAlSi3O8); column 2
+          table_row_number: 5
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_adularia
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Adularia (KAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: adularia
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '46.65'
+        points:
+        - T_K: 298.16
+          value: 46.65
+          as_published: '46.65'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Adularia (KAlSi3O8); column 3
+          table_row_number: 5
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_adularia
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Adularia (KAlSi3O8)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: adularia
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.5 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_adularia
+      - kelley_1953_table25_s298_minus_s51_measured_adularia
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_adularia
+        - kelley_1953_table25_s298_minus_s51_measured_adularia
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 52.5
+          as_published: 52.5 ± 0.5
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Adularia (KAlSi3O8); final entropy and uncertainty
+          table_row_number: 5
+          table_phase_column: 4
+          phase: null
   KAlSi2O6:
     observations:
     - observation_id: kelley_1953_table20_cp
@@ -4001,11 +5325,11 @@ species:
         mineral: leucite
       units: cal/mol/K
       per: mol_species
-      method_as_published: corrected experimental heat-capacity results reported by
-        the authors
+      method_as_published: Authors’ composition-corrected experimental heat-capacity
+        measurements; pre-correction numeric cells are not printed.
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 53.07
@@ -4269,8 +5593,17 @@ species:
             row: 206.23 K; MinerU row 11 col 3
           table_row_number: 11
           phase: null
-        attribution: Kelley et al. (1953), corrected experimental values as published;
-          pre-correction cells are not tabulated
+      derivation:
+        relation: The reported heat capacities are the authors’ composition-corrected
+          experimental values; the uncorrected numerical measurements are not printed.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 22
+            table: '20'
+            note: Pre-correction measurement cells are not tabulated.
     - observation_id: kelley_1953_table21_cp
       type: heat_capacity_and_heat_content_series
       locator:
@@ -4287,7 +5620,7 @@ species:
       method_as_published: smooth values from author-corrected results
       values:
         quantity: cp
-        method_class: quoted_attributed
+        method_class: measured_reduced
         reference_temperature_K: 298.16
         points:
         - T_K: 50.0
@@ -4415,6 +5748,115 @@ species:
           pre-correction cells are not tabulated
       derived_from:
       - kelley_1953_table20_cp
+    - observation_id: kelley_1953_table25_s51_extrapolated_leucite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Leucite (KAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: leucite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '5.53'
+        points:
+        - T_K: 298.16
+          value: 5.53
+          as_published: '5.53'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Leucite (KAlSi2O6); column 2
+          table_row_number: 6
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_leucite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Leucite (KAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: leucite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '38.52'
+        points:
+        - T_K: 298.16
+          value: 38.52
+          as_published: '38.52'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Leucite (KAlSi2O6); column 3
+          table_row_number: 6
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_leucite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Leucite (KAlSi2O6)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: leucite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.4 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_leucite
+      - kelley_1953_table25_s298_minus_s51_measured_leucite
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_leucite
+        - kelley_1953_table25_s298_minus_s51_measured_leucite
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 44.0
+          as_published: 44.0 ± 0.4
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Leucite (KAlSi2O6); final entropy and uncertainty
+          table_row_number: 6
+          table_phase_column: 4
+          phase: null
   KAlSiO4:
     observations:
     - observation_id: kelley_1953_table22_cp
@@ -4839,3 +6281,603 @@ species:
             table.
       derived_from:
       - kelley_1953_table22_cp
+    - observation_id: kelley_1953_table25_s51_extrapolated_kaliophilite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Kaliophilite (KAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: kaliophilite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Extrapolated entropy contribution reported in Table 25.
+      values:
+        quantity: entropy_S51_extrapolated_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed extrapolated S°51 contribution, not absolute S;
+          the schema has no exact token for this component.
+        quantity_as_printed: '3.60'
+        points:
+        - T_K: 298.16
+          value: 3.6
+          as_published: '3.60'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Kaliophilite (KAlSiO4); column 2
+          table_row_number: 7
+          table_phase_column: 2
+          phase: null
+    - observation_id: kelley_1953_table25_s298_minus_s51_measured_kaliophilite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Kaliophilite (KAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: kaliophilite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Measured entropy increment reported in Table 25.
+      values:
+        quantity: entropy_S298_16_minus_S51_measured_component
+        method_class: quoted_attributed
+        attribution: Kelley et al. (1953), Table 25.
+        schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
+          This is only the printed measured S°298.16−S°51 contribution, not absolute
+          S; the schema has no exact token for this component.
+        quantity_as_printed: '28.25'
+        points:
+        - T_K: 298.16
+          value: 28.25
+          as_published: '28.25'
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Kaliophilite (KAlSiO4); column 3
+          table_row_number: 7
+          table_phase_column: 3
+          phase: null
+    - observation_id: kelley_1953_table25_entropy_S_kaliophilite
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '25'
+        row: Kaliophilite (KAlSiO4)
+      phase: cr
+      condensed_form:
+        state: crystalline
+        mineral: kaliophilite
+      units: cal/mol/K
+      per: mol_species
+      method_as_published: Absolute entropy at 298.16 K from the two Table 25 components.
+      uncertainty:
+        confidence_level: not_stated
+        as_published: ±0.3 cal/deg·mol; confidence level not stated
+      derived_from:
+      - kelley_1953_table25_s51_extrapolated_kaliophilite
+      - kelley_1953_table25_s298_minus_s51_measured_kaliophilite
+      derivation:
+        relation: Sum of the printed S°51 extrapolated and S°298.16−S°51 measured
+          contributions.
+        inputs:
+        - kelley_1953_table25_s51_extrapolated_kaliophilite
+        - kelley_1953_table25_s298_minus_s51_measured_kaliophilite
+      values:
+        quantity: S
+        method_class: measured_reduced
+        points:
+        - T_K: 298.16
+          value: 31.8
+          as_published: 31.8 ± 0.3
+          locator:
+            page: 24
+            pdf_page_index: 23
+            table: '25'
+            row: Kaliophilite (KAlSiO4); final entropy and uncertainty
+          table_row_number: 7
+          table_phase_column: 4
+          phase: null
+  reaction_albite_nephelite_to_jadeite:
+    observations: []
+    context:
+    - observation_id: kelley_1953_table34_reaction_thermochemistry
+      type: reaction_thermochemistry
+      locator:
+        page: 35
+        pdf_page_index: 34
+        table: '34'
+      units: cal/mol
+      values:
+        quantity: reaction_thermochemistry
+        reaction_as_printed: albite + nephelite = 2 jadeite
+        pressure_as_printed: 1 atm. pressure
+        phase_notation_as_printed: The reaction names the mineral phases; no (s) or
+          (cr) suffix is printed.
+        schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+          has no reaction-level type, and iter_extract_observations (simulator/battery/migrate.py:13482-13496)
+          walks species-keyed observations only. gibbs_table maps to delta_fG for
+          one substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf
+          (Quantity.LOG10_KF, simulator/battery/enums.py:69) is a formation equilibrium
+          constant. Neither is an exact type or quantity for these reaction enthalpies
+          and free energies, so the printed cells remain in context.
+        candidate_types_and_quantities_considered:
+        - gibbs_table -> delta_fG
+        - log10_Kf
+        reason_not_typed: These are reaction enthalpy and reaction free-energy values
+          for multi-species reactions, not delta_fG for one substance or log10 formation
+          equilibrium constants. The extract schema has no reaction-level observation
+          type; assigning them to one mineral would misattribute the reaction.
+        basis_at_298_16_as_printed: -5,530 ± 430 cal.
+        runs:
+        - T_K: 298.16
+          T_K_as_printed: '298.16'
+          delta_r_H_cal_mol: -5530
+          delta_r_H_as_printed: -5,530
+          delta_r_H_source_kind: measured
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: -730
+          delta_r_F_as_printed: '-730'
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 400.0
+          T_K_as_printed: '400'
+          delta_r_H_cal_mol: -5530
+          delta_r_H_as_printed: -5,530
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 930
+          delta_r_F_as_printed: '+930'
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 500.0
+          T_K_as_printed: '500'
+          delta_r_H_cal_mol: -5800
+          delta_r_H_as_printed: -5,800
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 2570
+          delta_r_F_as_printed: 2,570
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 600.0
+          T_K_as_printed: '600'
+          delta_r_H_cal_mol: -5770
+          delta_r_H_as_printed: -5,770
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 4240
+          delta_r_F_as_printed: 4,240
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 700.0
+          T_K_as_printed: '700'
+          delta_r_H_cal_mol: -5650
+          delta_r_H_as_printed: -5,650
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 5910
+          delta_r_F_as_printed: 5,910
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 800.0
+          T_K_as_printed: '800'
+          delta_r_H_cal_mol: -5500
+          delta_r_H_as_printed: -5,500
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 7550
+          delta_r_F_as_printed: 7,550
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 900.0
+          T_K_as_printed: '900'
+          delta_r_H_cal_mol: -5390
+          delta_r_H_as_printed: -5,390
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 9170
+          delta_r_F_as_printed: 9,170
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 1000.0
+          T_K_as_printed: 1,000
+          delta_r_H_cal_mol: -5320
+          delta_r_H_as_printed: -5,320
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 10780
+          delta_r_F_as_printed: 10,780
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 1100.0
+          T_K_as_printed: 1,100
+          delta_r_H_cal_mol: -5380
+          delta_r_H_as_printed: -5,380
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 12400
+          delta_r_F_as_printed: 12,400
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        - T_K: 1200.0
+          T_K_as_printed: 1,200
+          delta_r_H_cal_mol: -5600
+          delta_r_H_as_printed: -5,600
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen,
+            and Burley as cited in the source; other table temperatures are derived
+            by the authors by combining that determination with this report’s heat-content
+            data.
+          delta_r_F_cal_mol: 14010
+          delta_r_F_as_printed: 14,010
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors by combining the cited
+            298.16 K heat-of-reaction determination with this report’s entropy and
+            high-temperature heat-content tables.
+        formula_reaction_as_printed: NaAlSi3O8 + NaAlSiO4 = 2 NaAlSi2O6
+        formula_labels_as_printed: page 35 table text labels the printed formulas
+          albite, nephelite, and jadeite
+  reaction_albite_to_jadeite_quartz:
+    observations: []
+    context:
+    - observation_id: kelley_1953_table36_reaction_thermochemistry
+      type: reaction_thermochemistry
+      locator:
+        page: 37
+        pdf_page_index: 36
+        table: '36'
+      units: cal/mol
+      values:
+        quantity: reaction_thermochemistry
+        reaction_as_printed: albite = jadeite + quartz
+        pressure_as_printed: 1 atm. pressure
+        phase_notation_as_printed: The reaction names the mineral phases; no (s) or
+          (cr) suffix is printed.
+        schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+          has no reaction-level type, and iter_extract_observations (simulator/battery/migrate.py:13482-13496)
+          walks species-keyed observations only. gibbs_table maps to delta_fG for
+          one substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf
+          (Quantity.LOG10_KF, simulator/battery/enums.py:69) is a formation equilibrium
+          constant. Neither is an exact type or quantity for these reaction enthalpies
+          and free energies, so the printed cells remain in context.
+        candidate_types_and_quantities_considered:
+        - gibbs_table -> delta_fG
+        - log10_Kf
+        reason_not_typed: These are reaction enthalpy and reaction free-energy values
+          for multi-species reactions, not delta_fG for one substance or log10 formation
+          equilibrium constants. The extract schema has no reaction-level observation
+          type; assigning them to one mineral would misattribute the reaction.
+        runs:
+        - T_K: 298.16
+          T_K_as_printed: '298.16'
+          delta_r_H_cal_mol: 140
+          delta_r_H_as_printed: '140'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 2610
+          delta_r_F_as_printed: 2,610
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 400.0
+          T_K_as_printed: '400'
+          delta_r_H_cal_mol: 180
+          delta_r_H_as_printed: '180'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 3460
+          delta_r_F_as_printed: 3,460
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 500.0
+          T_K_as_printed: '500'
+          delta_r_H_cal_mol: 280
+          delta_r_H_as_printed: '280'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 4260
+          delta_r_F_as_printed: 4,260
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 600.0
+          T_K_as_printed: '600'
+          delta_r_H_cal_mol: 320
+          delta_r_H_as_printed: '320'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 5060
+          delta_r_F_as_printed: 5,060
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 700.0
+          T_K_as_printed: '700'
+          delta_r_H_cal_mol: 440
+          delta_r_H_as_printed: '440'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 5850
+          delta_r_F_as_printed: 5,850
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 800.0
+          T_K_as_printed: '800'
+          delta_r_H_cal_mol: 630
+          delta_r_H_as_printed: '630'
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 6610
+          delta_r_F_as_printed: 6,610
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 900.0
+          T_K_as_printed: '900'
+          delta_r_H_cal_mol: 1060
+          delta_r_H_as_printed: 1,060
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 7320
+          delta_r_F_as_printed: 7,320
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 1000.0
+          T_K_as_printed: 1,000
+          delta_r_H_cal_mol: 1080
+          delta_r_H_as_printed: 1,080
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 8020
+          delta_r_F_as_printed: 8,020
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 1100.0
+          T_K_as_printed: 1,100
+          delta_r_H_cal_mol: 1110
+          delta_r_H_as_printed: 1,110
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 8710
+          delta_r_F_as_printed: 8,710
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+        - T_K: 1200.0
+          T_K_as_printed: 1,200
+          delta_r_H_cal_mol: 1210
+          delta_r_H_as_printed: 1,210
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+          delta_r_F_cal_mol: 9390
+          delta_r_F_as_printed: 9,390
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from data in this report
+            and the cited quartz entropy and heat-content data.
+  reaction_nephelite_quartz_to_jadeite:
+    observations: []
+    context:
+    - observation_id: kelley_1953_table37_reaction_thermochemistry
+      type: reaction_thermochemistry
+      locator:
+        page: 37
+        pdf_page_index: 36
+        table: '37'
+      units: cal/mol
+      values:
+        quantity: reaction_thermochemistry
+        reaction_as_printed: nephelite + quartz = jadeite
+        pressure_as_printed: 1 atm. pressure
+        phase_notation_as_printed: The reaction names the mineral phases; no (s) or
+          (cr) suffix is printed.
+        schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+          has no reaction-level type, and iter_extract_observations (simulator/battery/migrate.py:13482-13496)
+          walks species-keyed observations only. gibbs_table maps to delta_fG for
+          one substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf
+          (Quantity.LOG10_KF, simulator/battery/enums.py:69) is a formation equilibrium
+          constant. Neither is an exact type or quantity for these reaction enthalpies
+          and free energies, so the printed cells remain in context.
+        candidate_types_and_quantities_considered:
+        - gibbs_table -> delta_fG
+        - log10_Kf
+        reason_not_typed: These are reaction enthalpy and reaction free-energy values
+          for multi-species reactions, not delta_fG for one substance or log10 formation
+          equilibrium constants. The extract schema has no reaction-level observation
+          type; assigning them to one mineral would misattribute the reaction.
+        runs:
+        - T_K: 298.16
+          T_K_as_printed: '298.16'
+          delta_r_H_cal_mol: -5670
+          delta_r_H_as_printed: -5,670
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: -3340
+          delta_r_F_as_printed: -3,340
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 400.0
+          T_K_as_printed: '400'
+          delta_r_H_cal_mol: -5720
+          delta_r_H_as_printed: -5,720
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: -2540
+          delta_r_F_as_printed: -2,540
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 500.0
+          T_K_as_printed: '500'
+          delta_r_H_cal_mol: -6080
+          delta_r_H_as_printed: -6,080
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: -1700
+          delta_r_F_as_printed: -1,700
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 600.0
+          T_K_as_printed: '600'
+          delta_r_H_cal_mol: -6090
+          delta_r_H_as_printed: -6,090
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: -820
+          delta_r_F_as_printed: '-820'
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 700.0
+          T_K_as_printed: '700'
+          delta_r_H_cal_mol: -6090
+          delta_r_H_as_printed: -6,090
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 60
+          delta_r_F_as_printed: '+60'
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 800.0
+          T_K_as_printed: '800'
+          delta_r_H_cal_mol: -6130
+          delta_r_H_as_printed: -6,130
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 940
+          delta_r_F_as_printed: '940'
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 900.0
+          T_K_as_printed: '900'
+          delta_r_H_cal_mol: -6450
+          delta_r_H_as_printed: -6,450
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 1850
+          delta_r_F_as_printed: 1,850
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 1000.0
+          T_K_as_printed: 1,000
+          delta_r_H_cal_mol: -6400
+          delta_r_H_as_printed: -6,400
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 2760
+          delta_r_F_as_printed: 2,760
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 1100.0
+          T_K_as_printed: 1,100
+          delta_r_H_cal_mol: -6490
+          delta_r_H_as_printed: -6,490
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 3690
+          delta_r_F_as_printed: 3,690
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+        - T_K: 1200.0
+          T_K_as_printed: 1,200
+          delta_r_H_cal_mol: -6810
+          delta_r_H_as_printed: -6,810
+          delta_r_H_source_kind: derived
+          delta_r_H_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+          delta_r_F_cal_mol: 4610
+          delta_r_F_as_printed: 4,610
+          delta_r_F_source_kind: derived
+          delta_r_F_source_as_printed: Derived by the authors from the data listed
+            earlier in the report or from the sources cited there.
+metadata:
+  source_calorie_definition_as_printed: Kelley et al. define 1 cal. = 4.1833 int.
+    joules (PDF p. 16); the repository converts thermochemical calories using 4.184
+    J. Stored values remain in cal/mol and cal/mol/K.

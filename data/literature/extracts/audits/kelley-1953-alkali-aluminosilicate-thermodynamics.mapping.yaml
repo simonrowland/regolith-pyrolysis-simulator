@@ -2,232 +2,555 @@ source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
 source_locator_basis: absolute PDF page plus printed table number
 transcription: MinerU table drafts cross-checked against pdftotext-layout.txt
 render_checks:
-  pages: [16, 17, 18, 19, 22, 23, 28, 29, 32, 33, 34]
-  reason: >-
-    Table layout and every printed value were visually checked. Tables 26 through 33
-    include comma-grouped thousands and phase-labelled equal-temperature cells.
-    The converted scratch CSVs preserve the original cell text and normalize only
-    render-confirmed thousands separators for compare.
+  pages:
+  - 16
+  - 17
+  - 18
+  - 19
+  - 22
+  - 23
+  - 24
+  - 28
+  - 29
+  - 32
+  - 33
+  - 34
+  - 35
+  - 37
+  reason: Existing rendered layout checks plus page 24 for Table 25 ± uncertainties
+    and pages 35 and 37 for reaction-table row/column assignment and the Table 37
+    600 K negative free-energy sign.
 tables:
-  - page: 16
-    table: '9'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: albite
-    attribution: >-
-      Kelley et al. (1953), corrected experimental values as published; pre-correction
-      cells are not tabulated
-    printed_rows: 29
-  - page: 16
-    table: '10'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: albite
-    derived_from: ['table 9']
-    printed_rows: 11
-  - page: 17
-    table: '11'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_direct
-    unit: cal/mol/K
-    mineral: jadeite
-    printed_rows: 29
-  - page: 17
-    table: '12'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_reduced
-    unit: cal/mol/K
-    mineral: jadeite
-    derived_from: ['table 11']
-    printed_rows: 11
-  - page: 17
-    table: '13'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_direct
-    unit: cal/mol/K
-    mineral: synthetic nephelite
-    printed_rows: 29
-  - page: 18
-    table: '14'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_reduced
-    unit: cal/mol/K
-    mineral: synthetic nephelite
-    derived_from: ['table 13']
-    printed_rows: 11
-  - page: 18
-    table: '15'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: natural nephelite
-    attribution: >-
-      Kelley et al. (1953), corrected experimental values as published; pre-correction
-      cells are not tabulated
-    printed_rows: 29
-  - page: 18
-    table: '16'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: natural nephelite
-    derived_from: ['table 15']
-    printed_rows: 11
-  - page: 19
-    table: '17'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: adularia
-    attribution: >-
-      Kelley et al. (1953), corrected experimental values as published; pre-correction
-      cells are not tabulated
-    printed_rows: 29
-  - page: 19
-    table: '18'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: adularia
-    derived_from: ['table 17']
-    printed_rows: 11
-  - page: 19
-    table: '19'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: ferriferous orthoclase
-    attribution: >-
-      Kelley et al. (1953), corrected experimental values as published; pre-correction
-      cells are not tabulated
-    printed_rows: 29
-  - page: 22
-    table: '20'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: leucite
-    attribution: >-
-      Kelley et al. (1953), corrected experimental values as published; pre-correction
-      cells are not tabulated
-    printed_rows: 29
-  - page: 22
-    table: '21'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: quoted_attributed
-    unit: cal/mol/K
-    mineral: leucite
-    derived_from: ['table 20']
-    printed_rows: 11
-  - page: 22
-    table: '22'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_direct
-    unit: cal/mol/K
-    mineral: kaliophilite
-    printed_rows: 29
-  - page: 23
-    table: '23'
-    type: heat_capacity_and_heat_content_series
-    quantity: cp
-    evidence_class: measured_reduced
-    unit: cal/mol/K
-    mineral: kaliophilite
-    derived_from: ['table 22']
-    printed_rows: 11
-  - page: 28
-    table: '26'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_direct
-    unit: cal/mol
-    mineral: albite
-    printed_rows: 5
-  - page: 28
-    table: '26'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: quoted_attributed
-    unit: cal/mol
-    mineral: albite
-    attribution: W. P. White
-    printed_rows: 6
-  - page: 28
-    table: '27'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_reduced
-    unit: cal/mol
-    mineral: albite
-    derived_from: ['table 26 present measurements', 'table 26 White values']
-    printed_rows: 11
-  - page: 29
-    table: '28'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_direct
-    unit: cal/mol
-    mineral: jadeite
-    printed_rows: 11
-  - page: 29
-    table: '29'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_reduced
-    unit: cal/mol
-    mineral: jadeite
-    derived_from: ['table 28']
-    printed_rows: 9
-  - page: 32
-    table: '30'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_direct
-    unit: cal/mol
-    mineral: synthetic nephelite
-    printed_rows: 25
-  - page: 33
-    table: '31'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_reduced
-    unit: cal/mol
-    mineral: synthetic nephelite
-    derived_from: ['table 30']
-    polymorphs: [delta, beta, gamma]
-    printed_rows: 19
-  - page: 33
-    table: '32'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_direct
-    unit: cal/mol
-    mineral: carnegieite
-    polymorphs: [delta, beta]
-    printed_rows: 23
-  - page: 34
-    table: '33'
-    type: heat_capacity_and_heat_content_series
-    quantity: H_minus_H298
-    evidence_class: measured_reduced
-    unit: cal/mol
-    mineral: carnegieite
-    derived_from: ['table 32']
-    polymorphs: [delta, beta]
-    printed_rows: 16
+- page: 16
+  table: '9'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: albite
+  printed_rows: 29
+  raw_inputs: not_printed; the numeric pre-correction measurements are not tabulated
+- page: 16
+  table: '10'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: albite
+  derived_from:
+  - table 9
+  printed_rows: 11
+- page: 17
+  table: '11'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_direct
+  unit: cal/mol/K
+  mineral: jadeite
+  printed_rows: 29
+- page: 17
+  table: '12'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: jadeite
+  derived_from:
+  - table 11
+  printed_rows: 11
+- page: 17
+  table: '13'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_direct
+  unit: cal/mol/K
+  mineral: synthetic nephelite
+  printed_rows: 29
+- page: 18
+  table: '14'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: synthetic nephelite
+  derived_from:
+  - table 13
+  printed_rows: 11
+- page: 18
+  table: '15'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: natural nephelite
+  printed_rows: 29
+  raw_inputs: not_printed; the numeric pre-correction measurements are not tabulated
+- page: 18
+  table: '16'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: natural nephelite
+  derived_from:
+  - table 15
+  printed_rows: 11
+- page: 19
+  table: '17'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: adularia
+  printed_rows: 29
+  raw_inputs: not_printed; the numeric pre-correction measurements are not tabulated
+- page: 19
+  table: '18'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: adularia
+  derived_from:
+  - table 17
+  printed_rows: 11
+- page: 19
+  table: '19'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: ferriferous orthoclase
+  printed_rows: 29
+  raw_inputs: not_printed; the numeric pre-correction measurements are not tabulated
+  correction_as_printed: Na only; 94.0 mol% KAlSi3O8 + 6.0 mol% NaAlSi3O8; Fe left
+    in; mol wt 278.35 for pure KAlSi3O8.
+- page: 22
+  table: '20'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: leucite
+  printed_rows: 29
+  raw_inputs: not_printed; the numeric pre-correction measurements are not tabulated
+- page: 22
+  table: '21'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: leucite
+  derived_from:
+  - table 20
+  printed_rows: 11
+- page: 22
+  table: '22'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_direct
+  unit: cal/mol/K
+  mineral: kaliophilite
+  printed_rows: 29
+- page: 23
+  table: '23'
+  type: heat_capacity_and_heat_content_series
+  quantity: cp
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  mineral: kaliophilite
+  derived_from:
+  - table 22
+  printed_rows: 11
+- page: 28
+  table: '26'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_direct
+  unit: cal/mol
+  mineral: albite
+  printed_rows: 5
+- page: 28
+  table: '26'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: quoted_attributed
+  unit: cal/mol
+  mineral: albite
+  attribution: W. P. White
+  printed_rows: 6
+- page: 28
+  table: '27'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_reduced
+  unit: cal/mol
+  mineral: albite
+  derived_from:
+  - table 26 present measurements
+  - table 26 White values
+  printed_rows: 11
+- page: 29
+  table: '28'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_direct
+  unit: cal/mol
+  mineral: jadeite
+  printed_rows: 11
+- page: 29
+  table: '29'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_reduced
+  unit: cal/mol
+  mineral: jadeite
+  derived_from:
+  - table 28
+  printed_rows: 9
+- page: 32
+  table: '30'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_direct
+  unit: cal/mol
+  mineral: synthetic nephelite
+  printed_rows: 25
+- page: 33
+  table: '31'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_reduced
+  unit: cal/mol
+  mineral: synthetic nephelite
+  derived_from:
+  - table 30
+  polymorphs:
+  - delta
+  - beta
+  - gamma
+  printed_rows: 19
+- page: 33
+  table: '32'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_direct
+  unit: cal/mol
+  mineral: carnegieite
+  polymorphs:
+  - delta
+  - beta
+  printed_rows: 23
+- page: 34
+  table: '33'
+  type: heat_capacity_and_heat_content_series
+  quantity: H_minus_H298
+  evidence_class: measured_reduced
+  unit: cal/mol
+  mineral: carnegieite
+  derived_from:
+  - table 32
+  polymorphs:
+  - delta
+  - beta
+  printed_rows: 16
+additional_records:
+- page: 24
+  table: '25'
+  quantity: S
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  species_count: 6
+  printed_rows: 6
+  components:
+  - entropy_S51_extrapolated_component
+  - entropy_S298_16_minus_S51_measured_component
+  component_evidence_class: quoted_attributed
+  component_schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute entropy;
+    the two component columns are not absolute S.
+  render_check: PDF page 24 confirms ± uncertainties; pdftotext reads the glyph as
+    +.
+- page: 28
+  table: '27'
+  quantity: entropy_increment_above_298_16K
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  printed_rows: 11
+  schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+    not S_T−S_298.16.
+- page: 29
+  table: '29'
+  quantity: entropy_increment_above_298_16K
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  printed_rows: 9
+  schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+    not S_T−S_298.16.
+- page: 33
+  table: '31'
+  quantity: entropy_increment_above_298_16K
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  printed_rows: 19
+  schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+    not S_T−S_298.16.
+- page: 34
+  table: '33'
+  quantity: entropy_increment_above_298_16K
+  evidence_class: measured_reduced
+  unit: cal/mol/K
+  printed_rows: 16
+  schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy,
+    not S_T−S_298.16.
+inventory:
+- table: '1'
+  page: 11
+  caption: Chemical analysis of albite
+  printed_rows: '5'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '2'
+  page: 11
+  caption: Chemical analysis of jadeite
+  printed_rows: '7'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '3'
+  page: 11
+  caption: Chemical analysis of synthetic nephelite
+  printed_rows: '3'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '4'
+  page: 12
+  caption: Chemical analysis of natural nephelite
+  printed_rows: '6'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '5'
+  page: 12
+  caption: Chemical analysis of adularia
+  printed_rows: '6'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '6'
+  page: 13
+  caption: Chemical analysis of ferriferous orthoclase
+  printed_rows: '5'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '7'
+  page: 13
+  caption: Chemical analysis of leucite
+  printed_rows: '6'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '8'
+  page: 13
+  caption: Chemical analysis of kaliophilite
+  printed_rows: '4'
+  disposition: Sample chemistry; outside the thermochemistry rail.
+- table: '9'
+  page: 16
+  caption: Heat capacity of albite
+  printed_rows: 10 physical; 29 T/Cp pairs
+  disposition: Corrected experimental Cp retained as measured_reduced; raw inputs
+    are not printed.
+- table: '10'
+  page: 16
+  caption: Heat capacity of albite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 9.
+- table: '11'
+  page: 17
+  caption: Heat capacity of jadeite
+  printed_rows: 10 physical; 29 pairs
+  disposition: Measured-direct Cp retained.
+- table: '12'
+  page: 17
+  caption: Heat capacity of jadeite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 11.
+- table: '13'
+  page: 17
+  caption: Heat capacity of synthetic nephelite
+  printed_rows: 10 physical; 29 pairs
+  disposition: Measured-direct Cp retained.
+- table: '14'
+  page: 18
+  caption: Heat capacity of synthetic nephelite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 13.
+- table: '15'
+  page: 18
+  caption: Heat capacity of natural nephelite
+  printed_rows: 10 physical; 29 pairs
+  disposition: Corrected experimental Cp retained as measured_reduced; raw inputs
+    are not printed.
+- table: '16'
+  page: 18
+  caption: Heat capacity of natural nephelite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 15.
+- table: '17'
+  page: 19
+  caption: Heat capacity of adularia
+  printed_rows: 10 physical; 29 pairs
+  disposition: Corrected experimental Cp retained as measured_reduced; raw inputs
+    are not printed.
+- table: '18'
+  page: 19
+  caption: Heat capacity of adularia (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 17.
+- table: '19'
+  page: 19
+  caption: Heat capacity of ferriferous orthoclase
+  printed_rows: 10 physical; 29 pairs
+  disposition: Sodium-only correction retained as measured_reduced; 94.0 mol% KAlSi3O8
+    + 6.0 mol% NaAlSi3O8, Fe left in, mol wt 278.35.
+- table: '20'
+  page: 22
+  caption: Heat capacity of leucite
+  printed_rows: 10 physical; 29 pairs
+  disposition: Corrected experimental Cp retained as measured_reduced; raw inputs
+    are not printed.
+- table: '21'
+  page: 22
+  caption: Heat capacity of leucite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 20.
+- table: '22'
+  page: 22
+  caption: Heat capacity of kaliophilite
+  printed_rows: 10 physical; 29 pairs
+  disposition: Measured-direct Cp retained.
+- table: '23'
+  page: 23
+  caption: Heat capacity of kaliophilite (smooth values)
+  printed_rows: 4 physical; 11 pairs
+  disposition: Smooth Cp retained as measured_reduced from Table 22.
+- table: '24'
+  page: 24
+  caption: Heat capacity of hypothetical standard substance
+  printed_rows: '5'
+  disposition: Extrapolation reference material, not a named Na/K aluminosilicate
+    mineral.
+- table: '25'
+  page: 24
+  caption: Entropies at 298.16 K
+  printed_rows: '6'
+  disposition: Six absolute S values and both printed component columns retained;
+    ± values render-checked.
+- table: '26'
+  page: 28
+  caption: Heat content of albite
+  printed_rows: 11 rows across two sections; 5 present + 6 White
+  disposition: Present measurements and W. P. White values retained as separate series.
+- table: '27'
+  page: 28
+  caption: Heat-content and entropy increments for albite
+  printed_rows: 6 physical; 11 H + 11 S records
+  disposition: H increments use H_minus_H298; S increments retained with quantity-unknown
+    schema gap.
+- table: '28'
+  page: 29
+  caption: Heat content of jadeite
+  printed_rows: 6 physical; 11 rows
+  disposition: Measured-direct H increments retained.
+- table: '29'
+  page: 29
+  caption: Heat-content and entropy increments for jadeite
+  printed_rows: 5 physical; 9 H + 9 S records
+  disposition: H increments use H_minus_H298; S increments retained with quantity-unknown
+    schema gap.
+- table: '30'
+  page: 32
+  caption: Heat content of nephelite
+  printed_rows: 13 physical; 25 rows
+  disposition: Measured-direct H increments retained.
+- table: '31'
+  page: 33
+  caption: Heat-content and entropy increments for nephelite
+  printed_rows: 10 physical; 19 H + 19 S records
+  disposition: H increments use H_minus_H298; S increments retained quantity-unknown,
+    with each polymorph separated.
+- table: '32'
+  page: 33
+  caption: Heat content of carnegieite
+  printed_rows: 12 physical; 23 rows
+  disposition: Measured-direct H increments retained.
+- table: '33'
+  page: 34
+  caption: Heat-content and entropy increments for carnegieite
+  printed_rows: 8 physical; 16 H + 16 S records
+  disposition: H increments use H_minus_H298; S increments retained quantity-unknown;
+    printed 1200–1400 K smooth values noted inside discarded interval.
+- table: '34'
+  page: 35
+  caption: Thermodynamic values for albite + nephelite = 2 jadeite (1 atm pressure)
+  printed_rows: 5 physical; 10 T rows
+  disposition: Twenty ΔH/ΔF cells retained per table as reaction_thermochemistry context;
+    the schema has no exact reaction-level observation type, so no single mineral
+    is assigned.
+- table: '35'
+  page: 36
+  caption: Minimum pressure at which jadeite is stable relative to albite and nephelite
+  printed_rows: 4 physical; 10 T/P rows
+  disposition: Calculated stability pressure, outside the requested thermochemistry
+    rail.
+- table: '36'
+  page: 37
+  caption: Thermodynamic values for albite = jadeite + quartz (1 atm pressure)
+  printed_rows: 5 physical; 10 T rows
+  disposition: Twenty ΔH/ΔF cells retained per table as reaction_thermochemistry context;
+    the schema has no exact reaction-level observation type, so no single mineral
+    is assigned.
+- table: '37'
+  page: 37
+  caption: Thermodynamic values for nephelite + quartz = jadeite (1 atm pressure)
+  printed_rows: 5 physical; 10 T rows
+  disposition: Twenty ΔH/ΔF cells retained per table as reaction_thermochemistry context;
+    the schema has no exact reaction-level observation type, so no single mineral
+    is assigned.
+schema_gap_notes:
+- Quantity.S = "S" (simulator/battery/enums.py:93) is absolute molar entropy; no exact
+  token represents S51 extrapolated components, measured S298.16−S51 components, or
+  S_T−S_298.16 increments.
+- Quantity.DELTA_FH = "delta_fH" and Quantity.DELTA_FG = "delta_fG" (simulator/battery/enums.py:84-85)
+  are formation quantities; the reaction ΔH and ΔF values in Tables 34, 36 and 37
+  are not formation values.
+- OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100) has no reaction-level
+  type, and iter_extract_observations (simulator/battery/migrate.py:13482-13496) walks
+  species-keyed observations only. gibbs_table maps to delta_fG for one substance
+  (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf (Quantity.LOG10_KF,
+  simulator/battery/enums.py:69) is a formation equilibrium constant. Neither is an
+  exact type or quantity for these reaction enthalpies and free energies, so the printed
+  cells remain in context.
+reaction_context_records:
+- page: 35
+  table: '34'
+  type: reaction_thermochemistry (context)
+  context_id: kelley_1953_table34_reaction_thermochemistry
+  temperature_rows: 10
+  numeric_cells: 20
+  disposition: Retained in species-keyed context under a neutral reaction grouping
+    identifier; no single mineral assigned. OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+    has no reaction-level type; gibbs_table -> delta_fG and log10_Kf are not exact
+    candidates.
+  grouping_key: reaction_albite_nephelite_to_jadeite
+- page: 37
+  table: '36'
+  type: reaction_thermochemistry (context)
+  context_id: kelley_1953_table36_reaction_thermochemistry
+  temperature_rows: 10
+  numeric_cells: 20
+  disposition: Retained in species-keyed context under a neutral reaction grouping
+    identifier; no single mineral assigned. OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+    has no reaction-level type; gibbs_table -> delta_fG and log10_Kf are not exact
+    candidates.
+  grouping_key: reaction_albite_to_jadeite_quartz
+- page: 37
+  table: '37'
+  type: reaction_thermochemistry (context)
+  context_id: kelley_1953_table37_reaction_thermochemistry
+  temperature_rows: 10
+  numeric_cells: 20
+  disposition: Retained in species-keyed context under a neutral reaction grouping
+    identifier; no single mineral assigned. OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100)
+    has no reaction-level type; gibbs_table -> delta_fG and log10_Kf are not exact
+    candidates.
+  grouping_key: reaction_nephelite_quartz_to_jadeite
