@@ -9,7 +9,9 @@ from simulator.core import PyrolysisSimulator
 from simulator.state import MeltState
 
 
-def test_melt_resident_projection_includes_spent_oxide_and_retains_nonoxide():
+def test_melt_resident_projection_includes_spent_oxide_and_retains_nonoxide(
+    vapor_pressure_data,
+):
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.atom_ledger = AtomLedger()
     sim.atom_ledger.load_external(
@@ -28,3 +30,8 @@ def test_melt_resident_projection_includes_spent_oxide_and_retains_nonoxide():
     assert sim.melt.total_mass_kg == pytest.approx(4.2, abs=1e-15)
     assert sim._melt_oxide_wt_pct() == pytest.approx(
         {'FeO': 75.0, 'Na2O': 25.0}, abs=1e-14)
+
+    sim.vapor_pressures = vapor_pressure_data
+    sim.species_formula_registry = {}
+    _, _, available_kg = sim._build_evaporation_aux_maps({'Na': 1.0, 'Fe': 1.0})
+    assert available_kg == pytest.approx({'Na': 1.0, 'Fe': 3.0}, abs=1e-15)
