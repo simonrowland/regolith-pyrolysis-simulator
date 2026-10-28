@@ -24,7 +24,7 @@ printed_tables:
         reason: retained as printed gamma_st = 1 reference row
     conditions:
       temperature: series heading in each row group
-      log_fO2: Table 2 by series
+      oxygen_fugacity: Table 2 positive -log fO2 as printed
       total_pressure: abstract, printed 1 atm
       reference_state: virtual melt at XSiO2 = 0.45; standard alkali oxide mole fractions extrapolated
     render_verified: true
@@ -50,7 +50,7 @@ printed_tables:
         reason: retained as printed gamma_st = 1 reference row
     conditions:
       temperature: 1470°C from series 38, Table 2
-      log_fO2: Table 2, series 38
+      oxygen_fugacity: Table 2 positive -log fO2 as printed, series 38
       total_pressure: abstract, printed 1 atm
       reference_state: CSA6 standard melt
     render_verified: true
@@ -61,7 +61,9 @@ extraction_decision:
   absolute_activity: typed_refusal
   reason: relative to the printed reference melt; absolute activity not printed
   preserved_value: printed relative gamma_Na2O; no absolute-activity conversion
-  schema_gap: The extract schema has no relative-to-reference activity quantity form (t-1563).
+  schema_gap: >-
+    The extract schema has no relative-to-reference activity quantity form (t-1563); the printed
+    -log fO2 condition has no identity mapping for typed-refused activity rows.
   standard_state: preserved verbatim per table
   method_class: quoted_attributed; the authors calculate relative coefficients from measured compositions using Eq. (1)
 not_extracted:

@@ -16,10 +16,11 @@ composition measurements. Table 4 has 15 printed rows and Table 5 has 4; all 19 
 including the four normalization references (Standard 36, 39, 37, and CSA6), are retained
 as printed.
 
-The abstract prints total pressure as 1 atm (render-checked on PDF page 1). Table 2 supplies temperatures and `−log fO2`
-for the experimental series; the abstract and methods identify the CO/CO2 gas mix at the
-iron–wüstite buffer. No Table 4–5 gamma uncertainty is printed. The experiment rows
-preserve the exact table compositions, series conditions, reference convention, and
+The abstract prints total pressure as 1 atm (render-checked on PDF page 1). Table 2 supplies
+temperatures and positive `−log fO2` values for each experimental series; these are retained
+as printed without sign or pressure conversion. The abstract and methods identify the CO/CO2
+gas mix at the iron–wüstite buffer. No Table 4–5 gamma uncertainty is printed. The experiment
+rows preserve the exact table compositions, series conditions, reference convention, and
 method locators.
 
 ## Cell audit
@@ -41,11 +42,11 @@ between the two machine reads and the page layouts visually.
 ## Isolated migration
 
 The real migrator emits 19 unavailable activity values, 0 hard issues, and 19 rejected
-admissions. Temperature and composition reach every identity; total pressure reaches each
-identity from the four printed series experiments. The printed log fugacity remains in
-each row's located `point_conditions`, but the current migrator leaves identity `fO2_Pa`
-unknown on typed-refused activity rows. Resolving this requires a migrator path change,
-outside the extraction task's no-schema/no-migrator-change scope.
+admissions. Temperature, composition, and total pressure reach every identity. The printed
+positive `−log fO2` remains in each row's located `point_conditions`; identity `fO2_Pa`
+remains unknown on typed-refused activity rows, per the controller ruling. The log-form
+condition has no identity mapping for typed-refused activity rows (schema gap t-1563); no
+conversion to Pa is made.
 
 Expected store delta without regeneration: +19 activity observations, 0 admitted absolute
 activity values. No battery store was regenerated.

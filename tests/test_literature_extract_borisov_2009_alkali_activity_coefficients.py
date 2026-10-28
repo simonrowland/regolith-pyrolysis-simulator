@@ -96,8 +96,12 @@ def test_borisov_2009_isolated_migration_preserves_conditions_and_refuses_absolu
         assert row.identity.temperature_K.is_value
         assert row.identity.composition.is_value
         assert row.identity.total_pressure_Pa.is_value
-        assert row.point_conditions["log_fO2"].state.is_value
-        assert row.point_conditions["log_fO2"].locator is not None
+        assert row.point_conditions["temperature_K"].state.is_value
+        assert row.point_conditions["temperature_K"].locator is not None
+        assert row.point_conditions["total_pressure_Pa"].state.is_value
+        assert row.point_conditions["total_pressure_Pa"].locator is not None
+        assert row.point_conditions["minus_log_fO2_as_published"].state.is_value
+        assert row.point_conditions["minus_log_fO2_as_published"].locator is not None
         assert row.point_conditions["composition"].state.is_value
         assert row.point_conditions["composition"].locator is not None
 
@@ -105,4 +109,7 @@ def test_borisov_2009_isolated_migration_preserves_conditions_and_refuses_absolu
     # activity observations; the printed log fugacity remains on each row.
     first = migrated["borisov_2009_table_4_darnk_36_na2o_relative_gamma"]
     assert first.identity.fO2_Pa.is_unknown
-    assert first.point_conditions["log_fO2"].state.value == Decimal("-10.74")
+    assert (
+        first.point_conditions["minus_log_fO2_as_published"].state.value
+        == Decimal("10.74")
+    )
