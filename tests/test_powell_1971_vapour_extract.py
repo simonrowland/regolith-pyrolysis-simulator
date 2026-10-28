@@ -22,7 +22,7 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 290
-    assert len(migrator.result.queue) == 637
+    assert len(migrator.result.queue) == 647
     assert not [
         issue
         for issue in migrator.result.validation.issues
@@ -105,6 +105,43 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
             "quoted_pressure_as_printed"
         ]
         == "0.80"
+    )
+    t09_1036 = rows["powell_1971_t09_r05_apparent_knudsen_pressure"]
+    assert t09_1036["values"]["apparent_pressure_torr"] == 0.00849
+    assert t09_1036["values"]["apparent_pressure_as_printed"] == "8.49 x 10-3"
+    assert t09_1036["locator"] == {"page": 116, "table": "9", "row": "5"}
+
+    eyber_log_rows = [
+        rows[f"powell_1971_eyber_na2so4_r{row:02d}_log_kp"]
+        for row in range(1, 7)
+    ]
+    assert all("reaction" not in row["values"] for row in eyber_log_rows)
+
+    liquid_ids = {
+        *(f"powell_1971_eyber_na2so4_r{row:02d}_pressure" for row in range(1, 6)),
+        "powell_1971_p100_r01_dissociation_and_kp",
+        "powell_1971_p100_r02_dissociation_and_kp",
+        "powell_1971_t06_r01_slope_enthalpy",
+        "powell_1971_t06_r03_slope_enthalpy",
+        *(f"powell_1971_p101_r{row:02d}_dissociation_and_kp" for row in range(1, 5)),
+    }
+    assert all(rows[observation_id]["phase"] == "l" for observation_id in liquid_ids)
+    assert rows["powell_1971_p101_r05_dissociation_and_kp"]["phase"] == "cr"
+    assert all(
+        observations[f"{EXTRACT.stem}::{observation_id}"].identity.species.phase.value == "l"
+        for observation_id in liquid_ids
+    )
+
+    janaf_ids = {
+        *(f"powell_1971_p100_r{row:02d}_dissociation_and_kp" for row in range(1, 6)),
+        *(f"powell_1971_p101_r{row:02d}_dissociation_and_kp" for row in range(1, 6)),
+    }
+    assert all(
+        rows[observation_id]["values"]["evidence_class"] == "measured_reduced"
+        and rows[observation_id]["values"]["method_class"] == "measured_reduced"
+        and "JANAF" in rows[observation_id]["values"]["derivation"]["relation"]
+        and observations[f"{EXTRACT.stem}::{observation_id}"].evidence.class_.value == "measured_reduced"
+        for observation_id in janaf_ids
     )
 
     assert {
