@@ -20,6 +20,28 @@ _RENDER_PINS = {
     "kroger_1958_solution_formation_rohrenglas_I": ("12760", "kcal/100 kg glass", 228, "16"),
 }
 
+_SULFATGLAS_KG_PINS = {
+    "kroger_1958_direct_sulfatglas_I": {
+        "SiO2": "67.85",
+        "Na2O": "11.56",
+        "Na2SO4": "2.60",
+        "CaO": "15.20",
+    },
+    "kroger_1958_direct_sulfatglas_II": {
+        "SiO2": "74.15",
+        "Na2O": "12.43",
+        "Na2SO4": "3.00",
+        "CaO": "11.22",
+    },
+    "kroger_1958_direct_sulfatglas_III": {
+        "SiO2": "68.34",
+        "Na2O": "13.40",
+        "Na2SO4": "3.50",
+        "CaO": "13.76",
+        "Al2O3·2SiO2": "3.56",
+    },
+}
+
 
 def _load():
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -48,6 +70,14 @@ def _render_pin_grid(document):
     }
 
 
+def _sulfatglas_kg_grid(document):
+    observations = _observations(document)
+    return {
+        observation_id: observations[observation_id]["point_conditions"]["printed_composition"]["state"]["value"]
+        for observation_id in _SULFATGLAS_KG_PINS
+    }
+
+
 def test_render_checked_cells_and_complete_printed_row_count():
     document = _load()
     observations = _observations(document)
@@ -70,6 +100,26 @@ def test_render_pin_rejects_a_mutated_stored_cell():
     _observations(mutated)["kroger_1958_direct_sulfatglas_I"]["values"]["value_as_printed"]["value"] = "209.6"
     assert _render_pin_grid(document) == _RENDER_PINS
     assert _render_pin_grid(mutated) != _RENDER_PINS
+
+
+def test_sulfatglas_compositions_are_pinned_as_printed_kilogram_maps():
+    document = _load()
+    observations = _observations(document)
+    assert _sulfatglas_kg_grid(document) == _SULFATGLAS_KG_PINS
+    for observation_id, expected in _SULFATGLAS_KG_PINS.items():
+        condition = observations[observation_id]["point_conditions"]["printed_composition"]
+        assert condition["state"] == {"tag": "value", "value": expected}
+        assert "kilograms" in condition["locator"]["note"]
+
+    mutated = deepcopy(_load())
+    for observation_id in _SULFATGLAS_KG_PINS:
+        condition = _observations(mutated)[observation_id]["point_conditions"]["printed_composition"]
+        condition["state"]["value"] = {
+            "basis": "as printed",
+            "amount_basis": "mass_percent",
+            "components": list(_SULFATGLAS_KG_PINS[observation_id].items()),
+        }
+    assert _sulfatglas_kg_grid(mutated) != _SULFATGLAS_KG_PINS
 
 
 def test_isolated_migration_preserves_unknown_quantity_conditions_and_lineage():
@@ -112,6 +162,12 @@ def test_isolated_migration_preserves_unknown_quantity_conditions_and_lineage():
             composition = observation.point_conditions["printed_composition"]
             assert composition.state.is_value
             assert composition.locator.page == source["point_conditions"]["printed_composition"]["locator"]["page"]
+            if row_id in _SULFATGLAS_KG_PINS:
+                assert {
+                    key: str(value)
+                    for key, value in composition.state.value.items()
+                } == _SULFATGLAS_KG_PINS[row_id]
+                assert "kilograms" in composition.locator.note
             quench = observation.point_conditions["quench_state"]
             assert quench.state.is_value and quench.state.value.value == "not_stated"
             assert quench.locator.page == source["point_conditions"]["quench_state"]["locator"]["page"]
