@@ -61,4 +61,25 @@ def test_shornikov_2000_context_only_extract_validates_and_migrates(tmp_path: Pa
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert len(result.context_by_work) == 1
-    assert sum(len(rows) for rows in result.context_by_work.values()) == 3
+    context_rows = [
+        row for rows in result.context_by_work.values() for row in rows
+    ]
+    original_context_types = {
+        "shornikov_2000_experimental_method": "method",
+        "shornikov_2000_partial_pressure_method": "pressure_method_context",
+        "shornikov_2000_figures_1_to_3_context": "figure_inventory",
+    }
+    assert {
+        row["observation_id"]: row["type"]
+        for row in context_rows
+        if row["observation_id"] in original_context_types
+    } == original_context_types
+
+    figure_points = [
+        row for row in context_rows if row.get("type") == "figure_read_point"
+    ]
+    assert len(figure_points) == 35
+    assert all(
+        row["observation_id"].startswith("shornikov_2000_fig")
+        for row in figure_points
+    )
