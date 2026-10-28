@@ -2419,12 +2419,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return
         from engines.magemin import MAGEMinShadowProvider
+        from engines.alphamelts import AlphaMELTSProvider
+        from simulator.chemistry.kernel.config import LIQUID_FRACTION_PROVIDER_ORDER
 
-        provider = MAGEMinShadowProvider()
-        self._chem_registry.register_idempotent(
-            provider,
-            [ChemistryIntent.GATE_LIQUID_FRACTION],
-            fallback=True,
+        providers = {
+            'magemin': MAGEMinShadowProvider(),
+            'alphamelts': AlphaMELTSProvider(),
+        }
+        self._chem_registry.register_gate_provider_order(
+            providers[name] for name in LIQUID_FRACTION_PROVIDER_ORDER[self._liquid_fraction_provider]
         )
 
     def _resolve_liquid_fraction_provider(self) -> None:

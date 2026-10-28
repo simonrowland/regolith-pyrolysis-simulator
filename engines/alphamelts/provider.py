@@ -117,10 +117,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         must already have run so ``backend._mode`` reflects the available
         transport path.
 
-    ``backend`` may be ``None`` -- in that case :meth:`dispatch`
-    returns ``status='unavailable'`` with an empty
-    :class:`LiquidusDiagnostics`. This matches the kernel's
-    ``status='unavailable'`` vocabulary for absent engines.
+    The separately declared freeze gate lazily initializes a subprocess
+    backend when none is bound. Other intents with no bound backend return
+    ``status='unavailable'`` with empty :class:`LiquidusDiagnostics`.
     """
 
     name = 'alphamelts-diagnostic'
@@ -258,6 +257,8 @@ class AlphaMELTSProvider(ChemistryProvider):
                 warnings=tuple(gate_warnings),
             )
 
+        if request.intent == ChemistryIntent.GATE_LIQUID_FRACTION:
+            self._ensure_backend()
         if self._backend is None or not self._backend_available():
             if self.transport_closed_mid_run():
                 from engines.alphamelts.thermoengine import (
@@ -506,6 +507,15 @@ class AlphaMELTSProvider(ChemistryProvider):
             species: kg / total_kg * 100.0
             for species, kg in kg_by_species.items()
         }
+
+    def _ensure_backend(self):
+        """Lazily open the separately declared gate transport."""
+        if self._backend is None:
+            from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+            self._backend = AlphaMELTSBackend()
+            self._backend.initialize({'mode': 'subprocess'})
+        return self._backend
 
     def _backend_available(self) -> bool:
         if self._backend is None:
@@ -764,6 +774,25 @@ class AlphaMELTSProvider(ChemistryProvider):
             getattr(request, 'redox_state', None),
         )
         subprocess_required = self._subprocess_required()
+        if (subprocess_available(self._backend)
+                and request.intent == ChemistryIntent.GATE_LIQUID_FRACTION):
+            evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+                request.pressure_bar, transport='subprocess',
+            )
+            path = self._backend.gate_cooling_path(
+                pressure_bar=evaluation_pressure_bar,
+                fO2_log=fO2_log if fO2_log is not None else -9.0,
+                redox_state=redox_state,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=dict(request.account_view.species_formula_registry or {}),
+            )
+            pressure_diagnostics = alphamelts_reference_pressure_diagnostics(
+                physical_pressure_bar=request.pressure_bar,
+                evaluation_pressure_bar=evaluation_pressure_bar,
+            )
+            return 'subprocess', replace(path, diagnostics={
+                **dict(path.diagnostics or {}), **pressure_diagnostics,
+            })
         if not subprocess_required and python_api_available(self._backend):
             mode = 'petthermotools'
             equilibrate_transport = equilibrate_via_python_api

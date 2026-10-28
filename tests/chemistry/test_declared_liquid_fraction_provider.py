@@ -13,6 +13,7 @@ from unittest.mock import patch
 import pytest
 
 from engines.magemin import MAGEMinShadowProvider
+from engines.alphamelts import AlphaMELTSProvider
 from simulator.chemistry.kernel import normalize_chemistry_kernel_config
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
@@ -45,6 +46,13 @@ from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 from tests.test_optimizer_evalspec import _mre_cap_profile
+
+
+@pytest.fixture(autouse=True)
+def _isolate_primary_failure_contract(monkeypatch):
+    # These tests inject MAGEMin faults and check d-298/d-299 after all
+    # declared engines fail. Alternate success has its own gate tests.
+    monkeypatch.setattr(AlphaMELTSProvider, '_ensure_backend', lambda _: None)
 
 
 def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
@@ -209,7 +217,7 @@ def test_magemin_warm_worker_respawn_programming_error_propagates(
             pass
 
 
-@pytest.mark.parametrize('value', ['auto', 'alphamelts', '', None, True, 1])
+@pytest.mark.parametrize('value', ['auto', '', None, True, 1])
 def test_gate_provider_rejects_undeclared_values(value):
     with pytest.raises((TypeError, ValueError), match='liquid_fraction_provider'):
         normalize_chemistry_kernel_config({'liquid_fraction_provider': value})

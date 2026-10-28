@@ -309,7 +309,7 @@ omit it.
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
   "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
-  "liquid_fraction_provider": "magemin",     // declared gate: "magemin" or "analytical"
+  "liquid_fraction_provider": "magemin",     // declared gate: "magemin", "alphamelts" or "analytical"
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id

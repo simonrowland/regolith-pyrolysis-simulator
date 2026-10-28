@@ -577,6 +577,15 @@ class ChemistryKernel:
                 raise ProviderUnavailableError(
                     f"no authoritative provider registered for intent {intent.value!r}"
                 )
+            if (intent == ChemistryIntent.GATE_LIQUID_FRACTION
+                    and self._registry.gate_provider_order):
+                return self._dispatch_gate_provider_order(
+                    temperature_C=temperature_C, pressure_bar=pressure_bar,
+                    fO2_log=fO2_log, redox_state=redox_state,
+                    fe_redox_policy=fe_redox_policy, control_inputs=control_inputs,
+                    declared_accounts=declared_accounts,
+                    account_mol_overrides=account_mol_overrides,
+                )
             return self._dispatch_through_provider(
                 intent,
                 fallback,
@@ -655,6 +664,62 @@ class ChemistryKernel:
                 ),
                 fallback_reason="authoritative_provider_unavailable_error",
             )
+
+    def _dispatch_gate_provider_order(self, **controls) -> IntentResult:
+        from simulator.melt_backend.liquidus import LiquidusSampleError
+        from simulator.engine_pool import EngineWorkerTimeout
+        from simulator.reduced_real_determinism import gate_curve_provider_diagnostic_reasons
+
+        attempts = []
+        order = self._registry.gate_provider_order
+        primary_result = None
+        for provider in order:
+            try:
+                result = self._dispatch_through_provider(
+                    ChemistryIntent.GATE_LIQUID_FRACTION, provider,
+                    role='fallback', fallback_reason='no_authoritative_provider',
+                    **controls,
+                )
+            except (ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout) as exc:
+                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+                diagnostic.update(exception_class=type(exc).__name__, exception_message=str(exc))
+                if isinstance(exc, EngineWorkerTimeout):
+                    diagnostic['reason'] = 'engine_worker_timeout'
+                result = IntentResult(
+                    intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+                    status=str(getattr(exc, 'status', 'unavailable')),
+                    diagnostic=diagnostic, warnings=tuple(getattr(exc, 'warnings', ()) or ()),
+                )
+            if primary_result is None:
+                primary_result = result
+            diagnostic = dict(result.diagnostic or {})
+            if result.status == 'ok':
+                break
+            reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+            attempts.append({
+                'provider': provider.capability_profile().provider_id,
+                'status': result.status,
+                'reason': '; '.join(reasons) or '; '.join(result.warnings) or result.status,
+                'diagnostic': diagnostic,
+            })
+            # Missing/invalid controls remain typed terminal failures.
+            if any(reason in {'missing_input', 'invalid_input', 'invalid_fo2_log',
+                              'invalid_pressure_bar', 'non_finite_composition'} for reason in reasons):
+                break
+        if attempts:
+            # Exhausting the alternate must preserve d-298/d-299's original
+            # primary failure classification, including timeout retries.
+            if result.status != 'ok':
+                result = primary_result
+                diagnostic = dict(result.diagnostic or {})
+            diagnostic['gate_provider_step_down'] = {
+                'requested_provider_order': [p.capability_profile().provider_id for p in order],
+                'failed_providers': attempts,
+                'realized_provider': (provider.capability_profile().provider_id
+                                      if result.status == 'ok' else None),
+            }
+            result = replace(result, diagnostic=diagnostic)
+        return result
 
     def _dispatch_authoritative_without_shadows(
         self,
