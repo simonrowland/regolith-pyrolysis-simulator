@@ -102,6 +102,7 @@ def test_explicit_zero_conductance_closes_controlled_line():
     assert flow.pipe_capacity_kg_hr == 0.0
     assert flow.swallowed_flux_kg_hr == 0.0
     assert math.isinf(flow.saturation)
+    assert flow.overload_notice["overload_ratio"] == "infinite"
     assert flow.binding_cause == "pipe"
 
 
@@ -167,3 +168,57 @@ def test_reductant_flash_carries_transport_domain_notice():
     assert notice["reason"]
     assert notice["regime"]
     assert notice["certified_band"]
+
+
+@pytest.mark.parametrize("atmosphere", [Atmosphere.CONTROLLED_O2, Atmosphere.PN2_SWEEP])
+def test_pressure_driven_flash_uses_one_pressure_for_pipe_and_condenser(atmosphere):
+    model = OverheadGasModel(headspace_config={"enabled": False})
+    melt = SimpleNamespace(
+        atmosphere=atmosphere,
+        p_total_mbar=0.2,
+        pO2_mbar=0.0,
+        temperature_C=1150.0,
+        campaign=SimpleNamespace(name="C3_NA"),
+        campaign_hour=0.0,
+    )
+    flux = _flux({"Na": 113.0})
+    nominal_capacity = model._pipe_conductance(
+        20.0, melt.temperature_C, species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0
+    flow = model.controlled_o2_transport_capacity(
+        flux, melt, cold_train_capacity=NoColdTrain("runtime_enforcement_disabled"),
+    )
+    assert flow.upstream_pressure_bar > 0.0002
+    assert flow.swallowed_flux_kg_hr == pytest.approx(113.0)
+    assert flow.saturation == 1.0
+    assert flow.overload_notice["overload_ratio"] == pytest.approx(
+        113.0 / nominal_capacity,
+    )
+    # The independent forward evaluation must carry the entire source at the
+    # inverse's pressure; the test does not reproduce the pressure formula.
+    assert model._pipe_conductance(
+        flow.upstream_pressure_bar * 1e5,
+        melt.temperature_C,
+        p_downstream_Pa=flow.downstream_pressure_bar * 1e5,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0 == pytest.approx(113.0)
+    assert _bled_kg(flow, holdup_kg=113.0) == pytest.approx(113.0)
+
+    configured = {}
+    sim = SimpleNamespace(
+        overhead_model=model,
+        melt=melt,
+        condensation_model=SimpleNamespace(
+            pipe_segments=(),
+            configure_operating_conditions=lambda **kw: configured.update(kw),
+        ),
+        _effective_transport_capacity_this_tick=flow,
+        _resolve_condensation_carrier_gas=lambda: "O2",
+    )
+    PyrolysisSimulator._configure_condensation_operating_conditions(sim, flux)
+    assert configured["overhead_pressure_mbar"] == pytest.approx(
+        flow.upstream_pressure_bar * 1000.0,
+    )
+    assert configured["species_partial_pressures_mbar"] == pytest.approx(
+        {"Na": flow.upstream_pressure_bar * 1000.0},
+    )

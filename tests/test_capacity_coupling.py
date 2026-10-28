@@ -1316,7 +1316,11 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
     assert sim.melt.campaign == CampaignPhase.C4
     bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
     assert "transport_cap" not in bakeout
-    assert snapshot.overhead.transport_saturation_pct > 100.0
+    assert snapshot.overhead.transport_saturation_pct == pytest.approx(100.0)
+    notice = snapshot.overhead.transport_overload_notice
+    assert notice["overload_ratio"] > 1.0
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["predicted_pressure_bar"] > sim.melt.p_total_mbar / 1000.0
 
     reasons = [transition.reason for transition in sim.atom_ledger.transitions]
     reason_set = set(reasons)

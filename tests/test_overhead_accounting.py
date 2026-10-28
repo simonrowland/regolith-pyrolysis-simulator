@@ -1857,6 +1857,63 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
 
 
+def test_controlled_flash_preserves_condenser_pressure_and_drains_residual(
+    monkeypatch,
+):
+    sim = _gas_train_sim()
+    flux = EvaporationFlux(total_kg_hr=1.0, species_kg_hr={"Fe": 1.0})
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": 0.5},
+            condensed_by_stage_species={1: {"Fe": 0.5}},
+        ),
+    )
+    sim.melt.campaign = CampaignPhase.C4
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.temperature_C = 1150.0
+    sim.melt.p_total_mbar = 0.2
+    sim.melt.pO2_mbar = 0.0
+    sim._apply_native_fe_saturation_split = lambda **_kwargs: None
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+    configured = {}
+    real_configure = sim.condensation_model.configure_operating_conditions
+
+    def capture(**kwargs):
+        configured.update(kwargs)
+        return real_configure(**kwargs)
+
+    monkeypatch.setattr(sim.condensation_model, "configure_operating_conditions", capture)
+    sim.step()
+
+    flow = sim._effective_transport_capacity_this_tick
+    assert flow.retained_holdup_kg == 0.0
+    assert flow.demand_flux_kg_hr == pytest.approx(1.0)
+    assert flow.swallowed_flux_kg_hr == pytest.approx(1.0)
+    assert sim.overhead.transport_saturation_pct == pytest.approx(100.0)
+    assert sim.overhead.transport_overload_notice["authority_level"] == "extrapolated"
+    assert sim._melt_headspace_composition_mbar == pytest.approx(
+        configured["species_partial_pressures_mbar"],
+    )
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        configured["species_partial_pressures_mbar"]["Fe"] * 100.0,
+    )
+    assert sim.atom_ledger.project_account_kg("process.condensation_train")["Fe"] == pytest.approx(0.5)
+    assert sim.atom_ledger.project_account_kg("terminal.offgas")["Fe"] == pytest.approx(0.5)
+    assert sim.atom_ledger.project_account_kg("process.overhead_gas").get("Fe", 0.0) == pytest.approx(0.0)
+    assert abs(sim.record.snapshots[-1].mass_balance_error_pct) < 5e-12
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(
+        sim, sim.record.snapshots[-1], include_fe_redox_split=False,
+    )
+    assert summary["transport_overload_notice"] == sim.overhead.transport_overload_notice
+
+
 def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(
     monkeypatch,
 ):

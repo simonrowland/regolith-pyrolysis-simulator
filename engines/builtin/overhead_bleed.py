@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Literal, NotRequired, TypedDict
 
 from engines.builtin._common import (
     build_atom_balance_proof,
@@ -38,6 +39,35 @@ OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT = (
 OXYGEN_SPECIES = "O2"
 
 
+class TransportOverloadNotice(TypedDict):
+    reason: str
+    regime: str
+    authority_level: str
+    certified_band: dict[str, float]
+    overload_ratio: float | Literal["infinite"]
+    predicted_pressure_bar: NotRequired[float]
+
+
+def transport_overload_notice(
+    saturation: float, upstream_pressure_bar: float,
+) -> TransportOverloadNotice | None:
+    """Mark departure from the prescribed-pressure transport domain."""
+    if saturation <= 1.0:
+        return None
+    return {
+        "reason": "evolved_vapour_exceeds_transport_capacity",
+        "regime": "pressure_driven_poiseuille",
+        "authority_level": "extrapolated",
+        "certified_band": {
+            "max_overload_ratio": 1.0,
+            "upstream_pressure_bar": upstream_pressure_bar,
+        },
+        # Strict JSON cannot carry infinity; keep the zero-capacity overload
+        # explicit instead of letting the report serializer turn it into null.
+        "overload_ratio": "infinite" if math.isinf(saturation) else saturation,
+    }
+
+
 @dataclass(frozen=True)
 class EffectiveTransportCapacity:
     """One-tick controlled-flow boundary shared by bleed and diagnostics."""
@@ -53,6 +83,7 @@ class EffectiveTransportCapacity:
     upstream_pressure_bar: float
     downstream_pressure_bar: float
     binding_cause: str
+    overload_notice: TransportOverloadNotice | None = None
 
 
 def controlled_flow_capacity(
@@ -151,6 +182,7 @@ def controlled_flow_capacity(
         upstream_pressure_bar=upstream_pressure,
         downstream_pressure_bar=downstream_pressure,
         binding_cause=binding_cause,
+        overload_notice=transport_overload_notice(saturation, upstream_pressure),
     )
 
 

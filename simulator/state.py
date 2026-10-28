@@ -991,6 +991,9 @@ class OverheadGas:
     # Evaporation rate as % of pipe conductance (0-100+)
     # >100% triggers ΔT/dt throttling
 
+    transport_overload_notice: Dict[str, Any] = field(default_factory=dict)
+    # Original nominal-capacity overload, retained after pressure-driven relief.
+
 
 ENERGY_SCOPE_ELECTRICAL_PLUS_KNOWN_EVAPORATION = (
     "electrical_plus_known_evaporation_enthalpy"

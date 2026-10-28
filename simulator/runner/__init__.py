@@ -2865,6 +2865,11 @@ def build_per_hour_summary(
         )
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category
+    transport_notice = getattr(snapshot.overhead, "transport_overload_notice", {})
+    if transport_notice:
+        summary["transport_overload_notice"] = _json_safe(
+            transport_notice
+        )
     c2a_staged_gas = dict(getattr(snapshot, "c2a_staged_gas", {}) or {})
     if c2a_staged_gas:
         summary["c2a_staged_gas"] = _json_safe(c2a_staged_gas)
