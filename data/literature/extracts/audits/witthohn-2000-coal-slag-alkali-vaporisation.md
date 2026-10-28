@@ -38,7 +38,7 @@ settled from the render and footnote. Percent values are retained as printed.
 | K(g), samples A-D | Fig. 2, p. 16 | 0 | Typed refusal; points appear only on a logarithmic plot |
 | Na(g), samples E-G | Fig. 3, p. 17 | 0 | Typed refusal; points appear only on a logarithmic plot |
 | K(g), samples E-G | Fig. 3, p. 17 | 0 | Typed refusal; points appear only on a logarithmic plot |
-| Na2O activity, quasi-binary | Fig. 4, p. 18 | 0 | Typed refusal; plotted experimental points attributed to prior work |
+| Na2O activity, quasi-binary | Fig. 4, p. 17 | 0 | Typed refusal; plotted experimental points attributed to prior work |
 | Na2O activity, quasi-ternary | Fig. 5, p. 18 | 0 | Typed refusal; plotted experimental points attributed to Neudorf and Elliott (1980) |
 | K2O activity | Fig. 6, p. 18 | 0 | Typed refusal; calculated curves only, no measured K2O activity points |
 

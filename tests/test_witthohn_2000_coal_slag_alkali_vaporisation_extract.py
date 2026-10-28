@@ -28,6 +28,15 @@ def test_figure_only_measurements_remain_typed_refusals_after_migration() -> Non
         row for observation_id, row in rows.items() if "_g_fig" in observation_id
     ]
     assert len(pressure_rows) == 4
+    assert all(row.identity.quantity.value.value == "p_partial" for row in pressure_rows)
+    activity_rows = [
+        row
+        for observation_id, row in rows.items()
+        if "_na2o_fig" in observation_id or "_k2o_fig" in observation_id
+    ]
+    assert len(activity_rows) == 3
+    assert all(row.identity.quantity.value.value == "activity" for row in activity_rows)
+    assert all(row.identity.species.phase.value.value == "l" for row in activity_rows)
     assert all(
         row.evidence.class_.value.value == "measured_reduced"
         for row in pressure_rows
@@ -59,5 +68,6 @@ def test_figure_only_measurements_remain_typed_refusals_after_migration() -> Non
     # The page and printed figure locators cover three independent figure-only
     # candidates. None has a numeric point from the paper's table text.
     assert rows["witthohn_2000_na_g_fig2_figure_only"].locator.page == 16
+    assert rows["witthohn_2000_na2o_fig4_figure_only"].locator.page == 17
     assert rows["witthohn_2000_na2o_fig5_figure_only"].locator.page == 18
     assert rows["witthohn_2000_k2o_fig6_model_figure_only"].locator.page == 18

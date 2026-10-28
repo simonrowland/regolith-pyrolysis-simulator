@@ -28,7 +28,7 @@ fidelity_samples:
   observation_id: witthohn_2000_na2o_fig4_figure_only
   field: status
   value: typed_refusal
-  locator: {page: 18, figure: '4'}
+  locator: {page: 17, figure: '4'}
 - species: K2O
   observation_id: witthohn_2000_k2o_fig6_model_figure_only
   field: status
@@ -54,7 +54,7 @@ species:
     context:
     - observation_id: witthohn_2000_kems_pressure_method_context
       type: method
-      locator: {page: 5, section: 'Mass spectrometric measurement'}
+      locator: {page: 4, section: Experimental}
       units: as printed
       values:
         quantity: kems_pressure_method_and_calibration
@@ -252,7 +252,8 @@ species:
       regime: kems_effusion
       units: Pa
       values:
-        quantity: measured_na_g_partial_pressure_series
+        quantity: partial_pressure
+        label: Measured Na(g) partial-pressure series
         method_class: measured_reduced
         derivation:
           relation: >-
@@ -262,7 +263,7 @@ species:
           output_unit: Pa
           raw_inputs:
             state: {tag: value, value: not_printed}
-            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+            locator: {page: 5, note: 'Detector-signal rows and calibration inputs are not tabulated.'}
         status: typed_refusal
         reason: Figure-only plotted values are outside this extraction wave.
         admission_status: rejected_no_figure_reading
@@ -280,7 +281,8 @@ species:
       regime: kems_effusion
       units: Pa
       values:
-        quantity: measured_na_g_partial_pressure_series
+        quantity: partial_pressure
+        label: Measured Na(g) partial-pressure series
         method_class: measured_reduced
         derivation:
           relation: >-
@@ -290,7 +292,7 @@ species:
           output_unit: Pa
           raw_inputs:
             state: {tag: value, value: not_printed}
-            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+            locator: {page: 5, note: 'Detector-signal rows and calibration inputs are not tabulated.'}
         status: typed_refusal
         reason: Figure-only plotted values are outside this extraction wave.
         admission_status: rejected_no_figure_reading
@@ -310,7 +312,8 @@ species:
       regime: kems_effusion
       units: Pa
       values:
-        quantity: measured_k_g_partial_pressure_series
+        quantity: partial_pressure
+        label: Measured K(g) partial-pressure series
         method_class: measured_reduced
         derivation:
           relation: >-
@@ -320,7 +323,7 @@ species:
           output_unit: Pa
           raw_inputs:
             state: {tag: value, value: not_printed}
-            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+            locator: {page: 5, note: 'Detector-signal rows and calibration inputs are not tabulated.'}
         status: typed_refusal
         reason: Figure-only plotted values are outside this extraction wave.
         admission_status: rejected_no_figure_reading
@@ -338,7 +341,8 @@ species:
       regime: kems_effusion
       units: Pa
       values:
-        quantity: measured_k_g_partial_pressure_series
+        quantity: partial_pressure
+        label: Measured K(g) partial-pressure series
         method_class: measured_reduced
         derivation:
           relation: >-
@@ -348,7 +352,7 @@ species:
           output_unit: Pa
           raw_inputs:
             state: {tag: value, value: not_printed}
-            locator: {page: 5, section: 'Mass spectrometric measurement', note: 'Detector-signal rows and calibration inputs are not tabulated.'}
+            locator: {page: 5, note: 'Detector-signal rows and calibration inputs are not tabulated.'}
         status: typed_refusal
         reason: Figure-only plotted values are outside this extraction wave.
         admission_status: rejected_no_figure_reading
@@ -359,16 +363,17 @@ species:
     - observation_id: witthohn_2000_na2o_fig4_figure_only
       type: activity_coefficient
       locator:
-        page: 18
+        page: 17
         figure: '4'
         note: >-
           Quasi-binary Na2O-SiO2 comparison; experimental points attributed in
           the legend to prior studies. No numeric table is printed.
-      phase: liquid
+      phase: l
       standard_state: vapour pressure of pure Na2O
       units: dimensionless activity
       values:
-        quantity: na2o_activity_literature_comparison
+        quantity: activity
+        label: Na2O activity literature comparison
         method_as_published: >-
           Experimental points from emf measurements (Neudorf and Elliott, 1980;
           Yamaguchi et al., 1982), transpiration (Rego et al., 1985), and chemical
@@ -389,11 +394,12 @@ species:
         note: >-
           Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed
           to Neudorf and Elliott (1980). No numeric table is printed.
-      phase: liquid
+      phase: l
       standard_state: vapour pressure of pure Na2O
       units: dimensionless activity
       values:
-        quantity: na2o_activity_literature_comparison
+        quantity: activity
+        label: Na2O activity literature comparison
         method_as_published: emf measurements (Neudorf and Elliott, 1980)
         method_class: quoted_attributed
         attribution: Neudorf and Elliott (1980)
@@ -411,11 +417,12 @@ species:
         note: >-
           FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these
           as calculated activities, not measured activity points.
-      phase: liquid
+      phase: l
       standard_state: vapour pressure of pure K2O
       units: dimensionless activity
       values:
-        quantity: calculated_k2o_activity_model_curves
+        quantity: activity
+        label: Calculated K2O activity model curves
         method_as_published: >-
           FACT 2.1 thermodynamic modelling with the modified quasi-chemical model
           and the ChemSage delta-G minimiser.
