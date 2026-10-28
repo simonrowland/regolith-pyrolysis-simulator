@@ -6912,14 +6912,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return NoColdTrain("runtime_enforcement_disabled"), params.cold_train
         return capacity_from_hardware(params.cold_train), params.cold_train
 
-    def _controlled_o2_transport_capacity(self, evap_flux, *, dt_hr=1.0):
+    def _controlled_o2_transport_capacity(
+        self, evap_flux, *, dt_hr=1.0, retained_holdup_kg=None,
+    ):
         """Build the live controlled-flow boundary through canonical policy."""
 
         capacity, _cold_train = self._cold_train_capacity_policy()
-        retained_holdup_kg = sum(
-            max(0.0, float(mass_kg))
-            for mass_kg in self._overhead_holdup_species_kg().values()
-        )
+        if retained_holdup_kg is None:
+            retained_holdup_kg = sum(
+                max(0.0, float(mass_kg))
+                for mass_kg in self._overhead_holdup_species_kg().values()
+            )
         return self.overhead_model.controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
@@ -15685,7 +15688,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux = self._ledger_committed_evap_flux_this_tick
             inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
             effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(inlet_flux)
+                self._controlled_o2_transport_capacity(
+                    inlet_flux,
+                    # Reconcile any rejected evaporation parcel against the
+                    # same pre-tick holdup. Post-route overhead already holds
+                    # this tick's source; reading it again counts that source
+                    # twice and changes pressure after condenser routing.
+                    retained_holdup_kg=(
+                        effective_transport_capacity.retained_holdup_kg
+                        if effective_transport_capacity is not None
+                        else None
+                    ),
+                )
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity

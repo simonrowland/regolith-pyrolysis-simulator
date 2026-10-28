@@ -50,7 +50,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
@@ -71,6 +71,7 @@ from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default
 from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
+    transport_overload_notice,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -734,7 +735,7 @@ class OverheadGasModel:
         melt: MeltState,
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
-    ) -> dict[str, float]:
+    ) -> dict[str, Any]:
         """Estimate pipe pressure/capacity with the existing Poiseuille model."""
 
         conductance_temperature_C = _required_finite_float(
@@ -780,7 +781,7 @@ class OverheadGasModel:
                 'effective_transport_capacity.effective_capacity_kg_hr',
             )
             conductance = pipe_conductance_kg_hr / 3600.0
-            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+            vapor_pressure_mbar = effective_transport_capacity.upstream_pressure_bar * 1000.0
         else:
             conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
                 allowed_pressure_Pa,
@@ -852,6 +853,14 @@ class OverheadGasModel:
                 if controlled_flow
                 else 'pipe'
             ),
+            'transport_overload_notice': (
+                effective_transport_capacity.overload_notice
+                if controlled_flow
+                else transport_overload_notice(
+                    pipe_capacity_used_pct / 100.0,
+                    allowed_pressure_Pa / 1.0e5,
+                )
+            ),
         }
 
     def controlled_o2_transport_capacity(
@@ -863,15 +872,20 @@ class OverheadGasModel:
         retained_holdup_kg: float = 0.0,
         dt_hr: float = 1.0,
     ) -> Optional[EffectiveTransportCapacity]:
-        """Return the one-tick flow boundary for controlled-pO2 operation."""
+        """Resolve controlled flow or an overloaded pressure-driven pipe."""
 
-        if self._downstream_pressure_override is not None:
+        controlled_flow = (
+            self._downstream_pressure_override is None
+            and getattr(melt.atmosphere, 'name', '') in {
+                'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE',
+            }
+        )
+        if not controlled_flow and evap_flux.total_kg_hr == 0.0 and retained_holdup_kg == 0.0:
             return None
-        if getattr(melt.atmosphere, 'name', '') not in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        }:
+        downstream_pressure_bar = (
+            0.0 if controlled_flow else self._resolve_downstream_pressure(melt, None)
+        )
+        if not controlled_flow and self._conductance_override is not None:
             return None
         allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
         pipe_capacity_kg_hr = (
@@ -880,7 +894,7 @@ class OverheadGasModel:
             else self._pipe_conductance(
                 allowed_pressure_Pa,
                 float(melt.temperature_C),
-                p_downstream_Pa=0.0,
+                p_downstream_Pa=downstream_pressure_bar * 1.0e5,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             ) * 3600.0
         )
@@ -888,14 +902,14 @@ class OverheadGasModel:
 
         equipment_capacity = (
             cold_train_capacity.value_kg_hr
-            if isinstance(cold_train_capacity, FiniteCapacity)
+            if controlled_flow and isinstance(cold_train_capacity, FiniteCapacity)
             else None
         )
-        equipment_capacity_required = not (
+        equipment_capacity_required = controlled_flow and not (
             isinstance(cold_train_capacity, NoColdTrain)
             and cold_train_capacity.reason == "runtime_enforcement_disabled"
         )
-        return controlled_flow_capacity(
+        flow = controlled_flow_capacity(
             pipe_capacity_kg_hr=pipe_capacity_kg_hr,
             equipment_capacity_kg_hr=equipment_capacity,
             evolved_flux_kg_hr=evap_flux.total_kg_hr,
@@ -904,6 +918,58 @@ class OverheadGasModel:
             equipment_capacity_required=equipment_capacity_required,
             upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
         )
+        if not controlled_flow and flow.overload_notice is None:
+            return None
+        if (
+            flow.demand_flux_kg_hr > flow.pipe_capacity_kg_hr
+            and self._conductance_override is None
+        ):
+            # b-832 ruling A: pressure is the response, not a source throttle.
+            # Leybold, Fundamentals of Vacuum Technology, p.17, eq.1.28a:
+            # C ~ mean(P), so F=C*(P1-P2) ~ P1^2-P2^2. Reuse the pipe
+            # owner's inverse below: P1=sqrt(F/k+P2^2), [kg/hr]/[kg/(hr bar^2)]
+            # = bar^2. Vacuum sanity: 4x flow needs 2x P1 (same law/source);
+            # at 113/3.9 loading, 0.2 mbar becomes 1.0766 mbar. As F tends
+            # back into the nominal band this extension is no longer engaged.
+            pressure_bar = self._vapor_pressure_mbar_from_flux(
+                flow.demand_flux_kg_hr / 3600.0,
+                float(melt.temperature_C),
+                p_downstream_bar=downstream_pressure_bar,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,
+            ) / 1000.0
+            if not math.isfinite(pressure_bar) or pressure_bar <= 0.0:
+                raise OverheadConfigurationError(
+                    'positive transport demand requires valid pipe geometry and temperature'
+                )
+            pressure_bar = max(pressure_bar, flow.upstream_pressure_bar)
+            # The condenser receives the full source before OVERHEAD_BLEED.
+            # Its O2 equipment/accumulator/relief partition remains the O2
+            # disposition owner; it must not imprison condensable vapour.
+            resolved = controlled_flow_capacity(
+                pipe_capacity_kg_hr=max(
+                    flow.pipe_capacity_kg_hr, flow.demand_flux_kg_hr,
+                ),
+                equipment_capacity_kg_hr=None,
+                equipment_capacity_required=False,
+                evolved_flux_kg_hr=flow.evolved_flux_kg_hr,
+                retained_holdup_kg=flow.retained_holdup_kg,
+                dt_hr=dt_hr,
+                upstream_pressure_bar=pressure_bar,
+            )
+            return replace(
+                resolved,
+                equipment_capacity_kg_hr=flow.equipment_capacity_kg_hr,
+                downstream_pressure_bar=(
+                    resolved.downstream_pressure_bar
+                    if controlled_flow else downstream_pressure_bar
+                ),
+                binding_cause='pressure_driven_pipe',
+                overload_notice={
+                    **flow.overload_notice,
+                    'predicted_pressure_bar': pressure_bar,
+                },
+            )
+        return flow
 
     def _resolve_liner_temperature_value(
         self,
@@ -1132,6 +1198,9 @@ class OverheadGasModel:
         gas.transport_binding_cause = transport_state['transport_binding_cause']
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
+        gas.transport_overload_notice = dict(
+            transport_state['transport_overload_notice'] or {}
+        )
 
         if self._finite_headspace_enabled:
             self._update_finite_headspace(
@@ -1381,6 +1450,7 @@ class OverheadGasModel:
         gas.evap_exceeds_transport = False  # dimensionless bool — reset transport over-capacity flag
         gas.transport_saturation_pct = 0.0  # percent — reset pipe capacity used
         gas.transport_binding_cause = 'pipe'
+        gas.transport_overload_notice.clear()
         gas.stage_area_geometry_provenance_notice.clear()
 
     @staticmethod
