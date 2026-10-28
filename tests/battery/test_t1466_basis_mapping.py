@@ -1,0 +1,454 @@
+"""Source-basis pins for VapoRock gas rows and internal formation rows.
+
+The publication has to print the basis. A sample row from each family is
+scored as a series cell. Rows whose publication does not print a basis stay
+on the missing-input refusal.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from dataclasses import replace
+from decimal import Decimal
+from pathlib import Path
+
+from simulator.battery.compilation_tier import (
+    _iter_compilation_series_cells,
+    predict_thermo_attempt,
+)
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    NoticeKind,
+    PerBasis,
+    Quantity,
+    RefusalReason,
+    ValueKind,
+)
+from simulator.battery.identity import atm_to_pa, bar_to_pa, quantity_token
+from simulator.physical_constants import GAS_CONSTANT
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    _identity_from_plain,
+    _state_from_plain,
+    compilation_column_series_from_record,
+    migrate,
+    to_plain,
+)
+from simulator.battery.records import State
+from simulator.state_types import StateTag
+
+from tests.battery.test_migrate import (
+    _copy_compilation_record,
+    _migrate_real_extract,
+    _write_min_tree,
+)
+
+B677 = "pankratz-1984-usbm-b677"
+B592 = "kelley-king-1961-usbm-b592"
+B689 = "pankratz-1987-usbm-b689"
+B696 = "pankratz-1994-usbm-b696"
+B2131 = "robie-hemingway-1995-usgs-b2131"
+
+_MISSING_GAS = "vaporock-gas-thermo-requires-mol-species-basis"
+_MISSING_PER = "per-basis-unsupported"
+
+
+def _migrate_record(tmp_path: Path, source_id: str, filename: str):
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, source_id, filename)
+    return migrate(root, write=False)
+
+
+def _observation(result, source_id: str, record_id: str, quantity: Quantity, *, contains: str | None = None):
+    prefix = f"{source_id}:{record_id}"
+    found = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.startswith(prefix)
+        and quantity_token(obs.identity) is quantity
+        and (contains is None or contains in obs.observation_id)
+    ]
+    assert len(found) == 1, [obs.observation_id for obs in found]
+    return found[0]
+
+
+def _cell_at(observation, temperature: str):
+    target = Decimal(temperature)
+    found = [
+        cell
+        for cell in _iter_compilation_series_cells(observation)
+        if isinstance(cell.identity.temperature_K, State)
+        and cell.identity.temperature_K.is_value
+        and cell.identity.temperature_K.value == target
+    ]
+    assert found, [
+        (
+            cell.observation_id,
+            getattr(cell.identity.temperature_K, "value", None),
+        )
+        for cell in _iter_compilation_series_cells(observation)
+    ]
+    return found[0]
+
+
+def _per_is_unknown(observation) -> bool:
+    per = observation.identity.per
+    return per is None or per.is_unknown
+
+
+def _attempt(engine: Engine, cell):
+    return predict_thermo_attempt(engine, cell)
+
+
+def _record_doc(source_id: str, filename: str) -> dict:
+    path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / source_id
+        / "records"
+        / filename
+    )
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(document, dict)
+    return document
+
+
+def _printed_b677_token(document: dict, temperature: str, column: int) -> str:
+    for row in document["source_table_rows_raw"]:
+        if isinstance(row, list) and row and str(row[0]) == temperature:
+            return str(row[column])
+    raise AssertionError(temperature)
+
+
+def _assert_cell_matches_reader(
+    observation,
+    document: dict,
+    quantity: Quantity,
+    temperature: str,
+    *,
+    printed_token: str,
+    column: int,
+) -> None:
+    """Stored magnitude is the reader's lift of the printed cell, not a recomputed factor."""
+
+    assert _printed_b677_token(document, temperature, column) == printed_token
+    series = next(
+        item
+        for item in compilation_column_series_from_record(document)
+        if item.quantity is quantity
+    )
+    assert series.value.series is not None
+    magnitude = next(
+        value
+        for point_temperature, value in series.value.series
+        if point_temperature == Decimal(temperature)
+    )
+    assert _cell_at(observation, temperature).value.point == magnitude
+
+
+def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path / "ideal-gas-reference", B677, "table-0096.json")
+    heat_capacity = _observation(result, B677, "table-0096", Quantity.CP)
+    entropy = _observation(result, B677, "table-0096", Quantity.S)
+    enthalpy = _observation(result, B677, "table-0096", Quantity.H_MINUS_H298)
+    gibbs = _observation(result, B677, "table-0096", Quantity.DELTA_FG)
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pankratz-1984-usbm-b677-p001-p040.md:677" in heat_capacity.identity.per.reason
+    assert "101325" in heat_capacity.identity.per.reason
+    assert heat_capacity.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    # Identity.__post_init__ rewrites decimal axes with State.of, which drops a reason.
+    assert heat_capacity.identity.standard_pressure_Pa.reason is None
+    assert heat_capacity.identity.subtype.is_not_applicable
+    assert entropy.identity.per.value is PerBasis.MOL_SPECIES
+    assert entropy.identity.subtype.is_not_applicable
+    assert enthalpy.identity.subtype.value == "H(T)-H(298.15 K)"
+    assert ":149" in enthalpy.identity.subtype.reason
+    assert _per_is_unknown(gibbs)
+    document = _record_doc(B677, "table-0096.json")
+    _assert_cell_matches_reader(
+        heat_capacity, document, Quantity.CP, "1600", printed_token="4.975", column=1
+    )
+    _assert_cell_matches_reader(
+        enthalpy, document, Quantity.H_MINUS_H298, "1600", printed_token="6.469", column=3
+    )
+    admitted_enthalpy = _attempt(Engine.VAPOROCK, _cell_at(enthalpy, "1600"))
+    assert admitted_enthalpy.refusal_reason is None
+    assert admitted_enthalpy.value is not None
+
+    condensed_reference = _migrate_record(
+        tmp_path / "condensed-reference", B677, "table-0095.json"
+    )
+    mismatched_enthalpy = _observation(
+        condensed_reference, B677, "table-0095", Quantity.H_MINUS_H298
+    )
+    refused_enthalpy = _attempt(
+        Engine.VAPOROCK, _cell_at(mismatched_enthalpy, "1600")
+    )
+    assert refused_enthalpy.value is None
+    phase = mismatched_enthalpy.identity.species.phase
+    assert phase.is_unknown
+    # The record flags its "(c,1,g)" heading as OCR-suspect; the extract
+    # prints K(c,l,g). Keep the mixed phase unknown (records/table-0095.json:6-27;
+    # source/mineru/pankratz-1984-usbm-b677-p041-p080.md:863-876).
+    assert refused_enthalpy.refusal_reason is RefusalReason.UNSUPPORTED
+    assert refused_enthalpy.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+    assert refused_enthalpy.refusal_detail["quantity"] == "H_minus_H298"
+
+    restored = _identity_from_plain(to_plain(heat_capacity.identity))
+    assert restored.per.reason == heat_capacity.identity.per.reason
+    assert restored.standard_pressure_Pa.value == atm_to_pa(1)
+    admitted = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "1600"))
+    assert admitted.refusal_reason is None
+    assert admitted.value is not None
+    outside = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298"))
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+
+    printed_cp = janaf_tabulated_gas_thermo("K", Decimal("298.15")).heat_capacity
+    assert outside.refusal_reason is None
+    assert outside.value == printed_cp
+    assert outside.authority is Authority.BRIDGE
+    assert len(outside.notices) == 1
+    notice = outside.notices[0]
+    assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert notice.affected_quantities == (Quantity.CP,)
+    assert notice.authority is Authority.BRIDGE
+    assert "branch=table" in outside.call_evidence
+    assert "coefficient_interval=outside" in outside.call_evidence
+    assert "janaf_table_id=K-005" in outside.call_evidence
+    assert _cell_at(heat_capacity, "298").identity.per.value is PerBasis.MOL_SPECIES
+
+
+def test_b677_mgo_formation_maps_mol_species_without_a_reaction(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B677, "table-1203.json")
+    gibbs = _observation(result, B677, "table-1203", Quantity.DELTA_FG)
+    heat_capacity = _observation(result, B677, "table-1203", Quantity.CP)
+    assert gibbs.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pankratz-1984-usbm-b677-p001-p040.md:175" in gibbs.identity.per.reason
+    assert "0.5" in gibbs.identity.per.reason
+    assert gibbs.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    assert gibbs.identity.reaction.is_unknown
+    assert _per_is_unknown(heat_capacity)
+    document = _record_doc(B677, "table-1203.json")
+    _assert_cell_matches_reader(
+        gibbs,
+        document,
+        Quantity.DELTA_FG,
+        "1200",
+        printed_token="-112.322",
+        column=5,
+    )
+    inside = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "1200"))
+    assert inside.value is None
+    assert inside.refusal_detail["reason"] == "standard-pressure-transform-reaction-unknown"
+    below = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "298"))
+    assert below.value is None
+    assert below.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+
+
+def _b592_printed_raw(document: dict, column: str) -> str:
+    return str(document["rows"][0]["cells"][column]["raw"])
+
+
+def _reader_magnitude(document: dict, quantity: Quantity, temperature: str, *, key: str | None = None):
+    matched = [
+        series
+        for series in compilation_column_series_from_record(document)
+        if series.quantity is quantity and (key is None or key in series.series_key)
+    ]
+    assert len(matched) == 1
+    series = matched[0]
+    target = Decimal(temperature)
+    if series.value.kind is ValueKind.SERIES:
+        assert series.value.series is not None
+        return next(value for point_temperature, value in series.value.series if point_temperature == target)
+    assert series.temperature_K.value == target
+    return series.value.point
+
+
+def test_b592_alo_uses_printed_table6_basis(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B592, "table-006-0018.json")
+    heat_capacity = _observation(result, B592, "table-006-0018", Quantity.CP)
+    entropy = _observation(
+        result, B592, "table-006-0018", Quantity.S, contains="entropy_recommended"
+    )
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert "kelley-king-1961-usbm-b592-p101-p120.md:263" in heat_capacity.identity.per.reason
+    assert "Heat capacities" in heat_capacity.identity.per.reason
+    # :793 states 1 atm for selected entropies only. Cp stays unmapped on pressure.
+    assert "p001-p040.md:793" not in heat_capacity.identity.per.reason
+    assert heat_capacity.identity.standard_pressure_Pa.is_unknown
+    assert "kelley-king-1961-usbm-b592-p001-p040.md:793" in entropy.identity.per.reason
+    assert "1 atm" in entropy.identity.per.reason
+    assert "kelley-king-1961-usbm-b592-p101-p120.md:263" in entropy.identity.per.reason
+    assert entropy.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    document = _record_doc(B592, "table-006-0018.json")
+    assert _b592_printed_raw(document, "cp_298_15_k") == "7.37"
+    assert _b592_printed_raw(document, "entropy_recommended") == "52.16±0.10"
+    assert _cell_at(heat_capacity, "298.15").value.point == _reader_magnitude(
+        document, Quantity.CP, "298.15"
+    )
+    assert entropy.value.point == _reader_magnitude(
+        document, Quantity.S, "298.15", key="entropy_recommended"
+    )
+    admitted = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298.15"))
+    assert admitted.refusal_reason is None
+    assert admitted.value is not None
+
+
+def _b2131_printed_raw(document: dict, temperature: str, column: str) -> str:
+    for row in document["rows"]:
+        cells = row.get("cells")
+        if not isinstance(cells, dict):
+            continue
+        if str(cells.get("temperature", {}).get("raw")) == temperature:
+            return str(cells[column]["raw"])
+    raise AssertionError(temperature)
+
+
+def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B2131, "high-temperature-p182.json")
+    log_kf = _observation(result, B2131, "high-temperature-p182", Quantity.LOG10_KF)
+    assert log_kf.identity.per.value is PerBasis.MOL_SPECIES
+    assert "pdftotext-layout.txt:167-169" in log_kf.identity.per.reason
+    assert ":170-171" in log_kf.identity.per.reason
+    assert ":187-188" in log_kf.identity.per.reason
+    assert ":313-315" in log_kf.identity.per.reason
+    assert ":332-333" in log_kf.identity.per.reason
+    assert "101325" in log_kf.identity.per.reason
+    assert "1 bar" in log_kf.identity.per.reason
+    assert log_kf.identity.standard_pressure_Pa.value == bar_to_pa(1)
+    assert log_kf.identity.reaction.is_unknown
+    document = _record_doc(B2131, "high-temperature-p182.json")
+    assert _b2131_printed_raw(document, "298.15", "log_kf") == "105.66"
+    assert _cell_at(log_kf, "298.15").value.point == _reader_magnitude(
+        document, Quantity.LOG10_KF, "298.15"
+    )
+    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "298.15"))
+    assert attempt.value is None
+    assert attempt.refusal_detail["reason"] == "ellingham-phase-or-polymorph-not-in-fit"
+
+
+def test_b689_ags_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B689, "page-0003.json")
+    enthalpy = _observation(result, B689, "page-0003", Quantity.H_MINUS_H298)
+    assert _per_is_unknown(enthalpy)
+    cell = _cell_at(enthalpy, "298.15")
+    attempt = _attempt(Engine.VAPOROCK, cell)
+    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+
+
+def test_b696_ago_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B696, "page-0006.json")
+    heat_capacity = _observation(result, B696, "page-0006", Quantity.CP)
+    assert _per_is_unknown(heat_capacity)
+    cell = _cell_at(heat_capacity, "1000")
+    attempt = _attempt(Engine.VAPOROCK, cell)
+    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+
+
+def test_b677_silver_stays_unmapped(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B677, "table-0008.json")
+    heat_capacity = _observation(result, B677, "table-0008", Quantity.CP)
+    gibbs = _observation(result, B677, "table-0008", Quantity.DELTA_FG)
+    assert _per_is_unknown(heat_capacity)
+    assert _per_is_unknown(gibbs)
+    gas = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "1000"))
+    formation = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "1000"))
+    assert gas.refusal_detail["reason"] == _MISSING_GAS
+    assert formation.refusal_detail["reason"] == _MISSING_PER
+
+
+def test_b592_aluminum_gas_outside_interval_stays_unmapped(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B592, "table-006-0003.json")
+    entropy = _observation(
+        result,
+        B592,
+        "table-006-0003",
+        Quantity.S,
+        contains="entropy_recommended",
+    )
+    assert _per_is_unknown(entropy)
+    attempt = _attempt(Engine.VAPOROCK, _cell_at(entropy, "298.15"))
+    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+
+
+def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
+    result = _migrate_record(tmp_path, B2131, "high-temperature-p067.json")
+    log_kf = _observation(result, B2131, "high-temperature-p067", Quantity.LOG10_KF)
+    assert _per_is_unknown(log_kf)
+    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(log_kf, "1600"))
+    assert attempt.refusal_detail["reason"] == _MISSING_PER
+
+
+def test_cited_value_reason_survives_plain_reload() -> None:
+    cited = State(StateTag.VALUE, value=PerBasis.MOL_SPECIES, reason="quoted basis")
+    restored = _state_from_plain(to_plain(cited), lambda value: PerBasis(str(value)))
+    assert restored.value is PerBasis.MOL_SPECIES
+    assert restored.reason == "quoted basis"
+    bare = _state_from_plain(
+        to_plain(State.of(PerBasis.MOL_SPECIES)),
+        lambda value: PerBasis(str(value)),
+    )
+    assert bare.reason is None
+
+
+def test_shornikov_solid_k2o_stays_missing_per_basis(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "shornikov-2013-potassium-silicate-thermodynamics.yaml",
+    )
+    found = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("shornikov_2013_t3_solid_k2o")
+        and quantity_token(obs.identity) is Quantity.DELTA_FG
+    ]
+    assert len(found) == 1
+    oxide = found[0]
+    assert _per_is_unknown(oxide)
+    assert oxide.value.point == Decimal("-161.387")
+    attempt = _attempt(Engine.INTERNAL_ANALYTICAL, oxide)
+    assert attempt.refusal_detail["reason"] == _MISSING_PER
+
+
+def _at_pressure(cell, pressure_Pa: Decimal):
+    return replace(
+        cell,
+        identity=replace(cell.identity, standard_pressure_Pa=State.of(pressure_Pa)),
+    )
+
+
+def test_catalog_entropy_shifts_between_one_atm_and_one_bar(tmp_path: Path) -> None:
+    """S°(1 atm) − S°(1 bar) = −R ln(1.01325). Cp and H−H298 do not move.
+
+    R is the project constant. The expected difference is not taken from
+    the shift helper under test.
+    """
+
+    result = _migrate_record(tmp_path, B677, "table-0096.json")
+    entropy = _cell_at(_observation(result, B677, "table-0096", Quantity.S), "1600")
+    heat = _cell_at(_observation(result, B677, "table-0096", Quantity.CP), "1600")
+    enthalpy = _cell_at(
+        _observation(result, B677, "table-0096", Quantity.H_MINUS_H298), "1600"
+    )
+    assert entropy.identity.standard_pressure_Pa.value == atm_to_pa(1)
+    one_bar = bar_to_pa(1)
+    entropy_atm = _attempt(Engine.VAPOROCK, entropy)
+    entropy_bar = _attempt(Engine.VAPOROCK, _at_pressure(entropy, one_bar))
+    assert entropy_atm.refusal_reason is None
+    assert entropy_bar.refusal_reason is None
+    expected = -Decimal(str(GAS_CONSTANT)) * Decimal(str(math.log(1.01325)))
+    # The shift is added to an entropy of about 195 J/mol/K under the default
+    # 28-digit Decimal context, so (raw + shift) - raw drops digits past ~1e-25.
+    # 1e-12 J/mol/K still rejects a missing 0.109 J/mol/K correction.
+    assert abs(entropy_atm.value - entropy_bar.value - expected) < Decimal("1e-12")
+    for cell in (heat, enthalpy):
+        at_atm = _attempt(Engine.VAPOROCK, cell)
+        at_bar = _attempt(Engine.VAPOROCK, _at_pressure(cell, one_bar))
+        assert at_atm.refusal_reason is None
+        assert at_bar.refusal_reason is None
+        assert at_atm.value == at_bar.value
