@@ -187,9 +187,11 @@ def test_silica_glass_capture_is_unavailable_when_stage_3_is_missing():
 
     silica = result['pure_silica_glass']
     assert silica['stage_3_capture_kg'] is None
+    assert silica['class_total_kg'] is None
     assert silica['flag']['status'] == 'unavailable'
     assert silica['flag']['reason']
     assert silica['stage_3_kg_by_species'] == {}
+    assert result['glass']['class_total_kg'] is None
 
 
 def test_silica_glass_capture_is_zero_when_stage_3_exists_with_no_collection():

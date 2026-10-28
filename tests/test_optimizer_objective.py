@@ -363,6 +363,28 @@ def test_pure_silica_objective_uses_route_classified_product_not_raw_capture() -
     ) == pytest.approx(4.5)
 
 
+def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
+    from simulator.three_product_report import classify_products
+
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    product_classes = classify_products(sim)
+    product_kg = _metric_value(
+        "pure_silica_glass_kg", sim, {}, product_classes
+    )
+
+    assert product_kg is None
+    evidence = objective_module._silica_objective_evidence(
+        product_classes, product_kg
+    )
+    assert evidence["value_status"] == "unavailable"
+    assert evidence["certification_flag"]["status"] == "unavailable"
+    assert evidence["certification_flag"]["reason"]
+
+
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
     sim = SimpleNamespace(
         energy_electrical_plus_evaporation_cumulative_kWh=18.0,
