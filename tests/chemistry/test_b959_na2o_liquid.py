@@ -1,6 +1,8 @@
 """JANAF Na-013 regressions for b-959; no golden rebaselining."""
 
 import math
+from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
@@ -97,3 +99,27 @@ def test_na_liquid_source_endpoint_and_flagged_extension():
 def test_na_liquid_reference_refuses_missing_or_invalid_temperature(temperature_K):
     with pytest.raises((TypeError, ValueError)):
         _na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+
+
+def test_feo_gate_at_legacy_crossover_proposes_balanced_reduction():
+    from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+    from simulator.core import PyrolysisSimulator
+    from tests.chemistry.conftest import _atom_check
+    from tests.chemistry.test_builtin_metallothermic_step_provider import (
+        _c3_na_feo_cleanup_request,
+    )
+
+    # Reuse the provider's controlled liquid-fraction request, resolving only
+    # its formula registry. This isolates the cited FeO standard-state gate
+    # from the external melt backend, which supplies that input in a full run.
+    registry = PyrolysisSimulator._load_species_formula_registry()
+    request = _c3_na_feo_cleanup_request(
+        SimpleNamespace(species_formula_registry=registry), liquid_fraction=0.25
+    )
+    result = BuiltinMetallothermicStepProvider().dispatch(
+        replace(request, temperature_C=1181.5)
+    )
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["metal_produced_kg"] > 0.0
+    _atom_check(result.transition, registry, tol=1e-9)

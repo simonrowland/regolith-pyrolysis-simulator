@@ -1416,14 +1416,16 @@ def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     assert attempt.value is not None
     assert attempt.unit == "kJ_per_declared_mol_basis"
     residual = attempt.value - _PRINTED_DFG
-    # 0.442 kJ/mol O2 / n_ox 2 = 0.221 kJ/mol oxide.
-    assert abs(residual - Decimal("0.1832")) < Decimal("0.001")
+    # b-959 interpolates the printed JANAF liquid rows exactly; the former
+    # unconstrained fit had a +0.1832 kJ/mol Na2O residual at this 2200 K row.
+    assert abs(residual) < Decimal("0.001")
+    # Retain the original per-oxide fit-error ceiling as an additional guard.
     assert abs(residual) < Decimal("0.221")
     assert attempt.refusal_reason is None
 
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
     assert prediction.value is not None
-    assert float(prediction.value).hex() == "-0x1.d9f559b3d0780p+1"
+    assert float(prediction.value).hex() == float(attempt.value).hex()
     assert prediction.unit == attempt.unit
 
 

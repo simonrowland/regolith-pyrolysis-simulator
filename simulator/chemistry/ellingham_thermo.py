@@ -1248,8 +1248,14 @@ _ELLINGHAM_PHASE_INTERVALS: dict[str, tuple[_EllinghamPhaseInterval, ...]] = {
     "Na2O": (
         _phase_interval("Na2O", 0.0, 1023.150, "JANAF Na-014 gamma <--> beta 1023.150 K"),
         _phase_interval("Na2O", 1023.150, 1243.150, "JANAF Na-014 beta <--> alpha 1243.150 K"),
-        _phase_interval("Na2O", 1243.150, 1405.200, "JANAF Na-014 alpha <--> liquid 1405.200 K"),
-        _phase_interval("Na2O", 1405.200, None, "JANAF Na-014 liquid; table has no further transition"),
+        _phase_interval(
+            "Na2O", 1243.150, _na2o_janaf_liquid_source_data()[1],
+            "JANAF Na-014 alpha <--> liquid 1405.200 K",
+        ),
+        _phase_interval(
+            "Na2O", _na2o_janaf_liquid_source_data()[1], None,
+            "JANAF Na-014 liquid; table has no further transition",
+        ),
     ),
     "Ni": (
         _phase_interval("Ni", 0.0, 631.0, "JANAF Ni-001 magnetic transition 631 K"),

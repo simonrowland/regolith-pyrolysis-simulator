@@ -172,7 +172,11 @@ def test_ellingham_table_matches_declared_provenance():
         "expected_1900C",
     ),
     [
-        ("Na", 3000.0, -157.82, -65.74, -19.70),
+        # Na-013 liquid ΔfG rows (kJ/mol Na2O): 1800/1900 K
+        # -95.974/-72.614; 2000/2100 K -49.488/-26.582;
+        # 2100/2200 K -26.582/-3.886. Interpolate at the Celsius-derived
+        # temperatures, then double onto the per-O2 reaction basis.
+        ("Na", 3000.0, -157.772320, -65.464522, -19.959752),
         ("K", 2000.0, -9.06, 84.50, 131.26),
         ("Fe", 2600.0, -310.43, -289.09, -278.42),
         ("Mn", 2600.0, -484.25, -451.12, -434.56),
