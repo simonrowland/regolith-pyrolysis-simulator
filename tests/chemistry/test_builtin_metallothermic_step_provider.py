@@ -1855,7 +1855,7 @@ def test_c3_na_shuttle_returns_na2o_to_cleaned_melt(
     assert result.transition is not None
     assert result.transition.credits["process.cleaned_melt"]["Na2O"] > 0.0
     assert SPENT_REDUCTANT_RESIDUE_ACCOUNT not in result.transition.credits
-    assert result.diagnostic["spent_reductant_residue_account"] == "process.cleaned_melt"
+    assert result.diagnostic["cleaned_melt_account"] == "process.cleaned_melt"
     assert "Na2O" not in result.transition.credits.get(
         "process.reagent_inventory", {}
     )
