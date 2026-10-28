@@ -590,6 +590,15 @@ def test_coverage_non_pressure_engine_omits_pressure_columns():
     assert all(
         not benchmark.coverage_cell_accepted(row, "alphamelts") for row in rows
     )
+    # This successful coverage result is a domain projection, not a
+    # prediction by the point-observable adapter.
+    assert benchmark.detect_run_self_contradiction(
+        [{"engine": "alphamelts", "status": "unavailable"}],
+        (),
+        rows,
+    ) == ("alphamelts",)
+    guard_contract = benchmark.engines_with_ok_and_adapter_unavailable.__doc__ or ""
+    assert "domain_gate" in guard_contract and "domain projection" in guard_contract
 
 
 def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
