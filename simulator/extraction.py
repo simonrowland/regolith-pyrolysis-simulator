@@ -1415,6 +1415,8 @@ class ExtractionMixin:
         from simulator.mre_reproduction import PlantMREIntervalControl
 
         mre_diagnostic_state_before_step = {
+            'voltage_status_by_oxide': dict(
+                getattr(self, '_mre_decomposition_voltage_status_by_oxide', {}) or {}),
             'uncertified_yield': dict(
                 getattr(self, '_mre_uncertified_yield', {}) or {}),
             'ellingham_ladder_diagnostic': dict(
@@ -1432,6 +1434,7 @@ class ExtractionMixin:
                 None,
             ),
         }
+        self._mre_decomposition_voltage_status_by_oxide = {}
         self._mre_uncertified_yield = {}
         self._mre_ellingham_ladder_diagnostic = {}
         if (
@@ -1463,6 +1466,8 @@ class ExtractionMixin:
                 self.melt, 'mre_c5_ladder_complete', False),
             'melt_declared_rung_V': getattr(
                 self.melt, 'mre_declared_rung_V', 0.0),
+            'voltage_status_by_oxide': dict(
+                mre_diagnostic_state_before_step['voltage_status_by_oxide']),
             'uncertified_yield': dict(
                 mre_diagnostic_state_before_step['uncertified_yield']),
             'ellingham_ladder_diagnostic': dict(
@@ -1774,6 +1779,8 @@ class ExtractionMixin:
                 control.diagnostic_state_before_dispatch)
         else:
             mre_diagnostic_state_before_step = {
+                'voltage_status_by_oxide': dict(
+                    getattr(self, '_mre_decomposition_voltage_status_by_oxide', {}) or {}),
                 'uncertified_yield': dict(
                     getattr(self, '_mre_uncertified_yield', {}) or {}),
                 'ellingham_ladder_diagnostic': dict(
@@ -1791,6 +1798,7 @@ class ExtractionMixin:
                     None,
                 ),
             }
+            self._mre_decomposition_voltage_status_by_oxide = {}
             self._mre_uncertified_yield = {}
             self._mre_ellingham_ladder_diagnostic = {}
 
@@ -1867,6 +1875,9 @@ class ExtractionMixin:
             fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._mre_decomposition_voltage_status_by_oxide = dict(
+            diagnostic.get('mre_decomposition_voltage_status_by_oxide') or {}
+        )
         self._mre_effective_voltage_margin_V_by_oxide = dict(
             diagnostic.get('mre_effective_voltage_margin_V_by_oxide') or {}
         )
@@ -1953,6 +1964,8 @@ class ExtractionMixin:
                 if is_plant
                 else mre_diagnostic_state_before_step
             )
+            self._mre_decomposition_voltage_status_by_oxide = dict(
+                restore_state['voltage_status_by_oxide'])
             self._mre_uncertified_yield = dict(
                 restore_state['uncertified_yield'])
             self._mre_ellingham_ladder_diagnostic = dict(

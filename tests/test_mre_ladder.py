@@ -337,6 +337,55 @@ def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypat
     assert "Na-015" in caught.value.diagnostic["missing_input"]
 
 
+@pytest.mark.parametrize("campaign", [CampaignPhase.C5, CampaignPhase.MRE_BASELINE])
+@pytest.mark.parametrize("oxide,temperature_K", [("Cr2O3", 1773.15), ("Na2O", 1200.0), ("MgO", 1773.15)])
+def test_mre_voltage_notices_reach_operator_snapshot_and_report(campaign, oxide, temperature_K):
+    sim = _sim({"campaigns": {}, "mre_voltage_sequence": {"sequence": [
+        {"species": oxide, "decomposition_V": "canonical", "min_hold_hours": 0},
+    ]}})
+    sim.melt.temperature_C = temperature_K - 273.15
+    sim.melt.campaign = campaign
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = oxide
+    sim.melt.mre_max_voltage_V = 3.0
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    _seed_cleaned_melt_kg(sim, {oxide: 10.0})
+    sim._commanded_pO2_bar = lambda: 1.0
+
+    sim._step_mre()
+
+    expected = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=temperature_K).status
+    assert "out_of_domain:" in expected
+    assert sim._mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+    summary = build_per_hour_summary(sim, snapshot)
+    assert summary["mre_decomposition_voltage_status_by_oxide"] == {oxide: expected}
+    sim._mre_decomposition_voltage_status_by_oxide.clear()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {oxide: expected}
+
+
+def test_mre_voltage_notices_restore_on_terminal_refusal():
+    from simulator.electrolysis import MREElectrolysisRefusal, MRE_RAW_MARGIN_REFUSAL
+
+    sim = _sim({"campaigns": {}})
+    sim.melt.campaign = CampaignPhase.MRE_BASELINE
+    sim.melt.temperature_C = 1500.0
+    sim._mre_voltage_sequence = [{"voltage": 2.0, "species": ["Cr2O3"], "min_hold_hours": 0}]
+    _seed_cleaned_melt_kg(sim, {"Cr2O3": 10.0})
+    sim._mre_decomposition_voltage_status_by_oxide = {"previous": "retained"}
+    sim._commanded_pO2_bar = lambda: 1.0
+    sim._dispatch_only = lambda *_args, **_kwargs: SimpleNamespace(
+        status="refused", transition=None, diagnostic={
+            "reason_refused": MRE_RAW_MARGIN_REFUSAL,
+            "mre_decomposition_voltage_status_by_oxide": {"Cr2O3": "attempted"},
+        },
+    )
+    with pytest.raises(MREElectrolysisRefusal):
+        sim._step_mre()
+    assert sim._mre_decomposition_voltage_status_by_oxide == {"previous": "retained"}
+
+
 def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
     import subprocess
     import sys
@@ -945,10 +994,15 @@ def test_c5_disabled_keeps_ellingham_ladder_diagnostic_empty_in_snapshot():
     sim.melt.campaign = CampaignPhase.C5
     sim.melt.c5_enabled = False
     sim._mre_ellingham_ladder_diagnostic = {"schema": "stale"}
+    sim._mre_decomposition_voltage_status_by_oxide = {"Cr2O3": "stale"}
 
     sim._step_mre()
 
     assert sim._mre_ellingham_ladder_diagnostic == {}
+    assert sim._mre_decomposition_voltage_status_by_oxide == {}
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_decomposition_voltage_status_by_oxide == {}
+    assert "mre_decomposition_voltage_status_by_oxide" not in build_per_hour_summary(sim, snapshot)
     assert sim._make_snapshot().mre_ellingham_ladder_diagnostic == {}
 
 

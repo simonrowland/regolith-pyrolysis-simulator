@@ -1089,6 +1089,7 @@ class HourSnapshot:
     mre_declared_rung_V: float = 0.0
     mre_current_A: float = 0.0  # Effective Faradaic current, never nominal dispatch
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
+    mre_decomposition_voltage_status_by_oxide: Dict[str, str] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
     metal_phase_stratification: Dict[str, Any] = field(default_factory=dict)
