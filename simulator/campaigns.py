@@ -1063,58 +1063,17 @@ class CampaignManager:
         return limit, 'setpoint:C4.max_process_wall_clock_hr'
 
     @staticmethod
-    def _c4_snapshot_was_transport_hold(snapshot: object) -> bool:
-        """True when Loop-3/4 fully zeroed a wanted preheat ramp this hour.
-
-        Premise: ``max_target_acquisition_hr`` budgets reaching
-        ``temp_range_C[0]`` at the campaign's nominal ramp (setpoint comment:
-        ~42 h from 1160 C at 10 C/h plus margin). Hours where the plant
-        wanted to ramp (``nominal_ramp_rate_C_hr > 0``) but transport
-        saturation forced ``actual_ramp_rate_C_hr == 0`` with a recorded
-        throttle reason are isothermal holdup-drain holds, not preheat
-        opportunity.
-
-        Algebra: transport-hold ⇔ nominal>0 ∧ actual≤0 ∧ throttle_reason≠''.
-        Unitless rates in C/hr; reason is a non-empty diagnostic string.
-        Sanity/limit: snapshots that never set ramp fields (unit tests,
-        default 0/0/'') are NOT holds, so opportunity collapses to wall
-        campaign hours when throttle telemetry is absent.
-        """
-        nominal = float(
-            getattr(snapshot, 'nominal_ramp_rate_C_hr', 0.0) or 0.0
-        )
-        actual = float(
-            getattr(snapshot, 'actual_ramp_rate_C_hr', 0.0) or 0.0
-        )
-        reason = str(getattr(snapshot, 'throttle_reason', '') or '')
-        return nominal > 0.0 and actual <= 0.0 and bool(reason)
-
-    @staticmethod
-    def _c4_current_is_transport_hold(
-        transport_state: Mapping[str, object] | None,
-    ) -> bool:
-        """True when this hour's applied ramp was fully transport-zeroed.
-
-        Uses the live ramp telemetry stamped into ``transport_state`` by
-        core._check_campaign_endpoint (nominal/actual/throttle_reason for the
-        ramp already applied this hour) — production always stamps all three
-        keys (core.py transport_state assembly). Absent telemetry is NOT a
-        hold (wall-clock semantics), same predicate as the snapshot form.
-        A sat-only fallback was deleted per the 2026-08-07 dual C4 review
-        P3a/P3b: it never fired in production, no test pinned it, and it
-        classified holds on weaker evidence (no throttle_reason) with a
-        fail-slow non-finite branch.
-        """
-        if transport_state is None:
-            return False
-        nominal = float(
-            transport_state.get('nominal_ramp_rate_C_hr', 0.0) or 0.0
-        )
-        actual = float(
-            transport_state.get('actual_ramp_rate_C_hr', 0.0) or 0.0
-        )
-        reason = str(transport_state.get('throttle_reason', '') or '')
-        return nominal > 0.0 and actual <= 0.0 and bool(reason)
+    def _c4_ramp_opportunity_fraction(
+        nominal_rate_C_hr: object,
+        actual_rate_C_hr: object,
+    ) -> float:
+        nominal_rate = float(nominal_rate_C_hr or 0.0)
+        actual_rate = float(actual_rate_C_hr or 0.0)
+        if nominal_rate <= 0.0:
+            # Legacy or absent ramp telemetry keeps its existing wall-time
+            # accounting; production stamps a positive nominal rate.
+            return 1.0
+        return min(1.0, actual_rate / nominal_rate)
 
     def _c4_acquisition_opportunity_hr(
         self,
@@ -1124,43 +1083,54 @@ class CampaignManager:
         transport_state: Mapping[str, object] | None,
         current_acquired: bool,
     ) -> float:
-        """Count C4 hours that count against max_target_acquisition_hr.
+        """Count nominal-ramp-equivalent hours against the C4 budget.
 
-        Derivation (b-147 Mg Pref_GF landing, 2026-08-07):
-        - Pref_GF is ~0.54–0.59 dex above demoted TE Pref_GR on the gas
-          domain, so C3_NA evaporates more Mg into process.overhead_gas
-          (measured CI path: ~19 kg → ~51 kg rate-hour sum; ~17 kg holdup
-          remains at C4 entry).
-        - C4 controlled-O2 pipe capacity at p_total=0.2 mbar is ~0.35 kg/hr
-          with binding controlled_o2_no_equipment; demand≈holdup/dt saturates
-          transport at tens of × capacity and zeros ΔT/dt for ~50–75 h.
-        - Wall-clock acquisition then refuses at 60 h while T is still the
-          C3 carry-in (~1150 C), never giving the 42 h nominal preheat.
-        - Opportunity hours exclude fully transport-throttled isothermal
-          holds so the 60 h budget is preheat opportunity, not holdup drain.
-        Sanity: with no throttle telemetry / no holds, equals
-        completed_campaign_hour (bit-identical to pre-fix unit tests).
+        The 60 h budget is ``(window_low - entry_T) / nominal_ramp + margin``,
+        sized for an unthrottled preheat. Each one-hour step advances T by its
+        actual ramp, so used budget is the sum of ``actual_ramp / nominal``
+        (capped at one) for those hours. Units: h × (C/h) / (C/h) = h.
+        Unthrottled hours consume one hour, as before; zero-ramp hours consume
+        zero, preserving the existing full-hold exclusion; partial ramps use
+        their fractional share. Missing ramp telemetry keeps legacy wall-time
+        accounting, though production stamps it on every C4 step.
         """
+        if transport_state is None:
+            nominal_rate = actual_rate = 0.0
+        else:
+            nominal_rate = float(
+                transport_state.get('nominal_ramp_rate_C_hr', 0.0) or 0.0
+            )
+            actual_rate = float(
+                transport_state.get('actual_ramp_rate_C_hr', 0.0) or 0.0
+            )
+        current_opportunity = (
+            1.0
+            if current_acquired
+            else self._c4_ramp_opportunity_fraction(
+                nominal_rate,
+                actual_rate,
+            )
+        )
+
         if not c4_snapshots:
-            # No prior telemetry: preserve wall-clock semantics (unit tests
-            # and the first C4 tick before any snapshot is recorded).
-            if current_acquired or not self._c4_current_is_transport_hold(
-                transport_state
-            ):
+            # Without history, preserve the legacy fallback for unknown ramps.
+            if current_acquired or transport_state is None or nominal_rate <= 0.0:
                 return float(completed_campaign_hour)
-            # Fully throttled first hour(s) with empty history: no opportunity
-            # yet. completed_campaign_hour still advances wall clock elsewhere.
-            return 0.0
+            if current_opportunity == 0.0:
+                # The first observed C4 tick was a zero-ramp hold.
+                return 0.0
+            return float(
+                completed_campaign_hour - 1.0 + current_opportunity
+            )
 
         prior_opportunity = sum(
-            1
+            self._c4_ramp_opportunity_fraction(
+                getattr(snapshot, 'nominal_ramp_rate_C_hr', 0.0),
+                getattr(snapshot, 'actual_ramp_rate_C_hr', 0.0),
+            )
             for snapshot in c4_snapshots
-            if not self._c4_snapshot_was_transport_hold(snapshot)
         )
-        current_counts = current_acquired or not self._c4_current_is_transport_hold(
-            transport_state
-        )
-        return float(prior_opportunity + int(current_counts))
+        return float(prior_opportunity + current_opportunity)
 
     @staticmethod
     def c6_at_hold_target(
@@ -2831,21 +2801,15 @@ class CampaignManager:
                     transport_state=transport_state,
                     current_acquired=current_acquired,
                 )
-                # Held-hours bound (b-147 dual C4-review P1, 2026-08-07): the
-                # opportunity clock excludes transport-hold hours, so a
-                # PERMANENT transport hold (zero-capacity or regenerating
-                # holdup) would freeze opportunity and spin C4 forever — the
-                # inverse of the liveness hole the clock fixed.
-                # Premise: held hours = wall hours − opportunity hours; a
-                # finite holdup drain contributes finitely, a permanent hold
-                # grows without bound. Algebra: refuse when held ≥
-                # acquisition_limit + process_limit (both setpoint-sourced;
-                # a flat wall-hours cap is WRONG — the honest CI Pref_GF path
-                # acquires near wall hour 120-135 and would trip it).
-                # Unit: hours. Sanity: CI path holds ~50-90 h (17 kg holdup
-                # at ~0.35 kg/hr) < 100 h budget, unaffected; a plant held
-                # 100+ hours with no ramp deserves the typed refusal (raise
-                # the setpoints if a feedstock legitimately needs longer).
+                # Keep this hard backstop wall-clock based: it counts elapsed
+                # campaign hours not credited as nominal-ramp progress, so a
+                # permanent hold eventually refuses even when its acquisition
+                # debit stays at zero. A flat total-hours cap is too low—the
+                # honest CI Pref_GF path acquires near wall hour 120-135.
+                # Refuse when uncredited wall hours reach acquisition_limit +
+                # process_limit (both setpoint-sourced; units are hours).
+                # The finite CI drain (~50-90 h) stays below its 100 h bound;
+                # a plant held 100+ h with no ramp gets the typed refusal.
                 if (
                     completed_campaign_hour - acquisition_elapsed_hr
                 ) >= (

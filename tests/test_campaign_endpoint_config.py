@@ -617,6 +617,22 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
         )
         for _ in range(3)
     ]
+    hold_state = {
+        "binding_cause": "controlled_o2_no_equipment",
+        "saturation_pct": 5000.0,
+        "nominal_ramp_rate_C_hr": 10.0,
+        "actual_ramp_rate_C_hr": 0.0,
+        "throttle_reason": (
+            "equipment incompatibility [controlled_o2_no_equipment] "
+            "saturated (5000%)"
+        ),
+    }
+    assert manager._c4_acquisition_opportunity_hr(
+        completed_campaign_hour=4.0,
+        c4_snapshots=hold_snaps,
+        transport_state=hold_state,
+        current_acquired=False,
+    ) == 0.0
     # Wall campaign hour 3 (completed=4) would refuse under wall-clock
     # semantics; opportunity hours are still 0 (all holds + current hold).
     assert manager.check_endpoint(
@@ -624,16 +640,7 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
         _flux(Mg=0.0),
         CondensationTrain(),
         BatchRecord(snapshots=hold_snaps),
-        transport_state={
-            "binding_cause": "controlled_o2_no_equipment",
-            "saturation_pct": 5000.0,
-            "nominal_ramp_rate_C_hr": 10.0,
-            "actual_ramp_rate_C_hr": 0.0,
-            "throttle_reason": (
-                "equipment incompatibility [controlled_o2_no_equipment] "
-                "saturated (5000%)"
-            ),
-        },
+        transport_state=hold_state,
     ) is False
 
     # Three prior heating hours (no throttle) + current heating hour at
@@ -666,6 +673,29 @@ def test_c4_transport_hold_hours_do_not_burn_acquisition_budget() -> None:
     assert refusal.value.reason == "c4_target_window_not_acquired"
     assert refusal.value.diagnostic["acquisition_opportunity_hr"] == 4.0
     assert refusal.value.diagnostic["completed_campaign_hour"] == 4.0
+
+
+def test_c4_partial_transport_ramp_spends_fractional_budget() -> None:
+    manager = CampaignManager(_setpoints())
+    prior_ramp = HourSnapshot(
+        campaign=CampaignPhase.C4,
+        temperature_C=1205.0,
+        evap_flux=_flux(Mg=0.0),
+        nominal_ramp_rate_C_hr=10.0,
+        actual_ramp_rate_C_hr=5.0,
+        throttle_reason="transport saturation",
+    )
+
+    assert manager._c4_acquisition_opportunity_hr(
+        completed_campaign_hour=2.0,
+        c4_snapshots=[prior_ramp],
+        transport_state={
+            "nominal_ramp_rate_C_hr": 10.0,
+            "actual_ramp_rate_C_hr": 2.5,
+            "throttle_reason": "transport saturation",
+        },
+        current_acquired=False,
+    ) == pytest.approx(0.75)
 
 
 def test_c4_refusal_latches_is_complete() -> None:
