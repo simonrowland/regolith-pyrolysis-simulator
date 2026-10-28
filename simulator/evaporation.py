@@ -2145,6 +2145,7 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
+            'realized_provider': curve.get('gate_provider_step_down', {}).get('realized_provider'),
             'curve': copy.deepcopy(curve),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
@@ -2157,6 +2158,13 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
+            return None
+        realized_provider = previous.get('realized_provider')
+        if realized_provider and realized_provider not in {
+            attempt['provider'] for attempt in failure['provider_diagnostic'].get(
+                'gate_provider_step_down', {},
+            ).get('failed_providers', ())
+        }:
             return None
         composition = self.melt.composition_wt_pct()
         previous_composition = previous['composition_wt_pct']
@@ -2752,6 +2760,8 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
+        step_down = None
+        failed_providers = []
         for attempt in range(2):
             try:
                 result = self._dispatch_only(
@@ -2779,14 +2789,48 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
+            if diagnostic.get('gate_provider_step_down'):
+                step_down = diagnostic['gate_provider_step_down']
+                failed_providers.extend(step_down['failed_providers'])
             if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
                 break
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
+        if step_down:
+            # Retry recovery changes the curve provider, not the work already attempted.
+            diagnostic['gate_provider_step_down'] = {
+                **step_down,
+                'failed_providers': failed_providers,
+                'realized_provider': fallback_provider if status == 'ok' else None,
+            }
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
+        notices = {}
+        if fallback_provider == 'alphamelts-diagnostic':
+            # Step 3 supplies measured-bracket validation. Until then this
+            # diagnostic prediction must not earn the primary MAGEMin
+            # binding's cache admission through the shared fallback slot.
+            notices['calibration_status'] = 'pending_validation'
+        if diagnostic.get('gate_provider_step_down'):
+            notices['gate_provider_step_down'] = diagnostic['gate_provider_step_down']
+        backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+        if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
+            for attempt in diagnostic.get('gate_provider_step_down', {}).get('failed_providers', ()):
+                details = attempt['diagnostic'].get('backend_diagnostics') or {}
+                if 'condensed_phase_reference_pressure_bar' in details:
+                    backend_diagnostic = details
+        if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
+            notices['alphamelts_reference_pressure'] = {
+                key: backend_diagnostic[key] for key in (
+                    'physical_overhead_pressure_bar', 'condensed_phase_reference_pressure_bar',
+                )
+            }
+            for key in ('solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
+                        'commissioning_notice', 'authority', 'certified_band'):
+                if key in backend_diagnostic:
+                    notices['alphamelts_reference_pressure'][key] = backend_diagnostic[key]
         status_outcome = gate_curve_provider_outcome_for_status(
             status,
             diagnostic,
@@ -2814,6 +2858,15 @@ class EvaporationMixin:
             ):
                 held = self._hold_freeze_gate_provider_curve(failure)
                 if held is not None:
+                    if 'gate_provider_step_down' in notices:
+                        held['gate_provider_step_down'] = notices['gate_provider_step_down']
+                    if 'gate_provider_step_down' in held:
+                        held['gate_provider_step_down'] = {
+                            **held['gate_provider_step_down'],
+                            'prediction': 'held_last_good_curve',
+                            'realized_provider': (self._freeze_gate_last_good_curve or {}).get('realized_provider')
+                            or self._liquid_fraction_provider,
+                        }
                     return held
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
@@ -2830,6 +2883,11 @@ class EvaporationMixin:
                             'not a fresh solve or a melting measurement'
                         ),
                     }
+                    curve.update(notices)
+                    if 'gate_provider_step_down' in curve:
+                        curve['gate_provider_step_down'] = {
+                            **curve['gate_provider_step_down'], 'prediction': 'kress91_floor',
+                        }
                     return curve
             if diagnostic.get('exception_class'):
                 mark_uncacheable_replay_disposition(
@@ -2847,6 +2905,7 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
             )
             if projected is not None:
+                projected.update(notices)
                 return self._remember_freeze_gate_provider_curve(projected)
             invalid_notice = getattr(
                 self, '_invalid_projected_liquidus_notice', None,
@@ -2900,6 +2959,7 @@ class EvaporationMixin:
                     },
                     'warnings': warnings,
                 }
+                curve.update(notices)
                 return curve
             reasons.append(
                 'gate liquid fraction unavailable: '
@@ -2917,6 +2977,7 @@ class EvaporationMixin:
                 reasons=reasons,
             )
             if curve is not None:
+                curve.update(notices)
                 record_gate_curve_provider_outcome(
                     self,
                     GateCurveProviderOutcome.PRODUCED,
@@ -2932,6 +2993,7 @@ class EvaporationMixin:
             reasons=reasons,
         )
         if curve is not None:
+            curve.update(notices)
             record_gate_curve_provider_outcome(
                 self,
                 GateCurveProviderOutcome.PRODUCED,

@@ -107,7 +107,10 @@ APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
-GATE_CURVE_NOTICE_KEYS = ('composition_projected_notice', 'gate_provider_refusal')
+GATE_CURVE_NOTICE_KEYS = (
+    'composition_projected_notice', 'gate_provider_refusal',
+    'gate_provider_step_down', 'alphamelts_reference_pressure',
+)
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -2724,6 +2727,14 @@ def gate_curve_provider_diagnostic_reasons(
     return tuple(reasons)
 
 
+def gate_curve_provider_has_terminal_input(reasons: Sequence[str]) -> bool:
+    """Missing or invalid inputs cannot be repaired by changing engines."""
+    return any(reason in {
+        "missing_input", "invalid_input", "invalid_fo2_log",
+        "invalid_pressure_bar", "non_finite_composition",
+    } for reason in reasons)
+
+
 def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
     return any(
         "timeout" in reason
@@ -2752,10 +2763,7 @@ def gate_curve_provider_outcome_for_status(
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
-    if any(reason in {
-        "missing_input", "invalid_input", "invalid_fo2_log",
-        "invalid_pressure_bar", "non_finite_composition",
-    } for reason in reasons):
+    if gate_curve_provider_has_terminal_input(reasons):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",

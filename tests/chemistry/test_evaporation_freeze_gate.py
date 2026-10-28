@@ -597,6 +597,9 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
     )
 
 
+# Full 24 h / 12 h / 12 h runner campaigns: review call 294.56 s;
+# base run timed out at 310.90 s total under the unchanged 300 s test limit.
+@pytest.mark.nightly
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     from simulator.accounting.run_artifact import build_run_artifact
     from simulator.core import PyrolysisSimulator
