@@ -203,6 +203,7 @@ def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
                     'refusal_type': 'EvaporationFluxConfigurationError',
                     'reason': 'missing Si transport row',
                     'parent_oxide': 'SiO2',
+                    'status': 'unavailable',
                 },
             },
         },

@@ -335,8 +335,9 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         transport = wall["evaporation_transport_notices_by_species"]
         assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
         assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
-        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
+        # b-858 restores the sourced Svehla Si Lennard-Jones row (t-1369), so
+        # this channel is a flagged prediction rather than a missing-input refusal.
+        assert transport["Si"]["evaporation"]["authority_level"] == "extrapolated"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["status"] == "unavailable"

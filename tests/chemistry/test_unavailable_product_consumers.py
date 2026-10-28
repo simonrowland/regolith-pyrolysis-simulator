@@ -263,6 +263,39 @@ def test_product_class_keeps_estimated_flux_and_ignores_empty_refusal():
     ]
 
 
+def test_product_class_marks_refused_channel_with_saved_capture_partial():
+    refused_sio = {
+        "species_id": "SiO",
+        "pressure": {"kind": "refusal", "code": "missing_input"},
+        "flux": {"kind": "refusal", "code": "missing_input"},
+        "is_refused": True,
+        "authority_level": "refused",
+        "reason": "missing SiO carrier input",
+    }
+    snapshot = SimpleNamespace(
+        condensed_by_stage_species_delta={(3, "SiO"): 12.5},
+        evap_flux=SimpleNamespace(
+            carrier_authority_by_species={"SiO": refused_sio}
+        ),
+    )
+    sim = SimpleNamespace(
+        _last_evaporation_flux_diagnostic={},
+        species_formula_registry={},
+        record=SimpleNamespace(snapshots=(snapshot,)),
+    )
+
+    partial = product_class_availability(
+        sim,
+        ("SiO", "SiO2"),
+        {"capture": 12.5},
+        has_computed_part=True,
+    )
+
+    assert partial["status"] == "partial"
+    assert partial["class_total_kg"] == 12.5
+    assert [item["species"] for item in partial["excluded"]] == ["SiO"]
+
+
 def test_classifier_marks_refused_only_class_unavailable(two_hour_run, monkeypatch):
     monkeypatch.setattr(two_hour_run, "product_ledger", lambda: {})
     products = classify_products(two_hour_run)

@@ -307,6 +307,12 @@
     return "value";
   }
 
+  function formatConservativeUpperBoundKg(value) {
+    if (value <= 0) return fmtNum(value, "kg");
+    const place = 10 ** (Math.floor(Math.log10(value)) - 2);
+    return fmtNum(Math.ceil(value / place) * place, "kg");
+  }
+
   function producerFlag(record) {
     if (!isRecord(record)) return "";
     const estimatedSpecies = Array.isArray(record.estimated_contributions)
@@ -349,7 +355,7 @@
       if (Array.isArray(excluded) && excluded.length) {
         parts.push(`excluded: ${excluded.map(item => {
           const bound = typeof item.upper_bound_kg === "number" && Number.isFinite(item.upper_bound_kg)
-            ? `up to ${fmtNum(item.upper_bound_kg, "kg")} (conservative upper bound)`
+            ? `up to ${formatConservativeUpperBoundKg(item.upper_bound_kg)} (conservative upper bound)`
             : `${item.upper_bound_kg} kg bound`;
           return `${item.species} via ${item.account} (${bound})`;
         }).join(", ")}`);

@@ -363,6 +363,27 @@ def _evaporation_quantity_authority_contributions(
             return False
         return math.isfinite(rate) and rate > 0.0
 
+    def has_positive_capture(snapshot: Any, species: Any) -> bool:
+        # Persisted condensate is positive output even if its snapshot omits
+        # the hourly species-flux map.
+        captures = getattr(snapshot, "condensed_by_stage_species_delta", {}) or {}
+        if not isinstance(captures, Mapping):
+            return False
+        for key, amount in captures.items():
+            if not (
+                isinstance(key, tuple)
+                and len(key) == 2
+                and str(key[1]) == str(species)
+            ):
+                continue
+            try:
+                kg = float(amount)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(kg) and kg > 0.0:
+                return True
+        return False
+
     def record_estimate(species: Any, record: Mapping[str, Any]) -> None:
         species_id = str(species)
         extra = record.get("extra")
@@ -445,7 +466,10 @@ def _evaporation_quantity_authority_contributions(
                         VAPOUR_CARRIER_AUTHORITY_REFUSED,
                         VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
                     }
-                    and has_positive_flux(flux, species)
+                    and (
+                        has_positive_flux(flux, species)
+                        or has_positive_capture(snapshot, species)
+                    )
                 ):
                     pressure = record.get("pressure")
                     pressure = pressure if isinstance(pressure, Mapping) else {}
@@ -468,7 +492,7 @@ def _evaporation_quantity_authority_contributions(
                             record.get("reason") or record.get("detail")
                             or pressure.get("detail") or carrier_flux.get("detail")
                             or extra.get("reason")
-                            or "carrier authority refused positive flux"
+                            or "carrier authority refused positive species output"
                         ),
                     )
 
