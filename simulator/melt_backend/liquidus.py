@@ -18,24 +18,11 @@ from simulator.melt_regime import liquid_fraction_invalidity
 
 # MAGEMin-facing default only - the generic finder stays unbounded so
 # AlphaMELTS (and pure-function unit tests) are not silently wall-capped.
-#
-# Derivation for DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s):
-#   Premise: a legitimate real MAGEMin freeze-gate search on lunar mare
-#   is documented at ~163 s wall (37-point 400-2200 C / 50 C grid +
-#   bisection; AGENTS.md test-timeout invariant / M5 MacBook Pro).
-#   Worst-case call count under defaults: ceil((2200-400)/50)+1 = 37
-#   grid + 2 * max_bisection_iterations (32) = 37 + 64 = 101 engine
-#   calls. Per-call timeout default is 60 s, so a between-calls-only
-#   budget would admit up to ~budget + 60 s of overrun per call; under
-#   per-call limits alone the pathological case is 101 * 60 s ~ 101 min.
-#   The shared warm pool now owns normal runtime liquidus searches under its
-#   separate 15 s budget. This default remains only for explicit cold-worker
-#   diagnostics. Preserve margin over the measured 163 s cold search without
-#   retaining the former pre-pool 900 s ceiling: 163 s * 1.8 = 293.4 s,
-#   rounded to 300 s. Sanity: 300 s is still 1.84x the cold measurement and
-#   far below 101 * 60 s, so it bounds the spinel-hang class.
-# Unit check: all terms in seconds; product is seconds.
-DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 300.0
+# The documented cold MAGEMin search takes about 163 s; a 10x co-tenancy
+# factor covers the load-50-to-60 studios while this remains only a hang
+# guard. Expiry raises instead of choosing another liquidus branch.
+# Unit check: 163 s * 10 = 1630 s.
+DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 1630.0
 MAX_LIQUIDUS_SCAN_POINTS = 100_000
 # frac_M >= 1 - LIQUIDUS_LIQUID_EPSILON is liquid. This is the finder's
 # declaration tolerance. The freeze-gate consumer may snap a supplied

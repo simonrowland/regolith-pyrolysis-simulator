@@ -50,10 +50,14 @@ from simulator.fe_redox import (
 )
 from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
+    MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S,
+    MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
+    MAGEMIN_WORKER_STARTUP_TIMEOUT_S,
     MAGEMinBackend,
+    _MAGEMinEngineCallError,
 )
 
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do
@@ -272,8 +276,10 @@ def _make_absent_magemin(monkeypatch):
 class _ImmediateFailurePool:
     def __init__(self, exception):
         self.exception = exception
+        self.submit_calls = 0
 
     def submit(self, *_args, **_kwargs):
+        self.submit_calls += 1
         future = Future()
         future.set_exception(self.exception)
         return future
@@ -1069,6 +1075,47 @@ def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
     assert raised.value.phase == 'job'
     assert raised.value.failed_slots == (0,)
     assert backend.is_available() is True
+    assert backend._subprocess_pool.submit_calls == 2
+
+
+@pytest.mark.parametrize(
+    'timeout_error',
+    [
+        pytest.param(
+            EngineWorkerTimeout('MAGEMin slot 0', 2.0, phase='job'),
+            id='discarded-warm-worker',
+        ),
+        pytest.param(
+            _MAGEMinEngineCallError(
+                'MAGEMinSubprocessSlotTimeout', 'subprocess slot timed out'
+            ),
+            id='subprocess-slot-contention',
+        ),
+    ],
+)
+def test_magemin_equilibrate_retries_once_after_worker_or_slot_timeout(
+    monkeypatch, timeout_error,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    calls = []
+
+    def call(**_kwargs):
+        calls.append(None)
+        if len(calls) == 1:
+            raise timeout_error
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    monkeypatch.setattr(backend, '_call_magemin', call)
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+    )
+
+    assert len(calls) == 2
+    assert result.status == 'ok'
 
 
 def test_magemin_worker_exit_returns_typed_not_converged():
@@ -1239,7 +1286,12 @@ def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
 
 
 def test_magemin_cold_liquidus_budget_retains_bounded_diagnostic_headroom():
-    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(300.0)
+    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(
+        1630.0
+    )
+    assert MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S == pytest.approx(1630.0)
+    assert MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S == pytest.approx(1630.0)
+    assert MAGEMIN_WORKER_STARTUP_TIMEOUT_S == pytest.approx(1630.0)
 
 
 # The test pins its OWN coarse grid rather than relying on the backend's

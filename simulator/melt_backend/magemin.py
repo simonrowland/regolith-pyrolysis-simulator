@@ -156,36 +156,29 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.feedstock_composition import iron_oxide_values, total_fe
 
 
-# 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
-# 2.0 -> 15.0 s. The 2.0 s wall was calibrated for an uncontended slot-free
-# machine; measured under 6-way concurrent MAGEMin load on top of a full
-# xdist gate (18 workers, M5 MacBook Pro): p50 = 0.16 s, p90 = 0.41 s,
-# p99 = 1.73 s, max = 1.98 s, with 10/767 calls crossing the 2.0 s wall.
-# Every crossing surfaced as EngineWorkerTimeout -> provider
-# 'not_converged'/'unavailable' -> the freeze-gate curve silently fell back
-# from the MAGEMin gate dispatch to the backend/kernel liquidus source,
-# shifting wall-deposit/redox values ~0.1-0.5 % on warm xdist gateways
-# (the coating-SHA / split_path[lunar] drift class). The timeout value does
-# NOT touch physics: warm and cold subprocess results are byte-identical
-# (tests/test_engine_worker_live_determinism.py A/B), so this only moves
-# when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99
-# while staying well inside the 60.0 s finder aggregate budget below.
-MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
+# Warm worker call guard: observed max 1.98 s under concurrent MAGEMin load
+# (6 engine callers plus an 18-worker xdist gate); 10x co-tenancy is 19.8 s,
+# rounded up to 20 s for studios running at load 50-60. It refuses a run if
+# crossed; it cannot select a different result.
+MAGEMIN_WARM_CALL_TIMEOUT_S = 20.0
+# A cold search is documented at about 163 s (liquidus.py). A 10x
+# co-tenancy guard bounds a single cold subprocess call at 1630 s.
+MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S = 1630.0
+# Slot contention is separately bounded at 10x the documented 163 s cold
+# search, allowing the normal work of co-tenants before refusing.
+MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S = 1630.0
+# A cold search includes starting its worker and takes about 163 s; allow 10x
+# for worker startup under studio co-tenancy before refusing the run.
+MAGEMIN_WORKER_STARTUP_TIMEOUT_S = 1630.0
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
-# 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
-# liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
-# freeze-gate curve scans under the same 6-way + full-gate load: p50 =
-# 12.7 s, p90 = max = 14.8 s completing, with 3/15 scans exhausting the
-# 15.0 s budget at ~15.3 s -> 'not_converged' -> silent freeze-gate curve
-# source fallback. 60.0 s is ~4x the measured scan max while still far
-# below the cold/diagnostic DEFAULT_LIQUIDUS_FINDER_BUDGET_S (300 s) that
-# bounds the spinel-hang class; like the call wall it moves only when the
-# budget fires, never the physics of a completed scan.
-MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 60.0
+# Warm scan guard: the same loaded studio run completed full scans in at most
+# 14.8 s. Ten times that measured duration is 148 s; round up to 150 s for
+# load-50-to-60 co-tenancy. Expiry refuses the run instead of changing curves.
+MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 150.0
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
     tempfile.gettempdir(),
     'regolith-pyrolysis-simulator',
@@ -1358,7 +1351,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
             raw_pool_size = self._config.get('warm_pool_size', 1)
             raw_startup_timeout_s = self._config.get(
-                'worker_startup_timeout_s', 30.0
+                'worker_startup_timeout_s',
+                MAGEMIN_WORKER_STARTUP_TIMEOUT_S,
             )
             for field_name, value in (
                 ('warm_call_timeout_s', raw_warm_timeout_s),
@@ -1656,15 +1650,36 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         try:
-            raw = self._call_magemin(
-                bulk_projection=bulk_projection,
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                call_timeout_s=call_timeout_s,
-                capture_native_activities=native_activity_formula is not None,
-                composition_mol=composition_mol,
-            )
+            timeout_retry_used = False
+            while True:
+                try:
+                    raw = self._call_magemin(
+                        bulk_projection=bulk_projection,
+                        temperature_C=temperature_C,
+                        pressure_bar=pressure_bar,
+                        fO2_log=fO2_log,
+                        call_timeout_s=call_timeout_s,
+                        capture_native_activities=(
+                            native_activity_formula is not None
+                        ),
+                        composition_mol=composition_mol,
+                    )
+                    break
+                except EngineWorkerTimeout:
+                    # A timed-out warm worker was discarded. Give its
+                    # replacement one bounded attempt before refusing.
+                    if timeout_retry_used:
+                        raise
+                    timeout_retry_used = True
+                except _MAGEMinEngineCallError as exc:
+                    if (
+                        exc.exception_type != 'MAGEMinSubprocessSlotTimeout'
+                        or timeout_retry_used
+                    ):
+                        raise
+                    # Slot contention is transient; retry once with the same
+                    # bounded slot guard before reporting the timeout.
+                    timeout_retry_used = True
         except EngineWorkerTimeout:
             # A hang is a control-plane event, not an equilibrium refusal.
             # The pool has already killed the slot; preserve the typed signal
@@ -2796,7 +2811,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     )
                 )
                 startup_timeout_s = float(self._config.get(
-                    'worker_startup_timeout_s', 30.0
+                    'worker_startup_timeout_s',
+                    MAGEMIN_WORKER_STARTUP_TIMEOUT_S,
                 ))
                 future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
                     timeout_s,
@@ -3090,7 +3106,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 for item in args
             ]
             args.append('--out_matlab=1')
-        configured_timeout_s = float(self._config.get('timeout_s', 60.0))
+        configured_timeout_s = float(self._config.get(
+            'timeout_s', MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S
+        ))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
         else:
@@ -3105,7 +3123,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             timeout_s = min(configured_timeout_s, remaining)
         call_started = time.monotonic()
         matlab_text = ''
-        with _magemin_subprocess_slot(timeout_s):
+        with _magemin_subprocess_slot(min(
+            timeout_s, MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S
+        )):
             remaining_timeout_s = timeout_s - max(
                 0.0, time.monotonic() - call_started
             )
@@ -3697,9 +3717,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--buffer_n={buffer_n:.6f}',
             '--out_matlab=1',
         ]
-        timeout_s = float(self._config.get('timeout_s', 60.0))
+        timeout_s = float(self._config.get(
+            'timeout_s', MAGEMIN_SUBPROCESS_CALL_TIMEOUT_S
+        ))
         try:
-            with _magemin_subprocess_slot(timeout_s):
+            with _magemin_subprocess_slot(min(
+                timeout_s, MAGEMIN_SUBPROCESS_SLOT_TIMEOUT_S
+            )):
                 with tempfile.TemporaryDirectory() as tmpdir:
                     completed = subprocess.run(  # noqa: S603 - adapter-built
                         args,
