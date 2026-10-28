@@ -27,16 +27,17 @@ CONFIGURED_GOLDEN_PATH = Path(
 CONFIGLESS_GOLDEN_PATH = Path(
     "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
 )
-# Confirmed inside pytest on Mac-Studio-256-2 at green pins.
+# Measured from the configured gate path at the merged b-899 / d-298 / d-299 tip.
 CONFIGURED_OWNER_PN2_ANCHORS = {
-    "native_fe_pool_mol": 1572.6800886957762,
-    "native_fe_tap_mol": 1570.5846976173568,
+    "native_fe_pool_mol": 785.5636564861113,
+    "native_fe_tap_mol": 783.4682654076919,
     "native_fe_vapor_mol": 2.095391078419451,
-    "native_fe_vapor_escape_fraction_of_pool": 0.0013323695603962018,
-    "stage_3_Fe_wt_pct": 0.04224433363512624,
+    "native_fe_vapor_escape_fraction_of_pool": 0.0026673727343654134,
+    "stage_3_Fe_wt_pct": 32.42706585433077,
     "SiO_provider_pO2_bar": 1e-09,
-    "SiO_flux_kg_hr": 0.0279267607515389,
+    "SiO_flux_kg_hr": 0.025287083093095325,
 }
+
 # Configless fallback, not canonical. Used when the consumed curve did not
 # come from the gate liquid-fraction path.
 CONFIGLESS_FALLBACK_NOT_CANONICAL = {
