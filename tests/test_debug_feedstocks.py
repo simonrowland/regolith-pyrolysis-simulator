@@ -171,7 +171,29 @@ def _simulator_shell(melt: MeltState, setpoints: dict) -> PyrolysisSimulator:
 
 
 def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
-    manager = CampaignManager(_setpoints())
+    source_campaigns = _setpoints()["campaigns"]
+    c3 = source_campaigns["C3"]
+    staged = source_campaigns["C2A_staged"]["na_shuttle_stage"]
+    manager = CampaignManager(
+        {
+            "campaigns": {
+                "C2A_staged": {
+                    "na_shuttle_stage": {
+                        key: staged[key]
+                        for key in ("target_C", "ramp_rate_C_per_hr", "duration_h")
+                    }
+                },
+                "C3": {
+                    "pO2_mbar_default": c3["pO2_mbar_default"],
+                    "p_total_mbar_default": c3["p_total_mbar_default"],
+                    "Na_phase": {
+                        key: c3["Na_phase"][key]
+                        for key in ("T_inject_C", "T_bakeout_C")
+                    },
+                }
+            }
+        }
+    )
     record = BatchRecord(path="A_staged")
 
     assert manager.get_next_campaign(

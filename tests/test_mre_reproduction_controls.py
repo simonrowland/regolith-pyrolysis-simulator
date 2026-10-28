@@ -250,15 +250,27 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
 ) -> None:
     backend = InternalAnalyticalBackend()
     backend.initialize({})
-    setpoints = load_config_bundle().setpoints
-    setpoints["mre_voltage_sequence"] = {
-        "sequence": [
-            {
-                "species": "FeO",
-                "decomposition_V": 0.8,
-                "min_hold_hours": 1,
+    campaign_key = {
+        CampaignPhase.C5: "C5",
+        CampaignPhase.MRE_BASELINE: "mre_baseline",
+    }[campaign]
+    source_row = load_config_bundle().setpoints["campaigns"][campaign_key]
+    setpoints = {
+        "campaigns": {
+            campaign_key: {
+                key: source_row[key]
+                for key in ("pO2_mbar_default", "p_total_mbar_default")
             }
-        ]
+        },
+        "mre_voltage_sequence": {
+            "sequence": [
+                {
+                    "species": "FeO",
+                    "decomposition_V": 0.8,
+                    "min_hold_hours": 1,
+                }
+            ]
+        },
     }
     sim = PyrolysisSimulator(
         backend,
