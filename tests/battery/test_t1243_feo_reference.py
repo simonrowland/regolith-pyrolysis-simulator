@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    FO2Channel,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -30,7 +31,6 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     ResidualStatus,
 )
-from simulator.battery.generators.bench import activity_request_for_engine
 from simulator.battery.generators.janaf import (
     JANAF_R_J_PER_MOL_K,
     _fusion_table_points,
@@ -45,6 +45,7 @@ from simulator.battery.migrate import (
     load_yaml,
 )
 from simulator.battery.records import (
+    FO2Control,
     Located,
     Notice,
     StandardState,
@@ -56,7 +57,6 @@ from simulator.battery.score import (
     Execution,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
-    _activity_contract_refusal,
     compile_residual,
     flagged_strata,
     fusion_comparison_reference,
@@ -517,48 +517,71 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     assert extrapolated == 32
 
 
-def test_distin_activity_refuses_without_source_oxygen_potential(migration) -> None:
-    """Pin the pre-change refusal for a Distin row without the Fe buffer condition.
+def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) -> None:
+    """Pin d-305: without the typed Fe condition, every Distin row refuses.
 
-    Table I prints FeO, Fe2O3, SiO2 and an oxygen-in-metal activity ratio,
-    but no fO2. With the explicit Fe-metal saturation condition removed, the
-    pre-change activity request still refuses rather than treating the
-    measured activity as an imposed oxygen potential.
+    Table I prints FeO, Fe2O3, SiO2 and the oxygen-in-metal activity ratio,
+    not fO2. A fixed fO2 or dropping Fe2O3 would be an unruled derivation;
+    t-1571 supplies the Fe-metal-saturated closed-solve route.
     """
-    observation = next(
-        row
-        for row in _feo_rows(migration)
-        if row.source_id == _DISTIN
-        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    context = _context(migration)
+    context = replace(
+        context,
+        experiments={
+            experiment_id: replace(experiment, fO2_control=None)
+            for experiment_id, experiment in context.experiments.items()
+        },
     )
-    converted = fusion_comparison_reference(
-        observation, engine=Engine.INTERNAL_ANALYTICAL
-    )
-    experiment = migration.experiments[converted.experiment_id]
-    experiment = replace(experiment, fO2_control=None)
-    generated = activity_request_for_engine(
-        experiment, converted, Engine.INTERNAL_ANALYTICAL.value
-    )
+    rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
+    assert len(rows) == 24
+    expected = {
+        Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_UNKNOWN,
+        Engine.OPENIMCC: RefusalReason.IDENTITY_INCOMPLETE,
+        Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
+        Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
+        Engine.THERMOENGINE: RefusalReason.UNSUPPORTED,
+        Engine.VAPOROCK: RefusalReason.UNSUPPORTED,
+    }
+    for observation in rows:
+        for engine, reason in expected.items():
+            residual, _candidate = compile_residual(
+                observation,
+                engine,
+                context=context,
+                comparison_ids={observation.observation_id},
+            )
+            assert residual.status is ResidualStatus.REFUSED
+            assert residual.refusal is not None
+            assert residual.refusal.reason is reason
 
-    assert generated is not None
-    assert generated.payload is None
-    oxygen_gap = next(
-        gap for gap in generated.readiness.gaps if gap.waypoint == "oxygen_condition"
-    )
-    assert oxygen_gap.reason.value == "missing_evidence"
-    assert "FeO" in oxygen_gap.missing
 
-    refusal = _activity_contract_refusal(
-        Engine.INTERNAL_ANALYTICAL,
-        channel="melt_activity",
-        sources=(),
-        identity=converted.identity,
-        requested=converted.identity.composition,
-        generated=generated,
-    )
-    assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert refusal.refusal_detail["reason"] == "missing_evidence"
-    assert refusal.refusal_detail["gaps"][0]["waypoint"] == "oxygen_condition"
+def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
+    """A typed source Fe condition enables the d-305 closed redox solve."""
+    rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
+    assert len(rows) == 24
+    context = _context(migration)
+    for experiment_id in {row.experiment_id for row in rows}:
+        experiment = context.experiments[experiment_id]
+        control = experiment.fO2_control
+        assert isinstance(control, FO2Control)
+        assert control.channel.is_value
+        assert control.channel.value is FO2Channel.BUFFER
+        assert control.buffer is not None
+        assert control.buffer.locator is not None
+        assert control.buffer.locator.page == 74
+
+    residuals = []
+    for observation in rows:
+        residual, _candidate = compile_residual(
+            observation,
+            Engine.OPENIMCC,
+            context=context,
+            comparison_ids={observation.observation_id},
+        )
+        residuals.append(residual)
+        assert residual.status is ResidualStatus.NO_BAND
+        assert residual.numeric is not None
+    assert len(residuals) == 24
 
 
 def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
