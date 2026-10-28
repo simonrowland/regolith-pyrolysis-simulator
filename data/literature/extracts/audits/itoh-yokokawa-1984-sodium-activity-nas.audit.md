@@ -4,10 +4,11 @@
 
 The requested observable is absolute Na2O activity. The paper reports one
 absolute point in Eq. (5): `log alpha*_Na2O = -9.0`, pure solid Na2O reference,
-`X_Na2O = 0.33`, at 1300 K. The extract has one observation row, matching the
-one absolute point printed in the paper. Following the controller ruling, the
-stored activity is `10^(-9.0) = 1e-9`, with the printed log value retained in
-`value_as_printed`, `log10_activity_as_published`, and derivation lineage. The
+`X_Na2O = 0.33`, at 1300 K. The extract has one absolute activity point,
+represented by two linked observations. Following the controller ruling, the
+extract stores a support row for the printed log activity (typed refusal because
+no schema quantity represents that form) and a linked activity row storing
+`10^(-9.0) = 1e-9`. The printed log value and locator remain on both rows. The
 rounded one-decimal log value gives an activity half-width of
 `1e-9 * ln(10) * 0.5 * 10^-1 = 1.1512925465e-10`; confidence level is not
 stated.
@@ -41,9 +42,14 @@ as an activity observation.
 
 The authors derive the absolute log activity from their concentration-cell
 EMF measurements, Gibbs–Duhem integration, and the printed pure-oxide
-thermochemical relation (Eqs. 1–5). The printed log cell is the measured-reduced
-input to the base-10 conversion, and the row's method class is
-`measured_reduced`. The closed method token is `emf_cell`, with the source
+thermochemical relation (Eqs. 1–5). Following the controller's ruling, the
+printed log result is stored in a typed-refusal support observation because the
+schema has no quantity token for the printed log form. The admitted linear
+activity row is `measured_reduced`, related to its support row by
+`a(Na2O) = 10^(log10 a(Na2O))`, with `derived_from` resolving to that sibling.
+The propagated half-width is `1.1512925465e-10` from the one-decimal printed
+log value; confidence level is not stated. The closed method token is
+`emf_cell`, with the source
 description retained in `method_as_printed`; the isolated migration binds it
 to the experiment and has no unstated-method queue item. The paper does not
 state total pressure or oxygen fugacity for this activity point; both remain
@@ -65,36 +71,29 @@ both machine texts and render-checked above.
 
 `mineru_table_draft.py compare` returned 0 matched, 0 no-match, 0 mismatches,
 and 0 total table points. The sole absolute activity is a located prose value,
-not a table point, and is pinned by the focused fidelity test. The real
-migrator produced 1 admitted observation with activity `1e-9`, method
-`emf_cell`, and the expected identity conditions. It currently reports 2 hard
-conditional-field issues: `measured_reduced` requires resolved `derived_from`
-lineage, and the schema separately records that `printed_unresolved` inputs do
-not resolve to a record or asset. The only printed conversion input is Eq.
-(5)'s log cell; the paper cannot be used as its own derivation input, and the
-relative EMF table is outside this extract's requested absolute-activity observation.
-Resolving this requires changing the derivation schema/validator or changing
-the controller-directed evidence class. Both are outside this extraction's
-authorized scope, so migration acceptance is blocked pending controller
-ruling. Pressure and fO2 remain unknown.
+not a table point, and is pinned by the focused fidelity test. The isolated
+migration admits 1 activity observation with activity `1e-9`, method
+`emf_cell`, and the expected identity conditions; the typed-refusal support row
+preserves the printed log cell. Migration reports 0 hard issues.
+Pressure and fO2 remain unknown.
 
-The original focused migration/fidelity test passed before the review change.
-After the FIX-FIRST changes, the YAML flow-scalar guard passed (17 tests). The
-focused test pins the converted value, printed input, method, locators, and
-both explained lineage issues described above. The single-file extract validator passes with
-`--check-fidelity-match` (`OK: 1 extract file(s) valid`). The combined required
-suite run reported 655 passed and 4 failures caused by the configured 300-second
-pytest timeout while loading the complete corpus: the comma/duplicate-key
-loader guard, `test_repo_extracts_validate_green`, `test_coverage_pending_stubs_not_found`,
-and `test_pilot_extract_count_exact_and_merge_smoke`. The traceback in each
-failure was inside YAML parsing/loading at the timeout boundary; the run showed
-no extract-specific validation failure. Focused migration, fidelity and the
-YAML flow-scalar guard were rerun after the review fixes.
+The focused test pins the printed `-9.0`, converted activity `1e-9`, propagated
+uncertainty, method, conditions, and source locators; it also mutates the
+printed log value to prove the fidelity check detects a mismatch. It confirms
+the isolated migration has 2 observations: 1 admitted activity point, 1
+unavailable typed-refusal support row, and 0 hard issues. The single-file
+extract validator passes with `--check-fidelity-match`; the YAML flow-scalar
+guard passes all 17 tests. The repo-wide extraction suite reports 640 passed
+and 2 failures at the configured 300-second timeout while loading the complete
+corpus: `test_coverage_pending_stubs_not_found` and
+`test_pilot_extract_count_exact_and_merge_smoke`. Their traceback is in
+PyYAML parsing/loading at the timeout boundary, with no extract-specific
+validation failure.
 
 ## Expected store delta
 
-If the lineage rule is resolved, the expected store delta is one admitted
-numeric melt_activity observation with activity `1e-9`, method `emf_cell`,
-composition and T, the Raoultian pure-solid Na2O reference, and the propagated
-precision half-width. Pressure and fO2 remain unknown. No store regeneration
-is committed while the hard issue remains.
+The expected store delta is one admitted numeric melt_activity observation
+with activity `1e-9`, method `emf_cell`, composition and T, the Raoultian
+pure-solid Na2O reference, and the propagated precision half-width. Pressure
+and fO2 remain unknown. The typed-refusal support row is not admitted to the
+store. No store regeneration is committed.

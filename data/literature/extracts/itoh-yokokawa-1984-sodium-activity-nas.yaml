@@ -63,6 +63,16 @@ species:
             is not stated.
           value: '1.1512925465e-10'
           units: dimensionless
+        derived_from: [itoh_yokokawa_1984_eq5_printed_log_input]
+        derivation:
+          relation: a(Na2O) = 10^(log10 a(Na2O))
+          inputs: [itoh_yokokawa_1984_eq5_printed_log_input]
+          output_unit: dimensionless activity
+          printed_precision:
+            decimal_places: 1
+            half_last_digit_in_log10_activity: '0.05'
+            activity_half_width: '1.1512925465e-10'
+            note: ln(10) * 0.05 * 1e-9; confidence level not stated.
         values:
           quantity: activity
           method_class: measured_reduced
@@ -71,30 +81,9 @@ species:
           activity: '1e-9'
           value_as_printed: '-9.0'
           log10_activity_as_published: '-9.0'
-          derivation:
-            relation: >-
-              Linear Na2O activity is 10^(the printed log10 activity) from
-              Eq. (5); the authors derive that log activity from this study's
-              concentration-cell EMF measurements and Gibbs-Duhem integration.
-            output_unit: dimensionless
-            parameters:
-              - [log10_activity_as_published, {state: {tag: value, value: '-9.0'}, locator: {page: 4, published_page: 882, equation: '5'}}]
-            raw_inputs:
-              state: {tag: value, value: printed_unresolved}
-              locator:
-                page: 4
-                published_page: 882
-                equation: '5'
-                note: 'Printed input verbatim: log alpha*_Na2O = -9.0.'
           T_K: '1300'
           composition_as_published: 'X_Na2O = 0.33 in the Na2O–SiO2 binary'
           composition_mol: {Na2O: '0.33', SiO2: '0.67'}
-          calculation_as_printed: >-
-            Absolute log activity calculated from the study's concentration-cell
-            EMF measurements, Gibbs–Duhem integration, and the printed pure-oxide
-            thermochemical relation (equations 1–5); Eq. (5)'s printed log value
-            is retained as the input to the base-10 conversion.
-          calculation_locator: {page: 3, published_page: 881, equations: '1–5'}
           point_conditions:
             temperature_K:
               state: {tag: value, value: '1300'}
@@ -119,3 +108,22 @@ species:
               locator: {page: 1, published_page: 879, section: Experimental}
           method_as_printed: Concentration-cell electromotive-force measurement, followed by Gibbs–Duhem integration.
           printed_activity_form: log10(alpha*_Na2O)
+      - observation_id: itoh_yokokawa_1984_eq5_printed_log_input
+        experiment: itoh_yokokawa_1984_concentration_cell_emf
+        type: gibbs_table
+        locator:
+          page: 4
+          published_page: 882
+          equation: '5'
+          note: Printed log activity immediately before Eq. (5).
+        phase: l
+        units: printed log10 activity; no closed log-activity quantity token
+        values:
+          quantity: log10_activity_as_published
+          method_class: measured_direct
+          admission_status: typed_refusal
+          value_as_printed: '-9.0'
+          printed_form: log10(alpha*_Na2O)
+          schema_gap: >-
+            No schema token exists for the printed log10 activity form; this
+            support observation preserves the source cell for derivation lineage.

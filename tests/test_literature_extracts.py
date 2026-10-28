@@ -1407,22 +1407,41 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     source = EXTRACTS / name
     doc = yaml.safe_load(source.read_text(encoding="utf-8"))
     observations = doc["species"]["Na2O"]["observations"]
-    assert len(observations) == 1
-    row = observations[0]
+    assert len(observations) == 2
+    row = next(
+        item
+        for item in observations
+        if item["observation_id"] == "itoh_yokokawa_1984_eq5_absolute_activity"
+    )
+    printed_log = next(
+        item
+        for item in observations
+        if item["observation_id"] == "itoh_yokokawa_1984_eq5_printed_log_input"
+    )
     assert row["values"]["log10_activity_as_published"] == "-9.0"
     assert row["values"]["value_as_printed"] == "-9.0"
     assert row["values"]["activity"] == "1e-9"
-    assert row["values"]["derivation"]["raw_inputs"]["locator"] == {
-        "page": 4,
-        "published_page": 882,
-        "equation": "5",
-        "note": "Printed input verbatim: log alpha*_Na2O = -9.0.",
-    }
+    assert row["locator"]["page"] == 4
+    assert row["locator"]["published_page"] == 882
+    assert row["locator"]["equation"] == "5"
+    assert row["values"]["method_class"] == "measured_reduced"
+    assert row["values"]["evidence_class"] == "measured_reduced"
+    assert row["derivation"]["relation"] == "a(Na2O) = 10^(log10 a(Na2O))"
+    assert row["derived_from"] == ["itoh_yokokawa_1984_eq5_printed_log_input"]
+    assert printed_log["values"]["admission_status"] == "typed_refusal"
+    assert printed_log["values"]["value_as_printed"] == "-9.0"
+    assert printed_log["locator"]["page"] == 4
+    assert printed_log["locator"]["published_page"] == 882
+    assert printed_log["locator"]["equation"] == "5"
     assert row["uncertainty"]["value"] == "1.1512925465e-10"
     assert row["values"]["T_K"] == "1300"
+    assert row["values"]["point_conditions"]["temperature_K"]["locator"][
+        "page"
+    ] == 4
     assert row["values"]["point_conditions"]["composition"]["state"]["value"][
         "components"
     ] == [["Na2O", "0.33"], ["SiO2", "0.67"]]
+    assert row["values"]["point_conditions"]["composition"]["locator"]["page"] == 3
     assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
     assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
     assert row["regime"] == "emf_cell"
@@ -1450,18 +1469,23 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert "mismatch" in " ".join(vle.check_fidelity_sample_matches(mutated, sample))
 
     result = _migrate_real_extract(tmp_path, name, extract_doc=doc)
-    assert len(result.observations) == 1
-    migrated = to_plain(next(iter(result.observations.values())))
+    assert len(result.observations) == 2
+    migrated_rows = {
+        observation_id.rsplit("::", 1)[-1]: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+    }
+    migrated = migrated_rows["itoh_yokokawa_1984_eq5_absolute_activity"]
     assert migrated["identity"]["quantity"]["value"] == "activity"
     assert migrated["admission"]["status"] == "admitted"
     assert migrated["value"]["kind"] == "point"
     assert Decimal(str(migrated["value"]["point"])) == Decimal("1e-9")
     assert len(result.experiments) == 1
     assert next(iter(result.experiments.values())).method.value.value == "emf_cell"
-    assert Decimal(
-        migrated["derivation"]["parameters"][0][1]["state"]["value"]
-    ) == Decimal("-9.0")
-    assert migrated["derivation"]["parameters"][0][1]["locator"]["page"] == 4
+    assert migrated["derivation"]["relation"] == "a(Na2O) = 10^(log10 a(Na2O))"
+    parent_id = migrated["derived_from"][0].rsplit("::", 1)[-1]
+    assert parent_id == "itoh_yokokawa_1984_eq5_printed_log_input"
+    assert migrated_rows[parent_id]["admission"]["status"] == "rejected"
+    assert migrated_rows[parent_id]["value"]["kind"] == "unavailable"
     assert migrated["uncertainty"]["verbatim"]["value"] == "1.1512925465e-10"
     assert migrated["identity"]["temperature_K"]["value"] == "1300"
     assert migrated["identity"]["composition"]["tag"] == "value"
@@ -1476,19 +1500,17 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert migrated["identity"]["total_pressure_Pa"]["tag"] == "unknown"
     assert migrated["identity"]["fO2_Pa"]["tag"] == "unknown"
     assert result.validation is not None
-    hard_issues = result.validation.hard_issues
-    assert {issue.path.rsplit(".", 1)[-1] for issue in hard_issues} == {
-        "derivation",
-        "derived_from",
-    }
-    assert any(
-        issue.detail.startswith("printed derivation inputs do not resolve")
-        for issue in hard_issues
-    )
-    assert any(
-        issue.detail == "derived observation requires derived_from"
-        for issue in hard_issues
-    )
+    assert not result.validation.hard_issues
+    assert sum(
+        observation.admission.status.value == "admitted"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "activity"
+        for observation in result.observations.values()
+    ) == 1
+    assert sum(
+        observation.value.kind.value == "unavailable"
+        for observation in result.observations.values()
+    ) == 1
 
 
 @pytest.mark.parametrize(
