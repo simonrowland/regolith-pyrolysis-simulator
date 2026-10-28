@@ -2008,6 +2008,58 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     }
 
 
+def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.melt_backend.liquidus import (
+        find_liquidus_solidus_by_fraction,
+    )
+
+    class BudgetLimitedBackend:
+        _bridge = "test"
+
+        def is_available(self) -> bool:
+            return True
+
+        def get_engine_version(self) -> str:
+            return "budget-limited-test"
+
+        def find_liquidus_solidus(self, **_kwargs):
+            # This is the production finder with a declared budget too small
+            # for its first deadline check. It deterministically returns the
+            # same typed aggregate-budget refusal every time.
+            return find_liquidus_solidus_by_fraction(
+                lambda _temperature_C: 1.0,
+                budget_s=1.0e-12,
+            )
+
+    budget_backend = BudgetLimitedBackend()
+    monkeypatch.setattr(
+        MAGEMinShadowProvider,
+        "_ensure_backend",
+        lambda _provider: budget_backend,
+    )
+
+    execution = build_sso2_owner_recipe_execution(hours=9)
+    evidence = sso2_owner_recipe_evidence(execution)
+    partition = evidence["fe_drain_vapor_partition_dependency"]
+
+    assert partition["native_fe_saturation_split_count"] == 0
+    fallback = execution.simulator._melt_redox_liquidus_gate_fallback_summary()
+    budget_notices = [
+        item
+        for item in fallback.get("recent", ())
+        if item.get("liquidus_status") == "not_converged"
+    ]
+    assert budget_notices
+    assert all(
+        item.get("kind") == "liquidus_budget_exceeded"
+        and item.get("reason") == "aggregate_budget_exceeded"
+        for item in budget_notices
+    )
+
+
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
 
