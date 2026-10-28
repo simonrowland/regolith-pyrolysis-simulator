@@ -2396,6 +2396,12 @@ def engines_with_ok_and_adapter_unavailable(
 ) -> tuple[str, ...]:
     """Engines that both answered ok and reported themselves unavailable.
 
+    Coverage ``ok`` statuses count, including ``observable_family=domain_gate``.
+    A domain projection is a successful answer from the named engine wrapper,
+    so this predicate treats it as evidence that the wrapper is present. It
+    checks wrapper presence, not support for the point observable or physics
+    backend.
+
     Structural run-level guard: an engine that produced at least one
     ``ok`` row cannot also report ``status=unavailable`` in the same run
     without contradicting itself. Reason text is not consulted, so
