@@ -8,11 +8,17 @@ source:
 extraction:
   method: >-
     Tables 1–4 transcribed from MinerU table HTML and pdftotext-layout, with page renders used to verify
-    table layouts and the Table 4 final-row zero. The numeric table outputs are retained with descriptive
-    quantity labels because the closed quantity vocabulary has no exact token for layer-thickness growth,
-    molar amount in an etched reaction product, or XRD peak-area ratio. Tables 5–12 are separate
-    carbonate–ceramic batch reaction phase studies, not alkali-vapor exposures. Figure-only corrosion
-    traces are listed in the accompanying audit and are not transcribed.
+    table layouts and the Table 4 final-row zero. The prose rate constants and associated measured bounds
+    for alumina, mullite, cordierite, transformation-toughened zirconia, and aluminum titanate are added
+    from the cited source pages. Numerical corrosion outputs retain descriptive non-token quantity labels
+    where the closed vocabulary has no exact token. Tables 5–12 are separate carbonate–ceramic batch
+    reaction phase studies, not alkali-vapor exposures. Figure-only corrosion traces remain undigitized.
+  campaign_atmosphere:
+    concentration_as_reported: 'approximately 1.0 +/- 0.1 vol% NaNO3 vapor; Figure 10 caption states 0.98 vol%'
+    derivation: Assuming ideal gases, calculated from NaNO3 weight-loss rate and fixed compressed-air flow.
+    scope: One fixed campaign concentration used throughout the corrosion experiments.
+    locator: {page: 39, published_page: 27, section: '3.3'}
+    alternate_caption_locator: {page: 66, published_page: 54, figure: '10'}
   date: '2026-10-28'
   worker: w1028naF-pickrell94-corr
 review_status: draft
@@ -42,21 +48,26 @@ species:
           published_page: 38
           table: '1'
           note: Alkali reaction kinetics of Si3N4; 4 printed temperature rows.
+        derivation:
+          locator: {page: 50, published_page: 38, table: '1'}
+          relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 51, published_page: 39, figure: '4', note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion
         units: um_per_h, T_C as printed
         values:
           quantity: reaction_layer_thickness_growth_rate_um_per_h
-          method_class: quoted_attributed
-          attribution: Authors' reaction-rate constants reduced from measured corrosion thickness-versus-time data.
+          method_class: measured_reduced
           points:
-            - {T_C: 950, phase: null, value: 3.00, locator: {page: 50, published_page: 38, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 50, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1000, phase: null, value: 7.40, locator: {page: 50, published_page: 38, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 50, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1050, phase: null, value: 12.95, locator: {page: 50, published_page: 38, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 50, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1100, phase: null, value: 27.22, locator: {page: 50, published_page: 38, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 50, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 950, phase: null, value: 3.00, locator: {page: 50, published_page: 38, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 50, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1000, phase: null, value: 7.40, locator: {page: 50, published_page: 38, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 50, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1050, phase: null, value: 12.95, locator: {page: 50, published_page: 38, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 50, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1100, phase: null, value: 27.22, locator: {page: 50, published_page: 38, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 50, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
           printed_reaction_layer: sodium silicate liquid at test temperatures; tended to bead during cooling
           alkali_source: sodium nitrate
-          alkali_vapor_concentration_as_printed: 1.0 +/- 0.1 vol%
           carrier_gas: compressed air, filtered to remove CO2 and moisture
           salt_source_temperature_C_as_printed: 720
           salt_source_temperature_uncertainty_C_as_printed: 10
@@ -109,21 +120,26 @@ species:
           published_page: 55
           table: '2'
           note: Alkali reaction kinetics of SiC; 4 printed temperature rows.
+        derivation:
+          locator: {page: 67, published_page: 55, table: '2'}
+          relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 66, published_page: 54, figure: '10', note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion
         units: um_per_h, T_C as printed
         values:
           quantity: reaction_layer_thickness_growth_rate_um_per_h
-          method_class: quoted_attributed
-          attribution: Authors' reaction-rate constants reduced from measured corrosion thickness-versus-time data.
+          method_class: measured_reduced
           points:
-            - {T_C: 950, phase: null, value: 2.95, locator: {page: 67, published_page: 55, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 67, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1000, phase: null, value: 4.01, locator: {page: 67, published_page: 55, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 67, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1050, phase: null, value: 5.33, locator: {page: 67, published_page: 55, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 67, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
-            - {T_C: 1100, phase: null, value: 9.20, locator: {page: 67, published_page: 55, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 67, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 950, phase: null, value: 2.95, locator: {page: 67, published_page: 55, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 67, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1000, phase: null, value: 4.01, locator: {page: 67, published_page: 55, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 67, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1050, phase: null, value: 5.33, locator: {page: 67, published_page: 55, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 67, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1100, phase: null, value: 9.20, locator: {page: 67, published_page: 55, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 67, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
           printed_reaction_layer: sodium silicate liquid at test temperatures; tended to bead during cooling
           alkali_source: sodium nitrate
-          alkali_vapor_concentration_as_printed: 1.0 +/- 0.1 vol%
           carrier_gas: compressed air, filtered to remove CO2 and moisture
           salt_source_temperature_C_as_printed: 720
           salt_source_temperature_uncertainty_C_as_printed: 10
@@ -178,7 +194,7 @@ species:
         values:
           quantity: etched_alumina_alkali_product_molar_amounts_and_ratio
           method_class: measured_direct
-          note: Alumina and soda moles measured by atomic absorption as a function of cumulative etch time; the source does not print the corrosion exposure associated with these analyzed specimens.
+          note: Alumina and soda moles measured by atomic absorption as a function of cumulative etch time; soda moles are retained as a non-scored sibling field because the migrator projects the alumina_moles value column only. The source does not print the corrosion exposure associated with these analyzed specimens.
           points:
             - {cumulative_etch_time_h: 0.5, phase: null, alumina_moles: 6.22, soda_moles: 6.52, value: 6.22, locator: {page: 79, published_page: 67, table: '3', row: 1, table_row_number: 2, table_phase_column: 2}}
             - {cumulative_etch_time_h: 1.0, phase: null, alumina_moles: 4.30, soda_moles: 6.70, value: 4.30, locator: {page: 79, published_page: 67, table: '3', row: 2, table_row_number: 3, table_phase_column: 2}}
@@ -189,14 +205,17 @@ species:
             - {cumulative_etch_time_h: 14, phase: null, alumina_moles: 3.37, soda_moles: 0.45, value: 3.37, locator: {page: 79, published_page: 67, table: '3', row: 7, table_row_number: 8, table_phase_column: 2}}
       - observation_id: pickrell_1994_table3_alumina_soda_molar_ratio
         type: composition_series
-        locator: {page: 79, published_page: 67, table: '3', note: Alumina/soda molar ratio calculated from the two printed mole columns.}
+        locator: {page: 79, published_page: 67, table: '3', note: Printed alumina/soda ratio; rounded mole columns do not reproduce every printed ratio.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
         units: dimensionless molar ratio
-        derived_from: [pickrell_1994_table3_alumina_product_analysis]
         derivation:
-          relation: Alumina moles divided by soda moles for each cumulative etch-time row.
-          inputs: [pickrell_1994_table3_alumina_product_analysis]
+          locator: {page: 79, published_page: 67, table: '3'}
+          relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not printed.
+          output_unit: dimensionless ratio
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 79, published_page: 67, table: '3', note: The table prints rounded mole columns that do not reproduce the last ratio rows.}
         values:
           quantity: etched_alumina_to_soda_molar_ratio
           method_class: measured_reduced
@@ -209,7 +228,7 @@ species:
             - {cumulative_etch_time_h: 10, phase: null, value: 6.23, locator: {page: 79, published_page: 67, table: '3', row: 6, table_row_number: 7, table_phase_column: 4}}
             - {cumulative_etch_time_h: 14, phase: null, value: 7.45, locator: {page: 79, published_page: 67, table: '3', row: 7, table_row_number: 8, table_phase_column: 4}}
       - observation_id: pickrell_1994_table4_beta_alumina_peak_area_measurements
-        # This observation holds the two measured peak-area columns.
+        # This observation holds both measured peak-area columns; alumina area is a non-scored sibling.
         type: concentration_series
         locator: {page: 81, published_page: 69, table: '4', note: Semiquantitative XRD peak-area measurements; 8 printed rows.}
         phase: cr
@@ -218,7 +237,7 @@ species:
         values:
           quantity: beta_alumina_and_alumina_xrd_peak_areas
           method_class: measured_direct
-          note: The last alumina peak-area cell is printed as dashes.
+          note: The last alumina peak-area cell is printed as dashes. Alumina peak area is retained as a non-scored sibling field because the migrator projects the beta_alumina_peak_area value column only.
           points:
             - {cumulative_etch_time_h: 0.5, phase: null, beta_alumina_peak_area: 0.0172, alumina_peak_area: 0.0338, value: 0.0172, locator: {page: 81, published_page: 69, table: '4', row: 1, table_row_number: 2, table_phase_column: 2}}
             - {cumulative_etch_time_h: 1.0, phase: null, beta_alumina_peak_area: 0.0230, alumina_peak_area: 0.0500, value: 0.0230, locator: {page: 81, published_page: 69, table: '4', row: 2, table_row_number: 3, table_phase_column: 2}}
@@ -263,3 +282,452 @@ species:
           value: 0
           cumulative_etch_time_h: 26
           alumina_peak_area_as_printed: '------'
+      - observation_id: pickrell_1994_prose_alumina_reaction_rate
+        type: rate_series
+        locator:
+          page: 75
+          published_page: 63
+          section: '4.1.3'
+          note: Three linear reaction-rate constants printed in prose; Figure 14 points remain undigitized.
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um/h as printed
+        derivation:
+          locator: {page: 75, published_page: 63, section: '4.1.3'}
+          relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 75, published_page: 63, figure: '14', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: measured_reduced
+          reaction_products_as_reported: XRD found alumina and sodium aluminate after 1050 C for 48 h; at 1100 C for 48 h and 1150 C for 45 h it found corundum, sodium aluminate, and an unidentified phase with some beta-alumina peak positions.
+          reaction_products_locator: {page: 77, published_page: 65, section: '4.1.3'}
+          points:
+            - T_C: 1050
+              n_exponent_as_printed: 0.9
+              value: 0.12
+              locator: {page: 75, published_page: 63, section: '4.1.3'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1050'}}
+                  locator: {page: 75, published_page: 63, section: '4.1.3'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1100
+              n_exponent_as_printed: 1.1
+              value: 0.24
+              locator: {page: 75, published_page: 63, section: '4.1.3'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1100'}}
+                  locator: {page: 75, published_page: 63, section: '4.1.3'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1150
+              n_exponent_as_printed: 1.3
+              value: 0.45
+              locator: {page: 75, published_page: 63, section: '4.1.3'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1150'}}
+                  locator: {page: 75, published_page: 63, section: '4.1.3'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+      - observation_id: pickrell_1994_prose_alumina_activation_energy
+        type: rate_series
+        locator: {page: 77, published_page: 65, section: '4.1.3', note: Arrhenius-derived activation energy and stated standard deviation.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: kJ/mol
+        derived_from: [pickrell_1994_prose_alumina_reaction_rate]
+        derivation:
+          locator: {page: 77, published_page: 65, section: '4.1.3', figure: '15'}
+          relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+          inputs: [pickrell_1994_prose_alumina_reaction_rate]
+          output_unit: kJ/mol
+        uncertainty:
+          activation_energy_uncertainty_kJ_per_mol: 5
+          note: Standard deviation is approximately 5 kJ/mol; confidence level not stated.
+        values:
+          quantity: alkali_corrosion_activation_energy
+          method_class: measured_reduced
+          value: 200
+          value_unit_as_printed: kJ/mol
+          approximate: true
+      - observation_id: pickrell_1994_prose_alumina_thickness_bound
+        type: rate_series
+        locator: {page: 75, published_page: 63, section: '4.1.3', note: Thickness change after 48 h at 1050 C is printed as less than 5 um.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um
+        values:
+          quantity: alumina_reaction_layer_thickness_upper_bound_um
+          method_class: measured_direct
+          points:
+            - T_C: 1050
+              exposure_time_h: 48
+              value: 5
+              value_operator: '<'
+              locator: {page: 75, published_page: 63, section: '4.1.3'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1050'}}
+                  locator: {page: 75, published_page: 63, section: '4.1.3'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+  Al6Si2O13:
+    observations:
+      - observation_id: pickrell_1994_prose_mullite_reaction_rate
+        type: rate_series
+        locator: {page: 85, published_page: 73, section: '4.1.4', note: Four linear reaction-rate constants printed in prose; Figure 18 points remain undigitized.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um/h as printed
+        derivation:
+          locator: {page: 85, published_page: 73, section: '4.1.4'}
+          relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 85, published_page: 73, figure: '18', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: measured_reduced
+          reaction_products_as_reported: After 1000 C for 8 h EDAX found aluminum silicon and sodium; XRD identified sodium aluminate and carnegieite.
+          reaction_products_locator: {page: 88, published_page: 76, section: '4.1.4'}
+          points:
+            - T_C: 950
+              n_exponent_as_printed: 0.7
+              value: 6
+              locator: {page: 85, published_page: 73, section: '4.1.4'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '950'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.4'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1000
+              n_exponent_as_printed: 0.8
+              value: 10
+              locator: {page: 85, published_page: 73, section: '4.1.4'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1000'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.4'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1050
+              n_exponent_as_printed: 1.2
+              value: 25
+              locator: {page: 85, published_page: 73, section: '4.1.4'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1050'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.4'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1100
+              n_exponent_as_printed: 1.2
+              value: 39
+              locator: {page: 85, published_page: 73, section: '4.1.4'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1100'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.4'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+      - observation_id: pickrell_1994_prose_mullite_activation_energy
+        type: rate_series
+        locator: {page: 88, published_page: 76, section: '4.1.4', note: Arrhenius-derived activation energy and stated standard deviation.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: kJ/mol
+        derived_from: [pickrell_1994_prose_mullite_reaction_rate]
+        derivation:
+          locator: {page: 88, published_page: 76, section: '4.1.4', figure: '19'}
+          relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+          inputs: [pickrell_1994_prose_mullite_reaction_rate]
+          output_unit: kJ/mol
+        uncertainty:
+          activation_energy_uncertainty_kJ_per_mol: 20
+          note: Associated standard deviation is approximately 20 kJ/mol; confidence level not stated.
+        values:
+          quantity: alkali_corrosion_activation_energy
+          method_class: measured_reduced
+          value: 182
+          value_unit_as_printed: kJ/mol
+  Mg2Al4Si5O18:
+    observations:
+      - observation_id: pickrell_1994_prose_cordierite_linear_reaction_rate
+        type: rate_series
+        locator: {page: 132, published_page: 120, section: '5', note: Chapter 5 prose reports the two linear low-temperature rates; Figure 21 remains undigitized.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um/h as printed
+        derivation:
+          locator: {page: 132, published_page: 120, section: '5'}
+          relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 90, published_page: 78, figure: '21', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: measured_reduced
+          reaction_product_note: XRD patterns after reaction in the alkali-containing atmosphere were complex and the phases could not be identified.
+          reaction_product_locator: {page: 92, published_page: 80, section: '4.1.5'}
+          points:
+            - T_C: 950
+              n_exponent_as_printed: 0.8
+              n_exponent_locator: {page: 90, published_page: 78, section: '4.1.5'}
+              value: 6
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '950'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1000
+              n_exponent_as_printed: 0.8
+              n_exponent_locator: {page: 90, published_page: 78, section: '4.1.5'}
+              value: 9
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1000'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+      - observation_id: pickrell_1994_prose_cordierite_parabolic_reaction_rate
+        type: rate_series
+        locator: {page: 132, published_page: 120, section: '5', note: Chapter 5 prose reports the two parabolic high-temperature rates; Figure 23 remains undigitized.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: mm^2/h as printed
+        derivation:
+          locator: {page: 132, published_page: 120, section: '5'}
+          relation: Parabolic reaction-rate constants reduced from measured squared-layer-thickness-versus-time data.
+          output_unit: mm^2/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 92, published_page: 80, figure: '23', note: Underlying squared-thickness-time points are plotted and not transcribed as numeric inputs.}
+        values:
+          quantity: reaction_layer_thickness_squared_rate_mm2_per_h
+          method_class: measured_reduced
+          points:
+            - T_C: 1050
+              n_exponent_as_printed: 0.5
+              n_exponent_locator: {page: 90, published_page: 78, section: '4.1.5'}
+              value: 0.0046
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1050'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1100
+              n_exponent_as_printed: 0.4
+              n_exponent_locator: {page: 90, published_page: 78, section: '4.1.5'}
+              value: 0.0055
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1100'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+  ZrO2:
+    observations:
+      - observation_id: pickrell_1994_prose_ttz_reaction_rate
+        type: rate_series
+        locator: {page: 132, published_page: 120, section: '5', note: Four linear TTZ reaction-rate constants printed in prose; Figure 25 points remain undigitized.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
+        units: um/h as printed
+        derivation:
+          locator: {page: 132, published_page: 120, section: '5'}
+          relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+          output_unit: um/h
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 84, published_page: 72, figure: '25', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: measured_reduced
+          points:
+            - T_C: 950
+              n_exponent_as_printed: 3.0
+              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              value: 0.4
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '950'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1000
+              n_exponent_as_printed: 1.6
+              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              value: 1.1
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1000'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1050
+              n_exponent_as_printed: 1.1
+              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              value: 3.4
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1050'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+            - T_C: 1100
+              n_exponent_as_printed: 0.8
+              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              value: 4.2
+              locator: {page: 132, published_page: 120, section: '5'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1100'}}
+                  locator: {page: 132, published_page: 120, section: '5'}
+                atmosphere:
+                  state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+                  locator: {page: 39, published_page: 27, section: '3.3'}
+      - observation_id: pickrell_1994_prose_ttz_activation_energy
+        type: rate_series
+        locator: {page: 85, published_page: 73, section: '4.1.6', note: Arrhenius-derived activation energy.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
+        units: kJ/mol
+        derived_from: [pickrell_1994_prose_ttz_reaction_rate]
+        derivation:
+          locator: {page: 85, published_page: 73, section: '4.1.6', figure: '26'}
+          relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+          inputs: [pickrell_1994_prose_ttz_reaction_rate]
+          output_unit: kJ/mol
+        values:
+          quantity: alkali_corrosion_activation_energy
+          method_class: measured_reduced
+          value: 229
+          value_unit_as_printed: kJ/mol
+      - observation_id: pickrell_1994_prose_ttz_thickness_after_15h
+        type: rate_series
+        locator: {page: 84, published_page: 72, section: '4.1.6', note: Measured reaction-layer thickness after 15 h at 950 C.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
+        units: mm
+        point_conditions:
+          atmosphere:
+            state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+            locator: {page: 39, published_page: 27, section: '3.3'}
+        values:
+          quantity: reaction_layer_thickness_mm
+          method_class: measured_direct
+          value: 0.008
+          T_C: 950
+          exposure_time_h: 15
+      - observation_id: pickrell_1994_prose_ttz_zero_thickness_under_8h
+        type: rate_series
+        locator: {page: 84, published_page: 72, section: '4.1.6', note: For all times below 8 h the measured reaction-layer thickness was zero; no temperature is assigned to this statement.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
+        units: mm
+        point_conditions:
+          atmosphere:
+            state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+            locator: {page: 39, published_page: 27, section: '3.3'}
+        values:
+          quantity: reaction_layer_thickness_below_8h_mm
+          method_class: measured_direct
+          value: 0
+          exposure_time_h: 8
+          exposure_time_operator: '<'
+      - observation_id: pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes
+        type: rate_series
+        locator: {page: 85, published_page: 73, section: '4.1.6', note: Two separate alkali-free blank runs each average two samples after 12 h at 1000 C.}
+        phase: cr
+        regime: alkali_free_thermal_blank
+        material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
+        units: mm
+        values:
+          quantity: alkali_free_thermal_thickness_change_mm
+          method_class: measured_direct
+          note: These are alkali-free blank thickness changes and are not corrosion rates.
+          points:
+            - T_C: 1000
+              exposure_time_h: 12
+              blank_set: first pair of samples
+              n_samples_as_printed: 2
+              value: 0.007
+              locator: {page: 85, published_page: 73, section: '4.1.6'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1000'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                atmosphere:
+                  state: {tag: value, value: without alkalis present}
+                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+            - T_C: 1000
+              exposure_time_h: 12
+              blank_set: second pair of samples
+              n_samples_as_printed: 2
+              value: 0.010
+              locator: {page: 85, published_page: 73, section: '4.1.6'}
+              point_conditions:
+                temperature_C:
+                  state: {tag: value, value: {kind: point, point: '1000'}}
+                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                atmosphere:
+                  state: {tag: value, value: without alkalis present}
+                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+  Al2TiO5:
+    observations:
+      - observation_id: pickrell_1994_prose_aluminum_titanate_dimensional_change
+        type: rate_series
+        locator: {page: 132, published_page: 120, section: '5', note: Approximately 25 percent dimensional change after short exposure at 950 C; it is not a reaction rate.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        material_as_reported: Aluminum titanate without stabilizing agents.
+        units: '%'
+        point_conditions:
+          atmosphere:
+            state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
+            locator: {page: 39, published_page: 27, section: '3.3'}
+        values:
+          quantity: aluminum_titanate_dimensional_change_percent
+          method_class: measured_direct
+          value: 25
+          T_C: 950
+          approximate: true
+          note: Dimensional change as printed for short times; not a rate. The reaction product after 3 h at 950 C was too fragile for accurate micrometer measurement.
+          source_detail_locator: {page: 90, published_page: 78, section: '4.1.7'}
