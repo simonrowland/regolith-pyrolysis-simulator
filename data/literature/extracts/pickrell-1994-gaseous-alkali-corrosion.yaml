@@ -1,0 +1,265 @@
+schema_version: literature_extract.v1
+source_id: pickrell-1994-gaseous-alkali-corrosion
+source:
+  citation: >-
+    Pickrell, G. R. (1994). High temperature alkali corrosion kinetics of low expansion ceramics.
+    PhD dissertation, Virginia Polytechnic Institute and State University.
+  year: 1994
+extraction:
+  method: >-
+    Tables 1–4 transcribed from MinerU table HTML and pdftotext-layout, with page renders used to verify
+    table layouts and the Table 4 final-row zero. The numeric table outputs are retained with descriptive
+    quantity labels because the closed quantity vocabulary has no exact token for layer-thickness growth,
+    molar amount in an etched reaction product, or XRD peak-area ratio. Tables 5–12 are separate
+    carbonate–ceramic batch reaction phase studies, not alkali-vapor exposures. Figure-only corrosion
+    traces are listed in the accompanying audit and are not transcribed.
+  date: '2026-10-28'
+  worker: w1028naF-pickrell94-corr
+review_status: draft
+fidelity_samples:
+  - path: species.Si3N4.observations[pickrell_1994_table1_si3n4_reaction_rate].values.points[0].value
+    value: 3.00
+    locator: {page: 50, published_page: 38, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}
+  - path: species.SiC.observations[pickrell_1994_table2_sic_reaction_rate].values.points[2].value
+    value: 5.33
+    locator: {page: 67, published_page: 55, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}
+  - path: species.Al2O3.observations[pickrell_1994_table3_alumina_product_analysis].values.points[3].alumina_moles
+    value: 4.48
+    locator: {page: 79, published_page: 67, table: '3', row: 4, table_row_number: 5, table_phase_column: 2}
+  - path: species.Al2O3.observations[pickrell_1994_table4_beta_alumina_peak_area_measurements].values.points[7].beta_alumina_peak_area
+    value: 0
+    locator: {page: 81, published_page: 69, table: '4', row: 8, table_row_number: 9, table_phase_column: 2}
+  - path: species.Al2O3.observations[pickrell_1994_table4_beta_alumina_peak_area_ratio_after_26h_etch].values.value
+    value: 0
+    locator: {page: 81, published_page: 69, table: '4', row: 8}
+species:
+  Si3N4:
+    observations:
+      - observation_id: pickrell_1994_table1_si3n4_reaction_rate
+        type: rate_series
+        locator:
+          page: 50
+          published_page: 38
+          table: '1'
+          note: Alkali reaction kinetics of Si3N4; 4 printed temperature rows.
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um_per_h, T_C as printed
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: quoted_attributed
+          attribution: Authors' reaction-rate constants reduced from measured corrosion thickness-versus-time data.
+          points:
+            - {T_C: 950, phase: null, value: 3.00, locator: {page: 50, published_page: 38, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 50, table: '1', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1000, phase: null, value: 7.40, locator: {page: 50, published_page: 38, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 50, table: '1', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1050, phase: null, value: 12.95, locator: {page: 50, published_page: 38, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 50, table: '1', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1100, phase: null, value: 27.22, locator: {page: 50, published_page: 38, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 50, table: '1', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'compressed air with 1.0 +/- 0.1 vol% sodium nitrate vapor'}, locator: {page: 39, published_page: 27, section: '3.3'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+          printed_reaction_layer: sodium silicate liquid at test temperatures; tended to bead during cooling
+          alkali_source: sodium nitrate
+          alkali_vapor_concentration_as_printed: 1.0 +/- 0.1 vol%
+          carrier_gas: compressed air, filtered to remove CO2 and moisture
+          salt_source_temperature_C_as_printed: 720
+          salt_source_temperature_uncertainty_C_as_printed: 10
+          carrier_gas_flow_cm3_per_min_as_printed: 86
+          exposure_time_note: Each condition averaged four specimens; individual times are shown only in figures and are not transcribed.
+          pressure_note: No total pressure or absolute alkali partial pressure is reported.
+      - observation_id: pickrell_1994_table1_si3n4_activation_energy
+        type: rate_series
+        locator: {page: 50, published_page: 38, table: '1', note: Activation energy printed in Table 1; method in the text on PDF page 51.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: kJ_per_mol
+        derived_from: [pickrell_1994_table1_si3n4_reaction_rate]
+        derivation:
+          relation: Arrhenius fit of the natural logarithm of the reaction-rate constant versus reciprocal temperature.
+          inputs: [pickrell_1994_table1_si3n4_reaction_rate]
+          output_unit: kJ/mol
+        uncertainty:
+          activation_energy_uncertainty_kJ_per_mol: 15
+          note: The source reports a standard deviation of approximately 15 kJ/mol; confidence level not stated.
+        values:
+          quantity: alkali_corrosion_activation_energy
+          method_class: measured_reduced
+          value: 199
+          value_unit_as_printed: kJ/mol
+          input_plot_note: The fitted thickness-time values are shown only in Figure 4 and are not extracted.
+      - observation_id: pickrell_1994_table1_si3n4_silicate_layer_ratio
+        type: composition_series
+        locator: {page: 50, published_page: 38, table: '1', note: Average SiO2/Na2O molar ratio by atomic absorption analysis.}
+        phase: glass
+        regime: sodium_nitrate_vapor_corrosion
+        units: dimensionless molar ratio
+        quench_redox_preservation: not_stated
+        quench_redox_preservation_locator: {page: 50, published_page: 38, table: '1', note: 'The source describes a liquid layer at test temperature that beads during cooling, but makes no statement about quench preservation of the analyzed composition.'}
+        uncertainty:
+          value_uncertainty: 0.64
+          note: Printed as ±0.64; confidence level not stated.
+        values:
+          quantity: sodium_silicate_layer_SiO2_to_Na2O_molar_ratio
+          method_class: measured_direct
+          value: 2.22
+          value_form_as_printed: molar_ratio
+          method_note: Atomic absorption analysis of the sodium silicate glass formed on Si3N4.
+  SiC:
+    observations:
+      - observation_id: pickrell_1994_table2_sic_reaction_rate
+        type: rate_series
+        locator:
+          page: 67
+          published_page: 55
+          table: '2'
+          note: Alkali reaction kinetics of SiC; 4 printed temperature rows.
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: um_per_h, T_C as printed
+        values:
+          quantity: reaction_layer_thickness_growth_rate_um_per_h
+          method_class: quoted_attributed
+          attribution: Authors' reaction-rate constants reduced from measured corrosion thickness-versus-time data.
+          points:
+            - {T_C: 950, phase: null, value: 2.95, locator: {page: 67, published_page: 55, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '950'}}, locator: {page: 67, table: '2', row: 1, table_row_number: 2, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1000, phase: null, value: 4.01, locator: {page: 67, published_page: 55, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1000'}}, locator: {page: 67, table: '2', row: 2, table_row_number: 3, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1050, phase: null, value: 5.33, locator: {page: 67, published_page: 55, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1050'}}, locator: {page: 67, table: '2', row: 3, table_row_number: 4, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+            - {T_C: 1100, phase: null, value: 9.20, locator: {page: 67, published_page: 55, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}, point_conditions: {temperature_C: {state: {tag: value, value: {kind: point, point: '1100'}}, locator: {page: 67, table: '2', row: 4, table_row_number: 5, table_phase_column: 2}}, atmosphere: {state: {tag: value, value: 'dry air containing 0.98 vol% sodium nitrate vapors'}, locator: {page: 66, published_page: 54, figure: '10'}}, fO2_Pa: {state: {tag: unknown, reason: numerical oxygen partial pressure is not reported}, locator: {page: 39, published_page: 27, section: '3.3'}}, total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 39, published_page: 27, section: '3.3'}}, alkali_partial_pressure_Pa: {state: {tag: unknown, reason: only vapor concentration is reported; total pressure is not printed}, locator: {page: 39, published_page: 27, section: '3.3'}}}}
+          printed_reaction_layer: sodium silicate liquid at test temperatures; tended to bead during cooling
+          alkali_source: sodium nitrate
+          alkali_vapor_concentration_as_printed: 1.0 +/- 0.1 vol%
+          carrier_gas: compressed air, filtered to remove CO2 and moisture
+          salt_source_temperature_C_as_printed: 720
+          salt_source_temperature_uncertainty_C_as_printed: 10
+          carrier_gas_flow_cm3_per_min_as_printed: 86
+          exposure_time_note: Each condition averaged four specimens; individual times are shown only in figures and are not transcribed.
+          pressure_note: No total pressure or absolute alkali partial pressure is reported.
+      - observation_id: pickrell_1994_table2_sic_activation_energy
+        type: rate_series
+        locator: {page: 67, published_page: 55, table: '2', note: Activation energy printed in Table 2; method in the text on PDF page 68.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion
+        units: kJ_per_mol
+        derived_from: [pickrell_1994_table2_sic_reaction_rate]
+        derivation:
+          relation: Arrhenius fit of the natural logarithm of the reaction-rate constant versus reciprocal temperature.
+          inputs: [pickrell_1994_table2_sic_reaction_rate]
+          output_unit: kJ/mol
+        uncertainty:
+          activation_energy_uncertainty_kJ_per_mol: 15
+          note: The source reports a standard deviation of approximately 15 kJ/mol; confidence level not stated.
+        values:
+          quantity: alkali_corrosion_activation_energy
+          method_class: measured_reduced
+          value: 104
+          value_unit_as_printed: kJ/mol
+          input_plot_note: The fitted thickness-time values are shown only in Figure 10 and are not extracted.
+      - observation_id: pickrell_1994_table2_sic_silicate_layer_ratio
+        type: composition_series
+        locator: {page: 67, published_page: 55, table: '2', note: Average SiO2/Na2O molar ratio by atomic absorption analysis.}
+        phase: glass
+        regime: sodium_nitrate_vapor_corrosion
+        units: dimensionless molar ratio
+        quench_redox_preservation: not_stated
+        quench_redox_preservation_locator: {page: 67, published_page: 55, table: '2', note: 'The source describes a liquid layer at test temperature that beads during cooling, but makes no statement about quench preservation of the analyzed composition.'}
+        uncertainty:
+          value_uncertainty: 0.45
+          note: Printed as ±0.45; confidence level not stated.
+        values:
+          quantity: sodium_silicate_layer_SiO2_to_Na2O_molar_ratio
+          method_class: measured_direct
+          value: 2.55
+          value_form_as_printed: molar_ratio
+          method_note: Atomic absorption analysis of the sodium silicate glass formed on SiC.
+  Al2O3:
+    observations:
+      - observation_id: pickrell_1994_table3_alumina_product_analysis
+        type: concentration_series
+        locator: {page: 79, published_page: 67, table: '3', note: Chemical analysis of alumina-alkali reaction products; 7 printed rows.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
+        units: moles as printed; molar ratio dimensionless
+        values:
+          quantity: etched_alumina_alkali_product_molar_amounts_and_ratio
+          method_class: measured_direct
+          note: Alumina and soda moles measured by atomic absorption as a function of cumulative etch time; the source does not print the corrosion exposure associated with these analyzed specimens.
+          points:
+            - {cumulative_etch_time_h: 0.5, phase: null, alumina_moles: 6.22, soda_moles: 6.52, value: 6.22, locator: {page: 79, published_page: 67, table: '3', row: 1, table_row_number: 2, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 1.0, phase: null, alumina_moles: 4.30, soda_moles: 6.70, value: 4.30, locator: {page: 79, published_page: 67, table: '3', row: 2, table_row_number: 3, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 2.0, phase: null, alumina_moles: 2.89, soda_moles: 4.06, value: 2.89, locator: {page: 79, published_page: 67, table: '3', row: 3, table_row_number: 4, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 4.0, phase: null, alumina_moles: 4.48, soda_moles: 1.14, value: 4.48, locator: {page: 79, published_page: 67, table: '3', row: 4, table_row_number: 5, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 6.0, phase: null, alumina_moles: 2.37, soda_moles: 0.45, value: 2.37, locator: {page: 79, published_page: 67, table: '3', row: 5, table_row_number: 6, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 10, phase: null, alumina_moles: 3.52, soda_moles: 0.57, value: 3.52, locator: {page: 79, published_page: 67, table: '3', row: 6, table_row_number: 7, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 14, phase: null, alumina_moles: 3.37, soda_moles: 0.45, value: 3.37, locator: {page: 79, published_page: 67, table: '3', row: 7, table_row_number: 8, table_phase_column: 2}}
+      - observation_id: pickrell_1994_table3_alumina_soda_molar_ratio
+        type: composition_series
+        locator: {page: 79, published_page: 67, table: '3', note: Alumina/soda molar ratio calculated from the two printed mole columns.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
+        units: dimensionless molar ratio
+        derived_from: [pickrell_1994_table3_alumina_product_analysis]
+        derivation:
+          relation: Alumina moles divided by soda moles for each cumulative etch-time row.
+          inputs: [pickrell_1994_table3_alumina_product_analysis]
+        values:
+          quantity: etched_alumina_to_soda_molar_ratio
+          method_class: measured_reduced
+          points:
+            - {cumulative_etch_time_h: 0.5, phase: null, value: 0.95, locator: {page: 79, published_page: 67, table: '3', row: 1, table_row_number: 2, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 1.0, phase: null, value: 0.64, locator: {page: 79, published_page: 67, table: '3', row: 2, table_row_number: 3, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 2.0, phase: null, value: 0.71, locator: {page: 79, published_page: 67, table: '3', row: 3, table_row_number: 4, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 4.0, phase: null, value: 3.94, locator: {page: 79, published_page: 67, table: '3', row: 4, table_row_number: 5, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 6.0, phase: null, value: 5.24, locator: {page: 79, published_page: 67, table: '3', row: 5, table_row_number: 6, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 10, phase: null, value: 6.23, locator: {page: 79, published_page: 67, table: '3', row: 6, table_row_number: 7, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 14, phase: null, value: 7.45, locator: {page: 79, published_page: 67, table: '3', row: 7, table_row_number: 8, table_phase_column: 4}}
+      - observation_id: pickrell_1994_table4_beta_alumina_peak_area_measurements
+        # This observation holds the two measured peak-area columns.
+        type: concentration_series
+        locator: {page: 81, published_page: 69, table: '4', note: Semiquantitative XRD peak-area measurements; 8 printed rows.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
+        units: peak area as printed
+        values:
+          quantity: beta_alumina_and_alumina_xrd_peak_areas
+          method_class: measured_direct
+          note: The last alumina peak-area cell is printed as dashes.
+          points:
+            - {cumulative_etch_time_h: 0.5, phase: null, beta_alumina_peak_area: 0.0172, alumina_peak_area: 0.0338, value: 0.0172, locator: {page: 81, published_page: 69, table: '4', row: 1, table_row_number: 2, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 1.0, phase: null, beta_alumina_peak_area: 0.0230, alumina_peak_area: 0.0500, value: 0.0230, locator: {page: 81, published_page: 69, table: '4', row: 2, table_row_number: 3, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 2.0, phase: null, beta_alumina_peak_area: 0.0248, alumina_peak_area: 0.0555, value: 0.0248, locator: {page: 81, published_page: 69, table: '4', row: 3, table_row_number: 4, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 4.0, phase: null, beta_alumina_peak_area: 0.0157, alumina_peak_area: 0.0513, value: 0.0157, locator: {page: 81, published_page: 69, table: '4', row: 4, table_row_number: 5, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 6.0, phase: null, beta_alumina_peak_area: 0.0182, alumina_peak_area: 0.0678, value: 0.0182, locator: {page: 81, published_page: 69, table: '4', row: 5, table_row_number: 6, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 10, phase: null, beta_alumina_peak_area: 0.0120, alumina_peak_area: 0.0531, value: 0.0120, locator: {page: 81, published_page: 69, table: '4', row: 6, table_row_number: 7, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 14, phase: null, beta_alumina_peak_area: 0.0065, alumina_peak_area: 0.0570, value: 0.0065, locator: {page: 81, published_page: 69, table: '4', row: 7, table_row_number: 8, table_phase_column: 2}}
+            - {cumulative_etch_time_h: 26, phase: null, beta_alumina_peak_area: 0, alumina_peak_area: '------', value: 0, locator: {page: 81, published_page: 69, table: '4', row: 8, table_row_number: 9, table_phase_column: 2}}
+      - observation_id: pickrell_1994_table4_beta_alumina_peak_area_ratio
+        type: concentration_series
+        locator: {page: 81, published_page: 69, table: '4', note: Beta-alumina/alumina peak-area ratio calculated from two printed peak-area columns.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
+        units: peak-area ratio, dimensionless
+        derived_from: [pickrell_1994_table4_beta_alumina_peak_area_measurements]
+        derivation:
+          relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+          inputs: [pickrell_1994_table4_beta_alumina_peak_area_measurements]
+        values:
+          quantity: beta_alumina_to_alumina_xrd_peak_area_ratio
+          method_class: measured_reduced
+          note: No confidence level is stated for the semiquantitative peak areas.
+          points:
+            - {cumulative_etch_time_h: 0.5, phase: null, value: 0.5089, locator: {page: 81, published_page: 69, table: '4', row: 1, table_row_number: 2, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 1.0, phase: null, value: 0.4600, locator: {page: 81, published_page: 69, table: '4', row: 2, table_row_number: 3, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 2.0, phase: null, value: 0.4468, locator: {page: 81, published_page: 69, table: '4', row: 3, table_row_number: 4, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 4.0, phase: null, value: 0.3060, locator: {page: 81, published_page: 69, table: '4', row: 4, table_row_number: 5, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 6.0, phase: null, value: 0.2684, locator: {page: 81, published_page: 69, table: '4', row: 5, table_row_number: 6, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 10, phase: null, value: 0.2260, locator: {page: 81, published_page: 69, table: '4', row: 6, table_row_number: 7, table_phase_column: 4}}
+            - {cumulative_etch_time_h: 14, phase: null, value: 0.1140, locator: {page: 81, published_page: 69, table: '4', row: 7, table_row_number: 8, table_phase_column: 4}}
+      - observation_id: pickrell_1994_table4_beta_alumina_peak_area_ratio_after_26h_etch
+        type: concentration_series
+        locator: {page: 81, published_page: 69, table: '4', row: 8, note: The printed ratio is zero; alumina peak area is shown as dashes.}
+        phase: cr
+        regime: sodium_nitrate_vapor_corrosion_product_etch_analysis
+        units: peak-area ratio, dimensionless
+        values:
+          quantity: beta_alumina_to_alumina_xrd_peak_area_ratio
+          method_class: quoted_attributed
+          attribution: Authors report a ratio of zero in Table 4 while the alumina peak-area cell is printed as dashes.
+          value: 0
+          cumulative_etch_time_h: 26
+          alumina_peak_area_as_printed: '------'
