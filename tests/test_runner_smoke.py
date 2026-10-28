@@ -95,9 +95,10 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
-        # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
-        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
-        "ledger_sha256": "fabe87d7c89cd5622ab3b77734e2ef1f307f3b7af48e5175723c14d93a4dea3e",
+        # t-1545: digests of the flux maps and ledger omitted from the public
+        # runner JSON. The public lunar fixture already matches that CI run.
+        "flux_maps_sha256": "3830bb0b373f8bf50ff72288983d666d26f24bdf1f11a385f3bd21718b86aa28",
+        "ledger_sha256": "a9c806b7f70f453e6af0c06732a002f93f0b9cafff3f66d653cc960fa669e6ee",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
