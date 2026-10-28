@@ -3385,6 +3385,13 @@ def _convert_rate_to_kg_per_s(
     unit = unit.replace("−", "-").replace("⁻", "-")
     if unit in {"kg/s", "kg_per_s", "kgs-1"}:
         return amount, "identity:kg_per_s"
+    if unit == "mg/min":
+        # 1 mg = 1e-6 kg and 1 min = 60 s, so 1 mg/min =
+        # 1e-6/60 kg/s = 1.6667e-8 kg/s.
+        return (
+            amount * Decimal("0.000001") / Decimal("60"),
+            "mg_per_min_to_kg_per_s",
+        )
     if "table2doesnotstatetherateunit" in unit:
         return None, "rate_unit_not_stated"
     if unit.startswith("mol/s/m2"):

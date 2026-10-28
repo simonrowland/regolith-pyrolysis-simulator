@@ -88,7 +88,17 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
         assert observation.identity.temperature_K.value == Decimal(
             str(point["T_C"])
         ) + Decimal("273.15")
-        assert observation.value.point == Decimal(str(point["mass_loss_rate"]))
+        assert observation.value.kind.value == "point"
+        if row == 1:
+            assert point["rate_as_printed"] == "0.0071 ± 0.0005"
+            assert observation.value.point == Decimal(
+                "1.183333333333333333333333333E-10"
+            )
+        elif row == 2:
+            assert point["rate_as_printed"] == "0.010 ± 0.002"
+            assert observation.value.point == Decimal(
+                "1.666666666666666666666666667E-10"
+            )
         assert observation.uncertainty.kind.value == "printed"
         condition = observation.point_conditions["orifice_diameter_mm"]
         assert condition.state.is_value
