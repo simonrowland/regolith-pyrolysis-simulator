@@ -1,0 +1,46 @@
+source_id: nbs-1981-tn270-8-alkali-thermochemistry
+source_tables:
+- table: '99'
+  pages:
+  - 41
+  - 61
+  in_scope_printed_rows: 11
+  row_formula_column: 1
+  row_state_column: 3
+  formula_weight_column: 4
+  quantity_columns:
+    delta_fH_0K_excluded:
+      column: 5
+      unit: kcal/mol
+    delta_fH_298K:
+      column: 6
+      unit: kcal/mol
+    delta_fG_298K:
+      column: 7
+      unit: kcal/mol
+    H_298_minus_H_0:
+      column: 8
+      unit: kcal/mol
+      schema_gap: reference 0 K is not representable by the current enthalpy_increment
+        subtype
+    S_298K:
+      column: 9
+      unit_as_printed: cal/deg mol
+      unit_token: cal/deg-mole
+    Cp_298K:
+      column: 10
+      unit_as_printed: cal/deg mol
+      unit_token: cal/deg-mole
+  phase_mapping:
+    c: cr
+    g: g
+    c2: cr (form preserved as printed; alpha qualifier retained)
+    c3: cr (form preserved as printed; unstable qualifier retained)
+  standard_state_locator:
+    page: 10
+    pdf_page_index: 9
+    section: Conventions Regarding Pure Substances
+counts:
+  printed_formula_state_rows: 11
+  populated_requested_numeric_cells: 33
+  quantity_unknown_H_298_minus_H_0_cells: 5

@@ -1,0 +1,1585 @@
+schema_version: literature_extract.v1
+source_id: nbs-1981-tn270-8-alkali-thermochemistry
+source:
+  citation: 'Wagman, D. D., Evans, W. H., Parker, V. B., Schumm, R. H. & Nuttall, R. L. (1981), Selected Values
+    of Chemical Thermodynamic Properties: Compounds of Uranium, Protactinium, Thorium, Actinium, and the Alkali
+    Metals, NBS Technical Note 270-8.'
+  year: 1981
+  report_number: NBS Technical Note 270-8
+extraction:
+  method: MinerU table-tool drafts and Tesseract OCR; requested numeric cells transcribed as printed, with OCR conflicts
+    and ambiguous cells checked against rendered table pages.
+  date: '2026-10-28'
+  worker: nbs81-tn270-2026-10-28
+review_status: draft
+classification:
+  primary: compilation_assessed
+  note: Tables 99 and 100 are assessed standard-state thermochemical compilations.
+notes:
+- text: H°298−H°0 cells are retained as quantity-unknown observations because the existing enthalpy_increment candidate
+    requires a positive reference temperature; these are typed refusals rather than a near-miss H(T)−H(298 K) quantity.
+  locator:
+    page: 10
+    pdf_page_index: 9
+    section: Conventions Regarding Pure Substances
+- text: Only sodium and potassium oxide and silicate entries are extracted in this round. Follow-up candidates from
+    the same alkali tables are the remaining sulfates, carbonates, and halides; they are not included here.
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+- text: Sodium silicate glass (gl) and the au form of Na2SiO3 are outside the requested crystal/liquid/gas scope.
+    Table 100 contains K2SiO3 and K2Si2O5 but no K4SiO4 or K6Si2O7 row.
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+species:
+  NaO2:
+    observations:
+    - observation_id: nbs81_table99_NaO2_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 35
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-62.2'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_NaO2_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 35
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-52.2'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_NaO2_c_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 c
+        column: H°298−H°0
+        table_row_number: 35
+        table_column_number: 8
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '4.37'
+        standard_pressure_Pa: 101325
+        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
+          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
+          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
+          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+    - observation_id: nbs81_table99_NaO2_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 c
+        column: S° at 298.15 K
+        table_row_number: 35
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '27.7'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_NaO2_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 c
+        column: C°p at 298.15 K
+        table_row_number: 35
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '17.24'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_NaO2_g_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 g
+        column: H°298−H°0
+        table_row_number: 36
+        table_column_number: 8
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '2.74'
+        fugacity_standard_state_as_printed: unit fugacity
+        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
+          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
+          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
+          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+    - observation_id: nbs81_table99_NaO2_g_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 g
+        column: S° at 298.15 K
+        table_row_number: 36
+        table_column_number: 9
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 g
+            column: 298.15 K table heading
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '63.7'
+        fugacity_standard_state_as_printed: unit fugacity
+    - observation_id: nbs81_table99_NaO2_g_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: NaO2 g
+        column: C°p at 298.15 K
+        table_row_number: 36
+        table_column_number: 10
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: NaO2 g
+            column: 298.15 K table heading
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: NaO2
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '10.7'
+        fugacity_standard_state_as_printed: unit fugacity
+  Na2O:
+    observations:
+    - observation_id: nbs81_table99_Na2O_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O c
+        column: ΔfH° at 298.15 K
+        table_row_number: 37
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-99.00'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O c
+        column: ΔfG° at 298.15 K
+        table_row_number: 37
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-89.74'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O_c_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O c
+        column: H°298−H°0
+        table_row_number: 37
+        table_column_number: 8
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '2.964'
+        standard_pressure_Pa: 101325
+        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
+          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
+          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
+          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+    - observation_id: nbs81_table99_Na2O_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O c
+        column: S° at 298.15 K
+        table_row_number: 37
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '17.94'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O c
+        column: C°p at 298.15 K
+        table_row_number: 37
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '16.52'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O_g_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O g
+        column: ΔfH° at 298.15 K
+        table_row_number: 38
+        table_column_number: 6
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '-8.5'
+        fugacity_standard_state_as_printed: unit fugacity
+    - observation_id: nbs81_table99_Na2O_g_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O g
+        column: ΔfG° at 298.15 K
+        table_row_number: 38
+        table_column_number: 7
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '-12.5'
+        fugacity_standard_state_as_printed: unit fugacity
+    - observation_id: nbs81_table99_Na2O_g_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O g
+        column: H°298−H°0
+        table_row_number: 38
+        table_column_number: 8
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '3.3'
+        fugacity_standard_state_as_printed: unit fugacity
+        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
+          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
+          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
+          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+    - observation_id: nbs81_table99_Na2O_g_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O g
+        column: S° at 298.15 K
+        table_row_number: 38
+        table_column_number: 9
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O g
+            column: 298.15 K table heading
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '62.4'
+        fugacity_standard_state_as_printed: unit fugacity
+    - observation_id: nbs81_table99_Na2O_g_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O g
+        column: C°p at 298.15 K
+        table_row_number: 38
+        table_column_number: 10
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O g
+            column: 298.15 K table heading
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '13.2'
+        fugacity_standard_state_as_printed: unit fugacity
+  Na2O2:
+    observations:
+    - observation_id: nbs81_table99_Na2O2_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O2 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 39
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-122.10'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O2_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O2 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 39
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-107.00'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O2_c_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O2 c
+        column: H°298−H°0
+        table_row_number: 39
+        table_column_number: 8
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '3.75'
+        standard_pressure_Pa: 101325
+        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
+          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
+          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
+          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+    - observation_id: nbs81_table99_Na2O2_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O2 c
+        column: S° at 298.15 K
+        table_row_number: 39
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '22.70'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2O2_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        row: Na2O2 c
+        column: C°p at 298.15 K
+        table_row_number: 39
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 41
+            pdf_page_index: 40
+            table: '99'
+            row: Na2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '21.33'
+        standard_pressure_Pa: 101325
+  Na2SiO3:
+    observations:
+    - observation_id: nbs81_table99_Na2SiO3_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2SiO3 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 29
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-371.63'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2SiO3_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2SiO3 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 29
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-349.19'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2SiO3_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2SiO3 c
+        column: S° at 298.15 K
+        table_row_number: 29
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '27.21'
+        standard_pressure_Pa: 101325
+  Na2Si2O5:
+    observations:
+    - observation_id: nbs81_table99_Na2Si2O5_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 34
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-589.8'
+        form_as_printed: formerly beta
+        polymorph: beta
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2Si2O5_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 34
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-555.0'
+        form_as_printed: formerly beta
+        polymorph: beta
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2Si2O5_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 c
+        column: S° at 298.15 K
+        table_row_number: 34
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '39.21'
+        form_as_printed: formerly beta
+        polymorph: beta
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2Si2O5_c2_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 c2
+        column: ΔfH° at 298.15 K
+        table_row_number: 36
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 c2
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: cr
+        phase_as_printed: c2
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-589.22'
+        form_as_printed: stable from 951 K to melting point at 1147 K; formerly alpha
+        polymorph: alpha
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2Si2O5_c3_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 c3
+        column: ΔfH° at 298.15 K
+        table_row_number: 38
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 c3
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: cr
+        phase_as_printed: c3
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-587.28'
+        form_as_printed: unstable
+        standard_pressure_Pa: 101325
+  Na4SiO4:
+    observations:
+    - observation_id: nbs81_table99_Na4SiO4_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na4SiO4 c
+        column: S° at 298.15 K
+        table_row_number: 40
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na4SiO4 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: entropy
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na4SiO4
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '46.76'
+        standard_pressure_Pa: 101325
+  Na6Si2O7:
+    observations:
+    - observation_id: nbs81_table99_Na6Si2O7_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na6Si2O7 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 41
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na6Si2O7 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na6Si2O7
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-868'
+        value_as_printed: '-868.'
+        standard_pressure_Pa: 101325
