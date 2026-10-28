@@ -2048,6 +2048,46 @@ def test_sso2_native_fe_split_is_stable_when_liquidus_budget_expires(
     assert expired.value.diagnostics["reason"] == "aggregate_budget_exceeded"
 
 
+def test_sso2_owner_execution_refuses_without_native_fe_split_count_on_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.magemin.provider import MAGEMinShadowProvider
+    from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
+
+    class BudgetLimitedBackend:
+        _bridge = "test"
+
+        def is_available(self) -> bool:
+            return True
+
+        def get_engine_version(self) -> str:
+            return "budget-limited-test"
+
+        def find_liquidus_solidus(self, **_kwargs):
+            return find_liquidus_solidus_by_fraction(
+                lambda _temperature_C: 1.0,
+                budget_s=1.0e-12,
+            )
+
+    budget_backend = BudgetLimitedBackend()
+    monkeypatch.setattr(
+        MAGEMinShadowProvider,
+        "_ensure_backend",
+        lambda _provider: budget_backend,
+    )
+
+    execution = build_sso2_owner_recipe_execution(hours=9)
+
+    assert execution.status == "refused"
+    assert execution.reason == "engine_compute_timeout"
+    partition = sso2_owner_recipe_evidence(execution)[
+        "fe_drain_vapor_partition_dependency"
+    ]
+    assert partition["native_fe_saturation_split_count"] is None
+    assert partition["status"] == "unavailable"
+    assert "engine_compute_timeout" in partition["status_reason"]
+
+
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
 
