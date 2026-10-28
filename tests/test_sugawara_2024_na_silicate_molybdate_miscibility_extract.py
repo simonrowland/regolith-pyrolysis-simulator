@@ -75,6 +75,7 @@ def test_render_verified_tables_emit_all_table2_tie_line_cells() -> None:
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     result = migrator.result
+    assert not result.queue
     assert not result.validation.hard_issues
     assert len(result.observations) == 48
     assert sum(len(work_context) for work_context in result.context_by_work.values()) == 4
