@@ -10683,89 +10683,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
             if feed_mol <= 1e-12:
                 continue
-            if to_sulfide:
-                sulfide_species = STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS.get(
-                    species)
-                stoich = STAGE0_CATION_SULFATE_SULFIDE_STOICH.get(species)
-                if sulfide_species is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate sulfide product for '
-                        f'{species!r}'
-                    )
-                if stoich is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate sulfide stoich for '
-                        f'{species!r}'
-                    )
-                feed_coeff = stoich['feed']
-                c_per_mol = stoich['C'] / feed_coeff
-                co_per_mol = stoich['CO'] / feed_coeff
-                sulfide_per_mol = stoich['sulfide'] / feed_coeff
-                extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
-                if extent_mol <= 1e-12:
-                    continue
-                reserved, carbon_mol_remaining = (
-                    self._reserve_stage0_bakeout_sulfate_carbon(
-                        species,
-                        extent_mol,
-                        c_per_mol,
-                        molar['C'],
-                        carbon_mol_remaining,
-                    )
+            products = (
+                STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS if to_sulfide
+                else STAGE0_CATION_SULFATE_OXIDE_PRODUCTS
+            )
+            stoich_table = (
+                STAGE0_CATION_SULFATE_SULFIDE_STOICH if to_sulfide
+                else STAGE0_CATION_SULFATE_OXIDE_STOICH
+            )
+            product_species = products.get(species)
+            stoich = stoich_table.get(species)
+            mode = 'sulfide' if to_sulfide else 'oxide'
+            if product_species is None:
+                raise AccountingError(
+                    f'unsupported cation-sulfate {mode} product for {species!r}'
                 )
-                if reserved:
-                    continue
-                c_consumed_kg = extent_mol * c_per_mol * molar['C']
-                products_kg = {'CO': co_per_mol * extent_mol * molar['CO']}
-                sulfide_products_kg = {
-                    sulfide_species: (
-                        sulfide_per_mol * extent_mol * molar[sulfide_species]
-                    ),
-                }
+            if stoich is None:
+                raise AccountingError(
+                    f'unsupported cation-sulfate {mode} stoich for {species!r}'
+                )
+            feed_coeff = stoich['feed']
+            c_per_mol = stoich['C'] / feed_coeff
+            co_per_mol = stoich['CO'] / feed_coeff
+            extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
+            if extent_mol <= 1e-12:
+                continue
+            reserved, carbon_mol_remaining = (
+                self._reserve_stage0_bakeout_sulfate_carbon(
+                    species, extent_mol, c_per_mol, molar['C'],
+                    carbon_mol_remaining,
+                )
+            )
+            if reserved:
+                continue
+            c_consumed_kg = extent_mol * c_per_mol * molar['C']
+            products_kg = {'CO': co_per_mol * extent_mol * molar['CO']}
+            product_kg = {
+                product_species: stoich[mode] / feed_coeff * extent_mol * molar[product_species],
+            }
+            if to_sulfide:
+                sulfide_products_kg = product_kg
                 oxide_products_kg: Dict[str, float] = {}
             else:
-                oxide_species = STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.get(
-                    species)
-                stoich = STAGE0_CATION_SULFATE_OXIDE_STOICH.get(species)
-                if oxide_species is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate oxide product for '
-                        f'{species!r}'
-                    )
-                if stoich is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate oxide stoich for '
-                        f'{species!r}'
-                    )
-                feed_coeff = stoich['feed']
-                c_per_mol = stoich['C'] / feed_coeff
-                so2_per_mol = stoich['SO2'] / feed_coeff
-                co_per_mol = stoich['CO'] / feed_coeff
-                oxide_per_mol = stoich['oxide'] / feed_coeff
-                extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
-                if extent_mol <= 1e-12:
-                    continue
-                reserved, carbon_mol_remaining = (
-                    self._reserve_stage0_bakeout_sulfate_carbon(
-                        species,
-                        extent_mol,
-                        c_per_mol,
-                        molar['C'],
-                        carbon_mol_remaining,
-                    )
-                )
-                if reserved:
-                    continue
-                c_consumed_kg = extent_mol * c_per_mol * molar['C']
                 products_kg = {
-                    'SO2': so2_per_mol * extent_mol * molar['SO2'],
-                    'CO': co_per_mol * extent_mol * molar['CO'],
+                    'SO2': stoich['SO2'] / feed_coeff * extent_mol * molar['SO2'],
+                    **products_kg,
                 }
-                oxide_products_kg = {
-                    oxide_species: (
-                        oxide_per_mol * extent_mol * molar[oxide_species]
-                    ),
-                }
+                oxide_products_kg = product_kg
                 sulfide_products_kg = {}
 
             consumed_kg = extent_mol * feed_formula.molar_mass_kg_per_mol()
