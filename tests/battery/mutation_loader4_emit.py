@@ -16,14 +16,22 @@ def _expect_red(
     needle: str,
     replacement: str,
     test_name: str,
+    additional_mutations: tuple[tuple[str, str], ...] = (),
 ) -> None:
     original_method = getattr(migrate.Migrator, method_name)
     source = textwrap.dedent(inspect.getsource(original_method))
-    assert source.count(needle) == 1, (method_name, needle, source.count(needle))
+    mutations = ((needle, replacement), *additional_mutations)
+    for mutation_needle, _mutation_replacement in mutations:
+        assert source.count(mutation_needle) == 1, (
+            method_name,
+            mutation_needle,
+            source.count(mutation_needle),
+        )
+    for mutation_needle, mutation_replacement in mutations:
+        source = source.replace(mutation_needle, mutation_replacement)
     namespace: dict[str, object] = {}
-    mutated = source.replace(needle, replacement)
     exec(
-        compile(mutated, f"<loader4-{method_name}-mutation>", "exec"),
+        compile(source, f"<loader4-{method_name}-mutation>", "exec"),
         migrate.__dict__,
         namespace,
     )
@@ -62,4 +70,16 @@ _expect_red(
     needle='and raw.get("omitted_reason") not in (None, "")',
     replacement="and True",
     test_name="test_real_nonyield_points_emit_unavailable_rows_with_conditions",
+)
+_expect_red(
+    method_name="_migrate_extract_observation",
+    needle="not _parent_bound_categorical(value_sel)\n        or any(name in",
+    replacement="True\n        or any(name in",
+    test_name="test_real_rows_that_fail_series_admission_stay_as_parent_context",
+    additional_mutations=(
+        (
+            "if _parent_bound_categorical(value_sel) and not non_yield_points:",
+            "if False:",
+        ),
+    ),
 )
