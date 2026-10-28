@@ -176,6 +176,23 @@ def test_isolated_migration_preserves_table1_identity_axes_and_values() -> None:
     assert "pO2_Pa" not in p_row.point_conditions
     assert "pO2_Pa" not in mn_row.point_conditions
 
+    contexts = [
+        *document["species"]["P"]["context"],
+        *document["species"]["Mn"]["context"],
+    ]
+    locators = {
+        row["observation_id"]: row["locator"]
+        for row in contexts
+        if "locator" in row
+    }
+    mn_distribution_fit = locators["tsukihashi_1985_manganese_distribution_temperature_relation"]
+    assert (mn_distribution_fit["page"], mn_distribution_fit["equation"]) == (5, "17")
+    iron_activity = locators["tsukihashi_1985_practical_slag_iron_activity"]
+    assert (iron_activity["page"], iron_activity["equation"]) == (4, "15")
+    assert locators["tsukihashi_1985_practical_slag_iron_oxide_figure_activities"]["page"] == 5
+    assert locators["tsukihashi_1985_manganese_capacity_and_activity_relation"]["page"] == 5
+    assert locators["tsukihashi_1985_manganese_capacity_definition"]["page"] == 6
+
     # The independently printed nitrogen assay remains context because its
     # complete run composition is absent; Table 1 composition is not reused.
     cn_context = document["species"]["CN"]["context"][0]

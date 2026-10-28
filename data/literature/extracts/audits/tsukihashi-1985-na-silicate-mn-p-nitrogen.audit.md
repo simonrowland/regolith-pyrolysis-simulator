@@ -61,19 +61,22 @@ are independently pinned in the focused test.
   `20180/T - 10.87`; equation 1 prints the rounded form `20200/T - 10.9`.
   The text also prints `f_P = 9.86` at 1200 °C, estimated with the stated
   zero-concentration approximation and regular-solution assumption.
-- PDF page 6, equation 17: the manganese distribution fit is
+- PDF page 5, equation 17: the manganese distribution fit is
   `6070/T - 2.74` over 1200–1350 °C.
+- PDF page 4, after equation 15, the prose prints `a_Fe = 0.684` at 1200 °C.
 - PDF page 5, Figure 5: practical-slag annotations print
-  `gamma_FeO = 0.55`, `a_Fe = 0.684`, and `a_FeO = 0.00375`; the synopsis
-  reports the FeO activity-coefficient range 0.2–1.0. The figure annotation
-  has no stated reference state beside these numbers, so none is inferred.
+  `gamma_FeO = 0.55` and `a_FeO = 0.00375`; the synopsis reports the FeO
+  activity-coefficient range 0.2–1.0. The figure annotation has no stated
+  reference state beside these numbers, so none is inferred.
 - PDF page 1, synopsis: the phosphate capacity is reported from 10^26.7 to
   10^29 at 1200 °C. Its quantity remains context because the schema has no
   matching quantity token.
-- PDF page 6, equations 20 and 23: the MnO activity-coefficient relation and
-  Mn capacity definition are recorded as printed. No capacity quantity token
-  exists, so capacity remains context with a schema-gap note. Figure 8's
-  activity-coefficient values are deferred to calibrated digitisation.
+- PDF page 5, equation 20: the MnO activity-coefficient relation is recorded
+  as printed. Figure 8's activity-coefficient values are deferred to
+  calibrated digitisation.
+- PDF page 6, equation 23: the Mn capacity definition is recorded as printed.
+  No capacity quantity token exists, so capacity remains context with a
+  schema-gap note.
 - PDF page 4, equation 11: the P2O5 activity-coefficient relation and
   Raoultian reference state are retained. Figure 4 values are deferred.
 - PDF page 7, section 3.3: the practical-slag nitrogen result is 2.1 wt% CN-
