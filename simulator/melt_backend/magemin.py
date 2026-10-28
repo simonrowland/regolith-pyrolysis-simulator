@@ -3373,7 +3373,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             component for component, value in source.items()
             if component not in order_set and value > 0.0
         )
-        if db in {'ig', 'igad'} and 'S' in dropped:
+        if 'S' in dropped and 'S' not in order:
             raise MeltCompositionError(
                 f'{OutOfDomainReason.FORBIDDEN_SPECIES.value}: S'
             )
