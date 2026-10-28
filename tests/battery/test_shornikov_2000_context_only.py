@@ -30,10 +30,25 @@ AUDIT_PATH = (
 def test_shornikov_2000_context_only_extract_validates_and_migrates(tmp_path: Path) -> None:
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
     assert validate_extract_file(EXTRACT_PATH) == []
-    assert doc["extraction"]["figure_read_candidates"] == []
-    assert "figure-read-candidate list is empty" in AUDIT_PATH.read_text(
-        encoding="utf-8"
-    )
+    expected_candidates = {
+        "shornikov_2000_fig1c_na2o_activity": "melt_activity",
+        "shornikov_2000_fig2_evaporation_composition": "residue_composition",
+        "shornikov_2000_fig3_melt_formation_gibbs_energy": "thermochemistry",
+    }
+    expected = set(expected_candidates.items())
+    extraction_candidates = doc["extraction"]["figure_read_candidates"]
+    context_candidates = doc["species"]["Na"]["context"][2]["values"][
+        "figure_read_candidates"
+    ]
+    assert {
+        (row["candidate_id"], row["rail"]) for row in extraction_candidates
+    } == expected
+    assert {
+        (row["candidate_id"], row["rail"]) for row in context_candidates
+    } == expected
+    assert len(extraction_candidates) == len(context_candidates) == 3
+    assert all(row["figure"] and row["x_axis_as_printed"] for row in extraction_candidates)
+    assert "1(c), p. 60" in AUDIT_PATH.read_text(encoding="utf-8")
     assert sum(
         len(block["observations"])
         for block in doc["species"].values()

@@ -24,19 +24,22 @@ comparison-method agreement using ionization cross-sections and Ag and Zn
 partial-pressure standards. These statements are retained as typed context,
 not numerical Na vapour observations.
 
-Figures 1–3 were reviewed from their captions and machine text. Figure 1 (PDF
-page 3, published p. 60) shows phase diagrams and pure-oxide activities; its
-present-study activity panel is at 1100 K and the caption's series are Na2O,
-ZnO, P2O5, and SnO in the comparison panel. Figure 2 (PDF page 6, published
-p. 63) shows changes in initial melt composition during evaporation, with
-series Na2O·ZnO·P2O5 and 4Na2O·6ZnO·5P2O5. Figure 3 (PDF page 6, published
-p. 63) shows Gibbs energies of formation for Na4P2O7–Zn2P2O7 and
-Sn2P2O7–Zn2P2O7 melts, with the present study at 1100 K and earlier data at
-1300 K. None of the three figures plots Na(g) partial pressure or evaporation
-flux, so the explicit figure-read-candidate list is empty. The numerical
-figure-only values represented by MinerU `<details>` blocks are excluded. No
-page render was needed: there were no eligible numeric pressure/flux cells or
-machine-read numeric tables to reconcile.
+Figures 1–3 were reviewed against renders of PDF pages 3 and 6. None plots
+Na(g) partial pressure or evaporation flux, but each carries scorable data on
+an owner rail and is retained as a figure-read candidate. Values remain
+undigitised.
+
+| Figure / page | Rail | Axes and units | Standard/reference state | Series and temperature |
+|---|---|---|---|---|
+| 1(c), p. 60 | `melt_activity` | x(ZnO), mole %; y(log a_i), dimensionless | Pure oxide components forming the ternary system | 1 Na2O, 2 ZnO, 3 P2O5; present study at 1100 K. Figure 1(d) is prior SnO-system data at 1300 K and is not included in this source's candidate. |
+| 2, p. 63 | `residue_composition` | x(Na2O), mole %; y(x(ZnO)), mole % | Not applicable to composition coordinates | 1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5. Temperature is not stated in the figure or caption. |
+| 3, p. 63 | `thermochemistry` | x(ZnO), mole %; y(ΔG_T/RT), dimensionless | Text names the pure oxide components as standard states | 1 Na4P2O7–Zn2P2O7, present study at 1100 K; 2 Sn2P2O7–Zn2P2O7, prior data at 1300 K. |
+
+The extraction and figure-inventory context row each carry these three
+candidates. The numerical figure-only values represented by MinerU `<details>`
+blocks are excluded. The renders confirm axes, legends, and locators; no plotted
+values were transcribed. No printed pressure/flux table cells exist to render
+check.
 
 ## Cell audit and row count
 
@@ -49,6 +52,6 @@ The figure-only observations are excluded under the extraction rule.
 
 The context-only extract has zero observation rows. Its focused regression
 test validates the extract, migrates it in isolation, pins zero observations
-and zero hard issues, and checks that the explicit empty figure-candidate list
-is present. Expected store delta: one work and three unscored context rows; no
+and zero hard issues, and checks the three figure candidates and their rails.
+Expected store delta: one work and three unscored context rows; no
 observations. No store regeneration is committed.

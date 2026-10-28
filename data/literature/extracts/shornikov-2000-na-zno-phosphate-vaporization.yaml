@@ -7,7 +7,41 @@ extraction:
   method: context-only source transcription from MinerU and tesseract OCR; no numerical Na(g) pressure or flux data are printed in tables or figures
   date: '2026-10-27'
   worker: codex-resume-76909-1793146109
-  figure_read_candidates: []
+  figure_read_candidates:
+  - candidate_id: shornikov_2000_fig1c_na2o_activity
+    figure: '1(c)'
+    page: 60
+    pdf_page_index: 2
+    rail: melt_activity
+    x_axis_as_printed: x(ZnO), mole %
+    y_axis_as_printed: log a_i (i)
+    units: dimensionless log activity; x composition in mole %
+    standard_state_as_printed: pure oxides forming the ternary system
+    series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
+    temperature_K: 1100
+    note: Na2O is series 1; figure values are not digitised.
+  - candidate_id: shornikov_2000_fig2_evaporation_composition
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+    rail: residue_composition
+    x_axis_as_printed: x(Na2O), mole %
+    y_axis_as_printed: x(ZnO), mole %
+    units: mole %
+    temperature_as_printed: not stated in the figure or caption
+    series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
+    note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+  - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+    rail: thermochemistry
+    x_axis_as_printed: x(ZnO), mole %
+    y_axis_as_printed: ΔG_T/RT
+    units: dimensionless ΔG_T/RT; x composition in mole %
+    reference_states_as_printed: pure oxide components; the text names these as standard states
+    series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
+    note: Gibbs energies of melt formation; figure values are not digitised.
   figures_reviewed:
   - figure: '1'
     page: 60
@@ -91,5 +125,39 @@ species:
           caption_scope: Gibbs energies of formation of Na4P2O7-Zn2P2O7 and Sn2P2O7-Zn2P2O7 melts
           series_as_printed: '1 present study at 1100 K; 2 prior data at 1300 K'
           Na_g_pressure_or_flux: false
-        figure_read_candidates: []
-        note: Figure captions and OCR were reviewed; none of Figures 1-3 plots Na(g) partial pressure or evaporation flux.
+        figure_read_candidates:
+        - candidate_id: shornikov_2000_fig1c_na2o_activity
+          figure: '1(c)'
+          page: 60
+          pdf_page_index: 2
+          rail: melt_activity
+          x_axis_as_printed: x(ZnO), mole %
+          y_axis_as_printed: log a_i (i)
+          units: dimensionless log activity; x composition in mole %
+          standard_state_as_printed: pure oxides forming the ternary system
+          series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
+          temperature_K: 1100
+          note: Na2O is series 1; figure values are not digitised.
+        - candidate_id: shornikov_2000_fig2_evaporation_composition
+          figure: '2'
+          page: 63
+          pdf_page_index: 5
+          rail: residue_composition
+          x_axis_as_printed: x(Na2O), mole %
+          y_axis_as_printed: x(ZnO), mole %
+          units: mole %
+          temperature_as_printed: not stated in the figure or caption
+          series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
+          note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+        - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
+          figure: '3'
+          page: 63
+          pdf_page_index: 5
+          rail: thermochemistry
+          x_axis_as_printed: x(ZnO), mole %
+          y_axis_as_printed: ΔG_T/RT
+          units: dimensionless ΔG_T/RT; x composition in mole %
+          reference_states_as_printed: pure oxide components; the text names these as standard states
+          series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
+          note: Gibbs energies of melt formation; figure values are not digitised.
+        note: Figures 1-3 do not plot Na(g) partial pressure or evaporation flux; the broader candidate inventory covers scorable data on the melt_activity, residue_composition, and thermochemistry rails.
