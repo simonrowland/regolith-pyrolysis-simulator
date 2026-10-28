@@ -14,6 +14,7 @@ from dataclasses import replace
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -55,11 +56,13 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     EnginePrediction,
     Execution,
+    FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
     compile_residual,
     flagged_strata,
     fusion_comparison_reference,
+    predict_with_engine,
     score_store,
     temperature_of,
 )
@@ -581,7 +584,44 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         residuals.append(residual)
         assert residual.status is ResidualStatus.NO_BAND
         assert residual.numeric is not None
+        conversion = next(
+            notice
+            for notice in residual.notices
+            if notice.reason.startswith("reference_converted_via_fusion;")
+        )
+        assert conversion.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        assert "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source)" in conversion.reason
+        assert "factor=" in conversion.reason
+        assert FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION in flagged_strata(
+            residual.notices
+        )
     assert len(residuals) == 24
+
+
+def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatch) -> None:
+    redox = pytest.importorskip("openimcc.redox")
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    experiment = migration.experiments[observation.experiment_id]
+    monkeypatch.setattr(
+        redox,
+        "evaluate_redox",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            metal_buffered=False, flags=("not_on_fe_metal_segment",)
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "openimcc_fe_metal_saturation_inactive"
 
 
 def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
