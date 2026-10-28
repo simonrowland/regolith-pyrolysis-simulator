@@ -283,6 +283,7 @@ def test_unmeasured_prior_policy_reaches_diagnostic_and_solver(reducing_probe):
 def test_unmeasured_prior_policy_is_preserved_in_step_event(monkeypatch):
     sim = _reducing_sim()
     monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-300)
+    monkeypatch.setattr(sim, '_oxygen_numerical_floor_bar', lambda: 1e-300)
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-300)
     assert sim._compute_native_fe_saturation_extent()['native_fe_mol'] > 0.
     sim._feedstock_iron_initialization['seed_basis'] = 'class_prior'
@@ -380,6 +381,7 @@ def test_extreme_sink_model_limit_reaches_hourly_redox_notices(monkeypatch):
     sim = _reducing_sim()
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
     monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-30)
+    monkeypatch.setattr(sim, '_oxygen_numerical_floor_bar', lambda: 1e-30)
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-22)
     result = sim._compute_native_fe_saturation_extent()
     notice, = result['model_limit_notices']
@@ -489,6 +491,7 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     # Ideal oxygen-free boundary; finite gas retains its actual nRT/V owner.
     receiver_floor = 1e-20 if finite_gas else 1e-300
     monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: receiver_floor)
+    monkeypatch.setattr(sim, '_oxygen_numerical_floor_bar', lambda: receiver_floor)
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
                         lambda *a, **kw: receiver_floor)
     if not finite_gas:
@@ -532,6 +535,7 @@ def test_open_receiver_uses_transport_and_exposes_unmodelled_removal(monkeypatch
     monkeypatch.setattr(sim, '_overhead_headspace_enabled', lambda: True)
     monkeypatch.setattr(sim, '_headspace_bleed_conductance_kg_s', lambda **kw: 1.)
     monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-300)
+    monkeypatch.setattr(sim, '_oxygen_numerical_floor_bar', lambda: 1e-300)
     # Reuse the oxygen-free limiting boundary of the provider closure test.
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-300)
     # A 9.10-bar ledger projection must never veto the flowing receiver.
