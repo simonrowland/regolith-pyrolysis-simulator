@@ -1399,7 +1399,7 @@ def test_minimal_extract_valid():
 def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     tmp_path: Path,
 ) -> None:
-    """Eq. (5)'s printed log activity stays typed-refused without exponentiation."""
+    """Eq. (5)'s printed log activity is reduced to linear activity."""
     from tests.battery.test_migrate import _migrate_real_extract
     from simulator.battery.migrate import to_plain
 
@@ -1410,18 +1410,37 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert len(observations) == 1
     row = observations[0]
     assert row["values"]["log10_activity_as_published"] == "-9.0"
+    assert row["values"]["value_as_printed"] == "-9.0"
+    assert row["values"]["activity"] == "1e-9"
+    assert row["values"]["derivation"]["raw_inputs"]["locator"] == {
+        "page": 4,
+        "published_page": 882,
+        "equation": "5",
+        "note": "Printed input verbatim: log alpha*_Na2O = -9.0.",
+    }
+    assert row["uncertainty"]["value"] == "1.1512925465e-10"
     assert row["values"]["T_K"] == "1300"
     assert row["values"]["point_conditions"]["composition"]["state"]["value"][
         "components"
     ] == [["Na2O", "0.33"], ["SiO2", "0.67"]]
     assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
     assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
-    assert row["values"]["admission_status"] == "typed_refusal"
-    assert "no log10-activity value token" in row["values"]["reason"] or (
-        "accept linear activity only" in row["values"]["reason"]
-    )
+    assert row["regime"] == "emf_cell"
+    assert doc["experiments"][0]["method"] == "emf_cell"
+    assert doc["experiments"][0]["method_as_printed"]
+    assert row["values"]["admission_status"] == "admitted"
     assert row["values"]["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
     assert row["values"]["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
+    assert row["values"]["point_conditions"]["total_pressure_Pa"]["locator"] == {
+        "page": 1,
+        "published_page": 879,
+        "section": "Experimental",
+    }
+    assert row["values"]["point_conditions"]["fO2_log"]["locator"] == {
+        "page": 1,
+        "published_page": 879,
+        "section": "Experimental",
+    }
     sample = doc["fidelity_samples"][0]
     assert not vle.check_fidelity_sample_matches(doc, sample)
     mutated = copy.deepcopy(doc)
@@ -1434,8 +1453,16 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert len(result.observations) == 1
     migrated = to_plain(next(iter(result.observations.values())))
     assert migrated["identity"]["quantity"]["value"] == "activity"
-    assert migrated["admission"]["status"] == "rejected"
-    assert migrated["value"]["kind"] == "unavailable"
+    assert migrated["admission"]["status"] == "admitted"
+    assert migrated["value"]["kind"] == "point"
+    assert Decimal(str(migrated["value"]["point"])) == Decimal("1e-9")
+    assert len(result.experiments) == 1
+    assert next(iter(result.experiments.values())).method.value.value == "emf_cell"
+    assert Decimal(
+        migrated["derivation"]["parameters"][0][1]["state"]["value"]
+    ) == Decimal("-9.0")
+    assert migrated["derivation"]["parameters"][0][1]["locator"]["page"] == 4
+    assert migrated["uncertainty"]["verbatim"]["value"] == "1.1512925465e-10"
     assert migrated["identity"]["temperature_K"]["value"] == "1300"
     assert migrated["identity"]["composition"]["tag"] == "value"
     assert dict(migrated["identity"]["composition"]["value"]["components"]) == {
@@ -1449,7 +1476,19 @@ def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
     assert migrated["identity"]["total_pressure_Pa"]["tag"] == "unknown"
     assert migrated["identity"]["fO2_Pa"]["tag"] == "unknown"
     assert result.validation is not None
-    assert not result.validation.hard_issues
+    hard_issues = result.validation.hard_issues
+    assert {issue.path.rsplit(".", 1)[-1] for issue in hard_issues} == {
+        "derivation",
+        "derived_from",
+    }
+    assert any(
+        issue.detail.startswith("printed derivation inputs do not resolve")
+        for issue in hard_issues
+    )
+    assert any(
+        issue.detail == "derived observation requires derived_from"
+        for issue in hard_issues
+    )
 
 
 @pytest.mark.parametrize(

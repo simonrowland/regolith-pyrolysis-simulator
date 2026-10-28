@@ -5,9 +5,12 @@
 The requested observable is absolute Na2O activity. The paper reports one
 absolute point in Eq. (5): `log alpha*_Na2O = -9.0`, pure solid Na2O reference,
 `X_Na2O = 0.33`, at 1300 K. The extract has one observation row, matching the
-one absolute point printed in the paper. The log value is retained as printed
-and typed-refused because the current schema/migrator has no log10-activity
-value token. No value was exponentiated.
+one absolute point printed in the paper. Following the controller ruling, the
+stored activity is `10^(-9.0) = 1e-9`, with the printed log value retained in
+`value_as_printed`, `log10_activity_as_published`, and derivation lineage. The
+rounded one-decimal log value gives an activity half-width of
+`1e-9 * ln(10) * 0.5 * 10^-1 = 1.1512925465e-10`; confidence level is not
+stated.
 
 Table 1 contains EMF observations for 27 listed compositions, all relative to
 the 40Na2O·60SiO2 melt. Table 2 contains 28 rows of relative partial molar
@@ -19,7 +22,8 @@ were not digitized. No table values were mislabeled as absolute activity.
 
 | Stored field | Source locator | Independent reads | Render check |
 |---|---|---|---|
-| `log10_activity_as_published = -9.0` | PDF p. 4 / printed p. 882, Eq. (5) | MinerU text and pdftotext both read `-9.0` | Render confirms minus sign, decimal, value, and Eq. (5) placement |
+| `value_as_printed = -9.0`; activity `1e-9` | PDF p. 4 / printed p. 882, Eq. (5) | MinerU text and pdftotext both read `-9.0` | Render confirms minus sign, decimal, value, and Eq. (5) placement; linear activity is the controller-directed base-10 conversion |
+| activity half-width `1.1512925465e-10` | derived from Eq. (5)'s one-decimal log print | Printed precision `d=1`; calculated as `a * ln(10) * 0.5 * 10^-d` | Confidence level not stated |
 | `T_K = 1300` | PDF p. 4 / printed p. 882, Eq. (5) | MinerU text and pdftotext agree | Same page render |
 | `X_Na2O = 0.33` | PDF p. 4 / printed p. 882, Eq. (5) | MinerU text and pdftotext agree | Same page render |
 | `X_SiO2 = 0.67` | PDF p. 3 / printed p. 881, Eq. (3) | MinerU text and pdftotext agree | Render confirms the printed 0.67 coefficient in Eq. (3) |
@@ -37,15 +41,17 @@ as an activity observation.
 
 The authors derive the absolute log activity from their concentration-cell
 EMF measurements, Gibbs–Duhem integration, and the printed pure-oxide
-thermochemical relation (Eqs. 1–5). Since the current schema cannot store the
-log form and the underlying EMF values cannot serve as stored activity
-lineage-inputs, evidence is `quoted_attributed` under d-110. The printed method
-is concentration-cell electromotive-force measurement. The paper does not
-state the total pressure or oxygen fugacity for this activity point; both
-remain unknown. The identity composition is the printed binary point from
-Eqs. (3) and (5). The migrator's identity binding reads `values.composition_mol`;
-the same composition is also present under `point_conditions.composition` with
-its state and locator.
+thermochemical relation (Eqs. 1–5). The printed log cell is the measured-reduced
+input to the base-10 conversion, and the row's method class is
+`measured_reduced`. The closed method token is `emf_cell`, with the source
+description retained in `method_as_printed`; the isolated migration binds it
+to the experiment and has no unstated-method queue item. The paper does not
+state total pressure or oxygen fugacity for this activity point; both remain
+unknown. Their locators cite PDF p. 1 / published p. 879, the Experimental
+section (not p. 2 / 880, which contains Table 1). The identity composition is
+the printed binary point from Eqs. (3) and (5). The migrator's identity binding
+reads `values.composition_mol`; the same composition is present under
+`point_conditions.composition` with its state and locator.
 
 ## Tool audit
 
@@ -59,16 +65,36 @@ both machine texts and render-checked above.
 
 `mineru_table_draft.py compare` returned 0 matched, 0 no-match, 0 mismatches,
 and 0 total table points. The sole absolute activity is a located prose value,
-not a table point, and is pinned by the focused fidelity test. The isolated
-real migrator produced 1 observation, 0 hard issues, and 1 unavailable value.
-The unavailable value is the expected typed refusal for the unhandled log10
-activity form; the identity retains T, composition, pure-solid standard state,
-and unknown pressure/fO2.
+not a table point, and is pinned by the focused fidelity test. The real
+migrator produced 1 admitted observation with activity `1e-9`, method
+`emf_cell`, and the expected identity conditions. It currently reports 2 hard
+conditional-field issues: `measured_reduced` requires resolved `derived_from`
+lineage, and the schema separately records that `printed_unresolved` inputs do
+not resolve to a record or asset. The only printed conversion input is Eq.
+(5)'s log cell; the paper cannot be used as its own derivation input, and the
+relative EMF table is outside this extract's requested absolute-activity observation.
+Resolving this requires changing the derivation schema/validator or changing
+the controller-directed evidence class. Both are outside this extraction's
+authorized scope, so migration acceptance is blocked pending controller
+ruling. Pressure and fO2 remain unknown.
 
-The focused migration/fidelity test passed (1 test). The combined required
+The original focused migration/fidelity test passed before the review change.
+After the FIX-FIRST changes, the YAML flow-scalar guard passed (17 tests). The
+focused test pins the converted value, printed input, method, locators, and
+both explained lineage issues described above. The single-file extract validator passes with
+`--check-fidelity-match` (`OK: 1 extract file(s) valid`). The combined required
 suite run reported 655 passed and 4 failures caused by the configured 300-second
 pytest timeout while loading the complete corpus: the comma/duplicate-key
 loader guard, `test_repo_extracts_validate_green`, `test_coverage_pending_stubs_not_found`,
 and `test_pilot_extract_count_exact_and_merge_smoke`. The traceback in each
 failure was inside YAML parsing/loading at the timeout boundary; the run showed
-no extract-specific validation failure.
+no extract-specific validation failure. Focused migration, fidelity and the
+YAML flow-scalar guard were rerun after the review fixes.
+
+## Expected store delta
+
+If the lineage rule is resolved, the expected store delta is one admitted
+numeric melt_activity observation with activity `1e-9`, method `emf_cell`,
+composition and T, the Raoultian pure-solid Na2O reference, and the propagated
+precision half-width. Pressure and fO2 remain unknown. No store regeneration
+is committed while the hard issue remains.

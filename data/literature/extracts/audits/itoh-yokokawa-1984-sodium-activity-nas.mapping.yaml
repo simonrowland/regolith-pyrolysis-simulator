@@ -4,8 +4,14 @@ scope:
   included:
     locator: {page: 4, published_page: 882, equation: '5'}
     printed_form: log10(alpha*_Na2O)
-    disposition: typed_refusal
-    reason: The schema carries linear activity but has no log10-activity value token.
+    disposition: activity converted from printed log10 form
+    conversion: a_Na2O = 10^(-9.0) = 1e-9
+    method_class: measured_reduced
+    method: emf_cell
+    method_as_printed: concentration-cell electromotive-force measurement
+    uncertainty: >-
+      Rounding half-width propagated as a * ln(10) * 0.5 * 10^-1; confidence
+      level not stated.
     identity_composition: values.composition_mol from the printed 0.33/0.67 coefficients in equation 3
   excluded_tables:
     - table: '1'
