@@ -296,8 +296,7 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     session = run._start_session()
     sim = session.simulator
     hot_hours = set()
-    c6_releases = []
-    c6_moves_toward_gas_split = False
+    c6_hours = set()
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
         snapshot = result.snapshot
@@ -323,45 +322,35 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         # The live campaign may already be the successor after a finishing
         # hour; the snapshot identifies the campaign that produced the hour.
         if snapshot.campaign == CampaignPhase.C6:
-            for transition in sim.atom_ledger.transitions[transition_count:]:
-                if transition.name == "fe_redox_respeciation":
-                    # Following passive exchange, reduction returns O2 to its
-                    # buffer. Count that production once, not again when the
-                    # exchange owner transports it to overhead.
-                    o2 = sum(
-                        _transition_account_species_mol(
-                            sim, transition, side="credits",
-                            account=account, species="O2",
-                        )
-                        for account in ("process.overhead_gas", "reservoir.fo2_buffer")
-                    )
-                    if o2 > 0.0:
-                        c6_releases.append(o2)
-                        transition.validate_conservation(sim.species_formula_registry)
-                        ferric_debit = _cleaned_melt_debit_mol(sim, transition, "Fe2O3")
-                        # Fe2O3 -> 2 FeO + 1/2 O2; mol O2 = mol Fe2O3 / 2.
-                        assert o2 == pytest.approx(ferric_debit / 2.0, abs=1e-12)
+            c6_hours.add(snapshot.hour)
             inventory = sim.atom_ledger.mol_by_account("process.cleaned_melt")
             assert inventory.get("FeO", 0.0) > 0.0
-            gas_ferric = sim._fe3_over_sigma_fe_at_fO2(
-                sim._melt_oxide_wt_pct(),
-                fO2_log=math.log10(sim.melt.p_total_mbar / 1000.0),
-                T_K=sim.melt.temperature_C + 273.15,
-                pressure_bar=sim.melt.p_total_mbar / 1000.0,
+            assert inventory.get("Fe2O3", 0.0) > 0.0
+            reservoir = snapshot.oxygen_reservoir
+            # C6 commands oxidizing gas, but a pressure floor supplies no
+            # ledger O2. Positive uptake is bounded by the zero available
+            # inventory; it cannot become ferric reduction and O2 release.
+            # Funded reduction/stoichiometry is exercised separately by
+            # test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen.
+            assert reservoir["headspace_transport_pO2_bar"] > 0.0
+            assert reservoir["melt_intrinsic_fO2_log"] < math.log10(
+                reservoir["headspace_transport_pO2_bar"]
             )
-            # Fe2O3 has two Fe atoms: n_target = f_ferric * n_Fe/2 mol.
-            gas_target = gas_ferric * sim._cleaned_melt_fe_atom_mol() / 2.0
-            for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
-                if diagnostic.get("direction") == "reducing":
-                    c6_moves_toward_gas_split |= (
-                        abs(inventory.get("Fe2O3", 0.0) - gas_target)
-                        < abs(diagnostic["current_fe2o3_mol"] - gas_target)
-                    )
+            assert reservoir["headspace_ledger_pO2_bar"] == 0.0
+            assert reservoir["exchange_o2_mol"] == 0.0
+            assert reservoir["exchange_unbacked_o2_mol"] == 0.0
+            assert reservoir["exchange_direction"] == "none:below_threshold"
+            assert not reservoir["exchange_clamped"]
+            assert all(
+                transition.name not in {
+                    "fe_redox_respeciation", "oxygen_reservoir_exchange",
+                }
+                for transition in sim.atom_ledger.transitions[transition_count:]
+            )
         transition_count = len(sim.atom_ledger.transitions)
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    assert c6_releases
-    assert c6_moves_toward_gas_split
+    assert len(c6_hours) == 20
 
 
 def _transition_account_species_mol(
