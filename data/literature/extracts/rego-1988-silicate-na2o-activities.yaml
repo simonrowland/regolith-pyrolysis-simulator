@@ -10,8 +10,9 @@ extraction:
   method: >-
     MinerU tables and pdftotext-layout were compared. Both printed tables were
     rendered at 600 dpi and every numeric cell was checked. The measured Na2O
-    isoactivity compositions occur in figures only; figure coordinates were
-    not digitised under the figure-deferral rule. Table I and Table II values
+    isoactivity compositions occur in figures only. Figs 3, 5 and 6 marker
+    centres were read at 600 dpi. Figure 4 is curves only and was not
+    sampled. Figures 1, 2, 7 and 8 remain deferred. Table I and Table II values
     are preserved in context, with printed logarithms unconverted and the
     calculated Table II values kept distinct from measurements.
   date: '2026-10-18'
@@ -19,7 +20,5499 @@ extraction:
 review_status: draft
 species:
   Na2O:
-    observations: []
+    observations:
+    - observation_id: rego_1988_fig3_sq_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3879.72, 511.34). Read 2 stroke-bbox centre (3877.00, 511.00). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.09'
+            CaO: '0.42'
+            SiO2: '0.49'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.09']
+              - ['CaO', '0.42']
+              - ['SiO2', '0.49']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_01
+    - observation_id: rego_1988_fig3_sq_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3867.02, 825.56). Read 2 stroke-bbox centre (3864.00, 823.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.14'
+            CaO: '0.33'
+            SiO2: '0.53'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.14']
+              - ['CaO', '0.33']
+              - ['SiO2', '0.53']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_02
+    - observation_id: rego_1988_fig3_sq_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3896.02, 1136.30). Read 2 stroke-bbox centre (3894.00, 1135.00). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.19'
+            CaO: '0.23'
+            SiO2: '0.58'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.19']
+              - ['CaO', '0.23']
+              - ['SiO2', '0.58']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_03
+    - observation_id: rego_1988_fig3_sq_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3920.37, 1359.28). Read 2 stroke-bbox centre (3918.00, 1359.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.23'
+            CaO: '0.16'
+            SiO2: '0.61'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.23']
+              - ['CaO', '0.16']
+              - ['SiO2', '0.61']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_04
+    - observation_id: rego_1988_fig3_sq_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3941.37, 1518.59). Read 2 stroke-bbox centre (3941.50, 1519.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.26'
+            CaO: '0.11'
+            SiO2: '0.63'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.26']
+              - ['CaO', '0.11']
+              - ['SiO2', '0.63']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_05
+    - observation_id: rego_1988_fig3_sq_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3963.62, 1714.37). Read 2 stroke-bbox centre (3962.00, 1717.50). Printed log a(Na2O) = -7.02. The two reads differ by more than 2 percent on a printed axis coordinate.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.3'
+            CaO: '0.047'
+            SiO2: '0.653'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.3']
+              - ['CaO', '0.047']
+              - ['SiO2', '0.653']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_sq_06
+    - observation_id: rego_1988_fig3_tri_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3775.95, 462.84). Read 2 stroke-bbox centre (3778.50, 459.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.054'
+            CaO: '0.44'
+            SiO2: '0.506'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.054']
+              - ['CaO', '0.44']
+              - ['SiO2', '0.506']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_01
+    - observation_id: rego_1988_fig3_tri_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3744.49, 791.08). Read 2 stroke-bbox centre (3743.50, 792.00). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.096'
+            CaO: '0.34'
+            SiO2: '0.564'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.096']
+              - ['CaO', '0.34']
+              - ['SiO2', '0.564']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_02
+    - observation_id: rego_1988_fig3_tri_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3740.21, 1089.29). Read 2 stroke-bbox centre (3737.50, 1090.00). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.14'
+            CaO: '0.24'
+            SiO2: '0.62'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.14']
+              - ['CaO', '0.24']
+              - ['SiO2', '0.62']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_03
+    - observation_id: rego_1988_fig3_tri_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3761.57, 1341.89). Read 2 stroke-bbox centre (3761.00, 1342.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.19'
+            CaO: '0.16'
+            SiO2: '0.65'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.19']
+              - ['CaO', '0.16']
+              - ['SiO2', '0.65']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_04
+    - observation_id: rego_1988_fig3_tri_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3757.41, 1486.26). Read 2 stroke-bbox centre (3757.00, 1487.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.21'
+            CaO: '0.12'
+            SiO2: '0.67'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.21']
+              - ['CaO', '0.12']
+              - ['SiO2', '0.67']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_05
+    - observation_id: rego_1988_fig3_tri_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3757.77, 1710.88). Read 2 stroke-bbox centre (3757.00, 1711.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.24'
+            CaO: '0.048'
+            SiO2: '0.712'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.24']
+              - ['CaO', '0.048']
+              - ['SiO2', '0.712']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_tri_06
+    - observation_id: rego_1988_fig3_cir_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3724.93, 512.50). Read 2 stroke-bbox centre (3722.50, 512.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.047'
+            CaO: '0.42'
+            SiO2: '0.533'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.047']
+              - ['CaO', '0.42']
+              - ['SiO2', '0.533']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_01
+    - observation_id: rego_1988_fig3_cir_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3726.12, 825.81). Read 2 stroke-bbox centre (3725.00, 825.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.096'
+            CaO: '0.33'
+            SiO2: '0.574'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.096']
+              - ['CaO', '0.33']
+              - ['SiO2', '0.574']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_02
+    - observation_id: rego_1988_fig3_cir_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3718.88, 1097.68). Read 2 stroke-bbox centre (3720.00, 1097.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.14'
+            CaO: '0.24'
+            SiO2: '0.62'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.14']
+              - ['CaO', '0.24']
+              - ['SiO2', '0.62']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_03
+    - observation_id: rego_1988_fig3_cir_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3703.64, 1333.86). Read 2 stroke-bbox centre (3703.00, 1333.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.17'
+            CaO: '0.17'
+            SiO2: '0.66'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.17']
+              - ['CaO', '0.17']
+              - ['SiO2', '0.66']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_04
+    - observation_id: rego_1988_fig3_cir_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3696.30, 1495.49). Read 2 stroke-bbox centre (3692.50, 1494.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.19'
+            CaO: '0.12'
+            SiO2: '0.69'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.19']
+              - ['CaO', '0.12']
+              - ['SiO2', '0.69']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_05
+    - observation_id: rego_1988_fig3_cir_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3726.12, 1708.59). Read 2 stroke-bbox centre (3726.50, 1709.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.23'
+            CaO: '0.049'
+            SiO2: '0.721'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.23']
+              - ['CaO', '0.049']
+              - ['SiO2', '0.721']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_cir_06
+    - observation_id: rego_1988_fig3_dia_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3685.96, 505.87). Read 2 stroke-bbox centre (3685.50, 506.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.035'
+            CaO: '0.43'
+            SiO2: '0.535'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.035']
+              - ['CaO', '0.43']
+              - ['SiO2', '0.535']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_01
+    - observation_id: rego_1988_fig3_dia_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3664.10, 809.46). Read 2 stroke-bbox centre (3663.00, 807.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.077'
+            CaO: '0.33'
+            SiO2: '0.593'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.077']
+              - ['CaO', '0.33']
+              - ['SiO2', '0.593']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_02
+    - observation_id: rego_1988_fig3_dia_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3655.62, 1111.90). Read 2 stroke-bbox centre (3655.00, 1110.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.12'
+            CaO: '0.24'
+            SiO2: '0.64'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.12']
+              - ['CaO', '0.24']
+              - ['SiO2', '0.64']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_03
+    - observation_id: rego_1988_fig3_dia_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3651.40, 1352.11). Read 2 stroke-bbox centre (3650.00, 1351.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.16'
+            CaO: '0.16'
+            SiO2: '0.68'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.16']
+              - ['CaO', '0.16']
+              - ['SiO2', '0.68']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_04
+    - observation_id: rego_1988_fig3_dia_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3611.61, 1505.00). Read 2 stroke-bbox centre (3612.00, 1505.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.17'
+            CaO: '0.11'
+            SiO2: '0.72'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.17']
+              - ['CaO', '0.11']
+              - ['SiO2', '0.72']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_05
+    - observation_id: rego_1988_fig3_dia_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3648.32, 1708.39). Read 2 stroke-bbox centre (3647.00, 1706.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.21'
+            CaO: '0.049'
+            SiO2: '0.741'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.21']
+              - ['CaO', '0.049']
+              - ['SiO2', '0.741']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_dia_06
+    - observation_id: rego_1988_fig3_inv_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3650.39, 512.90). Read 2 stroke-bbox centre (3653.50, 514.50). Printed log a(Na2O) = -7.97. The two reads differ by more than 2 percent on a printed axis coordinate.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.026'
+            CaO: '0.42'
+            SiO2: '0.554'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.026']
+              - ['CaO', '0.42']
+              - ['SiO2', '0.554']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_01
+    - observation_id: rego_1988_fig3_inv_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3613.33, 812.85). Read 2 stroke-bbox centre (3613.50, 813.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.063'
+            CaO: '0.33'
+            SiO2: '0.607'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.063']
+              - ['CaO', '0.33']
+              - ['SiO2', '0.607']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_02
+    - observation_id: rego_1988_fig3_inv_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3600.12, 1097.11). Read 2 stroke-bbox centre (3600.00, 1096.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.1'
+            CaO: '0.24'
+            SiO2: '0.66'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.1']
+              - ['CaO', '0.24']
+              - ['SiO2', '0.66']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_03
+    - observation_id: rego_1988_fig3_inv_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3569.95, 1342.78). Read 2 stroke-bbox centre (3569.50, 1343.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.13'
+            CaO: '0.16'
+            SiO2: '0.71'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.13']
+              - ['CaO', '0.16']
+              - ['SiO2', '0.71']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_04
+    - observation_id: rego_1988_fig3_inv_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3552.96, 1495.69). Read 2 stroke-bbox centre (3549.00, 1496.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.15'
+            CaO: '0.12'
+            SiO2: '0.73'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.15']
+              - ['CaO', '0.12']
+              - ['SiO2', '0.73']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_05
+    - observation_id: rego_1988_fig3_inv_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+        figure: '3'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3585.76, 1690.03). Read 2 stroke-bbox centre (3585.00, 1688.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.19'
+            CaO: '0.055'
+            SiO2: '0.755'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.19']
+              - ['CaO', '0.055']
+              - ['SiO2', '0.755']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 3
+              published_page: 657
+              pdf_page_index: 2
+              figure: '3'
+              note: rego_1988_fig3_inv_06
+    - observation_id: rego_1988_fig5_sq_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1803.82, 3416.23). Read 2 stroke-bbox centre (1804.50, 3415.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.2'
+            MgO: '0.27'
+            SiO2: '0.53'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.2']
+              - ['MgO', '0.27']
+              - ['SiO2', '0.53']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_01
+    - observation_id: rego_1988_fig5_sq_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1796.16, 3541.10). Read 2 stroke-bbox centre (1791.00, 3540.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.22'
+            MgO: '0.23'
+            SiO2: '0.55'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.22']
+              - ['MgO', '0.23']
+              - ['SiO2', '0.55']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_02
+    - observation_id: rego_1988_fig5_sq_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1762.46, 3783.19). Read 2 stroke-bbox centre (1762.00, 3782.00). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.25'
+            MgO: '0.15'
+            SiO2: '0.60'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.25']
+              - ['MgO', '0.15']
+              - ['SiO2', '0.60']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_03
+    - observation_id: rego_1988_fig5_sq_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1732.29, 4011.99). Read 2 stroke-bbox centre (1731.00, 4011.50). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.28'
+            MgO: '0.078'
+            SiO2: '0.642'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.28']
+              - ['MgO', '0.078']
+              - ['SiO2', '0.642']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_04
+    - observation_id: rego_1988_fig5_sq_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1740.42, 4139.29). Read 2 stroke-bbox centre (1737.50, 4140.00). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.3'
+            MgO: '0.038'
+            SiO2: '0.662'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.3']
+              - ['MgO', '0.038']
+              - ['SiO2', '0.662']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_05
+    - observation_id: rego_1988_fig5_sq_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1752.39, 4201.35). Read 2 stroke-bbox centre (1749.50, 4202.00). Printed log a(Na2O) = -7.02.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.31'
+            MgO: '0.019'
+            SiO2: '0.671'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.31']
+              - ['MgO', '0.019']
+              - ['SiO2', '0.671']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_06
+    - observation_id: rego_1988_fig5_sq_07
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1752.18, 4261.59). Read 2 stroke-bbox centre (1751.00, 4260.00). Printed log a(Na2O) = -7.02. Marker is centered on the printed Na2O-SiO2 edge. Read 1 X_MgO is -0.00018; stored X_MgO is 0.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.32'
+            MgO: '0'
+            SiO2: '0.68'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.32']
+              - ['MgO', '0']
+              - ['SiO2', '0.68']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_sq_07
+    - observation_id: rego_1988_fig5_tri_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1669.12, 3309.99). Read 2 stroke-bbox centre (1666.50, 3308.00). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.15'
+            MgO: '0.3'
+            SiO2: '0.55'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.15']
+              - ['MgO', '0.3']
+              - ['SiO2', '0.55']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_tri_01
+    - observation_id: rego_1988_fig5_tri_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1663.40, 3459.73). Read 2 stroke-bbox centre (1661.00, 3456.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.17'
+            MgO: '0.25'
+            SiO2: '0.58'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.17']
+              - ['MgO', '0.25']
+              - ['SiO2', '0.58']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_tri_02
+    - observation_id: rego_1988_fig5_tri_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1611.02, 3776.44). Read 2 stroke-bbox centre (1608.50, 3772.50). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.21'
+            MgO: '0.15'
+            SiO2: '0.64'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.21']
+              - ['MgO', '0.15']
+              - ['SiO2', '0.64']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_tri_03
+    - observation_id: rego_1988_fig5_tri_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1565.27, 4112.13). Read 2 stroke-bbox centre (1563.50, 4112.00). Printed log a(Na2O) = -7.53.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.25'
+            MgO: '0.047'
+            SiO2: '0.703'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.25']
+              - ['MgO', '0.047']
+              - ['SiO2', '0.703']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_tri_04
+    - observation_id: rego_1988_fig5_cir_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1651.83, 3290.45). Read 2 stroke-bbox centre (1653.50, 3290.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.14'
+            MgO: '0.31'
+            SiO2: '0.55'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.14']
+              - ['MgO', '0.31']
+              - ['SiO2', '0.55']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_01
+    - observation_id: rego_1988_fig5_cir_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1634.20, 3435.06). Read 2 stroke-bbox centre (1633.50, 3434.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.16'
+            MgO: '0.26'
+            SiO2: '0.58'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.16']
+              - ['MgO', '0.26']
+              - ['SiO2', '0.58']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_02
+    - observation_id: rego_1988_fig5_cir_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1605.45, 3616.32). Read 2 stroke-bbox centre (1606.00, 3615.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.18'
+            MgO: '0.2'
+            SiO2: '0.62'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.18']
+              - ['MgO', '0.2']
+              - ['SiO2', '0.62']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_03
+    - observation_id: rego_1988_fig5_cir_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1591.39, 3770.03). Read 2 stroke-bbox centre (1592.50, 3769.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.2'
+            MgO: '0.15'
+            SiO2: '0.65'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.2']
+              - ['MgO', '0.15']
+              - ['SiO2', '0.65']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_04
+    - observation_id: rego_1988_fig5_cir_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1564.56, 3950.80). Read 2 stroke-bbox centre (1565.50, 3951.50). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.22'
+            MgO: '0.098'
+            SiO2: '0.682'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.22']
+              - ['MgO', '0.098']
+              - ['SiO2', '0.682']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_05
+    - observation_id: rego_1988_fig5_cir_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1545.39, 4107.76). Read 2 stroke-bbox centre (1543.50, 4109.00). Printed log a(Na2O) = -7.56.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.24'
+            MgO: '0.048'
+            SiO2: '0.712'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.24']
+              - ['MgO', '0.048']
+              - ['SiO2', '0.712']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_cir_06
+    - observation_id: rego_1988_fig5_dia_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1607.83, 3271.10). Read 2 stroke-bbox centre (1608.00, 3269.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.13'
+            MgO: '0.31'
+            SiO2: '0.56'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.13']
+              - ['MgO', '0.31']
+              - ['SiO2', '0.56']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_01
+    - observation_id: rego_1988_fig5_dia_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1590.75, 3468.59). Read 2 stroke-bbox centre (1589.00, 3467.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.15'
+            MgO: '0.25'
+            SiO2: '0.60'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.15']
+              - ['MgO', '0.25']
+              - ['SiO2', '0.60']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_02
+    - observation_id: rego_1988_fig5_dia_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1546.75, 3623.72). Read 2 stroke-bbox centre (1546.50, 3623.00). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.16'
+            MgO: '0.2'
+            SiO2: '0.64'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.16']
+              - ['MgO', '0.2']
+              - ['SiO2', '0.64']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_03
+    - observation_id: rego_1988_fig5_dia_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1530.87, 3764.64). Read 2 stroke-bbox centre (1533.50, 3764.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.18'
+            MgO: '0.16'
+            SiO2: '0.66'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.18']
+              - ['MgO', '0.16']
+              - ['SiO2', '0.66']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_04
+    - observation_id: rego_1988_fig5_dia_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1485.05, 3950.60). Read 2 stroke-bbox centre (1485.00, 3953.00). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.2'
+            MgO: '0.098'
+            SiO2: '0.702'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.2']
+              - ['MgO', '0.098']
+              - ['SiO2', '0.702']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_05
+    - observation_id: rego_1988_fig5_dia_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.72'
+        marker_symbol: open diamond
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1461.28, 4108.40). Read 2 stroke-bbox centre (1461.00, 4107.50). Printed log a(Na2O) = -7.72.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.22'
+            MgO: '0.048'
+            SiO2: '0.732'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.22']
+              - ['MgO', '0.048']
+              - ['SiO2', '0.732']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_dia_06
+    - observation_id: rego_1988_fig5_inv_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1530.78, 3356.20). Read 2 stroke-bbox centre (1531.00, 3357.00). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.12'
+            MgO: '0.28'
+            SiO2: '0.60'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.12']
+              - ['MgO', '0.28']
+              - ['SiO2', '0.60']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_01
+    - observation_id: rego_1988_fig5_inv_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1511.98, 3466.28). Read 2 stroke-bbox centre (1512.50, 3466.00). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.13'
+            MgO: '0.25'
+            SiO2: '0.62'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.13']
+              - ['MgO', '0.25']
+              - ['SiO2', '0.62']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_02
+    - observation_id: rego_1988_fig5_inv_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1484.35, 3603.97). Read 2 stroke-bbox centre (1484.50, 3604.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.14'
+            MgO: '0.21'
+            SiO2: '0.65'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.14']
+              - ['MgO', '0.21']
+              - ['SiO2', '0.65']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_03
+    - observation_id: rego_1988_fig5_inv_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1448.93, 3752.32). Read 2 stroke-bbox centre (1449.00, 3753.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.16'
+            MgO: '0.16'
+            SiO2: '0.68'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.16']
+              - ['MgO', '0.16']
+              - ['SiO2', '0.68']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_04
+    - observation_id: rego_1988_fig5_inv_05
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1423.81, 3937.16). Read 2 stroke-bbox centre (1424.00, 3935.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.18'
+            MgO: '0.1'
+            SiO2: '0.72'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.18']
+              - ['MgO', '0.1']
+              - ['SiO2', '0.72']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_05
+    - observation_id: rego_1988_fig5_inv_06
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '5'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (1370.39, 4109.58). Read 2 stroke-bbox centre (1371.00, 4112.50). Printed log a(Na2O) = -7.97.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.19'
+            MgO: '0.048'
+            SiO2: '0.762'
+            basis: printed_mole_fraction
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.19']
+              - ['MgO', '0.048']
+              - ['SiO2', '0.762']
+            amount_basis: mole_fraction
+            basis: printed_mole_fraction
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '5'
+              note: rego_1988_fig5_inv_06
+    - observation_id: rego_1988_fig6_sq_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3193.91, 812.87). Read 2 stroke-bbox centre (3196.50, 812.00). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.37033 and s=0.13136, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.082'
+            CaO: '0.32'
+            SiO2: '0.54'
+            Al2O3: '0.058'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.082']
+              - ['CaO', '0.32']
+              - ['SiO2', '0.54']
+              - ['Al2O3', '0.058']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_01
+    - observation_id: rego_1988_fig6_sq_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3552.25, 1051.13). Read 2 stroke-bbox centre (3551.00, 1055.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.41750 and s=0.10084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.058'
+            CaO: '0.37'
+            SiO2: '0.51'
+            Al2O3: '0.062'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.058']
+              - ['CaO', '0.37']
+              - ['SiO2', '0.51']
+              - ['Al2O3', '0.062']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_02
+    - observation_id: rego_1988_fig6_sq_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3927.59, 1254.70). Read 2 stroke-bbox centre (3928.50, 1253.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.46685 and s=0.07477, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.039'
+            CaO: '0.42'
+            SiO2: '0.48'
+            Al2O3: '0.061'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.039']
+              - ['CaO', '0.42']
+              - ['SiO2', '0.48']
+              - ['Al2O3', '0.061']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_03
+    - observation_id: rego_1988_fig6_sq_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.02'
+        marker_symbol: open square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4278.22, 1464.32). Read 2 stroke-bbox centre (4278.00, 1463.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.51292 and s=0.04792, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.02'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.023'
+            CaO: '0.47'
+            SiO2: '0.45'
+            Al2O3: '0.057'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.023']
+              - ['CaO', '0.47']
+              - ['SiO2', '0.45']
+              - ['Al2O3', '0.057']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_04
+    - observation_id: rego_1988_fig6_tri_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3753.46, 1533.94). Read 2 stroke-bbox centre (3756.50, 1533.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.44423 and s=0.03901, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.021'
+            CaO: '0.41'
+            SiO2: '0.51'
+            Al2O3: '0.059'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.021']
+              - ['CaO', '0.41']
+              - ['SiO2', '0.51']
+              - ['Al2O3', '0.059']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_tri_01
+    - observation_id: rego_1988_fig6_tri_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: open triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4087.67, 1675.33). Read 2 stroke-bbox centre (4085.50, 1675.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.48810 and s=0.02090, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.01'
+            CaO: '0.45'
+            SiO2: '0.48'
+            Al2O3: '0.06'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.01']
+              - ['CaO', '0.45']
+              - ['SiO2', '0.48']
+              - ['Al2O3', '0.06']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_tri_02
+    - observation_id: rego_1988_fig6_cir_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3202.08, 977.18). Read 2 stroke-bbox centre (3205.00, 976.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.37154 and s=0.11032, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.068'
+            CaO: '0.32'
+            SiO2: '0.55'
+            Al2O3: '0.062'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.068']
+              - ['CaO', '0.32']
+              - ['SiO2', '0.55']
+              - ['Al2O3', '0.062']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_01
+    - observation_id: rego_1988_fig6_cir_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3488.79, 1183.21). Read 2 stroke-bbox centre (3487.50, 1182.00). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.40929 and s=0.08393, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.048'
+            CaO: '0.36'
+            SiO2: '0.53'
+            Al2O3: '0.062'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.048']
+              - ['CaO', '0.36']
+              - ['SiO2', '0.53']
+              - ['Al2O3', '0.062']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_02
+    - observation_id: rego_1988_fig6_cir_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3839.70, 1394.32). Read 2 stroke-bbox centre (3840.50, 1393.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.45543 and s=0.05689, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.03'
+            CaO: '0.41'
+            SiO2: '0.5'
+            Al2O3: '0.06'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.03']
+              - ['CaO', '0.41']
+              - ['SiO2', '0.5']
+              - ['Al2O3', '0.06']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_03
+    - observation_id: rego_1988_fig6_cir_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: open circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4121.29, 1550.67). Read 2 stroke-bbox centre (4119.50, 1549.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.49242 and s=0.03686, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.018'
+            CaO: '0.45'
+            SiO2: '0.47'
+            Al2O3: '0.062'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.018']
+              - ['CaO', '0.45']
+              - ['SiO2', '0.47']
+              - ['Al2O3', '0.062']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_04
+    - observation_id: rego_1988_fig6_inv_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3216.53, 718.83). Read 2 stroke-bbox centre (3217.00, 718.00). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.37321 and s=0.14341, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.089'
+            CaO: '0.32'
+            SiO2: '0.53'
+            Al2O3: '0.061'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.089']
+              - ['CaO', '0.32']
+              - ['SiO2', '0.53']
+              - ['Al2O3', '0.061']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_01
+    - observation_id: rego_1988_fig6_inv_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3519.33, 985.66). Read 2 stroke-bbox centre (3522.50, 985.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.41314 and s=0.10923, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.063'
+            CaO: '0.36'
+            SiO2: '0.51'
+            Al2O3: '0.067'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.063']
+              - ['CaO', '0.36']
+              - ['SiO2', '0.51']
+              - ['Al2O3', '0.067']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_02
+    - observation_id: rego_1988_fig6_inv_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3994.25, 1129.20). Read 2 stroke-bbox centre (3994.00, 1127.00). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.47550 and s=0.09084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.047'
+            CaO: '0.42'
+            SiO2: '0.47'
+            Al2O3: '0.063'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.047']
+              - ['CaO', '0.42']
+              - ['SiO2', '0.47']
+              - ['Al2O3', '0.063']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_03
+    - observation_id: rego_1988_fig6_inv_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.97'
+        marker_symbol: open inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4235.69, 1381.09). Read 2 stroke-bbox centre (4234.00, 1380.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.50730 and s=0.05858, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.97'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.028'
+            CaO: '0.46'
+            SiO2: '0.45'
+            Al2O3: '0.062'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.028']
+              - ['CaO', '0.46']
+              - ['SiO2', '0.45']
+              - ['Al2O3', '0.062']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_04
+    - observation_id: rego_1988_fig6_inv_f_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: filled inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3372.10, 619.53). Read 2 stroke-bbox centre (3371.00, 618.00). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.39354 and s=0.15612, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.088'
+            CaO: '0.31'
+            SiO2: '0.48'
+            Al2O3: '0.122'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.088']
+              - ['CaO', '0.31']
+              - ['SiO2', '0.48']
+              - ['Al2O3', '0.122']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_f_01
+    - observation_id: rego_1988_fig6_inv_f_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: filled inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3593.52, 873.11). Read 2 stroke-bbox centre (3596.50, 875.00). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.42278 and s=0.12365, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.066'
+            CaO: '0.34'
+            SiO2: '0.47'
+            Al2O3: '0.124'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.066']
+              - ['CaO', '0.34']
+              - ['SiO2', '0.47']
+              - ['Al2O3', '0.124']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_f_02
+    - observation_id: rego_1988_fig6_inv_f_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: filled inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4287.36, 1280.38). Read 2 stroke-bbox centre (4287.00, 1279.00). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.51400 and s=0.07148, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.032'
+            CaO: '0.43'
+            SiO2: '0.41'
+            Al2O3: '0.128'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.032']
+              - ['CaO', '0.43']
+              - ['SiO2', '0.41']
+              - ['Al2O3', '0.128']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_f_03
+    - observation_id: rego_1988_fig6_inv_f_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.53'
+        marker_symbol: filled inverted triangle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4401.99, 1312.89). Read 2 stroke-bbox centre (4398.00, 1312.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.52904 and s=0.06732, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.53'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.029'
+            CaO: '0.45'
+            SiO2: '0.4'
+            Al2O3: '0.121'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.029']
+              - ['CaO', '0.45']
+              - ['SiO2', '0.4']
+              - ['Al2O3', '0.121']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_inv_f_04
+    - observation_id: rego_1988_fig6_sq_f_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: filled square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3248.74, 756.85). Read 2 stroke-bbox centre (3254.00, 756.00). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.37747 and s=0.13854, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.08'
+            CaO: '0.3'
+            SiO2: '0.49'
+            Al2O3: '0.13'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.08']
+              - ['CaO', '0.3']
+              - ['SiO2', '0.49']
+              - ['Al2O3', '0.13']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_f_01
+    - observation_id: rego_1988_fig6_sq_f_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: filled square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3651.03, 924.96). Read 2 stroke-bbox centre (3657.00, 925.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.43036 and s=0.11700, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.061'
+            CaO: '0.35'
+            SiO2: '0.46'
+            Al2O3: '0.129'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.061']
+              - ['CaO', '0.35']
+              - ['SiO2', '0.46']
+              - ['Al2O3', '0.129']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_f_02
+    - observation_id: rego_1988_fig6_sq_f_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: filled square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4042.32, 1210.73). Read 2 stroke-bbox centre (4041.00, 1211.00). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.48185 and s=0.08040, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.038'
+            CaO: '0.4'
+            SiO2: '0.43'
+            Al2O3: '0.132'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.038']
+              - ['CaO', '0.4']
+              - ['SiO2', '0.43']
+              - ['Al2O3', '0.132']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_f_03
+    - observation_id: rego_1988_fig6_sq_f_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.56'
+        marker_symbol: filled square
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4372.91, 1375.01). Read 2 stroke-bbox centre (4372.00, 1375.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.52527 and s=0.05936, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.56'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.025'
+            CaO: '0.45'
+            SiO2: '0.4'
+            Al2O3: '0.125'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.025']
+              - ['CaO', '0.45']
+              - ['SiO2', '0.4']
+              - ['Al2O3', '0.125']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_sq_f_04
+    - observation_id: rego_1988_fig6_cir_f_01
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.72'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3167.19, 863.70). Read 2 stroke-bbox centre (3167.00, 862.00). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.36687 and s=0.12485, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.072'
+            CaO: '0.29'
+            SiO2: '0.51'
+            Al2O3: '0.128'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.072']
+              - ['CaO', '0.29']
+              - ['SiO2', '0.51']
+              - ['Al2O3', '0.128']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_f_01
+    - observation_id: rego_1988_fig6_cir_f_02
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.72'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3529.12, 1050.92). Read 2 stroke-bbox centre (3530.50, 1052.50). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.41447 and s=0.10087, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.054'
+            CaO: '0.34'
+            SiO2: '0.48'
+            Al2O3: '0.126'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.054']
+              - ['CaO', '0.34']
+              - ['SiO2', '0.48']
+              - ['Al2O3', '0.126']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_f_02
+    - observation_id: rego_1988_fig6_cir_f_03
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.72'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (3976.83, 1393.27). Read 2 stroke-bbox centre (3977.00, 1393.00). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.47339 and s=0.05702, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.027'
+            CaO: '0.4'
+            SiO2: '0.45'
+            Al2O3: '0.123'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.027']
+              - ['CaO', '0.4']
+              - ['SiO2', '0.45']
+              - ['Al2O3', '0.123']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_f_03
+    - observation_id: rego_1988_fig6_cir_f_04
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 4
+        published_page: 658
+        pdf_page_index: 3
+        figure: '6'
+        series: '-7.72'
+        marker_symbol: filled circle
+        note: >-
+          600 dpi page pixels. Read 1 NCC centre (4195.14, 1509.77). Read 2 stroke-bbox centre (4195.00, 1509.00). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.50207 and s=0.04210, Al2O3 mass fraction 0.20. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+      standard_state: pure liquid Na2O at 1400 C
+      units: log10 activity as printed
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity: '-7.72'
+        printed_form: log10
+        T_C: 1400
+        composition_mol:
+            Na2O: '0.019'
+            CaO: '0.43'
+            SiO2: '0.43'
+            Al2O3: '0.121'
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+      point_conditions:
+          atmosphere:
+            state:
+              tag: value
+              value: pure CO
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+              note: The equilibration gas was pure CO at a slight positive pressure.
+          total_pressure:
+            state:
+              tag: unknown
+              reason: slight positive pressure of CO; no numeric total pressure printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          oxygen:
+            state:
+              tag: unknown
+              reason: oxygen partial pressure is not printed
+            locator:
+              page: 1
+              published_page: 655
+              pdf_page_index: 0
+          composition:
+            components:
+              - ['Na2O', '0.019']
+              - ['CaO', '0.43']
+              - ['SiO2', '0.43']
+              - ['Al2O3', '0.121']
+            amount_basis: mole_fraction
+            basis: closed_from_axis_ratios_and_Al2O3_wt_pct
+            locator:
+              page: 4
+              published_page: 658
+              pdf_page_index: 3
+              figure: '6'
+              note: rego_1988_fig6_cir_f_04
     context:
       - observation_id: rego_1988_abstract_na2o_activity_range
         type: measurement_summary
@@ -206,8 +5699,7 @@ species:
           printed_quantity: log a_Na2O
           method_class: figure_only
           evidence_class: figure_only
-          status: typed_refusal
-          reason: figure_not_digitized
+          status: digitised
           species: Na2O
           system_as_published: Na2O-CaO-SiO2
           axes_as_printed: Na2O mol pct and CaO mol pct in a ternary diagram
@@ -216,23 +5708,20 @@ species:
           series:
             - activity_label_as_published: '-7.02'
               marker: open square
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.53'
               marker: open triangle
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.56'
               marker: open circle
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.72'
               marker: open diamond
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.97'
               marker: open inverted triangle
-              marker_count: 5
-          composition_state: unknown
-          composition_unknown_reason: >-
-            Full per-marker melt compositions occur only as plotted positions;
-            coordinates were not read because figure digitisation is deferred.
+              marker_count: 6
+          composition_state: digitised
           activity_label_attribution: >-
             The text states that the isoactivity values are from earlier
             measurements in the binary Na2O-SiO2 system, reference [2].
@@ -241,11 +5730,14 @@ species:
             to D. N. Rego, G. K. Sigworth, and W. O. Philbrook, Metall. Trans. B,
             1985, vol. 16B, pp. 313-23, reference [2].
           uncertainty_as_published: not stated
-          schema_gap: >-
-            No log10-activity value form exists in the quantity schema. Labels
-            remain strings as printed; no linear activities are inferred.
-          digitisation: deferred to a figure pass
-          numeric_points: none
+          digitisation: >-
+            Marker centres read at 600 dpi. Six markers on each of the five
+            isoactivity curves. Axis titles say mol pct; tick numerals 0.1 to
+            0.5 are mole fractions and are stored as mole fractions. Stored
+            compositions are the first read, rounded to 2 significant figures,
+            with SiO2 closed as the remainder. Audit:
+            rego-1988-silicate-na2o-activities-figure-audit.csv.
+          numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
       - observation_id: rego_1988_fig5_na2o_mgo_sio2_isoactivity
         type: figure_record
         locator:
@@ -262,8 +5754,7 @@ species:
           printed_quantity: log a_Na2O
           method_class: figure_only
           evidence_class: figure_only
-          status: typed_refusal
-          reason: figure_not_digitized
+          status: digitised
           species: Na2O
           system_as_published: Na2O-MgO-SiO2
           axes_as_printed: Na2O mol pct and MgO mol pct in a ternary diagram
@@ -272,23 +5763,20 @@ species:
           series:
             - activity_label_as_published: '-7.02'
               marker: open square
-              marker_count: 5
+              marker_count: 7
             - activity_label_as_published: '-7.53'
               marker: open triangle
-              marker_count: 5
+              marker_count: 4
             - activity_label_as_published: '-7.56'
               marker: open circle
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.72'
               marker: open diamond
-              marker_count: 5
+              marker_count: 6
             - activity_label_as_published: '-7.97'
               marker: open inverted triangle
-              marker_count: 5
-          composition_state: unknown
-          composition_unknown_reason: >-
-            Full per-marker melt compositions occur only as plotted positions;
-            coordinates were not read because figure digitisation is deferred.
+              marker_count: 6
+          composition_state: digitised
           activity_label_attribution: >-
             The activity levels are taken from earlier measurements in the
             binary Na2O-SiO2 system, reference [2].
@@ -296,11 +5784,17 @@ species:
             Melt compositions measured in this work; activity labels attributed
             to reference [2] as printed.
           uncertainty_as_published: not stated
-          schema_gap: >-
-            No log10-activity value form exists in the quantity schema. Labels
-            remain strings as printed; no linear activities are inferred.
-          digitisation: deferred to a figure pass
-          numeric_points: none
+          digitisation: >-
+            Marker centres read at 600 dpi. Counts are open square 7, open
+            triangle 4, open circle 6, open diamond 6, and open inverted
+            triangle 6. The circle rows near y 3616 and y 3951 have no
+            marker-sized upright triangle. One open square is centered on the
+            Na2O-SiO2 edge and stored X_MgO is 0. The dashed 1400 C liquidus
+            is drawn; a point is not assigned to one side of it. Axis titles
+            say mol pct; tick numerals 0.1 to 0.5 are mole fractions and are
+            stored as mole fractions. Audit:
+            rego-1988-silicate-na2o-activities-figure-audit.csv.
+          numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
       - observation_id: rego_1988_fig6_na2o_blast_furnace_slag_isoactivity
         type: figure_record
         locator:
@@ -317,8 +5811,7 @@ species:
           printed_quantity: log a_Na2O
           method_class: figure_only
           evidence_class: figure_only
-          status: typed_refusal
-          reason: figure_not_digitized
+          status: digitised
           species: Na2O
           system_as_published: Na2O-CaO-SiO2-Al2O3 blast-furnace-type slags
           axes_as_printed: >-
@@ -359,11 +5852,7 @@ species:
               Al2O3_content_as_published: 20 wt pct
               marker: filled triangle
               marker_count: 0
-          composition_state: unknown
-          composition_unknown_reason: >-
-            Full per-marker compositions are not printed as a table; the two
-            axes and Al2O3 series do not define every melt composition without
-            digitising marker coordinates.
+          composition_state: digitised
           activity_label_attribution: >-
             Isoactivity values are assigned from the earlier binary-system
             measurements cited as reference [2].
@@ -371,11 +5860,15 @@ species:
             Melt compositions measured in this work; activity labels attributed
             to reference [2] as printed.
           uncertainty_as_published: not stated
-          schema_gap: >-
-            No log10-activity value form exists in the quantity schema. Labels
-            remain strings as printed; no linear activities are inferred.
-          digitisation: deferred to a figure pass
-          numeric_points: none
+          digitisation: >-
+            Marker centres read at 600 dpi. Open markers are 10 wt pct Al2O3
+            and filled markers are 20 wt pct Al2O3. Counts stay 4, 4, 4, 4, 4,
+            4, 2, and 0. No filled triangle is drawn for log a(Na2O) = -7.97.
+            The axes are the printed ratios X_CaO/(X_CaO + X_SiO2) and
+            X_Na2O/(X_Na2O + X_SiO2). The four-oxide mole fraction is closed
+            from those ratios and the series Al2O3 weight percent. Audit:
+            rego-1988-silicate-na2o-activities-figure-audit.csv.
+          numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
       - observation_id: rego_1988_fig7_na2o_activity_ratio_model_comparison
         type: figure_record
         locator:
@@ -557,7 +6050,7 @@ species:
             - activity_label_as_published: '0.4'
               marker_count: 0
           attribution: This work; Gibbs-Duhem integration
-          digitisation: deferred to a figure pass
+          digitisation: curves only, Gibbs-Duhem model, no discrete nodes, not sampled
           numeric_points: none
       - observation_id: rego_1988_table_i_sio2_terminal_binary_activities
         type: context
