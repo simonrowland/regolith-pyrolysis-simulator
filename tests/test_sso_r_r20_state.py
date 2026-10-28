@@ -304,9 +304,22 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         assert abs(snapshot.mass_balance_error_pct) <= 5e-12
         if sim.melt.hour in (167, 168):
             hot_hours.add(sim.melt.hour)
-            assert sim._current_melt_redox_fO2_log() <= math.log10(
-                sim.melt.p_total_mbar / 1000.0,
-            )
+            # Interior inventory potentials stay unclipped, including values
+            # just above the gas ceiling after floating-point inversion.
+            fO2_log = sim._current_melt_redox_fO2_log()
+            assert math.isfinite(fO2_log)
+            assert fO2_log == sim._last_intrinsic_redox_state["fO2_log"]
+            assert fO2_log == snapshot.oxygen_reservoir["melt_intrinsic_fO2_log"]
+            ceiling = sim._melt_redox_fO2_upper_bound_log()
+            if fO2_log > ceiling:
+                assert not sim._last_intrinsic_redox_state.get("exchange_bounded")
+                assert sim._last_intrinsic_redox_state.get("bound") is None
+                assert {
+                    "flag": "REDOX_ABOVE_GAS_CEILING",
+                    "melt_potential": fO2_log,
+                    "ceiling": ceiling,
+                    "reason": "degassing_pending",
+                } in sim._redox_source_breakdown_diagnostic()["redox_bound_notices"]
         # The live campaign may already be the successor after a finishing
         # hour; the snapshot identifies the campaign that produced the hour.
         if snapshot.campaign == CampaignPhase.C6:
