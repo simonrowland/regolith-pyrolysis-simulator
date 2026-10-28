@@ -419,7 +419,7 @@ def test_estimate_total_energy_valid_anchor_and_degenerate_refusal():
         model.estimate_total_energy_kWh(feo, math.inf, T_C=1600.0)
 
 
-def test_multi_oxide_step_still_refuses_while_sequence_ranks():
+def test_multi_oxide_step_predicts_with_partition_notice_while_sequence_ranks():
     model = _legacy_model()
     melt = MeltState(composition_kg={"FeO": 1.0, "SiO2": 1.0})
     sequence = model.get_reduction_sequence(melt, T_C=1600.0, pO2_bar=1.0)
@@ -431,6 +431,12 @@ def test_multi_oxide_step_still_refuses_while_sequence_ranks():
         T_C=1600.0,
         pO2_bar=1.0,
     )
-    assert result["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    assert "oxides_reduced_kg" not in result
-    assert "energy_kWh" not in result
+    assert "reason_refused" not in result
+    assert set(result["oxides_reduced_kg"]) == {"FeO", "SiO2"}
+    assert all(value > 0 for value in result["oxides_reduced_kg"].values())
+    assert result["energy_kWh"] == pytest.approx(0.3)
+    assert result["current_partition_certified"] is False
+    notice = result["notices"][0]
+    assert notice["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"oxide_to_metal_target_count": (0, 1)}
