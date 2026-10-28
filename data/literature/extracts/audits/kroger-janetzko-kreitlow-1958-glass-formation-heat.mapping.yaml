@@ -66,9 +66,10 @@ tables:
     columns: [tube glass I/II compositions, direct mean, uncertainty, solution heat]
     typed_as: measured_direct
     observations: [Rohr I 130.2 ± 1.7 cal/g, Rohr II 121.1 ± 3.1 cal/g, Rohr I solution heat -566.6 ± 1.0 cal/g]
-    audit: Both machine reads and page render confirm rows, values, signs and uncertainties.
+    audit: Both machine reads and page render confirm rows, values, signs and uncertainties. Röhrenglas II Na2SO4 0.14 and Sb2O3 0.05 are in the calculated column; their analysed cells remain printed as —.
   "10":
-    page: 225
+    page: 226
+    pdf_page_index: 5
     columns: [Speiser glass, direct mean, uncertainty, composition]
     typed_as: measured_direct
     observations: 1
@@ -94,8 +95,8 @@ tables:
     typed_as: printed summary attached to corresponding measured observations
     audit: Both machine reads and page render confirm every stored direct and solution cell. The third “aus Bildungswärmen” column is excluded as an older calculated comparator, not a measurement.
 cross_reference_1956:
-  source: Kröger and Janetzko, Glastechnische Berichte 29 (1956), 393–400 (reference [2])
-  result: No exact glass/batch measurement duplicated. The 1956 direct 1:1:6 batch result (117.8 ± 2.5 cal/g; 100 kg basis 11780 kcal) is a different composition and is not a 1958 technical-glass row. The 1958 article cites prior soda, quartz and limestone solution heats [2]; those values are auxiliary inputs, not repeated glass-formation observations. No Table 16 “aus Bildungswärmen” comparator is admitted as measured data.
+  source: Kröger and Kreitlow, Glastechn. Ber. 29 (1956), 393–400 (reference [2]); Kröger and Janetzko, Z. anorg. allg. Chem. 284 (1956), 83–96 (reference [3])
+  result: No exact glass/batch measurement duplicated. The 1956 direct 1:1:6 batch result (117.8 ± 2.5 cal/g; 100 kg basis 11780 kcal) is a different composition and is not a 1958 technical-glass row. The 1958 article cites the Kröger and Kreitlow paper [2] for prior soda, quartz and limestone solution heats; those values are auxiliary inputs, not repeated glass-formation observations. No Table 16 “aus Bildungswärmen” comparator is admitted as measured data.
 schema_gap:
   observation_type: tools/validate_literature_extracts.py:96-99 OBSERVATION_TYPES includes gibbs_table, so the measured rows have an observation type.
   quantity: simulator/battery/migrate.py:442 TYPE_QUANTITY maps gibbs_table by default to delta_fG; :460 QUANTITY_ALIASES has no exact batch-to-glass-plus-gas reaction heat token. The extract supplies explicit heat_of_glass_formation_from_batch so it migrates quantity-unknown instead of incorrectly inheriting delta_fG.

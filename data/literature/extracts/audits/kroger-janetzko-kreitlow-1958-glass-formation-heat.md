@@ -19,8 +19,8 @@ The extract stores 35 observations: 16 detailed direct calorimetry means; 2 dire
 | Table 7 Tafelglas direct and solution-calorimetry summaries, including reducing direct Delog 13786 and Libbey-Owens 12428 kcal/100 kg | 224, Table 7 | Both OCR reads agree; render confirms the direct/solution columns and oxidising/reducing attribution. |
 | Brown 126.60 ± 1.6; chrom-green 124.40 ± 1.2; green 113.80 ± 0.9; white 126.8 ± 1.5 cal/g | 224, Table 8a | Both OCR reads agree; render confirms all four rows, means and uncertainties. |
 | Brown, chrom-green, green and white analyzed compositions | 224, Table 8b | Both OCR reads agree; render confirms row labels and composition columns; chrom-green Cr2O3 is 0.29 mass percent. |
-| Rohr I 130.2 ± 1.7; Rohr II 121.1 ± 3.1; Rohr I dissolution −566.6 ± 1.0 cal/g | 225, Table 9 | Both OCR reads agree; render confirms signs and row assignment. |
-| Speiser 109.6 ± 2.8 cal/g and composition | 225, Table 10 | Both OCR reads agree; render confirms mean, uncertainty and glass composition. |
+| Rohr I 130.2 ± 1.7; Rohr II 121.1 ± 3.1; Rohr I dissolution −566.6 ± 1.0 cal/g | 225, Table 9 | Both OCR reads agree; render confirms signs and row assignment. For Rohr II, Na2SO4 0.14 and Sb2O3 0.05 are calculated; the analyzed cells are —. |
+| Speiser 109.6 ± 2.8 cal/g and composition | 226, Table 10 | Both OCR reads agree; render confirms mean, uncertainty and glass composition. |
 | Geräteglas 107.0 ± 2.4; Kristallglas 123.7 ± 1.8; Bleikristallglas 90.3 ± 2.9 cal/g | 226, Table 11 | Both OCR reads agree; render confirms values and heading order. |
 | Sulfatglas I 209.5 ± 3.8; II 175.8 ± 4.3; III 203.5 ± 3.3 cal/g | 226, Table 12a | Both OCR reads agree; render confirms values and heading order. |
 | Table 16 direct summaries for 18 direct rows and solution summaries for 7 solution results | 228, Table 16 | Both OCR reads agree; render confirms each row and column. “Aus Bildungswärmen” is a calculated comparison column and is excluded from measured data. |
@@ -35,7 +35,7 @@ The article defines the measured process as `Gemenge = Glas + Gas` and describes
 
 The direct calorimetry means are `measured_direct`. The two carbon-reaction corrections are `measured_reduced` and link to the corresponding oxidising measurement. Component and glass dissolution heats are measured inputs. The solution-calorimetry results are the authors' own tabulated measurements (`measured_tabulated`); their reducing-condition values are `measured_reduced` from their oxidising solution rows. Their lineage lists stored inputs only. In particular, the older paper is not used as a `derived_from` parent.
 
-The 1956 paper's direct 1:1:6 batch result is 117.8 ± 2.5 cal/g (11780 kcal/100 kg), for the distinct printed glass composition 12.97:11.73:75.30 mass percent Na2O:CaO:SiO2. It is not duplicated here. The 1958 article cites Kröger and Janetzko, Glastechnische Berichte 29 (1956), 393–400 as reference [2] for prior quartz, soda and limestone solution heats; those auxiliary values are not repeated as measured glass-formation rows. The old calculated “aus Bildungswärmen” comparison is likewise not admitted as a measurement.
+The 1956 direct 1:1:6 batch result is 117.8 ± 2.5 cal/g (11780 kcal/100 kg), for the distinct printed glass composition 12.97:11.73:75.30 mass percent Na2O:CaO:SiO2. It is not duplicated here. Reference [2] is Kröger and Kreitlow, Glastechn. Ber. 29 (1956), 393–400, cited for prior quartz, soda and limestone solution heats; those auxiliary values are not repeated as measured glass-formation rows. Reference [3] is Kröger and Janetzko, Z. anorg. allg. Chem. 284 (1956), 83–96. The old calculated “aus Bildungswärmen” comparison is likewise not admitted as a measurement.
 
 ## Schema decision
 
