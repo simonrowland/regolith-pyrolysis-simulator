@@ -168,6 +168,8 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         else:
             assert row.point_conditions["composition"].state.is_value
             composition = row.point_conditions["composition"].state.value
+            # CaMgSi2O6 prints oxide mole amounts per formula unit; 1:1:2
+            # are inventory amounts, not mole fractions summing to one.
             assert composition.amount_basis is AmountBasis.MOL_INVENTORY
             assert dict(composition.components) == {
                 "CaO": Decimal("1"), "MgO": Decimal("1"), "SiO2": Decimal("2")
@@ -213,11 +215,12 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         if quantity is Quantity.PARTIAL_MOLAR_ENTHALPY:
             assert row.identity.composition.is_value
             composition = row.identity.composition.value
-            assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+            # Table 4 uses the same printed CaMgSi2O6 formula-unit amounts.
+            assert composition.amount_basis is AmountBasis.MOL_INVENTORY
             assert dict(composition.components) == {
-                "CaO": Decimal("0.25"),
-                "MgO": Decimal("0.25"),
-                "SiO2": Decimal("0.5"),
+                "CaO": Decimal("1"),
+                "MgO": Decimal("1"),
+                "SiO2": Decimal("2"),
             }
         assert row.identity.temperature_K.is_unknown
 
