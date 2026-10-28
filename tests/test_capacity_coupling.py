@@ -1314,7 +1314,6 @@ def test_non_overloaded_hour_is_byte_identical_to_legacy_path(monkeypatch):
 
     legacy_path = run_hour(disable_pressure_solver=True)
     pressure_solver_available = run_hour(disable_pressure_solver=False)
-
     assert pressure_solver_available == legacy_path
 
 
@@ -1400,6 +1399,16 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
     )
     assert transport.demand_flux_kg_hr == pytest.approx(
         transport.pipe_capacity_kg_hr, rel=1.0e-9
+    )
+    solved_pipe_outflow_kg_hr = sim.overhead_model._pipe_conductance(
+        solved_pressure_Pa,
+        float(sim.melt.temperature_C),
+        p_downstream_Pa=transport.downstream_pressure_bar * 1.0e5,
+        species_kg_for_M_avg=total_gas_species_kg_hr,
+    ) * 3600.0
+    assert solved_pipe_outflow_kg_hr == pytest.approx(
+        transport.demand_flux_kg_hr,
+        rel=1.0e-9,
     )
     assert snapshot.overhead.pressure_mbar >= (
         notice["resolved_pressure_bar"] * 1000.0

@@ -6913,21 +6913,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return capacity_from_hardware(params.cold_train), params.cold_train
 
     def _controlled_o2_transport_capacity(
-        self, evap_flux, *, dt_hr=1.0, retained_holdup_kg=None,
+        self,
+        evap_flux,
+        *,
+        dt_hr=1.0,
+        retained_holdup_kg=None,
+        retained_holdup_species_kg=None,
     ):
         """Build the live controlled-flow boundary through canonical policy."""
 
         capacity, _cold_train = self._cold_train_capacity_policy()
         if retained_holdup_kg is None:
+            holdup_species_kg = (
+                retained_holdup_species_kg
+                if retained_holdup_species_kg is not None
+                else self._overhead_holdup_species_kg()
+            )
             retained_holdup_kg = sum(
                 max(0.0, float(mass_kg))
-                for mass_kg in self._overhead_holdup_species_kg().values()
+                for mass_kg in holdup_species_kg.values()
             )
         return self.overhead_model.controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
             cold_train_capacity=capacity,
             retained_holdup_kg=retained_holdup_kg,
+            retained_holdup_species_kg=retained_holdup_species_kg,
             dt_hr=dt_hr,
         )
 
@@ -15666,8 +15677,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
-        effective_transport_capacity = (
-            self._controlled_o2_transport_capacity(inlet_flux)
+        retained_holdup_species_kg = self._overhead_holdup_species_kg()
+        overloaded_pressure_solved = False
+        effective_transport_capacity = self._controlled_o2_transport_capacity(
+            inlet_flux,
+            retained_holdup_species_kg=retained_holdup_species_kg,
         )
         if (
             effective_transport_capacity is not None
@@ -15706,6 +15720,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                 )
 
+            # The hourly boundary drains retained kg over 1 h into kg/hr;
+            # admitted inlet rates keep any additional gas species separate
+            # from the ordinary evaporation flux for the headspace split.
+            fixed_inlet_species_kg_hr = dict(
+                retained_holdup_species_kg
+            )
+            for species, raw_rate in inlet_flux.species_kg_hr.items():
+                rate = max(0.0, float(raw_rate)) - max(
+                    0.0,
+                    float(evap_flux.species_kg_hr.get(species, 0.0)),
+                )
+                if rate > 0.0:
+                    fixed_inlet_species_kg_hr[species] = (
+                        fixed_inlet_species_kg_hr.get(species, 0.0) + rate
+                    )
+            fixed_inlet_kg_hr = sum(fixed_inlet_species_kg_hr.values())
+            expected_fixed_inlet_kg_hr = max(
+                0.0,
+                effective_transport_capacity.demand_flux_kg_hr
+                - evap_flux.total_kg_hr,
+            )
+            if not math.isclose(
+                fixed_inlet_kg_hr,
+                expected_fixed_inlet_kg_hr,
+                rel_tol=1.0e-9,
+                abs_tol=1.0e-9,
+            ):
+                from simulator.overhead import OverheadConfigurationError
+
+                raise OverheadConfigurationError(
+                    'overloaded evaporation fixed-inlet species do not close to transport demand'
+                )
+
             try:
                 evap_flux, resolved_pressure_Pa = (
                     self.overhead_model._solve_overloaded_evaporation_flux(
@@ -15716,19 +15763,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                                 effective_transport_capacity
                             )
                         ),
-                        fixed_inlet_kg_hr=max(
-                            0.0,
-                            effective_transport_capacity.demand_flux_kg_hr
-                            - evap_flux.total_kg_hr,
-                        ),
+                        fixed_inlet_species_kg_hr=fixed_inlet_species_kg_hr,
                         flux_at_partials=evaporation_flux_at_partials,
                     )
                 )
             finally:
                 self._degraded_path_engagement = degraded_before
+            overloaded_pressure_solved = True
             inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
             effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(inlet_flux)
+                self._controlled_o2_transport_capacity(
+                    inlet_flux,
+                    retained_holdup_species_kg=retained_holdup_species_kg,
+                )
             )
             if (
                 effective_transport_capacity is not None
@@ -15774,6 +15821,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     # this tick's source; reading it again counts that source
                     # twice and changes pressure after condenser routing.
                     retained_holdup_kg=effective_transport_capacity.retained_holdup_kg,
+                    retained_holdup_species_kg=(
+                        retained_holdup_species_kg
+                        if overloaded_pressure_solved
+                        else None
+                    ),
                 )
                 # Rejection can only reduce the inlet. A pipe inside its
                 # nominal band before routing cannot acquire an overload here.
