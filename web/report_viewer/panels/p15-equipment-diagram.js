@@ -155,6 +155,14 @@
       : Array.isArray(silicaAvailability?.excluded)
         ? silicaAvailability.excluded
         : [];
+    const estimatedSilicaSpecies = Array.isArray(silica?.estimated_contributions)
+      ? [...new Set(silica.estimated_contributions
+        .filter((item) => item && typeof item.species === "string")
+        .map((item) => item.species))].sort()
+      : [];
+    const estimatedSilicaNote = estimatedSilicaSpecies.length
+      ? ` · includes estimated transport for ${estimatedSilicaSpecies.join(", ")}`
+      : "";
     const silicaProduct = silicaClassTotal !== null && silicaClassTotal > 0;
     const silicaFlaggedProduct = silicaProduct && silicaFlag !== null;
     const silicaQualified = silicaProduct && !silicaFlaggedProduct;
@@ -197,6 +205,7 @@
       ? `<span class="sec-p15-stage-route">${esc(
         `Designed product route · ${stageDefinition.productSpecies.map(prettySpecies).join(" / ")} · ${routeStatus}`
         + (excludedDetails.length ? ` · excluded: ${excludedDetails.join("; ")}` : "")
+        + estimatedSilicaNote
       )}</span>`
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";

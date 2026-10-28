@@ -204,6 +204,17 @@ function renderCeramicRumpPanel(payload) {
     const productClassStatus = payload && payload.product_class_status
         ? payload.product_class_status
         : availability && availability.status;
+    const estimatedContributions = Array.isArray(payload && payload.estimated_contributions)
+        ? payload.estimated_contributions
+        : availability && Array.isArray(availability.estimated_contributions)
+            ? availability.estimated_contributions
+            : [];
+    const estimatedSpecies = [...new Set(estimatedContributions
+        .filter(item => item && typeof item.species === 'string')
+        .map(item => item.species))].sort();
+    const estimateNote = estimatedSpecies.length
+        ? `includes estimated transport for ${estimatedSpecies.join(', ')}`
+        : '';
     updateAdvisoryState('ceramic-rump-state', status);
     advisoryClear(content);
     if (!payload || (status === 'n/a' && !productClassStatus)) {
@@ -212,10 +223,14 @@ function renderCeramicRumpPanel(payload) {
         return;
     }
     content.className = 'advisory-result';
-    if (productClassStatus) {
-        const availabilityDetails = { status: productClassStatus };
+    if (productClassStatus || estimateNote) {
+        const availabilityDetails = {};
+        if (productClassStatus) availabilityDetails.status = productClassStatus;
         if (availability && availability.total_basis) {
             availabilityDetails.total_basis = availability.total_basis;
+        }
+        if (estimateNote) {
+            availabilityDetails.estimated_transport = estimateNote;
         }
         const excluded = Array.isArray(payload.excluded)
             ? payload.excluded
@@ -226,7 +241,7 @@ function renderCeramicRumpPanel(payload) {
         );
     }
     if (status === 'no-match' || status === 'ambiguous' || !payload.match) {
-        if (productClassStatus) {
+        if (productClassStatus || estimateNote) {
             appendCeramicLine(
                 content, 'Ceramic composition', `${status} - ${payload.reason || ''}`,
             );

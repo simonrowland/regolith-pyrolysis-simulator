@@ -65,6 +65,14 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
     silica = products["pure_silica_glass"]
     assert silica["stage_3_capture_kg"] > 0.0
     assert silica["stage_3_kg_by_species"]
+    sio_estimate = next(
+        item
+        for item in silica["estimated_contributions"]
+        if item["species"] == "SiO"
+    )
+    assert sio_estimate["account"] == "process.cleaned_melt"
+    assert sio_estimate["authority"] in {"status_bearing", "extrapolated"}
+    assert sio_estimate["reason"]
     # C0 has no oxygen-hold qualification route: retain raw Stage-3 capture,
     # while the qualified product contribution remains an explicit zero.
     assert silica["class_total_kg"] == 0.0
@@ -73,6 +81,9 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
     assert glass["pure_silica_glass_kg"] == 0.0
     assert glass["species_kg"] == {}
     assert glass["excluded"] == silica["excluded"]
+    assert glass["estimated_contributions"] == silica[
+        "estimated_contributions"
+    ]
     rump = products["refractory_ceramic_rump"]
     rump_by_species = sim._terminal_rump_by_species()
     rump_by_class = sim._terminal_rump_by_class()

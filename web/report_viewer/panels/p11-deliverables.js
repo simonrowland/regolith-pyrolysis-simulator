@@ -308,14 +308,33 @@
   }
 
   function producerFlag(record) {
-    if (!isRecord(record) || (!own(record, "flag") && !own(record, "availability_flag"))) return "";
+    if (!isRecord(record)) return "";
+    const estimatedSpecies = Array.isArray(record.estimated_contributions)
+      ? [...new Set(record.estimated_contributions
+        .filter(item => isRecord(item) && typeof item.species === "string")
+        .map(item => item.species))].sort()
+      : [];
+    const estimateNote = estimatedSpecies.length
+      ? `includes estimated transport for ${estimatedSpecies.join(", ")}`
+      : "";
+    if (!own(record, "flag") && !own(record, "availability_flag")) {
+      return estimateNote
+        ? `<p class="sec-p11-flag">${esc(estimateNote)}</p>`
+        : "";
+    }
     if (isRecord(record.availability_flag) && isRecord(record.flag)) {
-      return producerFlag({ flag: record.availability_flag, excluded: record.excluded }) +
+      return producerFlag({
+        flag: record.availability_flag,
+        excluded: record.excluded,
+        estimated_contributions: record.estimated_contributions,
+      }) +
         producerFlag({ flag: record.flag });
     }
     const flag = record.availability_flag || record.flag;
     if (typeof flag === "string" && flag.trim()) {
-      return `<p class="sec-p11-flag">${esc(flag.trim())}</p>`;
+      return `<p class="sec-p11-flag">${esc(
+        [flag.trim(), estimateNote].filter(Boolean).join(" · ")
+      )}</p>`;
     }
     if (isRecord(flag) && typeof flag.status === "string" && flag.status.trim()) {
       const parts = [
@@ -325,6 +344,7 @@
         `band: ${typeof flag.band === "string" ? flag.band : JSON.stringify(flag.band)}`,
         `reason: ${String(flag.reason)}`
       ];
+      if (estimateNote) parts.push(estimateNote);
       const excluded = Array.isArray(record.excluded) ? record.excluded : flag.excluded;
       if (Array.isArray(excluded) && excluded.length) {
         parts.push(`excluded: ${excluded.map(item => {

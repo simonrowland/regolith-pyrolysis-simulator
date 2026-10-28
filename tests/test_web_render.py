@@ -515,6 +515,12 @@ def test_ceramic_rump_panel_renders_partial_class_exclusion():
                     "reason": "missing LJ row",
                     "upper_bound_kg": "unbounded",
                 }],
+                "estimated_contributions": [{
+                    "species": "SiO",
+                    "account": "process.cleaned_melt",
+                    "authority": "status_bearing",
+                    "reason": "estimated carrier row",
+                }],
             },
         },
     )
@@ -526,6 +532,31 @@ def test_ceramic_rump_panel_renders_partial_class_exclusion():
     assert "account process.cleaned_melt" in content
     assert "reason missing LJ row" in content
     assert "upper bound kg unbounded" in content
+    assert "includes estimated transport for SiO" in content
+
+
+def test_ceramic_rump_panel_renders_estimate_without_availability_status():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload={
+            "ceramic_rump_panel": {
+                "status": "no-match",
+                "reason": "no product match",
+                "estimated_contributions": [{
+                    "species": "SiO",
+                    "account": "process.cleaned_melt",
+                    "authority": "status_bearing",
+                    "reason": "estimated carrier row",
+                }],
+            },
+        },
+    )
+
+    assert "includes estimated transport for SiO" in rendered[
+        "text"
+    ]["ceramic-rump-content"]
 
 
 def test_started_status_clears_completion_bound_advisory_panels():

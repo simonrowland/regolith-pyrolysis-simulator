@@ -2622,6 +2622,11 @@ def _completion_payload(sim):
     ceramic_panel = ceramic_rump_payload(refractory_rump_composition_wt_pct)
     rump_class = classification.get('refractory_ceramic_rump')
     if isinstance(rump_class, Mapping):
+        estimated_contributions = rump_class.get('estimated_contributions')
+        if estimated_contributions:
+            ceramic_panel['estimated_contributions'] = list(
+                estimated_contributions
+            )
         rump_status = rump_class.get('status')
         if rump_status in {'partial', 'unavailable'}:
             ceramic_panel['product_class_status'] = rump_status

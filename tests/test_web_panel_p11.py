@@ -310,12 +310,38 @@ def test_p11_renders_availability_flag_without_other_flag() -> None:
         "reason": "missing LJ row",
         "upper_bound_kg": "unbounded",
     }]
+    bucket["estimated_contributions"] = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
     card = _card(_render(_wrapped(block)), "rump")
     visible = _visible(card)
 
     assert "partial" in visible
     assert "Si via process.cleaned_melt" in visible
     assert "unbounded kg bound" in visible
+    assert "includes estimated transport for SiO" in visible
+
+
+def test_p11_renders_estimates_for_available_class_without_status_flag() -> None:
+    block, classification = _mars()
+    bucket = classification["metals_plus_O2"]
+    bucket["status"] = "available"
+    bucket.pop("flag", None)
+    bucket.pop("availability_flag", None)
+    bucket["excluded"] = []
+    bucket["estimated_contributions"] = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
+
+    visible = _visible(_card(_render(_wrapped(block)), "metals"))
+
+    assert "includes estimated transport for SiO" in visible
 
 
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:

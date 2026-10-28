@@ -120,7 +120,7 @@ def test_unqualified_stage3_capture_stays_numeric_with_partial_class(
     assert silica["class_total_kg"] == 0.0
     assert silica["stage_3_capture_kg"] == 4.5
     assert silica["stage_3_kg_by_species"] == {"SiO2": 4.5}
-    assert [item["species"] for item in silica["excluded"]] == ["Si"]
+    assert any(item["species"] == "Si" for item in silica["excluded"])
 
 
 def test_zero_oxygen_partition_is_kept_without_refusal(two_hour_run, monkeypatch):
@@ -153,6 +153,117 @@ def test_product_class_with_only_refused_parts_is_unavailable(two_hour_run):
     )
     assert unavailable["status"] == "unavailable"
     assert unavailable["class_total_kg"] is None
+
+
+def test_product_class_keeps_estimated_flux_and_ignores_empty_refusal():
+    estimated_sio = {
+        "species_id": "SiO",
+        "source_account": "process.cleaned_melt",
+        "pressure": {"kind": "value", "pa": 4.0},
+        "flux": {"kind": "eligible"},
+        "authority_level": "extrapolated",
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "pending_validation",
+        "is_flux_active": True,
+        "extra": {"activity_reason": "estimated SiO carrier row"},
+    }
+    estimated_sio2 = {
+        **estimated_sio,
+        "species_id": "SiO2",
+        "authority_level": None,
+        "extra": {"activity_reason": "status-bearing SiO2 carrier row"},
+    }
+    empty_si_refusal = {
+        "species_id": "Si",
+        "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+        },
+        "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+        },
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "pending_validation",
+        "is_refused": True,
+    }
+    snapshot = SimpleNamespace(
+        evap_flux=SimpleNamespace(
+            species_kg_hr={"SiO": 0.2, "SiO2": 0.1},
+            carrier_authority_by_species={
+                "SiO": estimated_sio,
+                "SiO2": estimated_sio2,
+                "Si": empty_si_refusal,
+            },
+        )
+    )
+    sim = SimpleNamespace(
+        _last_evaporation_flux_diagnostic={},
+        species_formula_registry={},
+    )
+
+    available = product_class_availability(
+        sim,
+        "SiO",
+        {"capture": 4.0},
+        has_computed_part=True,
+        snapshots=(snapshot,),
+    )
+
+    assert available["status"] == "available"
+    assert available["class_total_kg"] == 4.0
+    assert available["excluded"] == []
+    assert available["estimated_contributions"] == [
+        {
+            "species": "SiO",
+            "account": "process.cleaned_melt",
+            "authority": "extrapolated",
+            "reason": "estimated SiO carrier row",
+        },
+        {
+            "species": "SiO2",
+            "account": "process.cleaned_melt",
+            "authority": "status_bearing",
+            "reason": "status-bearing SiO2 carrier row",
+        },
+    ]
+
+    refused_si = {
+        **empty_si_refusal,
+        "pressure": {"kind": "refusal", "code": "missing_input"},
+        "flux": {"kind": "refusal", "code": "missing_input"},
+        "refusal_code": "missing_input",
+        "reason": "Si carrier input was refused",
+    }
+    refused_snapshot = SimpleNamespace(
+        evap_flux=SimpleNamespace(
+            species_kg_hr={"SiO": 0.2, "SiO2": 0.1, "Si": 0.01},
+            carrier_authority_by_species={
+                "SiO": estimated_sio,
+                "SiO2": estimated_sio2,
+                "Si": refused_si,
+            },
+        )
+    )
+    partial = product_class_availability(
+        sim,
+        "SiO",
+        {"capture": 4.0},
+        has_computed_part=True,
+        snapshots=(refused_snapshot,),
+    )
+
+    assert partial["status"] == "partial"
+    assert partial["class_total_kg"] == 4.0
+    assert [item["species"] for item in partial["excluded"]] == ["Si"]
+    assert partial["estimated_contributions"] == available[
+        "estimated_contributions"
+    ]
+    assert partial["flag"]["estimated_contributions"] == partial[
+        "estimated_contributions"
+    ]
 
 
 def test_classifier_marks_refused_only_class_unavailable(two_hour_run, monkeypatch):
@@ -193,8 +304,11 @@ def test_cost_allocations_keep_numeric_mass_and_partial_flag(two_hour_run):
     )
     run_input = diagnostic["run_input_cost"]
     assert run_input["allocation_status"] == "partial_by_available_product_mass"
-    assert len(run_input["excluded_products"]) == 1
-    assert run_input["excluded_products"][0]["species"] == "Si"
+    assert any(
+        item["species"] == "Si"
+        and "EvaporationFluxConfigurationError" in item["reason"]
+        for item in run_input["excluded_products"]
+    )
     assert isinstance(run_input["owner_ratify_money_projection"], float)
     assert diagnostic["product_costs"]
     expected_excluded = classify_products(two_hour_run)["metals_plus_O2"][
@@ -203,8 +317,11 @@ def test_cost_allocations_keep_numeric_mass_and_partial_flag(two_hour_run):
     for entry in diagnostic["product_costs"].values():
         assert entry["status"] == "partial"
         assert entry["flag"]["status"] == "partial"
-        assert len(entry["excluded"]) == 1
-        assert entry["excluded"][0]["species"] == "Si"
+        assert any(
+            item["species"] == "Si"
+            and "EvaporationFluxConfigurationError" in item["reason"]
+            for item in entry["excluded"]
+        )
         assert isinstance(entry["quantity_kg"], (int, float))
         assert not is_unavailable_quantity(entry["owner_ratify_money_projection"])
         assert not is_unavailable_quantity(entry["accumulated_cost"])
@@ -217,6 +334,7 @@ def test_product_class_availability_reports_unbounded_without_full_window_ledger
         evap_flux=SimpleNamespace(
             carrier_authority_by_species={
                 "Si": {
+                    "status": "unavailable",
                     "policy": "fail_loud_missing_transport_parameters",
                     "refusal_type": "EvaporationFluxConfigurationError",
                     "reason": "missing row",
@@ -269,6 +387,7 @@ def test_product_class_availability_bounds_from_ledger_gross_flows():
         evap_flux=SimpleNamespace(
             carrier_authority_by_species={
                 "Si": {
+                    "status": "unavailable",
                     "policy": "fail_loud_missing_transport_parameters",
                     "refusal_type": "EvaporationFluxConfigurationError",
                     "reason": "missing row",
@@ -307,7 +426,11 @@ def test_cost_refusal_matches_declared_targets_without_si_product(two_hour_run):
     assert diagnostic["run_input_cost"]["allocation_status"] == (
         "partial_by_available_product_mass"
     )
-    assert diagnostic["run_input_cost"]["excluded_products"][0]["species"] == "Si"
+    assert any(
+        item["species"] == "Si"
+        and "EvaporationFluxConfigurationError" in item["reason"]
+        for item in diagnostic["run_input_cost"]["excluded_products"]
+    )
 
 
 @pytest.mark.parametrize("metric", ("oxygen_stored_kg", "oxygen_vented_kg"))

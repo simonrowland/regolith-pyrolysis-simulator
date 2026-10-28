@@ -1055,6 +1055,12 @@ def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
             "upper_bound_kg": 0.5,
             "upper_bound_basis": "conservative_ledger_bound",
         }],
+        "estimated_contributions": [{
+            "species": "SiO",
+            "account": "process.cleaned_melt",
+            "authority": "status_bearing",
+            "reason": "estimated carrier row",
+        }],
     })
     artifact = {
         "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
@@ -1072,6 +1078,7 @@ def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
         "Si via process.cleaned_melt (up to 0.5 kg "
         "(conservative upper bound); missing LJ row)"
     ) in stage
+    assert "includes estimated transport for SiO" in stage
 
 
 def test_empty_stage_indeterminate_renders_as_no_material() -> None:

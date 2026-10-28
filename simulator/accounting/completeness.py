@@ -25,7 +25,10 @@ from simulator.accounting.queries import (
 )
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.instrumentation import (
+    VAPOUR_CARRIER_AUTHORITY_MISSING,
+    VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
     VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
     vapour_carrier_authority_status,
 )
 
@@ -272,40 +275,69 @@ def evaporation_quantity_unavailabilities(
     *,
     snapshots: Any = None,
 ) -> list[dict[str, Any]]:
-    """Return all missing-transport refusals that overlap a quantity."""
+    """Return unavailable carrier contributions that overlap a quantity."""
 
-    refusals: dict[str, dict[str, Any]] = {}
+    unavailable, _estimated = _evaporation_quantity_authority_contributions(
+        sim, target_species, snapshots=snapshots
+    )
+    return unavailable
 
-    def record_refusal(
+
+def _evaporation_quantity_authority_contributions(
+    sim: Any,
+    target_species: str | tuple[str, ...] | None,
+    *,
+    snapshots: Any = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Separate withheld carrier mass from positive status-bearing flux."""
+
+    unavailable_by_species: dict[str, dict[str, Any]] = {}
+    estimated_by_species_account: dict[tuple[str, str], dict[str, Any]] = {}
+
+    def record_unavailable(
         species: Any,
         record: Any,
         *,
-        carrier_channel: bool = False,
+        refusal_type: Any,
+        reason: Any,
+        parent_oxide: Any = None,
     ) -> None:
+        species_id = str(species)
+        extra = record.get("extra") if isinstance(record, Mapping) else None
+        extra = extra if isinstance(extra, Mapping) else {}
+        parent = (
+            parent_oxide
+            or record.get("parent_oxide")
+            or extra.get("parent_oxide")
+        )
+        unavailable_by_species.setdefault(species_id, {
+            "refusal_type": str(refusal_type or "VapourCarrierRefusal"),
+            "reason": str(reason or "carrier input is unavailable"),
+            "parent_oxide": str(parent) if parent else "",
+            "account": str(
+                record.get("account") or record.get("source_account")
+                or extra.get("account") or "process.cleaned_melt"
+            ),
+        })
+
+    def record_missing_transport(species: Any, record: Any) -> None:
         if not isinstance(record, Mapping):
             return
         extra = record.get("extra")
         extra = extra if isinstance(extra, Mapping) else {}
-        missing_transport = (
-            (record.get("policy") or extra.get("policy"))
-            == "fail_loud_missing_transport_parameters"
-        )
+        if (record.get("policy") or extra.get("policy")) != (
+            "fail_loud_missing_transport_parameters"
+        ):
+            return
+        if (record.get("status") or extra.get("status")) != "unavailable":
+            return
         refusal_type = (
             record.get("refusal_type")
             or record.get("refusal_code")
             or extra.get("refusal_type")
         )
-        if missing_transport:
-            if not refusal_type:
-                return
-        elif (
-            not carrier_channel
-            or vapour_carrier_authority_status(
-                record, expected_species_id=str(species)
-            ) != VAPOUR_CARRIER_AUTHORITY_REFUSED
-        ):
+        if not refusal_type:
             return
-        refusal_type = refusal_type or "VapourCarrierRefusal"
         reason = (
             record.get("reason")
             or record.get("detail")
@@ -313,17 +345,66 @@ def evaporation_quantity_unavailabilities(
             or "transport parameters are unavailable"
         )
         parent_oxide = record.get("parent_oxide") or extra.get("parent_oxide")
-        refusals.setdefault(str(species), {
-            "refusal_type": str(refusal_type),
-            "reason": str(reason),
-            "parent_oxide": str(parent_oxide) if parent_oxide else "",
-        })
+        record_unavailable(
+            species,
+            record,
+            refusal_type=refusal_type,
+            reason=reason,
+            parent_oxide=parent_oxide,
+        )
+
+    def has_positive_flux(flux: Any, species: Any) -> bool:
+        rates = getattr(flux, "species_kg_hr", {}) or {}
+        if not isinstance(rates, Mapping):
+            return False
+        try:
+            rate = float(rates.get(str(species), 0.0))
+        except (TypeError, ValueError):
+            return False
+        return math.isfinite(rate) and rate > 0.0
+
+    def record_estimate(species: Any, record: Mapping[str, Any]) -> None:
+        species_id = str(species)
+        extra = record.get("extra")
+        extra = extra if isinstance(extra, Mapping) else {}
+        account = str(
+            record.get("source_account") or record.get("account")
+            or "process.cleaned_melt"
+        )
+        key = (species_id, account)
+        verdict = str(record.get("verdict_status") or "").lower()
+        authority = str(
+            record.get("authority_level")
+            or record.get("authority")
+            or (
+                "extrapolated"
+                if "extrapolat" in verdict
+                else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+            )
+        )
+        if key in estimated_by_species_account:
+            existing_authority = estimated_by_species_account[key]["authority"]
+            if existing_authority == "extrapolated" or authority != "extrapolated":
+                return
+        estimated_by_species_account[key] = {
+            "species": species_id,
+            "account": account,
+            "authority": authority,
+            "reason": str(
+                record.get("reason")
+                or record.get("detail")
+                or extra.get("reason")
+                or extra.get("activity_reason")
+                or record.get("verdict_status")
+                or "carrier evidence is status-bearing"
+            ),
+        }
 
     diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
     missing = diagnostic.get("missing_transport_parameters", {})
     if isinstance(missing, Mapping):
         for species, record in missing.items():
-            record_refusal(species, record)
+            record_missing_transport(species, record)
     if snapshots is None:
         snapshots = getattr(getattr(sim, "record", None), "snapshots", None)
     if snapshots is None:
@@ -333,7 +414,63 @@ def evaporation_quantity_unavailabilities(
         channels = getattr(flux, "carrier_authority_by_species", {}) or {}
         if isinstance(channels, Mapping):
             for species, record in channels.items():
-                record_refusal(species, record, carrier_channel=True)
+                if not isinstance(record, Mapping):
+                    continue
+                extra = record.get("extra")
+                extra = extra if isinstance(extra, Mapping) else {}
+                policy = record.get("policy") or extra.get("policy")
+                if policy == "fail_loud_missing_transport_parameters":
+                    record_missing_transport(species, record)
+                    continue
+                status = vapour_carrier_authority_status(
+                    record, expected_species_id=str(species)
+                )
+                if status == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING:
+                    if has_positive_flux(flux, species):
+                        record_estimate(species, record)
+                    continue
+                if status == VAPOUR_CARRIER_AUTHORITY_MISSING:
+                    record_unavailable(
+                        species,
+                        record,
+                        refusal_type="MissingVapourCarrierInput",
+                        reason=(
+                            record.get("reason") or record.get("detail")
+                            or extra.get("reason") or "carrier input is missing"
+                        ),
+                    )
+                    continue
+                if (
+                    status in {
+                        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+                        VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
+                    }
+                    and has_positive_flux(flux, species)
+                ):
+                    pressure = record.get("pressure")
+                    pressure = pressure if isinstance(pressure, Mapping) else {}
+                    carrier_flux = record.get("flux")
+                    carrier_flux = (
+                        carrier_flux if isinstance(carrier_flux, Mapping) else {}
+                    )
+                    refusal_type = (
+                        record.get("refusal_type")
+                        or record.get("refusal_code")
+                        or pressure.get("code")
+                        or carrier_flux.get("code")
+                        or "VapourCarrierRefusal"
+                    )
+                    record_unavailable(
+                        species,
+                        record,
+                        refusal_type=refusal_type,
+                        reason=(
+                            record.get("reason") or record.get("detail")
+                            or pressure.get("detail") or carrier_flux.get("detail")
+                            or extra.get("reason")
+                            or "carrier authority refused positive flux"
+                        ),
+                    )
 
     target_elements: set[str] | None = None
     registry = getattr(sim, "species_formula_registry", {})
@@ -352,13 +489,14 @@ def evaporation_quantity_unavailabilities(
             except (AccountingError, ValueError):
                 continue
             target_elements.update(atoms if len(atoms) == 1 else atoms - {"O"})
-    matches = []
-    for species, refusal in sorted(refusals.items()):
+
+    def matches_target(species: str, parent_oxide: str) -> bool:
+        if target_elements is None:
+            return True
         try:
             affected = set(resolve_species_formula(species, registry).elements)
         except (AccountingError, ValueError):
-            continue
-        parent_oxide = refusal.get("parent_oxide")
+            return False
         if parent_oxide:
             try:
                 affected.update(
@@ -366,20 +504,31 @@ def evaporation_quantity_unavailabilities(
                 )
             except (AccountingError, ValueError):
                 pass
-        if target_elements is not None and not target_elements & affected:
-            continue
-        matches.append({
+        return bool(target_elements & affected)
+
+    unavailable = [
+        {
             "status": "unavailable",
             "authority": "unavailable",
             "band": None,
             "reason": (
-                f"{species}: {refusal['refusal_type']}: {refusal['reason']}"
+                f"{species}: {record['refusal_type']}: {record['reason']}"
             ),
             "species": species,
-            "parent_oxide": parent_oxide,
-            "account": "process.cleaned_melt",
-        })
-    return matches
+            "parent_oxide": record["parent_oxide"],
+            "account": record["account"],
+        }
+        for species, record in sorted(unavailable_by_species.items())
+        if matches_target(species, record["parent_oxide"])
+    ]
+    estimates = [
+        record
+        for (species, _account), record in sorted(
+            estimated_by_species_account.items()
+        )
+        if matches_target(species, "")
+    ]
+    return unavailable, estimates
 
 
 def product_class_availability(
@@ -390,9 +539,11 @@ def product_class_availability(
     has_computed_part: bool,
     snapshots: Any = None,
 ) -> dict[str, Any]:
-    """Return numeric computable mass and any overlapping transport refusal."""
-    refusals = evaporation_quantity_unavailabilities(
-        sim, target_species, snapshots=snapshots
+    """Return computed mass with unavailable and estimated carrier evidence."""
+    refusals, estimated_contributions = (
+        _evaporation_quantity_authority_contributions(
+            sim, target_species, snapshots=snapshots
+        )
     )
     parts = (
         {
@@ -436,6 +587,7 @@ def product_class_availability(
         ),
         "status": status,
         "excluded": excluded,
+        "estimated_contributions": estimated_contributions,
         "reason": "; ".join(item["reason"] for item in excluded),
         "flag": (
             None if status == "available" else {
@@ -448,6 +600,7 @@ def product_class_availability(
                 "authority": "unavailable",
                 "reason": "; ".join(item["reason"] for item in excluded),
                 "excluded": excluded,
+                "estimated_contributions": estimated_contributions,
                 **({"total_basis": "lower_bound"} if status == "partial" else {}),
             }
         ),

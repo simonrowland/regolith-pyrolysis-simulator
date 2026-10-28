@@ -4738,6 +4738,12 @@ def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
         "reason": "missing LJ row",
         "upper_bound_kg": "unbounded",
     }]
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
     monkeypatch.setattr(
         sim, "_terminal_rump_by_species", lambda: dict(terminal_rump)
     )
@@ -4750,6 +4756,7 @@ def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
                 "class_total_kg": 60.0,
                 "availability_flag": {"status": "partial"},
                 "excluded": excluded,
+                "estimated_contributions": estimated_contributions,
                 "rump_silicate_residual_kg": 30.0,
             }
         },
@@ -4767,6 +4774,7 @@ def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
     assert ceramic_panel["product_class_status"] == "partial"
     assert ceramic_panel["availability_flag"]["status"] == "partial"
     assert ceramic_panel["excluded"] == excluded
+    assert ceramic_panel["estimated_contributions"] == estimated_contributions
 
 
 def test_web_payloads_preserve_full_precision_mass_balance_error(

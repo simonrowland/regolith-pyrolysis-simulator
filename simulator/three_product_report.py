@@ -546,6 +546,9 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             computed_mass_by_class[name],
             has_computed_part=computed_product_parts[name],
         )
+        bucket['estimated_contributions'] = availability[
+            'estimated_contributions'
+        ]
         if availability['status'] != 'available':
             if availability['status'] == 'partial':
                 bucket['class_total_kg'] = availability['class_total_kg']

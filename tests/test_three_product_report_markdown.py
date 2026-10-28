@@ -97,6 +97,12 @@ def test_metals_class_renders_per_species_breakdown():
         'metals_total_kg': 6.5,
         'O2_kg': 2.0,
         'class_total_kg': 8.5,
+        'estimated_contributions': [{
+            'species': 'SiO',
+            'account': 'process.cleaned_melt',
+            'authority': 'status_bearing',
+            'reason': 'estimated carrier row',
+        }],
     }
     report = format_three_product_markdown(classification)
     assert "**Fe**" in report
@@ -104,6 +110,7 @@ def test_metals_class_renders_per_species_breakdown():
     assert "**K**" in report
     assert "Metals subtotal" in report
     assert "Source-side O₂ potential subtotal" in report
+    assert "includes estimated transport for SiO" in report
 
 
 def test_partial_product_class_renders_excluded_refusal():
@@ -135,12 +142,19 @@ def test_partial_product_class_labels_numeric_ledger_bound_as_conservative():
             "upper_bound_kg": 0.5617,
             "upper_bound_basis": "conservative_ledger_bound",
         }],
+        "estimated_contributions": [{
+            "species": "SiO",
+            "account": "process.cleaned_melt",
+            "authority": "status_bearing",
+            "reason": "estimated carrier row",
+        }],
     })
     report = format_three_product_markdown(classification)
     assert (
         "Si via process.cleaned_melt (up to 0.562 kg "
         "(conservative upper bound); missing LJ row)"
     ) in report
+    assert "includes estimated transport for SiO" in report
 
 
 def test_silica_glass_class_shows_stage_3_capture():

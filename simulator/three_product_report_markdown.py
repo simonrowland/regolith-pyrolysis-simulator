@@ -154,6 +154,16 @@ def format_three_product_markdown(
                 '**Availability**: PARTIAL; computed total is a lower bound. '
                 + '; '.join(details)
             )
+        estimated_species = sorted({
+            str(item.get('species'))
+            for item in bucket.get('estimated_contributions', ())
+            if isinstance(item, Mapping) and item.get('species')
+        })
+        if estimated_species:
+            lines.append(
+                '**Estimated transport**: includes estimated transport for '
+                + ', '.join(estimated_species)
+            )
         if bucket_key not in {'metals_plus_O2', 'pure_silica_glass'}:
             flag = bucket.get('flag')
             if isinstance(flag, Mapping):
