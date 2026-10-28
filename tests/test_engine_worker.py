@@ -433,6 +433,98 @@ class _DeadlineRaceProcess:
         return True
 
 
+class _DeadlineRaceStartConnection(_DeadlineRaceConnection):
+    def close(self):
+        self.closed = True
+
+
+class _DeadlineRaceStartProcess:
+    def __init__(self):
+        self.alive = True
+        self.exitcode = None
+        self.pid = None
+
+    def start(self):
+        pass
+
+    def is_alive(self):
+        return self.alive
+
+    def join(self, timeout=None):
+        pass
+
+
+def _deadline_race_start_worker(monkeypatch, connection_specs, reader_plans):
+    clock = _DeadlineRaceClock()
+    connections = [
+        _DeadlineRaceStartConnection(clock, **spec)
+        for spec in connection_specs
+    ]
+    processes = [_DeadlineRaceStartProcess() for _ in connections]
+    connection_iter = iter(connections)
+    process_iter = iter(processes)
+    context = SimpleNamespace(
+        Pipe=lambda **_kwargs: (next(connection_iter), SimpleNamespace(
+            close=lambda: None,
+        )),
+        Process=lambda **_kwargs: next(process_iter),
+    )
+    worker = WarmEngineWorker(
+        name='deadline race startup worker',
+        bootstrap=_bootstrap_test_worker,
+        handler=_handle_test_request,
+        startup_timeout_s=1.0,
+        call_timeout_s=1.0,
+    )
+    discarded = []
+    readers = []
+
+    def discard_current(**kwargs):
+        if (
+            worker.process is not kwargs['expected_process']
+            or worker.connection is not kwargs['expected_connection']
+        ):
+            return
+        discarded.append(kwargs)
+        process = worker.process
+        connection = worker.connection
+        worker.process = None
+        worker.connection = None
+        process.alive = False
+        process.exitcode = -9
+        connection.closed = True
+        for reader in readers:
+            reader.alive = False
+
+    def make_reader(*, target, name, daemon):
+        run_target, caller_late = reader_plans[len(readers)]
+        reader = _DeadlineRaceReader(
+            target,
+            clock,
+            1.0,
+            run_target=run_target,
+            caller_late=caller_late,
+        )
+        readers.append(reader)
+        return reader
+
+    monkeypatch.setattr(
+        engine_pool_module.multiprocessing,
+        'get_context',
+        lambda _method: context,
+    )
+    monkeypatch.setattr(worker, '_discard_current', discard_current)
+    monkeypatch.setattr(engine_pool_module, 'time', SimpleNamespace(
+        monotonic=clock.monotonic,
+    ))
+    monkeypatch.setattr(engine_pool_module, 'threading', SimpleNamespace(
+        Event=lambda: _DeadlineRaceEvent(clock),
+        Lock=threading.Lock,
+        Thread=make_reader,
+    ))
+    return worker, clock, discarded, processes, connections
+
+
 def _deadline_race_worker(
     monkeypatch,
     *,
@@ -556,6 +648,86 @@ def test_partial_reply_keeps_original_deadline_after_pipe_readiness(monkeypatch)
     assert clock.now == pytest.approx(1.0)
     assert sum(clock.waits) == pytest.approx(0.05)
     assert len(discarded) == 1
+
+
+def test_start_partial_handshake_frame_times_out_reaps_and_restarts(monkeypatch):
+    worker, clock, discarded, processes, connections = (
+        _deadline_race_start_worker(
+            monkeypatch,
+            [
+                {
+                    'ready_at': 0.1,
+                    'completed_at': None,
+                    'response': RuntimeError('partial handshake frame'),
+                },
+                {
+                    'ready_at': 1.0,
+                    'completed_at': 1.9,
+                    'response': ('ready', 'restarted-ready'),
+                },
+            ],
+            [(False, False), (True, False)],
+        )
+    )
+
+    with pytest.raises(EngineWorkerTimeout) as caught:
+        worker.start()
+
+    assert caught.value.phase == 'initialization'
+    assert caught.value.timeout_s == pytest.approx(1.0)
+    assert clock.now == pytest.approx(1.0)
+    assert len(discarded) == 1
+    assert processes[0].exitcode == -9
+    assert not processes[0].is_alive()
+    assert connections[0].closed
+    assert worker.process is None
+
+    assert worker.start() == 'restarted-ready'
+    assert worker.start_count == 1
+    assert worker.process is processes[1]
+    worker.close()
+
+
+def test_published_handshake_outcome_wins_over_late_caller(monkeypatch):
+    worker, clock, discarded, _processes, _connections = (
+        _deadline_race_start_worker(
+            monkeypatch,
+            [{
+                'ready_at': 0.9,
+                'completed_at': 1.0,
+                'response': ('ready', 'on-time-ready'),
+            }],
+            [(True, True)],
+        )
+    )
+
+    assert worker.start() == 'on-time-ready'
+    assert worker.start_count == 1
+    assert discarded == []
+    assert clock.now > 1.0
+    worker.close()
+
+
+def test_start_handshake_eof_is_engine_worker_died(monkeypatch):
+    worker, _clock, discarded, processes, _connections = (
+        _deadline_race_start_worker(
+            monkeypatch,
+            [{
+                'ready_at': 0.1,
+                'completed_at': 0.2,
+                'response': EOFError('handshake eof'),
+            }],
+            [(True, False)],
+        )
+    )
+
+    with pytest.raises(EngineWorkerDied) as caught:
+        worker.start()
+
+    assert caught.value.phase == 'start'
+    assert isinstance(caught.value.__cause__, EOFError)
+    assert len(discarded) == 1
+    assert processes[0].exitcode == -9
 
 
 def test_remote_error_discards_tainted_slot_before_next_call():
