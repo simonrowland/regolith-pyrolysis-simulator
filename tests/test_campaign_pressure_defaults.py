@@ -80,21 +80,55 @@ def _n2_lab_schedule() -> dict:
         (CampaignPhase.C4, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
         (CampaignPhase.C5, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
         (CampaignPhase.C6, 0.2, 0.2, Atmosphere.CONTROLLED_O2),
+        (
+            CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            0.0,
+            0.05,
+            Atmosphere.HARD_VACUUM,
+        ),
         (CampaignPhase.MRE_BASELINE, 50.0, 50.0, Atmosphere.O2_BACKPRESSURE),
     ],
 )
-def test_configure_campaign_pressure_defaults_match_legacy_constants(
+def test_configure_campaign_pressure_defaults_remain_pinned_to_yaml(
     campaign: CampaignPhase,
     pO2_mbar: float,
     p_total_mbar: float,
     atmosphere: Atmosphere,
 ):
     melt = MeltState()
-    CampaignManager(_setpoints()).configure_campaign(melt, campaign)
+    manager = CampaignManager(_setpoints())
+    manager.configure_campaign(melt, campaign)
+    config = manager._campaign_config(campaign)
 
     assert melt.pO2_mbar == pytest.approx(pO2_mbar)
     assert melt.p_total_mbar == pytest.approx(p_total_mbar)
     assert melt.atmosphere is atmosphere
+    assert config["pO2_mbar_default"] == pytest.approx(pO2_mbar)
+    assert config["p_total_mbar_default"] == pytest.approx(p_total_mbar)
+
+
+@pytest.mark.parametrize(
+    ("campaign", "hold_temperature_C"),
+    [
+        (CampaignPhase.C6, 1400.0),
+        (CampaignPhase.C7_CA_ALUMINOTHERMIC, 1200.0),
+    ],
+)
+def test_c6_c7_default_hold_targets_remain_pinned_to_yaml(
+    campaign: CampaignPhase,
+    hold_temperature_C: float,
+) -> None:
+    manager = CampaignManager(_setpoints())
+    config = manager._campaign_config(campaign)
+
+    target, _ramp = manager.get_temp_target(
+        campaign,
+        0,
+        MeltState(campaign=campaign),
+    )
+
+    assert target == pytest.approx(hold_temperature_C)
+    assert config["default_hold_T_C"] == pytest.approx(hold_temperature_C)
 
 
 def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
