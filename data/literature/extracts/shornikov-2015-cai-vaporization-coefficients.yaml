@@ -1571,7 +1571,13 @@ species:
             paragraph: Crystalline Fe oxide
             note: The evaluation paragraph cites the experimental and thermochemical sources but prints no numeric inputs.
         method:
-          state: {tag: value, value: Evaluated on the basis of experimental data and thermochemical information}
+          state:
+            tag: value
+            value: >-
+              αvap (FeO, cr) = 1.00 ± 0.20 on the basis of experimental data
+              (Darken and Gurry, 1946) and calculations conducted in the course
+              of this study using thermochemical information from (Glushko et
+              al., 1978–1982).
           locator:
             page: 4
             pdf_page_index: 3
