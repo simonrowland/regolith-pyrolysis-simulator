@@ -4124,3 +4124,26 @@ def test_legacy_cold_mg_preserves_flagged_subthreshold_value(vapor_pressure_data
     assert notice['computed_pressure_Pa'] > 0
     assert 'metal_vapor_pressure_out_of_source_certified_range' in notice['reason']
     assert notice['authority_level'] == 'extrapolated'
+
+
+@pytest.mark.parametrize("temperature_K", [1000., 2500.])
+def test_uncompiled_oxide_fit_continues_on_both_sides_with_notice(temperature_K):
+    row = {"antoine": {"A": 10., "B": 10000., "C": 0.},
+           "valid_range_K": [1400., 2273.15]}
+    provider = BuiltinVaporPressureProvider({"metals": {}, "oxide_vapors": {"SiO": row}})
+    provider._vapour_rail_catalog = None
+    result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", temperature_K))
+    assert result.diagnostic["vapor_pressures_Pa"]["SiO"] > 0
+    notice = result.diagnostic["extrapolated_beyond_valid_range_K"]["SiO"]
+    assert notice["reason"] == "oxide_vapor_pressure_out_of_validated_range"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"temperature_K": (1400., 2273.15)}
+
+
+def test_uncompiled_oxide_continuation_keeps_invalid_coefficient_refusal():
+    row = {"antoine": {"A": 10., "B": "invalid", "C": 0.},
+           "valid_range_K": [1400., 2273.15]}
+    provider = BuiltinVaporPressureProvider({"metals": {}, "oxide_vapors": {"SiO": row}})
+    provider._vapour_rail_catalog = None
+    with pytest.raises(VaporPressureComputationError):
+        provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1000.))

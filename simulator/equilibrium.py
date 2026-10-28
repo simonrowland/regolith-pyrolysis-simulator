@@ -439,13 +439,13 @@ class EquilibriumMixin:
         activities = {}
         activity_provenance = {}
         metal_extrapolations = {}
+        oxide_vapor_extrapolations = {}
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
         antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
         # Typed notes accompany species omissions on this status='ok' path.
         from simulator.silent_zero import (
-            CATEGORY_MARK,
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
             ZeroBecause,
@@ -1429,26 +1429,17 @@ class EquilibriumMixin:
                 continue
             valid = data.get('valid_range_K', [0, 9999])
 
-            if valid[0] <= T_K <= valid[1]:
-                log_P = _antoine_log10_pressure(A, B, C, T_K)
-                P_sat = _pow10_pressure_or_raise(
-                    log_P,
-                    species=name,
-                    field="P_sat",
+            log_P = _antoine_log10_pressure(A, B, C, T_K)
+            P_sat = _pow10_pressure_or_raise(log_P, species=name, field="P_sat")
+            if not valid[0] <= T_K <= valid[1]:
+                oxide_vapor_extrapolations[name] = _vapor_pressure_temperature_extrapolation_notice(
+                    temperature_K=T_K, valid_range_K=valid,
+                    reason="out_of_domain_marked",
                 )
-            else:
-                _sz_omit(
-                    str(name),
-                    ZeroBecause.OUT_OF_DOMAIN_MARKED,
-                    field='valid_range_K',
-                    detail=(
-                        f'temperature_K={T_K!r} is outside valid_range_K '
-                        f'[{valid[0]!r}, {valid[1]!r}]; species omitted from '
-                        'vapor_pressures_Pa while status=ok'
-                    ),
-                    category=CATEGORY_MARK,
+                warnings.append(
+                    f"{name} oxide-vapor Antoine fit extrapolated beyond "
+                    f"valid_range_K {valid} at {T_K:.2f} K"
                 )
-                continue
 
             parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
@@ -1509,10 +1500,13 @@ class EquilibriumMixin:
                     field="P_sat_suppressed",
                 )
 
+            if name in oxide_vapor_extrapolations:
+                oxide_vapor_extrapolations[name]["computed_pressure_Pa"] = P_sat
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
-                    'builtin_authoritative',
+                    ('builtin_extrapolation_limited'
+                     if name in oxide_vapor_extrapolations else 'builtin_authoritative'),
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
@@ -1539,7 +1533,7 @@ class EquilibriumMixin:
                 'component_basis': 'raoultian_pure_endmember',
             },
             'activity_provenance': activity_provenance,
-            'extrapolated_beyond_valid_range_K': metal_extrapolations,
+            'extrapolated_beyond_valid_range_K': {**metal_extrapolations, **oxide_vapor_extrapolations},
             'a_FeO_calphad': feo_activity_diagnostic,
             'ellingham_authority': ellingham_authority_diagnostic(
                 ellingham_extrapolations,

@@ -4263,58 +4263,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             valid_range = _range_tuple(valid)
             if compiled_evaluator is None and valid_range is not None:
                 valid_low, valid_high = valid_range
-                if T_K < valid_low:
-                    continue
-                if T_K > valid_high:
-                    if name == "SiO":
-                        # t-838 pilot: the domain miss demotes evidence, not
-                        # the numeric source reaction. Other rails retain their
-                        # existing admission policy until separately reviewed.
-                        oxide_vapor_extrapolations[name] = (
-                            _vapor_pressure_temperature_extrapolation_notice(
-                                temperature_K=T_K,
-                                valid_range_K=(valid_low, valid_high),
-                                reason=(
-                                    "oxide_vapor_pressure_out_of_validated_range"
-                                ),
-                            )
-                        )
-                    else:
-                        extrapolation_allowed_range = _range_tuple(
-                            data.get("extrapolation_allowed_range_K")
-                        )
-                        if extrapolation_allowed_range is None:
-                            raise VaporPressureComputationError(
-                                "oxide_vapor_pressure_out_of_validated_range: "
-                                f"species={name} temperature_K={T_K:.2f} "
-                                f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
-                                "extrapolation_allowed_range_K=absent"
-                            )
-                        allowed_low, allowed_high = extrapolation_allowed_range
-                        if T_K < allowed_low or T_K > allowed_high:
-                            raise VaporPressureComputationError(
-                                "oxide_vapor_pressure_out_of_validated_range: "
-                                f"species={name} temperature_K={T_K:.2f} "
-                                f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
-                                "extrapolation_allowed_range_K="
-                                f"[{allowed_low:g}, {allowed_high:g}]"
-                            )
-                        oxide_vapor_extrapolations[name] = (
-                            _vapor_pressure_temperature_extrapolation_notice(
-                                temperature_K=T_K,
-                                valid_range_K=(valid_low, valid_high),
-                                reason=(
-                                    "oxide_vapor_pressure_out_of_validated_range"
-                                ),
-                            )
-                        )
-                        oxide_vapor_extrapolations[name][
-                            "extrapolation_allowed_range_K"
-                        ] = (allowed_low, allowed_high)
+                if T_K < valid_low or T_K > valid_high:
+                    oxide_vapor_extrapolations[name] = _vapor_pressure_temperature_extrapolation_notice(
+                        temperature_K=T_K, valid_range_K=(valid_low, valid_high),
+                        reason="oxide_vapor_pressure_out_of_validated_range",
+                    )
                     warnings.append(
                         f"{name} oxide-vapor Antoine fit extrapolated beyond "
-                        f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                        f"{T_K:.2f} K"
+                        f"valid_range_K [{valid_low:g}, {valid_high:g}] at {T_K:.2f} K"
                     )
             if compiled_evaluator is not None:
                 assert compiled_species is not None
