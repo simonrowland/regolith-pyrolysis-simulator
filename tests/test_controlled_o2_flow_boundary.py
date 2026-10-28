@@ -136,3 +136,34 @@ def test_disabled_runtime_policy_stays_on_no_equipment_path():
     )
     assert math.isfinite(flow.saturation)
     assert flow.binding_cause == "controlled_o2_no_equipment"
+
+
+def test_reductant_flash_carries_transport_domain_notice():
+    """b-832: the 113 kg/h C3_NA flash exceeds the 3.9 kg/h pipe."""
+    model = OverheadGasModel()
+    melt = SimpleNamespace(
+        atmosphere=Atmosphere.CONTROLLED_O2,
+        p_total_mbar=0.2,
+        temperature_C=1150.0,
+    )
+    flux = _flux({"Na": 113.0})
+    flow = controlled_flow_capacity(
+        pipe_capacity_kg_hr=3.9,
+        equipment_capacity_kg_hr=None,
+        equipment_capacity_required=False,
+        evolved_flux_kg_hr=flux.total_kg_hr,
+        upstream_pressure_bar=0.0002,
+    )
+    state = model.estimate_transport_state(
+        flux, melt, effective_transport_capacity=flow,
+    )
+
+    assert flow.swallowed_flux_kg_hr == pytest.approx(3.9)
+    assert state["pipe_capacity_used_pct"] > 2800.0
+    notice = state.get("transport_overload_notice")
+    assert notice is not None, "overloaded pipe silently retains the reductant flash"
+    assert notice["overload_ratio"] == pytest.approx(flow.saturation)
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"]
+    assert notice["regime"]
+    assert notice["certified_band"]
