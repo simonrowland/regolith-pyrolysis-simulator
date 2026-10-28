@@ -1,0 +1,43 @@
+source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+tables:
+  '1':
+    page: 3
+    printed_rows: 24
+    columns:
+      '1': compound
+      '2': quoted_attributed heat capacity from references [28-30], with printed uncertainty
+      '3': Neumann-Kopp estimate using reference [18]; context only
+      '4': printed deviation; context only
+      '5': this-work regression heat capacity; context only
+      '6': printed deviation; context only
+  '2':
+    page: 4
+    printed_rows: 24
+    columns:
+      '1': compound
+      '2': quoted_attributed formation enthalpy from references [28-30], with printed uncertainty where present
+      '3': Zhuang estimate using reference [21]; context only
+      '4': printed deviation; context only
+      '5': this-work regression formation enthalpy; context only
+      '6': printed deviation; context only
+  '3':
+    page: 6
+    printed_rows: 16
+    columns:
+      '1': compound
+      '2': model-calculated standard entropy at 298.15 K; context only
+      '3': model-calculated standard formation enthalpy at 298.15 K; context only
+      '4': model-calculated standard heat capacity at 298.15 K; context only
+      '5': model-calculated standard formation Gibbs energy at 298.15 K; context only
+  '4':
+    page: 6
+    printed_rows: 2
+    columns:
+      '1': compound
+      '2': source-attributed reference formation enthalpy with uncertainty
+      '3': this-work regression formation enthalpy; context only
+      '4': printed deviation; context only
+evidence_policy:
+  - Reference-data columns are quoted_attributed; citations are retained as printed.
+  - Calculated, fitted, and deviation cells are retained in species context and are not admitted as experimental observations.
+  - Table 2 em-dash reference cells for Li2GeO3, Na2GeO3, and K2GeO3 are not numeric observations.
