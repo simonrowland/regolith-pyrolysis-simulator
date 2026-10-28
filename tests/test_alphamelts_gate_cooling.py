@@ -11,6 +11,9 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.alphamelts import (
+    _alphamelts_backend_failure_error, ALPHAMELTS_REASON_CALC_MODE_MISMATCH,
+)
 from simulator.melt_backend.liquidus import EquilibriumCrystallizationPathResult
 from simulator.chemistry.kernel import IntentResult
 from simulator.accounting.formulas import resolve_species_formula
@@ -67,6 +70,25 @@ def test_cooling_row_requires_system_and_finite_phase_thermodynamics():
         backend._parse_gate_cooling_row(system, phases, temperature_C=950, pressure_bar=1, fO2_log=-2)
 
 
+def test_cooling_row_rejects_an_adjacent_printed_fo2_value():
+    system, phases = _tables(950, 0, liquid=False)
+    system = system.replace('10 -2\n', '10 -2.001\n')
+    with pytest.raises(ValueError, match='fO2'):
+        AlphaMELTSBackend()._parse_gate_cooling_row(
+            system, phases, temperature_C=950, pressure_bar=1, fO2_log=-2,
+        )
+
+
+@pytest.mark.parametrize('reason', [
+    'missing_input', 'invalid_input', 'invalid_fo2_log',
+    'invalid_pressure_bar', 'non_finite_composition',
+])
+def test_terminal_input_outcome_pin_before_owner_reuse(reason):
+    from simulator.reduced_real_determinism import gate_curve_provider_outcome_for_status
+
+    assert gate_curve_provider_outcome_for_status('ok', {'reason': reason}).value == 'failed'
+
+
 def test_exit_zero_without_rows_is_a_failed_provider(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
@@ -83,15 +105,25 @@ def test_exit_zero_without_rows_is_a_failed_provider(monkeypatch):
     assert not result.liquid_fraction_path
 
 
-def test_subprocess_gate_uses_reference_pressure():
+@pytest.mark.parametrize('contract_failure', [False, True])
+def test_subprocess_gate_uses_reference_pressure(contract_failure):
     calls = []
+
+    def cooling_path(**kw):
+        calls.append(kw)
+        if contract_failure:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_CALC_MODE_MISMATCH, 'injected ambient mode mismatch',
+            )
+        return EquilibriumCrystallizationPathResult(
+            status='not_converged', diagnostics={'reason': 'incomplete_cooling_path'},
+            warnings=('stopped at 1170 C',),
+        )
+
     backend = SimpleNamespace(
         _mode='subprocess', is_available=lambda: True,
         get_engine_version=lambda: 'test',
-        gate_cooling_path=lambda **kw: calls.append(kw) or EquilibriumCrystallizationPathResult(
-            status='not_converged', diagnostics={'reason': 'incomplete_cooling_path'},
-            warnings=('stopped at 1170 C',),
-        ),
+        gate_cooling_path=cooling_path,
     )
     request = IntentRequest(
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -103,7 +135,7 @@ def test_subprocess_gate_uses_reference_pressure():
         control_inputs={},
     )
     result = AlphaMELTSProvider(backend).dispatch(request)
-    assert result.status == 'not_converged'
+    assert result.status == ('unavailable' if contract_failure else 'not_converged')
     assert calls[0]['pressure_bar'] == 1
     assert result.diagnostic['backend_diagnostics'][
         'physical_overhead_pressure_bar'] == .009
@@ -111,6 +143,8 @@ def test_subprocess_gate_uses_reference_pressure():
         'condensed_phase_reference_pressure_bar'] == 1
     assert not result.diagnostic['liquid_fraction_path']
     assert result.diagnostic['solidus_T_C'] is None
+    if contract_failure:
+        assert result.diagnostic['backend_status_reason'] == ALPHAMELTS_REASON_CALC_MODE_MISMATCH
 
 
 @pytest.mark.parametrize('bulk,pressure', [('s-type', .009), ('c5', .05)])
@@ -139,6 +173,9 @@ def test_live_cooling_bounds_or_incomplete_refusal(bulk, pressure):
     if bulk == 's-type':
         assert result.status == 'ok', result
         assert details['solidus_bracket_C'] == [950, 960]
+        # Current native continuation output: numeric identity pin before
+        # moving boundary selection into its shared liquidus owner.
+        assert (diagnostic['solidus_T_C'], diagnostic['liquidus_T_C']) == (950.0, 1630.0)
         assert 950 <= diagnostic['solidus_T_C'] <= 960
         assert diagnostic['liquid_fraction_path'][0]['liquid_fraction'] == 0
     else:
@@ -188,13 +225,20 @@ def test_gate_order_steps_down_before_hold_or_floor(
             'solidus_T_C': 1000, 'liquidus_T_C': 1300,
             **({'gate_provider_step_down': {'realized_provider': 'alphamelts-diagnostic'}}
                if prior_good == 'alphamelts' else {}),
+            **({'alphamelts_reference_pressure': {
+                'physical_overhead_pressure_bar': .05,
+                'condensed_phase_reference_pressure_bar': 1,
+                'solidus_bracket_C': [1000, 1010],
+                'numerical_path_warning': 'original solved path warning',
+            }} if prior_good == 'alphamelts' else {}),
         })
     curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
     assert calls == ['magemin', 'alphamelts']
     notice = curve['gate_provider_step_down']
     assert notice['failed_providers'][0]['provider'] == 'magemin-shadow'
     assert 'no_convergence' in notice['failed_providers'][0]['reason']
-    assert curve['alphamelts_reference_pressure']['physical_overhead_pressure_bar'] == .009
+    if not prior_good:
+        assert curve['alphamelts_reference_pressure']['physical_overhead_pressure_bar'] == .009
     if alpha_ok:
         from simulator.reduced_real_determinism import _is_cacheable_gate_curve
 
@@ -211,6 +255,10 @@ def test_gate_order_steps_down_before_hold_or_floor(
         assert curve['gate_provider_refusal']['status'] == 'not_converged'
         if prior_good == 'alphamelts':
             assert notice['realized_provider'] == 'alphamelts-diagnostic'
+            solved = curve['alphamelts_reference_pressure']
+            assert solved['physical_overhead_pressure_bar'] == .05
+            assert solved['solidus_bracket_C'] == [1000, 1010]
+            assert solved['numerical_path_warning'] == 'original solved path warning'
 
 
 def test_magemin_success_does_not_call_alpha(
