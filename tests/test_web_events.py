@@ -4623,6 +4623,27 @@ def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
     assert serialized["pressure_mbar"] == pressure_mbar
 
 
+def test_tick_payload_exposes_transport_pressure_override():
+    sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
+    notice = {
+        "requested_pressure_bar": 0.0002,
+        "resolved_pressure_bar": 0.0010766,
+        "overload_ratio": 28.974,
+    }
+    snapshot.overhead.transport_overload_notice = notice
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="internal-analytical",
+        backend_authoritative=False,
+    )
+
+    assert payload["transport_saturation_pct"] == 0.0
+    assert payload["transport_overload_notice"] == notice
+
+
 def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
     sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
 
