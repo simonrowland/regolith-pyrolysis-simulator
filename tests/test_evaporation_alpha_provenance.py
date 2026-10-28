@@ -598,10 +598,7 @@ def test_ca_ti_alpha_ceiling_survives_grounded_report_consumer(species):
     )
 
 
-def test_default_setpoints_refuse_unmeasured_alpha_fallback():
+def test_default_setpoints_have_no_unmeasured_alpha_gate():
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
 
-    assert (
-        setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
-    )
+    assert "allow_unmeasured_alpha_fallback" not in setpoints["chemistry_kernel"]

@@ -490,12 +490,9 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
         if is_sso_scoped
         else set()
     )
-    unexpected = engaged_species - permitted
-    if unexpected:
-        raise RuntimeError(
-            "SSO-2 unmeasured-alpha fallback escaped its trace-species scope: "
-            + ", ".join(sorted(unexpected))
-        )
+    # Prediction is now unconditional for every unmeasured species. This
+    # SSO-2 notice reports its trace subset; the run records all alpha flags.
+    engaged_species.intersection_update(permitted)
     degraded = dict(
         getattr(sim, "_degraded_path_engagement_summary", lambda: {})() or {}
     )
@@ -510,7 +507,7 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
     return {
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",
-        "policy": "alpha=1.0 prototype fallback",
+        "policy": "proxy/bridge or alpha=1 upper bound",
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": sorted(permitted),
         "engaged_species": sorted(engaged_species),
