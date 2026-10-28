@@ -5,3 +5,5 @@
 Printed temperature-row count: 11. Machine-read numeric agreement was poor in the whole-report QA pre-screen, so the rendered page was checked across all rows and four stored numeric columns, including signs and row/column assignments. MinerU table p021-t08 supplied the transcription; pdftotext layout was checked against the render. No unresolved differences.
 
 Printed source annotations: S298: 53KEL/TOD, 65FUR/REI. H−H298 and S−S298: 65FUR/REI. ΔfH298: 53KRA/NEU, 51KRA/NEU. No separate Cp/ΔfG source annotation. S298=31.95 ± 0.30 cal/deg,mol and ΔfH298 uncertainty ±0.90 kcal/mol; confidence levels not stated. The S−S298 entropy increment has no exact token: `Quantity` in `simulator/battery/enums.py` (62–94) contains `S` but no increment token; `TYPE_QUANTITY`/`QUANTITY_ALIASES` in `simulator/battery/migrate.py` (435–475) has no exact mapping. The column is not mislabeled as absolute S.
+
+Jadeite remains without a polymorph token: `Polymorph` in `simulator/battery/enums.py:315-350` has no jadeite member, and `simulator/battery/migrate.py:8645-8653` has no jadeite extract alias.

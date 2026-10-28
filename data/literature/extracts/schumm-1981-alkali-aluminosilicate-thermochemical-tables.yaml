@@ -24,6 +24,8 @@ species:
         note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
         column: cp
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid nepheline as printed
       units: cal/deg-mole
       unit_as_printed: cal/deg,mol
@@ -31,7 +33,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: "Schumm prints source annotations for S298 (53KEL/TOD), H298 (53KEL/TOD), and delta_fH298 (53KRA/NEU); no separate Cp annotation is printed."
+        attribution: "Schumm prints source annotations for S298 (53KEL/TOD), H298 (53KEL/TOD), and delta_fH298 (53KRA/NEU); no separate Cp annotation is printed."
         series:
         - T_K: 298
           cp: 26.21
@@ -41,6 +43,26 @@ species:
           cp: 34.8
         - T_K: 467
           cp: 40.45
+    - observation_id: schumm81_nepheline_cp_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: cp
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid nepheline as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints source annotations for S298 (53KEL/TOD), H298 (53KEL/TOD), and delta_fH298 (53KRA/NEU); no separate Cp annotation is printed."
+        series:
         - T_K: 467
           cp: 34.11
         - T_K: 500
@@ -59,6 +81,26 @@ species:
           cp: 44.16
         - T_K: 1180
           cp: 45.43
+    - observation_id: schumm81_nepheline_cp_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: cp
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: solid nepheline as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints source annotations for S298 (53KEL/TOD), H298 (53KEL/TOD), and delta_fH298 (53KRA/NEU); no separate Cp annotation is printed."
+        series:
         - T_K: 1180
           cp: 42.67
         - T_K: 1200
@@ -78,13 +120,15 @@ species:
         note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
         column: H_minus_H298
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid nepheline as printed
       units: kcal/mol
       values:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: "Schumm prints source annotations for H298 (53KEL/TOD) and delta_fH298 (53KRA/NEU)."
+        attribution: "Schumm prints source annotations for H298 (53KEL/TOD) and delta_fH298 (53KRA/NEU)."
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -94,6 +138,25 @@ species:
           enthalpy_increment: 3.11
         - T_K: 467
           enthalpy_increment: 5.63
+    - observation_id: schumm81_nepheline_heat_content_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints source annotations for H298 (53KEL/TOD) and delta_fH298 (53KRA/NEU)."
+        series:
         - T_K: 467
           enthalpy_increment: 5.72
         - T_K: 500
@@ -112,6 +175,25 @@ species:
           enthalpy_increment: 30.49
         - T_K: 1180
           enthalpy_increment: 34.07
+    - observation_id: schumm81_nepheline_heat_content_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints source annotations for H298 (53KEL/TOD) and delta_fH298 (53KRA/NEU)."
+        series:
         - T_K: 1180
           enthalpy_increment: 34.2
         - T_K: 1200
@@ -131,6 +213,8 @@ species:
         note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
         column: delta_fH
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid nepheline as printed
       units: kcal/mol
       uncertainty:
@@ -140,7 +224,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: "Schumm prints delta_fH298 source as 53KRA/NEU."
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU."
         series:
         - T_K: 298
           delta_fH: -501.0
@@ -151,6 +235,28 @@ species:
           delta_fH: -501.82
         - T_K: 467
           delta_fH: -501.56
+    - observation_id: schumm81_nepheline_delta_fH_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±1.0 kcal/mol applies to ΔfH298 only; confidence level not stated.
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU."
+        series:
         - T_K: 467
           delta_fH: -501.48
         - T_K: 500
@@ -169,6 +275,28 @@ species:
           delta_fH: -502.18
         - T_K: 1180
           delta_fH: -501.63
+    - observation_id: schumm81_nepheline_delta_fH_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±1.0 kcal/mol applies to ΔfH298 only; confidence level not stated.
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU."
+        series:
         - T_K: 1180
           delta_fH: -501.51
         - T_K: 1200
@@ -188,13 +316,15 @@ species:
         note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
         column: delta_fG
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid nepheline as printed
       units: kcal/mol
       values:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: "Schumm prints delta_fH298 source as 53KRA/NEU; no separate delta_fG source annotation is printed."
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU; no separate delta_fG source annotation is printed."
         series:
         - T_K: 298
           delta_fG: -473.61
@@ -205,6 +335,25 @@ species:
         - T_K: 467
           phase_context_as_printed: alpha
           delta_fG: -457.86
+    - observation_id: schumm81_nepheline_delta_fG_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU; no separate delta_fG source annotation is printed."
+        series:
         - T_K: 467
           phase_context_as_printed: beta
           delta_fG: -457.86
@@ -224,6 +373,25 @@ species:
           delta_fG: -398.81
         - T_K: 1180
           delta_fG: -391.32
+    - observation_id: schumm81_nepheline_delta_fG_gamma
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      condensed_form:
+        polymorph: gamma
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: "Schumm prints delta_fH298 source as 53KRA/NEU; no separate delta_fG source annotation is printed."
+        series:
         - T_K: 1180
           delta_fG: -391.31
         - T_K: 1200
@@ -243,6 +411,8 @@ species:
         note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
         column: S298
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid nepheline as printed
       units: cal/deg-mole
       unit_as_printed: cal/deg,mol
@@ -254,7 +424,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: "S298 source: 53KEL/TOD."
+        attribution: "S298 source: 53KEL/TOD."
         series:
         - T_K: 298
           entropy: 29.7
@@ -275,7 +445,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 49.02
@@ -318,7 +488,7 @@ species:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
+        attribution: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -361,7 +531,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB.'
+        attribution: 'ΔfH298: 77HEM/ROB.'
         series:
         - T_K: 298
           delta_fH: -940.94
@@ -408,7 +578,7 @@ species:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 77HEM/ROB; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -887.57
@@ -456,7 +626,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 76OPE/HEM.'
+        attribution: 'S298: 76OPE/HEM.'
         series:
         - T_K: 298
           entropy: 49.57
@@ -469,13 +639,15 @@ species:
         note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
         column: cp
       phase: cr
+      condensed_form:
+        polymorph: high albite
       standard_state: solid high albite as printed
       units: cal/deg-mole
       values:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 48.95
@@ -514,13 +686,15 @@ species:
         note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
         column: H_minus_H298
       phase: cr
+      condensed_form:
+        polymorph: high albite
       standard_state: solid high albite as printed
       units: kcal/mol
       values:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (78HEM/KRU).'
+        attribution: 'H−H298 and S−S298: 78ROB/HEM (78HEM/KRU).'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -559,13 +733,15 @@ species:
         note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
         column: delta_fH
       phase: cr
+      condensed_form:
+        polymorph: high albite
       standard_state: solid high albite as printed
       units: kcal/mol
       values:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 68WAL, 68HOL/KLE.'
+        attribution: 'ΔfH298: 68WAL, 68HOL/KLE.'
         series:
         - T_K: 298
           delta_fH: -938.31
@@ -608,13 +784,15 @@ species:
         note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
         column: delta_fG
       phase: cr
+      condensed_form:
+        polymorph: high albite
       standard_state: solid high albite as printed
       units: kcal/mol
       values:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 68WAL, 68HOL/KLE; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 68WAL, 68HOL/KLE; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -886.29
@@ -653,6 +831,8 @@ species:
         note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
         column: S298
       phase: cr
+      condensed_form:
+        polymorph: high albite
       standard_state: solid high albite as printed
       units: cal/deg-mole
       unit_as_printed: cal/deg,mol
@@ -664,7 +844,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 78ROB/HEM.'
+        attribution: 'S298: 78ROB/HEM.'
         series:
         - T_K: 298
           entropy: 54.11
@@ -685,7 +865,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 38.16
@@ -735,7 +915,7 @@ species:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 65FUR/REI.'
+        attribution: 'H−H298 and S−S298: 65FUR/REI.'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -785,7 +965,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 53KRA/NEU, 51KRA/NEU.'
+        attribution: 'ΔfH298: 53KRA/NEU, 51KRA/NEU.'
         series:
         - T_K: 298
           delta_fH: -724.8
@@ -839,7 +1019,7 @@ species:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 53KRA/NEU, 51KRA/NEU; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 53KRA/NEU, 51KRA/NEU; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -682.13
@@ -894,7 +1074,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 53KEL/TOD, 65FUR/REI.'
+        attribution: 'S298: 53KEL/TOD, 65FUR/REI.'
         series:
         - T_K: 298
           entropy: 31.95
@@ -909,13 +1089,15 @@ species:
         note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
         column: cp
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid kaliophilite as printed
       units: cal/deg-mole
       values:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 28.63
@@ -941,6 +1123,25 @@ species:
         - T_K: 810
           cp: 42.68
           printed_row_index: 10
+    - observation_id: schumm81_kaliophilite_cp_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: cp
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid kaliophilite as printed
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: No separate Cp source annotation is printed.
+        series:
         - T_K: 810
           cp: 42.5
           printed_row_index: 11
@@ -983,13 +1184,15 @@ species:
         note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
         column: H_minus_H298
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid kaliophilite as printed
       units: kcal/mol
       values:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 68PAN.'
+        attribution: 'H−H298 and S−S298: 68PAN.'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -1015,6 +1218,25 @@ species:
         - T_K: 810
           enthalpy_increment: 18.86
           printed_row_index: 10
+    - observation_id: schumm81_kaliophilite_H_minus_H298_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'H−H298 and S−S298: 68PAN.'
+        series:
         - T_K: 810
           enthalpy_increment: 19.03
           printed_row_index: 11
@@ -1057,13 +1279,15 @@ species:
         note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
         column: delta_fH
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid kaliophilite as printed
       units: kcal/mol
       values:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 66BAR/ADA.'
+        attribution: 'ΔfH298: 66BAR/ADA.'
         series:
         - T_K: 298
           delta_fH: -506.4
@@ -1090,6 +1314,28 @@ species:
         - T_K: 810
           delta_fH: -505.82
           printed_row_index: 10
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±0.50 kcal/mol applies to the 298 K formation enthalpy anchor only; confidence level not stated.
+    - observation_id: schumm81_kaliophilite_delta_fH_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'ΔfH298: 66BAR/ADA.'
+        series:
         - T_K: 810
           delta_fH: -505.65
           printed_row_index: 11
@@ -1135,13 +1381,15 @@ species:
         note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
         column: delta_fG
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid kaliophilite as printed
       units: kcal/mol
       values:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 66BAR/ADA; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 66BAR/ADA; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -478.71
@@ -1167,6 +1415,25 @@ species:
         - T_K: 810
           delta_fG: -430.44
           printed_row_index: 10
+    - observation_id: schumm81_kaliophilite_delta_fG_beta
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      condensed_form:
+        polymorph: beta
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        attribution: 'ΔfH298: 66BAR/ADA; no separate ΔfG source annotation is printed.'
+        series:
         - T_K: 810
           delta_fG: -430.44
           printed_row_index: 11
@@ -1209,6 +1476,8 @@ species:
         note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
         column: S298
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: solid kaliophilite as printed
       units: cal/deg-mole
       unit_as_printed: cal/deg,mol
@@ -1220,7 +1489,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 53KEL/TOD.'
+        attribution: 'S298: 53KEL/TOD.'
         series:
         - T_K: 298
           entropy: 31.85
@@ -1241,7 +1510,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 39.24
@@ -1321,7 +1590,7 @@ species:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 68PAN.'
+        attribution: 'H−H298 and S−S298: 68PAN.'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -1401,7 +1670,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH source: 66BAR/ADA.'
+        attribution: 'ΔfH source: 66BAR/ADA.'
         series:
         - T_K: 298
           delta_fH: -720.4
@@ -1485,7 +1754,7 @@ species:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH source: 66BAR/ADA; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH source: 66BAR/ADA; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -681.53
@@ -1570,7 +1839,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 53KEL/TOD, 78ROB/HEM.'
+        attribution: 'S298: 53KEL/TOD, 78ROB/HEM.'
         series:
         - T_K: 298
           entropy: 47.85
@@ -1591,7 +1860,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 48.37
@@ -1647,7 +1916,7 @@ species:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
+        attribution: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -1703,7 +1972,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 71WAL/ROB.'
+        attribution: 'ΔfH298: 71WAL/ROB.'
         series:
         - T_K: 298
           delta_fH: -948.3
@@ -1763,7 +2032,7 @@ species:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 71WAL/ROB; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 71WAL/ROB; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -894.47
@@ -1824,7 +2093,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 76OPE/HEM.'
+        attribution: 'S298: 76OPE/HEM.'
         series:
         - T_K: 298
           entropy: 51.2
@@ -1843,7 +2112,7 @@ species:
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: No separate Cp source annotation is printed.
+        attribution: No separate Cp source annotation is printed.
         series:
         - T_K: 298
           cp: 48.88
@@ -1902,7 +2171,7 @@ species:
         quantity: H_minus_H298
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
+        attribution: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
         series:
         - T_K: 298
           enthalpy_increment: 0.0
@@ -1961,7 +2230,7 @@ species:
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB.'
+        attribution: 'ΔfH298: 77HEM/ROB.'
         series:
         - T_K: 298
           delta_fH: -946.4
@@ -2024,7 +2293,7 @@ species:
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB; no separate ΔfG source annotation is printed.'
+        attribution: 'ΔfH298: 77HEM/ROB; no separate ΔfG source annotation is printed.'
         series:
         - T_K: 298
           delta_fG: -893.9
@@ -2088,7 +2357,7 @@ species:
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
-        primary_sources_as_printed: 'S298: 76OPE/HEM.'
+        attribution: 'S298: 76OPE/HEM.'
         series:
         - T_K: 298
           entropy: 55.67
