@@ -1334,6 +1334,12 @@ class JANAFFusionEnergy:
         object.__setattr__(self, "sigma_delta_g_fus_kJ_per_mol", sigma)
 
 _FUSION_TABLES = {
+    "FeO": ("Fe-018", "Fe-019"),
+    "Cr2O3": ("Cr-014", "Cr-015"),
+    "TiO2": ("O-043", "O-044"),
+    # O-039's Ellingham solid branch is quartz-II, whereas battery SiO2
+    # defaults to high cristobalite. These are distinct phase references.
+    "SiO2(II)": ("O-037", "O-038"),
     "CaO": ("Ca-027", "Ca-028"),
     "Al2O3": ("Al-096", "Al-100"),
     # Mg-009 is the MgO(l) Gibbs function; like Al-100 and Ca-028, its
@@ -1347,6 +1353,13 @@ _FUSION_TABLES = {
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
+    "Cr-014": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    "Fe-018": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
+    "Fe-019": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
+    "O-043": "d231eea23e8ba366462064cece26816dd7bbf837eddc77d98a1af859f811bbf1",
+    "O-044": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
+    "O-037": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
     "Al-096": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "Al-097": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "Al-098": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
@@ -1361,6 +1374,11 @@ _FUSION_NODE_SET_SHA256 = {
 }
 
 _ACCEPTED_MELTING_K = {
+    # Chase 1998 JANAF Cr-015/O-044/Fe-019/O-038 transition rows (K).
+    "Cr2O3": Decimal("2603"),
+    "TiO2": Decimal("2130"),
+    "FeO": Decimal("1650"),
+    "SiO2(II)": Decimal("1696"),
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),

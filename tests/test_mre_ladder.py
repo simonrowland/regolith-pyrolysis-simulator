@@ -107,12 +107,12 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         0.386419,
         0.408926,
         0.804340,
-        1.118868,
+        1.059135,
         1.254731,
         1.491058,
-        1.575521,
+        1.555530,
         1.792604,
-        1.857324,
+        1.824432,
         2.208316,
     ], abs=1e-6)
     assert [entry["min_hold_hours"] for entry in sequence] == [
@@ -129,10 +129,12 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         10,
     ]
     assert sequence[1]["voltage_authority"] == "ellingham_graph"
-    assert sequence[1]["voltage_authoritative"] is True
+    assert sequence[1]["voltage_authoritative"] is False
+    assert "unresolved_standard_state" in sequence[1]["voltage_status"]
     assert sequence[5]["voltage_authority"] == "ellingham_graph"
     assert sequence[5]["voltage_authoritative"] is False
-    assert sequence[5]["voltage_status"] == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
+    assert sequence[5]["voltage_status"].startswith(mre_ladder.MRE_MN_DIAGNOSTIC_STATUS)
+    assert "unresolved_standard_state" in sequence[5]["voltage_status"]
     assert all(
         entry["voltage_authority"] == "ellingham_graph"
         for idx, entry in enumerate(sequence)
@@ -157,7 +159,7 @@ def test_unusable_mre_yaml_blocks_use_documented_fallback(setpoints):
     )
 
 
-def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
+def test_mre_voltage_reference_converts_solid_ellingham_graph_to_liquid():
     cr = mre_ladder.mre_decomposition_voltage_reference(
         "Cr2O3",
         temperature_K=1873.15,
@@ -171,8 +173,8 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     assert ti is not None
     assert cr.authority == "ellingham_graph"
     assert ti.authority == "ellingham_graph"
-    assert cr.voltage == pytest.approx(1.119, abs=0.001)
-    assert ti.voltage == pytest.approx(1.576, abs=0.001)
+    assert cr.voltage == pytest.approx(1.059, abs=0.001)
+    assert ti.voltage == pytest.approx(1.556, abs=0.001)
 
     standard_oxides = [
         "FeO",
@@ -218,9 +220,9 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
         "MgO",
         temperature_K=1873.15,
     )
-    assert al_low == pytest.approx(1.885517, abs=1e-6)
+    assert al_low == pytest.approx(1.849597, abs=1e-6)
     assert mg_low == pytest.approx(1.845957, abs=1e-6)
-    assert al_high == pytest.approx(1.857324, abs=1e-6)
+    assert al_high == pytest.approx(1.824432, abs=1e-6)
     assert mg_high == pytest.approx(1.792604, abs=1e-6)
     assert mg_high < al_high
 
@@ -236,6 +238,45 @@ def test_cr2o3_mre_voltage_includes_fusion_correction_at_1500_c():
     assert ref.voltage == pytest.approx(ref.raw_graph_voltage_V - 0.067, abs=0.001)
 
 
+@pytest.mark.parametrize(
+    ("oxide", "drop_V"),
+    [
+        ("FeO", 0.013129620),
+        ("Cr2O3", 0.089830409),
+        ("Al2O3", 0.052968901),
+        ("TiO2", 0.047013177),
+        ("SiO2", 0.002357829),
+    ],
+)
+def test_mre_liquid_standard_correction_and_metastable_notice(oxide, drop_V):
+    # Independent JANAF table-pair sweep at 1473.15 K, b848-build.md:
+    # Fe-018/019, Cr-014/015, Al-096/100, O-043/044, O-037/038.
+    ref = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=1473.15)
+    assert ref.raw_graph_voltage_V - ref.voltage == pytest.approx(drop_V, abs=1e-9)
+    assert ref.authoritative is False
+    assert "metastable_liquid_standard" in ref.status
+    assert "authority_level=extrapolated" in ref.status
+    assert "certified_band_K=[" in ref.status
+    # The source-frame voltage is provenance; the gate shares liquid E0.
+    assert mre_ladder._mre_raw_graph_requirement(ref, ref.voltage) == ref.voltage
+
+
+@pytest.mark.parametrize("oxide", ["FeO", "SiO2"])
+def test_already_liquid_mre_segments_need_no_fusion_correction(oxide):
+    ref = mre_ladder.mre_decomposition_voltage_reference(oxide, temperature_K=1873.15)
+    assert ref.voltage == ref.raw_graph_voltage_V
+    assert ref.status == "ok"
+
+
+def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
+    def missing(*_args):
+        raise ValueError("Cr-015: JANAF table values are missing")
+
+    monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
+    with pytest.raises(ValueError, match="Cr-015"):
+        mre_ladder.mre_decomposition_voltage_reference("Cr2O3", temperature_K=1773.15)
+
+
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
     ref = mre_ladder.mre_decomposition_voltage_reference(
         "MgO",
@@ -244,7 +285,8 @@ def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
 
     assert ref is not None
     assert ref.authority == "ellingham_graph"
-    assert ref.authoritative is True
+    assert ref.authoritative is False
+    assert "unresolved_standard_state" in ref.status
     assert ref.voltage == pytest.approx(1.81928, abs=1e-5)
     assert ref.metal_product_phase == "gas"
     assert "Mg(g)" in str(ref.ellingham_phase_basis)
@@ -259,7 +301,8 @@ def test_mn_graph_voltage_is_diagnostic_for_mre_consumption():
     assert ref is not None
     assert ref.authority == "ellingham_graph"
     assert ref.authoritative is False
-    assert ref.status == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
+    assert ref.status.startswith(mre_ladder.MRE_MN_DIAGNOSTIC_STATUS)
+    assert "unresolved_standard_state" in ref.status
 
 
 def test_nio_mre_voltage_uses_phase_correct_graph_row():
@@ -268,8 +311,8 @@ def test_nio_mre_voltage_uses_phase_correct_graph_row():
     assert ref is not None
     assert ref.voltage == pytest.approx(0.386419, abs=1e-6)
     assert ref.authority == "ellingham_graph"
-    assert ref.authoritative is True
-    assert ref.status == "ok"
+    assert ref.authoritative is False
+    assert "unresolved_standard_state" in ref.status
     assert "Ni(l)" in str(ref.ellingham_phase_basis)
 
 
@@ -293,7 +336,8 @@ def test_graph_mre_voltage_refuses_extrapolated_or_nonphysical_authority(
     assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
     assert ref.authority == "ellingham_fallback"
     assert ref.authoritative is False
-    assert ref.status == status
+    assert ref.status.startswith(status)
+    assert "static_fallback_oxide_phase_unstated" in ref.status
     if temperature_K == 500.0:
         assert ref.raw_graph_voltage_V is not None
         assert ref.raw_graph_voltage_V > ref.voltage
@@ -323,7 +367,8 @@ def test_graph_mre_voltage_refuses_nonfinite_delta_g(monkeypatch):
     assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
     assert ref.authority == "ellingham_fallback"
     assert ref.authoritative is False
-    assert ref.status == "ellingham_nonfinite_refused:delta_g"
+    assert ref.status.startswith("ellingham_nonfinite_refused:delta_g")
+    assert "static_fallback_oxide_phase_unstated" in ref.status
 
 
 def test_published_ladder_former_copy_sites_resolve_from_single_source():
@@ -389,7 +434,7 @@ def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():
     assert _species_names(sequence)[:3] == ["K2O", "NiO", "Na2O"]
     assert _species_names(sequence)[6:8] == ["SiO2", "TiO2"]
     assert sequence[6]["voltage"] == pytest.approx(1.491058, abs=1e-6)
-    assert sequence[7]["voltage"] == pytest.approx(1.575521, abs=1e-6)
+    assert sequence[7]["voltage"] == pytest.approx(1.555530, abs=1e-6)
 
 
 def test_max_voltage_for_target_uses_ladder_ground_truth():
@@ -400,7 +445,7 @@ def test_max_voltage_for_target_uses_ladder_ground_truth():
         abs=1e-6,
     )
     assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(
-        1.575521,
+        1.555530,
         abs=1e-6,
     )
     assert mre_ladder.max_voltage_for_target("CaO", sequence) == pytest.approx(
@@ -586,7 +631,8 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     class FakeSegment:
         def __init__(self, species: str):
             self.species = species
-            self.phase_basis = f"{species}(l) + O2 -> oxide; test"
+            oxide = {"Fe": "FeO", "Cr": "Cr2O3", "Si": "SiO2"}.get(species, species)
+            self.phase_basis = f"{species}(l) + O2 -> {oxide}(l); test"
 
         def delta_g_kJ_per_mol_O2(self, temperature_K: float) -> float:
             return fake_delta_g(self.species, temperature_K)
@@ -772,9 +818,10 @@ def test_c5_ladder_summary_records_non_authoritative_voltage_fallback():
     assert feo["voltage_authoritative"] is False
     assert non_authoritative["authoritative"] is False
     assert non_authoritative["authority"] == "ellingham_fallback"
-    assert non_authoritative["status"] == (
+    assert non_authoritative["status"].startswith(
         "ellingham_fallback:ellingham_nonpositive_refused:voltage"
     )
+    assert "static_fallback_oxide_phase_unstated" in non_authoritative["status"]
 
 
 def test_c5_disabled_keeps_ellingham_ladder_diagnostic_empty_in_snapshot():
