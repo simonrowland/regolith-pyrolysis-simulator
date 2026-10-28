@@ -117,7 +117,7 @@ MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
 MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
-MRE_DECOMP_VOLTAGE_PROVENANCE = {
+_MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
         "standard_voltage_V": DECOMP_VOLTAGES["NiO"],
         "electrons_per_formula": 2,
@@ -219,36 +219,42 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
     },
 }
 
-for _oxide, _row in MRE_DECOMP_VOLTAGE_PROVENANCE.items():
-    _reference = mre_decomposition_voltage_reference(_oxide)
-    if _reference is None:
-        continue
-    _row["standard_voltage_V"] = _reference.voltage
-    _row["standard_voltage_temperature_K"] = _reference.temperature_K
-    _row["standard_voltage_authority"] = _reference.authority
-    _row["standard_voltage_authoritative"] = _reference.authoritative
-    _row["standard_voltage_status"] = _reference.status
-    _row["ellingham_species"] = _reference.ellingham_species
-    _row["delta_gf_kJ_per_mol_formula"] = (
-        -_reference.voltage
-        * float(_row["electrons_per_formula"])
-        * FARADAY
-        / 1000.0
-    )
-    if _reference.authoritative:
-        _row["status"] = "authoritative_ellingham_graph"
-        _row["delta_g_kJ_per_mol_O2"] = (
-            -_reference.voltage * 4.0 * FARADAY / 1000.0
+def __getattr__(name: str):
+    # Preserve the reference sidecar API without reading JANAF at import.
+    if name != "MRE_DECOMP_VOLTAGE_PROVENANCE":
+        raise AttributeError(name)
+    rows = {oxide: dict(row) for oxide, row in _MRE_DECOMP_VOLTAGE_PROVENANCE.items()}
+    for _oxide, _row in rows.items():
+        _reference = mre_decomposition_voltage_reference(_oxide)
+        if _reference is None:
+            continue
+        _row["standard_voltage_V"] = _reference.voltage
+        _row["standard_voltage_temperature_K"] = _reference.temperature_K
+        _row["standard_voltage_authority"] = _reference.authority
+        _row["standard_voltage_authoritative"] = _reference.authoritative
+        _row["standard_voltage_status"] = _reference.status
+        _row["ellingham_species"] = _reference.ellingham_species
+        _row["delta_gf_kJ_per_mol_formula"] = (
+            -_reference.voltage
+            * float(_row["electrons_per_formula"])
+            * FARADAY
+            / 1000.0
         )
-        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
-    elif _reference.authority == "ellingham_graph":
-        _row["status"] = "diagnostic_ellingham_graph"
-        _row["delta_g_kJ_per_mol_O2"] = (
-            -_reference.voltage * 4.0 * FARADAY / 1000.0
-        )
-        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
-    else:
-        _row["status"] = "ellingham_fallback"
+        if _reference.authoritative:
+            _row["status"] = "authoritative_ellingham_graph"
+            _row["delta_g_kJ_per_mol_O2"] = (
+                -_reference.voltage * 4.0 * FARADAY / 1000.0
+            )
+            _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+        elif _reference.authority == "ellingham_graph":
+            _row["status"] = "diagnostic_ellingham_graph"
+            _row["delta_g_kJ_per_mol_O2"] = (
+                -_reference.voltage * 4.0 * FARADAY / 1000.0
+            )
+            _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+        else:
+            _row["status"] = "ellingham_fallback"
+    return rows
 
 
 class BuiltinElectrolysisStepProvider(ChemistryProvider):

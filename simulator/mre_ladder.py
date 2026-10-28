@@ -324,9 +324,11 @@ def _fallback_ladder(
     return tuple(entries)
 
 
-MRE_VOLTAGE_LADDER_FALLBACK = _fallback_ladder(
-    temperature_K=MRE_REFERENCE_TEMPERATURE_K,
-)
+def __getattr__(name: str):
+    # The compatibility export is evaluated only when requested, never at import.
+    if name == "MRE_VOLTAGE_LADDER_FALLBACK":
+        return _fallback_ladder(temperature_K=MRE_REFERENCE_TEMPERATURE_K)
+    raise AttributeError(name)
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
 C5_LIMITED_MRE_CURRENT_A = 1000.0

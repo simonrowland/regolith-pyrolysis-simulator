@@ -997,7 +997,7 @@ class ExtractionMixin:
         a sorted list of ``{voltage, species, min_hold_hours}`` dicts,
         or an empty list if YAML is missing / malformed / empty after
         filtering. The caller falls back to
-        ``_MRE_VOLTAGE_LADDER_FALLBACK`` on empty.
+        ``mre_ladder.build_mre_voltage_sequence`` on empty.
 
         Parsing is conservative — any individual unparseable entry is
         skipped rather than crashing the whole sequence. Defensive
@@ -1015,22 +1015,6 @@ class ExtractionMixin:
         return mre_ladder.coerce_mre_decomposition_voltage(value)
 
     # 0.5.4.1 B5 (CW1 historical-audit closure, 2026-05-28):
-    # canonical FALLBACK ladder used by ``_build_mre_voltage_sequence``
-    # when ``setpoints['mre_voltage_sequence']['sequence']`` is missing
-    # or unparseable. Pre-B5 this list was inline and the YAML
-    # ``data/setpoints.yaml § mre_voltage_sequence.sequence`` block
-    # documented the same data but was never read — operators
-    # tweaking the YAML saw zero effect. B5 wires the YAML through,
-    # so this alias is now the canonical runtime fallback, NOT an
-    # independent golden or ground-truth data source.
-    _MRE_VOLTAGE_LADDER_FALLBACK = mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK
-
-    # Default ``min_hold_hours`` per species used when YAML doesn't
-    # carry an explicit value. Sourced from the same fallback ladder
-    # above (so YAML-without-hours behaves identically to the fallback
-    # for those species). For species the YAML adds but the fallback
-    # doesn't cover (e.g., Na2O / K2O in the published YAML), the
-    # default below applies.
     _MRE_DEFAULT_MIN_HOLD_HOURS = mre_ladder.MRE_DEFAULT_MIN_HOLD_HOURS
 
     def _build_mre_voltage_sequence(self) -> list:
@@ -1042,7 +1026,7 @@ class ExtractionMixin:
 
         - If the YAML block is present and at least one entry parses
           cleanly, return the YAML-derived ladder.
-        - Otherwise fall back to ``_MRE_VOLTAGE_LADDER_FALLBACK``.
+        - Otherwise fall back to ``mre_ladder.build_mre_voltage_sequence``.
 
         YAML schema (per ``data/setpoints.yaml § mre_voltage_sequence
         .sequence``): each entry has ``species`` (single string),
