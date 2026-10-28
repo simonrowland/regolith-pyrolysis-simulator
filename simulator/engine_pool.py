@@ -322,9 +322,10 @@ class WarmEngineWorker:
         wall begins after READY, and a job timeout is reported only after the
         watchdog grace and bounded stop joins. In seconds, the caller envelope
         is call + startup + healthy-spawn slack + watchdog grace + stop joins
-        + one consumer poll tick. Default MAGEMin is 15 + 30 + 1 + 0.25 +
-        1.1 + 0.05 = 47.4 seconds. The adapter may cap this by its remaining
-        aggregate budget, which remains the stronger deadline.
+        + one consumer poll tick. With current MAGEMin guards, the caller
+        envelope is 20 + 1630 + 1 + 0.25 + 1.1 + 0.05 = 1652.4 seconds.
+        The adapter may cap this by its remaining aggregate budget, which
+        remains the stronger deadline.
         """
         call_s = float(call_timeout_s)
         startup_s = float(startup_timeout_s)

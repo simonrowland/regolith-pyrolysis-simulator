@@ -930,6 +930,9 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
     assert backend._subprocess_pool.workers[0].call_timeout_s == pytest.approx(
         MAGEMIN_WARM_CALL_TIMEOUT_S
     )
+    assert backend._subprocess_pool.workers[0].startup_timeout_s == pytest.approx(
+        MAGEMIN_WORKER_STARTUP_TIMEOUT_S
+    )
 
     projection = backend._build_db_bulk_projection({
         'SiO2': 60.0,
@@ -941,7 +944,10 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
     )
     assert submitted['result_timeout_s'] == pytest.approx(
-        47.4
+        engine_pool.WarmEngineWorker._caller_future_timeout_s(
+            MAGEMIN_WARM_CALL_TIMEOUT_S,
+            MAGEMIN_WORKER_STARTUP_TIMEOUT_S,
+        )
     )
     assert backend._call_magemin(
         projection,
