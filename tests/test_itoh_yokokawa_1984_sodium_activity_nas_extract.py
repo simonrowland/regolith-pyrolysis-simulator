@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, to_plain
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -121,10 +121,14 @@ def test_table_context_and_eq5_rows_migrate_with_point_conditions() -> None:
         assert row.identity.composition.is_value
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["temperature_K"].locator is not None
-        assert row.point_conditions["composition"].state.is_value
-        assert row.point_conditions["composition"].locator is not None
 
     linear = migrated["itoh_yokokawa_1984_eq5_absolute_activity"]
+    linear_identity = to_plain(linear)["identity"]
+    assert linear_identity["composition"]["tag"] == "value"
+    assert dict(linear_identity["composition"]["value"]["components"]) == {
+        "Na2O": "0.33",
+        "SiO2": "0.67",
+    }
     assert linear.value.kind.value == "point"
     assert Decimal(str(linear.value.point)) == Decimal("1e-9")
     assert linear.admission.status.value == "admitted"

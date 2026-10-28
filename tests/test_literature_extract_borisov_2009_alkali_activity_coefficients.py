@@ -115,23 +115,44 @@ def test_borisov_2009_isolated_migration_preserves_conditions_and_relative_refer
         if row.observation_id.rsplit("::", 1)[-1] in target_ids
     }
     assert len(migrated) == 15
+    incomplete_composition_ids = {
+        "borisov_2009_table5_csa12_na2o_activity_coefficient",
+        "borisov_2009_table5_csa18_na2o_activity_coefficient",
+        "borisov_2009_table5_csa25_na2o_activity_coefficient",
+    }
+    assert {
+        row_id for row_id, row in migrated.items()
+        if row.identity.composition.is_unknown
+    } == incomplete_composition_ids
     for row in migrated.values():
         assert row.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
         assert row.identity.temperature_K.is_value
-        assert row.identity.composition.is_value
-        assert row.identity.total_pressure_Pa.is_value
         assert row.identity.reference_state.is_unknown
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["temperature_K"].locator is not None
         assert row.point_conditions["total_pressure_Pa"].state.is_value
         assert row.point_conditions["total_pressure_Pa"].locator is not None
-        assert row.point_conditions["minus_log_fO2_as_published"].state.is_value
-        assert row.point_conditions["minus_log_fO2_as_published"].locator is not None
-        assert row.point_conditions["composition"].state.is_value
+        assert row.point_conditions["minus_log_fO2_as_printed"].state.is_value
+        assert row.point_conditions["minus_log_fO2_as_printed"].locator is not None
+        assert row.point_conditions["fO2_log"].state.is_value
+        assert row.point_conditions["fO2_log"].locator is not None
+        assert row.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+        if row.observation_id.rsplit("::", 1)[-1] in incomplete_composition_ids:
+            reason = (
+                "Table 3 prints an em dash for MgO in this sample; the melt "
+                "composition is incomplete and no oxide is reconstructed."
+            )
+            assert row.identity.composition.reason == reason
+            assert row.point_conditions["composition"].state.is_unknown
+            assert row.point_conditions["composition"].state.reason == reason
+        else:
+            assert row.identity.composition.is_value
+            assert row.point_conditions["composition"].state.is_value
         assert row.point_conditions["composition"].locator is not None
 
     first = migrated["borisov_2009_table4_darnk_36_na2o_activity_coefficient"]
     assert (
-        first.point_conditions["minus_log_fO2_as_published"].state.value
+        first.point_conditions["minus_log_fO2_as_printed"].state.value
         == Decimal("10.74")
     )
+    assert first.point_conditions["fO2_log"].state.value == Decimal("-10.74")

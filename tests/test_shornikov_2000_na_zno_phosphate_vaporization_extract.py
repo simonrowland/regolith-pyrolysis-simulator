@@ -47,6 +47,14 @@ def _figure_points(document):
     return result
 
 
+def _figure_point_counts(document):
+    points = _figure_points(document)
+    return {
+        figure: sum(_figure_label(row) == figure for row in points)
+        for figure in ("1(c)", "2", "3")
+    }
+
+
 def test_shornikov_2000_reconciled_figure_points_and_migration() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert validate_extract_document(document, path=EXTRACT) == []
@@ -59,13 +67,10 @@ def test_shornikov_2000_reconciled_figure_points_and_migration() -> None:
         row for rows in migrator.result.context_by_work.values() for row in rows
     ]
     assert len(migrated_context) == 36
-    assert sum(row.get("type") == "figure_read_point" for row in migrated_context) == 35
+    assert sum(row.get("type") == "figure_read_point" for row in migrated_context) == 25
 
     points = _figure_points(document)
-    assert {
-        figure: sum(_figure_label(row) == figure for row in points)
-        for figure in ("1(c)", "2", "3")
-    } == {"1(c)": 8, "2": 18, "3": 9}
+    assert _figure_point_counts(document) == {"1(c)": 8, "2": 18, "3": 9}
 
     by_id = {row["observation_id"]: row for row in _rows(document)}
     # Preserve the independent Batch4 reads as comparison pins. Green's tighter

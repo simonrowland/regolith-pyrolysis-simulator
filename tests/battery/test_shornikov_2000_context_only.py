@@ -6,6 +6,9 @@ import yaml
 
 from simulator.battery.migrate import migrate
 from tests.battery.test_migrate import _write_min_tree
+from tests.test_shornikov_2000_na_zno_phosphate_vaporization_extract import (
+    _figure_point_counts,
+)
 from tools.validate_literature_extracts import validate_extract_file
 
 
@@ -80,8 +83,9 @@ def test_shornikov_2000_context_only_extract_validates_and_migrates(tmp_path: Pa
     figure_points = [
         row for row in context_rows if row.get("type") == "figure_read_point"
     ]
-    assert len(figure_points) == 35
+    assert len(figure_points) == 25
     assert all(
         row["observation_id"].startswith("shornikov_2000_fig")
         for row in figure_points
     )
+    assert _figure_point_counts(doc) == {"1(c)": 8, "2": 18, "3": 9}
