@@ -644,13 +644,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1375.0,
                 ((1040.625, 0.0), (1375.0, 1.0)),
             ),
-            (
-                'C3_NA',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
-            ),
+            # t-1545: C3_NA is recorded once. The freeze-gate key quantizes
+            # cleaned-melt composition and fO2, so the Na reference changes
+            # the request sequence. The curve is the same 1040.625/1375 C
+            # projection. C0 through C2A_STAGED are unchanged.
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',

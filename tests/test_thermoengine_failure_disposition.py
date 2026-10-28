@@ -313,6 +313,7 @@ def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
                 liquid_composition_wt_pct=dict(kwargs['comp_wt']),
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=kwargs['fO2_log'],
+                solver_converged=True,
             )
 
         def close(self):
@@ -367,6 +368,7 @@ def test_gas_only_finished_assemblage_is_not_an_fo2_omission_refusal(
         activity_coefficients={'SiO2': 0.4},
         solved_fO2_log=None,
         solved_fO2_reason=None,
+        solver_converged=True,
     )
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
@@ -419,6 +421,42 @@ def test_gas_only_finished_assemblage_is_not_an_fo2_omission_refusal(
         )
 
 
+def test_thermoengine_phases_without_convergence_are_not_ok(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    backend._engine_version = 'test'
+    backend._vaporock_available = False
+
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            return ThermoEnginePayload(
+                phases_present=('liquid',),
+                phase_masses_kg={'liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(kwargs['comp_wt']),
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=False,
+            )
+
+    backend._thermoengine_transport = FakeTransport()
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *args, **kwargs: {},
+    )
+    not_ok = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'FeO': 20.0, 'SiO2': 80.0},
+        fO2_log=None,
+        pressure_bar=1.0,
+    )
+    assert not_ok.status == 'not_converged'
+    assert not_ok.diagnostics['authoritative_for_solved_conditions'] is False
+
+
 def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -438,6 +476,7 @@ def test_thermoengine_solves_intrinsic_fo2_without_an_input_or_redox_mode(
                 liquid_composition_wt_pct=dict(kwargs['comp_wt']),
                 activity_coefficients={'SiO2': 0.4},
                 solved_fO2_log=-8.25,
+                solver_converged=True,
             )
 
     backend._thermoengine_transport = FakeTransport()

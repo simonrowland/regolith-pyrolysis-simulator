@@ -394,14 +394,15 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # t-1545: activities are unchanged. Only Na, Na2, and Na2O_gas pressures
+    # move, by the Antoine shift at 2400.65 K (-0.464101 dex, dimer exactly 2x).
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "b3199e12f1162a3ae1cc010e197c7da0cb8138a8debd1337ce7b07cca7d5f478"
+    # Combined digest includes the numeric Na pressures above.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "ea0ea7be577c9d5488c63eb442fc69ee008ef47bc3686982a57d7fc70fe1e892"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -413,14 +414,15 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # t-1545: activities are unchanged. Only Na, Na2, and Na2O_gas pressures
+    # move, by the Antoine shift at 1800 K (-0.315574 dex, dimer exactly 2x).
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "9be991fe7403418797a9423e3e37d77eb8831e368d9f8e4b2782cf1a2f2643c5"
+    # Combined digest includes the numeric Na pressures above.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
+    ).hexdigest() == "724b2b90581d804de86d8b1f83aa47a9bdf04ddc1819c40a1e140d37ef54915e"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])

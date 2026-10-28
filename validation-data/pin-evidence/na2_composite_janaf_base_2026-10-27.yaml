@@ -1,0 +1,64 @@
+# Distilled pin evidence — Na2 / Na2O_gas structural unit-activity pins
+# after t-1545 re-grounded the monatomic base on NIST-JANAF liquid Na2O.
+# The 2026-08-09 L&H record stays at na2_composite_lh_base_2026-08-09.yaml.
+# This file is the live evidence ref for the catalog pins.
+schema_version: 1
+kind: vapour_rail_pin_evidence
+source_id: t1545-na-composites
+date: "2026-10-27"
+species: [Na2, Na2O_gas]
+validation: structural
+metric: unit_activity_pressure_Pa
+comparison_basis: >-
+  Unit-activity, pO2_bar=1.0 CompiledPressureEvaluator pressures for the
+  Na2 and Na2O_gas composite rows. base_reference is a byte-copy of the
+  monatomic NIST-JANAF liquid-NaO0.5 Pref (A=10.591766 / B=11697.747789 /
+  C=-125.178), valid 1400-2300 K. Not a second saturation law. The retired
+  L&H base was A=11.342243 / B=12140.316409 / C=-163.701.
+method: >-
+  Copy the landed monatomic Na JANAF Antoine onto the composite
+  base_reference_pressure_model (t-1545). The catalog has no YAML anchor
+  that inherits those coefficients. Exchange stoich remains 2 Na; activity
+  applied once via activity_exponent. Unit-activity pressures are the live
+  catalog evaluator at source_activity=1, pO2_bar=1. Monatomic authority_class
+  stays uncertified. Composite authority stays analytical_non_authoritative.
+  Gamma is not retuned.
+conditions:
+  activity: 1.0
+  pO2_bar: 1.0
+  base_reference_coefficients:
+    A: 10.591766
+    B: 11697.747789
+    C: -125.178
+  base_fit_domain_K: [1400.0, 2300.0]
+  composite_valid_domain_K: [1400.0, 1900.0]
+  marked_extrapolation: >-
+    Composite valid_domain [1400,1900] retained. That window sits inside
+    the monatomic JANAF band, so both rows evaluate the same Antoine.
+    max_base_incoherence_dex_at_2073_K is 0. 1950 K is composite-row OOR
+    only; the monatomic row is still in band there.
+pinned_unit_activity_pressures_Pa:
+  Na2:
+    "1400": 2.42979109e-04
+    "1673": 1.43478749e-01
+    "1900": 6.29129009e+00
+    "1950": 1.27076755e+01
+  Na2O_gas:
+    "1400": 2.09914979e-01
+    "1673": 1.47340501e+01
+    "1900": 1.78433459e+02
+    "1950": 2.83271624e+02
+checkable_claims:
+  - base coefficients byte-match metals_na_family Na JANAF Pref
+  - unit-activity pressures match the live catalog pins
+  - no live A=11.342243 remains as a composite base_reference
+  - monatomic authority_class stays uncertified
+  - 1950 K remains composite-row out of range
+runtime_changes:
+  - data/vapor_pressures.yaml Na2 / Na2O_gas base_reference_pressure_model
+  - data/vapour_rail_validation_pins.yaml Na2 / Na2O_gas unit_activity_probe
+publishable_companion_refs:
+  - data/vapor_pressures.yaml
+  - data/literature/extracts/nasa-cea-thermo.yaml
+  - validation-data/pin-evidence/na2_composite_lh_base_2026-08-09.yaml
+  - docs/model-limitations.md

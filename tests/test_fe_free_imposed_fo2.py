@@ -87,6 +87,7 @@ def test_fe_bearing_thermoengine_imposed_fo2_keeps_solver_request_and_activities
                 fe_redox_split={'FeO': 12.5, 'Fe2O3': 0.0},
                 solved_fO2_log=_REQUESTED_FO2_LOG,
                 solved_fO2_reason=None,
+                solver_converged=True,
             )
 
         def close(self):
@@ -339,6 +340,7 @@ def test_thermoengine_fe_free_absolute_fo2_uses_unconstrained_melt_and_printed_g
                 activity_coefficients=dict(_FE_FREE_ACTIVITIES),
                 solved_fO2_log=None,
                 solved_fO2_reason='undefined_zero_ferric_liquid',
+                solver_converged=True,
             )
 
         def close(self):

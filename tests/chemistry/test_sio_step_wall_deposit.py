@@ -230,8 +230,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 8.191796266986e-06 -> 8.191792965091e-06 kg.
     # 2026-10-15 b-894 r4: r3's O2 exchange clamp shifts melt fO2 and SiO wall flux.
     try:
+        # t-1545: Na reference pressures change the melt oxygen budget. On the
+        # unavailable-MAGEMin lunar 24 h report, Si evaporated falls 5.61e-6
+        # relative and this 1050 C Si+SiO2 deposit follows (-4.98e-6 relative,
+        # -4.08e-11 kg). Knudsen number, regime factor, alpha, and overhead
+        # pressure are unchanged, so the wall route itself did not move.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.191790844919e-06, rel=1e-9
+            8.191750021001999e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9

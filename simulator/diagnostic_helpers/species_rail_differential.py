@@ -1115,11 +1115,11 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
     """Pure-component P_sat in Pa. Melt Pref is not P_sat.
 
     Compiled Na/Mg evaluators are EQUILIBRIUM_PARTIAL_PRESSURE (NaO0.5 ⇌
-    Na(g)+¼O2 Pref, valid 1405–1600 K / Mg Pref_GF 1366–2273 K). At a=1
-    and pO2=p_ref they return Pref: Na 0.150 Pa at 1156 K (−5.82 dex vs
+    Na(g)+¼O2 Pref, valid 1400–2300 K / Mg Pref_GF 1366–2273 K). At a=1
+    and pO2=p_ref they return Pref: Na 0.194 Pa at 1156 K (−5.71 dex vs
     1 bar) and Mg 5.22e-13 Pa at 1363 K (−17.28 dex). That is the wrong
-    quantity, not a Pa/bar slip on metal P_sat (the leftover 0.82 dex on
-    Na is Pref continuation 250 K below its band; Mg is Pref_GF, not a
+    quantity, not a Pa/bar slip on metal P_sat (Na at 1156 K is Pref
+    continuation 244 K below the 1400 K floor; Mg is Pref_GF, not a
     denormal). The catalog ``pure_component_antoine`` sidecar is metal
     P_sat in Pa. Use it when present; otherwise only a compiled
     PURE_COMPONENT_SATURATION_PRESSURE evaluator; otherwise rail_row_absent.
@@ -2596,10 +2596,10 @@ def _psat_nbp_hand_computation() -> dict[str, Any]:
         ),
         "rows": rows,
         "diagnosis": (
-            "Na −5.82 dex was melt Pref (0.150 Pa, EQUILIBRIUM_PARTIAL_PRESSURE, "
-            "OOR continuation of the 1405–1600 K NaO0.5 Pref Antoine), not metal "
-            "P_sat. Treating 0.150 as bar leaves −0.82 dex: Pref at 1156 K is "
-            "not the boiling curve (250 K below its band). Mg −17.28 dex was "
+            "Na −5.71 dex was melt Pref (0.194 Pa, EQUILIBRIUM_PARTIAL_PRESSURE, "
+            "OOR continuation of the 1400–2300 K NaO0.5 Pref Antoine), not metal "
+            "P_sat. Treating 0.194 as bar leaves about −0.71 dex: Pref at 1156 K is "
+            "not the boiling curve (244 K below its band). Mg −17.28 dex was "
             "Pref_GF (5.22e-13 Pa; yaml pin at 1366 K is 6.02e-13 Pa), not a "
             "denormal and not Mg(cr). Engine is now pure_component_antoine in Pa."
         ),

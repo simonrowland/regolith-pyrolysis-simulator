@@ -807,14 +807,19 @@ def test_c0_same_step_pipe_cap_numeric_pin():
         p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
     )
 
-    assert inlet.total_kg_hr == pytest.approx(0.0009597869579047912)
+    # t-1545 at 950 C raises Na(g) by +0.054650 dex and Na2 by exactly twice
+    # that. K and the other inlet species are unchanged, so the inlet total
+    # rises with the 95.3% Na share. Poiseuille pipe mass conductance tracks
+    # the inlet mole-weighted M_avg (ratio 0.9977846910089); the cap then
+    # scales every species onto that conductance.
+    assert inlet.total_kg_hr == pytest.approx(0.001082490001530778)
     assert transport["pipe_conductance_kg_hr"] == pytest.approx(
-        0.0004385903383104627
+        0.0004376187251905914
     )
     sim._cap_c0_joint_release_to_pipe_capacity(flux)
-    assert flux.total_kg_hr == pytest.approx(0.0004385903383104627)
-    assert flux.species_kg_hr["Na"] == pytest.approx(0.0004181400259280556)
-    assert flux.species_kg_hr["K"] == pytest.approx(0.000020450135762602575)
+    assert flux.total_kg_hr == pytest.approx(0.0004376187251905914)
+    assert flux.species_kg_hr["Na"] == pytest.approx(0.0004195266769717676)
+    assert flux.species_kg_hr["K"] == pytest.approx(1.809189182469968e-05)
 
 
 def test_competing_branches_share_one_host_inventory():
