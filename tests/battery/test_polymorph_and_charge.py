@@ -471,6 +471,18 @@ def test_tridymite_is_a_closed_polymorph_token() -> None:
     assert coerce_polymorph_token("tridymite") is Polymorph.TRIDYMITE
 
 
+def test_pseudowollastonite_token_matches_thermoengine_pwo() -> None:
+    """The closed token is ThermoEngine's pWo label, not cyclowollastonite."""
+
+    from engines.alphamelts.thermoengine import _TE_PURE_PHASE_POLYMORPH
+
+    assert POLYMORPH_ALIASES["pseudowollastonite"] is Polymorph.PSEUDOWOLLASTONITE
+    assert Polymorph.PSEUDOWOLLASTONITE.value == _TE_PURE_PHASE_POLYMORPH["pWo"]
+    assert POLYMORPH_ALIASES["cyclowollastonite (pseudowollastonite)"] is (
+        Polymorph.CYCLOWOLLASTONITE
+    )
+
+
 def test_named_polymorph_tokens_require_their_mineral_formula() -> None:
     clinoenstatite = Species(
         "MgSiO3", Phase.CR, State.of(Polymorph.CLINOENSTATITE)

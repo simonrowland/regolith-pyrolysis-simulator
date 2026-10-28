@@ -5280,7 +5280,8 @@ def _phase_row_rejection(
     if token in PHASE_COMPOSITION_QUANTITIES:
         basis = str(values.get("basis") or "").strip()
         if basis not in PHASE_BASIS_TOKENS:
-            return "basis is not wt_percent or mole_fraction"
+            accepted = ", ".join(sorted(PHASE_BASIS_TOKENS))
+            return f"basis is not {accepted}"
     if token is Quantity.DISTRIBUTION_RATIO:
         counter = _phase_role_token(values.get("counter_phase_label"))
         if counter is None:
@@ -6439,6 +6440,13 @@ class CompilationColumnSeries:
     raw_tokens: tuple[str | None, ...] = ()
     source_units: tuple[str | None, ...] = ()
     cell_uncertainties: tuple[Decimal | None, ...] = ()
+
+
+_PANKRATZ_H298_REFERENCE_K = {
+    "pankratz-1984-usbm-b677": Decimal("298.15"),
+    "pankratz-1987-usbm-b689": Decimal("298.15"),
+    "pankratz-1994-usbm-b696": Decimal("298.15"),
+}
 
 
 def _normalize_compilation_column_label(label: str) -> str:
@@ -8953,6 +8961,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "cp_150_k",
         "cp_200_k",
         "cp_298_15_k",
+        "value_kJ_mol-1_K-1",
         "value",
     ),
     Quantity.S: (
@@ -9300,6 +9309,8 @@ def _convert_compilation_amount(
             )
         ):
             return amount, "identity:J_per_mol_K"
+        if heat and token == "kjmol−1k−1casio3":
+            return amount * Decimal("1000"), "kJ_to_J_exact"
         if energy and token in {
             "kcal/mol",
             "kcal/mole",
@@ -9335,6 +9346,7 @@ def _convert_compilation_amount(
             "kj/mole",
             "kjpermol",
             "kjmol^-1",
+            "kjmol−1casio3",
         }:
             return amount, "identity:kJ_per_mol"
     return None
@@ -17192,6 +17204,43 @@ class Migrator:
         ):
             before = self._count(source_key).observations_out
             for item in exploded:
+                # A series item's own derived_from names that row's parents.
+                # The parent observation's list remains the fallback when the
+                # item does not state one. The id hash skips this key.
+                point_derived_from = derived_from
+                point_source_derivation = source_derivation
+                raw_point = item.get("item") if isinstance(item, Mapping) else None
+                if (
+                    isinstance(raw_point, Mapping)
+                    and raw_point.get("derived_from") not in (None, "")
+                ):
+                    try:
+                        item_parents, item_prose = lineage_parents_from_source(
+                            {},
+                            raw_point,
+                            source_id,
+                            local_ids,
+                            source_asset_ids,
+                        )
+                    except ValueError as exc:
+                        item_parents, item_prose = (), (str(exc),)
+                    if item_parents:
+                        point_derived_from = item_parents
+                        if source_derivation is not None:
+                            point_source_derivation = replace(
+                                source_derivation, inputs=item_parents
+                            )
+                    if item_prose:
+                        self._flag_printed_lineage(
+                            item_prose,
+                            field="derived_from",
+                            work_id=work.work_id,
+                            locator=locator,
+                            source_key=source_key,
+                            observation_id=obs_id,
+                            stored_lineage=set(point_derived_from or ()),
+                            queued=queued_prose,
+                        )
                 self._emit_exploded_point(
                     parent_id=obs_id,
                     item=item,
@@ -17206,8 +17255,8 @@ class Migrator:
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
-                    derived_from=derived_from,
-                    source_derivation=source_derivation,
+                    derived_from=point_derived_from,
+                    source_derivation=point_source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
@@ -19304,6 +19353,7 @@ class Migrator:
         evidence: Evidence,
         temperature_K: Decimal | State[Decimal] | None = None,
         standard_pressure_Pa: Decimal | None = None,
+        subtype: str | None = None,
         uncertainty: Uncertainty | None = None,
         method: State[MethodToken] | None = None,
         equipment: object = None,
@@ -19322,6 +19372,8 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.of(temperature_K)
         if standard_pressure_Pa is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
+        if subtype is not None:
+            ident_kwargs["subtype"] = State.of(subtype)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
         if reaction is not None:
@@ -20306,8 +20358,20 @@ class Migrator:
                     )
             # One observation per declared mapped series; never first-numeric-cell.
             read_from = choose_read_from(work, locator)
+            reference_temperature = _PANKRATZ_H298_REFERENCE_K.get(source_id)
             for index, series in enumerate(column_series):
                 suffix = _compilation_series_obs_suffix(series)
+                if (
+                    series.quantity is Quantity.H_MINUS_H298
+                    and reference_temperature is not None
+                ):
+                    enthalpy_subtype = _format_enthalpy_increment_subtype(
+                        reference_temperature
+                    )
+                    enthalpy_per = PerBasis.MOL_SPECIES
+                else:
+                    enthalpy_subtype = None
+                    enthalpy_per = None
                 self._generic_obs(
                     work=work,
                     source_id=source_id,
@@ -20320,6 +20384,8 @@ class Migrator:
                     evidence=evidence,
                     temperature_K=series.temperature_K,
                     standard_pressure_Pa=p_std,
+                    subtype=enthalpy_subtype,
+                    per=enthalpy_per,
                     method=State.of(MethodToken.TABULATION),
                     derivation=_compilation_conversion_derivation(
                         series.unit_trail,
