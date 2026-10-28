@@ -240,12 +240,12 @@ def _na2o_janaf_liquid_source_data() -> tuple[
 def _na2o_janaf_fit_segments() -> tuple[EllinghamFitSegment, ...]:
     liquid_points, tm, fusion_h, alpha_1300 = _na2o_janaf_liquid_source_data()
     # Chase 1998 JANAF Na-013: ΔfG(1400)=-192.041, ΔfG(1500)=-167.596
-    # kJ/mol Na2O. Keep the existing 2600 K certified ceiling. Each secant
+    # kJ/mol Na2O. Use the complete printed liquid band through 3000 K. Each secant
     # is G=H-T*S with S=(G_left-G_right)/(T_right-T_left), H=G_left+T_left*S.
     # Two Na2O form per O2, so multiply source G and fusion H by two:
     # H [kJ/mol O2], S [kJ/(K mol O2)]. Sanity: G(1500)=-335.192 exactly.
     rows = tuple(
-        (t, 2.0 * g) for t, g in liquid_points if 1400.0 <= t <= 2600.0
+        (t, 2.0 * g) for t, g in liquid_points if t >= 1400.0
     )
     liquid_segments = []
     for (left, g_left), (right, g_right) in zip(rows, rows[1:]):
@@ -999,10 +999,7 @@ def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
 ) -> float:
     """Resolve the Na standard Gibbs energy on the liquid NaO0.5 activity basis."""
 
-    T_K = float(temperature_K)
-    if not math.isfinite(T_K) or T_K <= 0.0:
-        raise ValueError("temperature_K must be finite and positive")
-
+    T_K = _finite_temperature_K(temperature_K)
     active = ellingham_segment_for_temperature("Na", T_K)
     if "Na2O(l)" in active.phase_basis:
         # The canonical Na liquid segments now interpolate JANAF and coexist

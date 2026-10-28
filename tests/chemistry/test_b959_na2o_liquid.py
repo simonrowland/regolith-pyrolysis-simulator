@@ -1,11 +1,16 @@
 """JANAF Na-013 regressions for b-959; no golden rebaselining."""
 
+import math
+
 import pytest
 
 from simulator.chemistry.ellingham_thermo import (
     _na_activity_reference_standard_delta_g_kj_per_mol_o2,
+    ELLINGHAM_OUTSIDE_SEGMENT_REASON,
+    ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_segments,
+    ellingham_same_phase_extension,
 )
 
 
@@ -24,6 +29,10 @@ from simulator.chemistry.ellingham_thermo import (
         (2000.0, -98.976),
         (2200.0, -7.772),
         (2600.0, 169.992),
+        (2700.0, 213.566),
+        (2800.0, 256.820),
+        (2900.0, 299.770),
+        (3000.0, 342.428),
     ],
 )
 def test_liquid_standard_gibbs_matches_janaf_above_melting(
@@ -67,3 +76,24 @@ def test_na2o_janaf_fusion_enthalpy_and_alpha_rows():
     assert before_1400.delta_g_kJ_per_mol_O2(1400.0) == pytest.approx(
         alpha.delta_g_kJ_per_mol_O2(1400.0), abs=1e-9
     )
+
+
+def test_na_liquid_source_endpoint_and_flagged_extension():
+    # Na-013's last printed row is 3000 K. Beyond it the prediction keeps
+    # its original reason, authority level and last certified segment band.
+    assert ellingham_authority_limit(3000, species="Na", consumer="test") is None
+    extension = ellingham_same_phase_extension("Na", 3001)
+    assert extension is not None
+    assert extension["authority"] == "extrapolated"
+    assert extension["segment_range_K"] == (2900.0, 3000.0)
+    assert extension["original_refusal_reason"] == ELLINGHAM_OUTSIDE_SEGMENT_REASON
+    assert "segment_band_K=2900-3000" in extension["notice_reason"]
+    assert math.isfinite(
+        _na_activity_reference_standard_delta_g_kj_per_mol_o2(3001)
+    )
+
+
+@pytest.mark.parametrize("temperature_K", [None, 0, -1, math.nan, math.inf])
+def test_na_liquid_reference_refuses_missing_or_invalid_temperature(temperature_K):
+    with pytest.raises((TypeError, ValueError)):
+        _na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)

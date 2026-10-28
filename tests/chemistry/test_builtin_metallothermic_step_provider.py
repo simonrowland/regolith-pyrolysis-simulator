@@ -245,7 +245,8 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
     limited = authority["extrapolated_beyond_fit_range_K"]["Na/TiO2"][
         "limited_species"
     ]
-    assert set(limited) == {"Na", "Ti"}
+    # Na-013 now grounds Na through 3000 K; Ti still ends at 2600 K.
+    assert set(limited) == {"Ti"}
 
 
 def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
@@ -698,12 +699,12 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 
 def test_reduction_margin_kj_per_mol_o2_uses_ellingham_difference():
     # Margin under the JANAF-4th multiphase Ellingham re-ground:
-    # Na/FeO @ 1150 C = +11.1 kJ/mol O2.
+    # Na-013 liquid rows put Na/FeO @ 1150 C at +12.24 kJ/mol O2.
     provider = BuiltinMetallothermicStepProvider()
 
     margin = provider._reduction_margin_kj_per_mol_o2("Na", "FeO", 1150.0)
 
-    assert margin == pytest.approx(11.1, abs=0.1)
+    assert margin == pytest.approx(12.24, abs=0.1)
 
 
 def test_crossover_temperature_C_reports_physical_roots_only():
@@ -1338,14 +1339,21 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         additives_kg={"Na": 30.0},
     )
     _prepare_stranded_staged_na_hold(sim)
+    crossover_C = BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "Na", "Fe"
+    )
+    assert crossover_C is not None
+    # Keep this synthetic window subdegree as the source-grounded root moves.
+    first_liquid_C = crossover_C - 0.3
+    liquidus_C = crossover_C - 0.1
     curve = {
         "source": "test:reviewer-subdegree-na-fe-window",
         "solidus_T_C": 1100.0,
-        "liquidus_T_C": 1181.4,
+        "liquidus_T_C": liquidus_C,
         "path": (
             (1100.0, 0.0),
-            (1181.2, 0.0),
-            (1181.4, 0.1),
+            (first_liquid_C, 0.0),
+            (liquidus_C, 0.1),
         ),
     }
     monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
@@ -1358,14 +1366,14 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         "solved boundaries plus curve sample knots"
     )
     assert diagnostic["first_positive_liquid_temperature_C"] == pytest.approx(
-        1181.2,
+        first_liquid_C,
         abs=diagnostic["boundary_tolerance_C"],
     )
     assert diagnostic["joint_window_T_min_exclusive_C"] == (
         diagnostic["first_positive_liquid_temperature_C"]
     )
     assert any(
-        row["temperature_C"] == pytest.approx(1181.4)
+        row["temperature_C"] == pytest.approx(liquidus_C)
         and row["status"] == "ok"
         for row in diagnostic["rows"]
     )
@@ -1373,7 +1381,7 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         diagnostic,
         configured_temperature_C=1250.0,
     )
-    assert 1181.2 < selected["temperature_C"] < 1181.5
+    assert first_liquid_C < selected["temperature_C"] < crossover_C
     assert selected["liquid_fraction"] > 0.0
 
 
