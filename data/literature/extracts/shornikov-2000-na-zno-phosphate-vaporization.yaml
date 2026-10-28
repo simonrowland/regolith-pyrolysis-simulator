@@ -1,0 +1,163 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2000-na-zno-phosphate-vaporization
+source:
+  citation: "Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Thermodynamic Properties and Vaporization Processes in the Na2O–ZnO–P2O5 System. Glastech. Ber. Glass Sci. Technol., 73 C2, 58–65."
+  year: 2000
+extraction:
+  method: context-only source transcription from MinerU and tesseract OCR; no numerical Na(g) pressure or flux data are printed in tables or figures
+  date: '2026-10-27'
+  worker: codex-resume-76909-1793146109
+  figure_read_candidates:
+  - candidate_id: shornikov_2000_fig1c_na2o_activity
+    figure: '1(c)'
+    page: 60
+    pdf_page_index: 2
+    rail: melt_activity
+    x_axis_as_printed: x(ZnO), mole %
+    y_axis_as_printed: log a_i (i)
+    units: dimensionless log activity; x composition in mole %
+    standard_state_as_printed: pure oxides forming the ternary system
+    series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
+    temperature_K: 1100
+    note: Na2O is series 1; figure values are not digitised.
+  - candidate_id: shornikov_2000_fig2_evaporation_composition
+    figure: '2'
+    page: 63
+    pdf_page_index: 5
+    rail: residue_composition
+    x_axis_as_printed: x(Na2O), mole %
+    y_axis_as_printed: x(ZnO), mole %
+    units: mole %
+    temperature_as_printed: not stated in the figure or caption
+    series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
+    note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+  - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
+    figure: '3'
+    page: 63
+    pdf_page_index: 5
+    rail: thermochemistry
+    x_axis_as_printed: x(ZnO), mole %
+    y_axis_as_printed: ΔG_T/RT
+    units: dimensionless ΔG_T/RT; x composition in mole %
+    reference_states_as_printed: pure oxide components; the text names these as standard states
+    series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
+    note: Gibbs energies of melt formation; figure values are not digitised.
+  figures_reviewed:
+  - figure: '1'
+    page: 60
+    pdf_page_index: 2
+    caption_scope: phase diagrams and pure-oxide activities
+    contains_Na_g_pressure_or_flux: false
+  - figure: '2'
+    page: 63
+    pdf_page_index: 5
+    caption_scope: changes in initial melt compositions during evaporation
+    contains_Na_g_pressure_or_flux: false
+  - figure: '3'
+    page: 63
+    pdf_page_index: 5
+    caption_scope: Gibbs energies of melt formation
+    contains_Na_g_pressure_or_flux: false
+review_status: draft
+species:
+  Na:
+    observations: []
+    context:
+    - observation_id: shornikov_2000_experimental_method
+      type: method
+      locator:
+        pdf_page_index: 0
+        page: 58
+        section: Experimental
+      units: as printed
+      values:
+        method_class: method_only
+        method_as_printed: high-temperature mass-spectrometric Knudsen effusion
+        cell_material: molybdenum
+        evaporation_to_effusion_square_area_ratio: '>500'
+        mass_spectrometer: modified MI 1201T
+        note: Samples were the Na2O·ZnO·P2O5 and 4Na2O·6ZnO·5P2O5 compounds.
+    - observation_id: shornikov_2000_partial_pressure_method
+      type: pressure_method_context
+      locator:
+        pdf_page_index: 1
+        page: 59
+        section: Results and Discussion
+      units: as printed
+      values:
+        method_class: method_only
+        species_with_partial_pressures_determined:
+        - PO
+        - PO2
+        - P2
+        - Zn
+        - Na
+        - NaPO3
+        method_as_printed: Hertz-Knudsen equation with partial evaporation coefficients
+        cross_check_as_printed: comparison method using ionization cross-sections and Ag and Zn partial-pressure standards
+        ionization_energy_eV: '25.0±0.1'
+        note: The article gives no numerical Na partial-pressure or evaporation-flux values in text or tables.
+    - observation_id: shornikov_2000_figures_1_to_3_context
+      type: figure_inventory
+      locator:
+        pdf_page_index: 2
+        page: 60
+        figure: '1'
+      units: as printed in figure captions
+      values:
+        method_class: figure_only
+        figures_reviewed:
+        - figure: '1'
+          page: 60
+          pdf_page_index: 2
+          caption_scope: phase diagrams and pure-oxide activities; panel c is the present study at 1100 K
+          series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5; 4 SnO in the comparison panel'
+          Na_g_pressure_or_flux: false
+        - figure: '2'
+          page: 63
+          pdf_page_index: 5
+          caption_scope: initial Na2O-ZnO-P2O5 melt compositions change during evaporation
+          series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
+          Na_g_pressure_or_flux: false
+        - figure: '3'
+          page: 63
+          pdf_page_index: 5
+          caption_scope: Gibbs energies of formation of Na4P2O7-Zn2P2O7 and Sn2P2O7-Zn2P2O7 melts
+          series_as_printed: '1 present study at 1100 K; 2 prior data at 1300 K'
+          Na_g_pressure_or_flux: false
+        figure_read_candidates:
+        - candidate_id: shornikov_2000_fig1c_na2o_activity
+          figure: '1(c)'
+          page: 60
+          pdf_page_index: 2
+          rail: melt_activity
+          x_axis_as_printed: x(ZnO), mole %
+          y_axis_as_printed: log a_i (i)
+          units: dimensionless log activity; x composition in mole %
+          standard_state_as_printed: pure oxides forming the ternary system
+          series_as_printed: '1 Na2O; 2 ZnO; 3 P2O5'
+          temperature_K: 1100
+          note: Na2O is series 1; figure values are not digitised.
+        - candidate_id: shornikov_2000_fig2_evaporation_composition
+          figure: '2'
+          page: 63
+          pdf_page_index: 5
+          rail: residue_composition
+          x_axis_as_printed: x(Na2O), mole %
+          y_axis_as_printed: x(ZnO), mole %
+          units: mole %
+          temperature_as_printed: not stated in the figure or caption
+          series_as_printed: '1 Na2O·ZnO·P2O5; 2 4Na2O·6ZnO·5P2O5'
+          note: Initial melt compositions are shown changing during evaporation; figure values are not digitised.
+        - candidate_id: shornikov_2000_fig3_melt_formation_gibbs_energy
+          figure: '3'
+          page: 63
+          pdf_page_index: 5
+          rail: thermochemistry
+          x_axis_as_printed: x(ZnO), mole %
+          y_axis_as_printed: ΔG_T/RT
+          units: dimensionless ΔG_T/RT; x composition in mole %
+          reference_states_as_printed: pure oxide components; the text names these as standard states
+          series_as_printed: '1 Na4P2O7-Zn2P2O7, present study at 1100 K; 2 Sn2P2O7-Zn2P2O7, prior data at 1300 K'
+          note: Gibbs energies of melt formation; figure values are not digitised.
+        note: Figures 1-3 do not plot Na(g) partial pressure or evaporation flux; the broader candidate inventory covers scorable data on the melt_activity, residue_composition, and thermochemistry rails.
