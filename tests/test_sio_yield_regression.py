@@ -576,12 +576,19 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # activities, SiO flux, and restored terminal capture. This is a residual
     # after subtracting nearly equal Si inventories, so the small route shift
     # moves the reported percent by a larger relative factor.
+    # 2026-10-27 t-1545: same cancellation after the Na reference. The percent
+    # is abs(evaporated - terminal) / evaporated. Stage-3 in that CI capture
+    # equals the re-pinned CLI stage-3. The unmatched mass moves by ~1e-14 kg,
+    # far below the Si inventory move, so the reported percent moves more
+    # than the SiO mass.
+    # lunar 6.164333700073318e-7 -> 8.344609400158102e-7,
+    # mars 2.271604686598938e-7 -> 6.656336594691266e-7.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333700073318e-7,
+        "lunar_mare_low_ti": 8.344609400158102e-7,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        "mars_basalt": 2.271604686598938e-7,
+        "mars_basalt": 6.656336594691266e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
