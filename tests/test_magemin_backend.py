@@ -2453,7 +2453,7 @@ def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
     ]
 
 
-@pytest.mark.parametrize('database', ['ig', 'igad', 'mtl'])
+@pytest.mark.parametrize('database', ['ig', 'igad', 'mtl', 'mp', 'mb'])
 def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(
     monkeypatch, database,
 ):

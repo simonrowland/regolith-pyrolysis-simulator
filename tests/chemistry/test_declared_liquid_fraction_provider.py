@@ -307,6 +307,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
     original_equilibrate = backend.equilibrate
     diagnostics = []
     injected = []
+    merged_diagnostics = []
     original_dispatch = sim._dispatch_only
 
     # Keep the adapter's projection and classification path real, while making
@@ -353,7 +354,10 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
             for _ in range(2):
                 with pytest.raises(EvaporationFluxRefusal) as error:
                     sim._melt_redox_liquidus_gate_curve()
-                assert error.value.diagnostic['provider_diagnostic'] == diagnostics[-1]
+                merged_diagnostics.append((
+                    error.value.diagnostic['provider_diagnostic'],
+                    diagnostics[-1],
+                ))
                 assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
                 assert sim._freeze_gate_liquid_fraction_cache is None
                 assert sim._freeze_gate_liquid_fraction_curve_memo == {}
@@ -367,7 +371,9 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 assert notice['provider_outcome'] == 'numerical_failure'
                 assert notice['authority'] == 'extrapolated'
                 assert notice['qualification'] == 'numerical_failure_kress91_floor_prediction'
-                assert notice['provider_diagnostic'] == diagnostics[-1]
+                merged_diagnostics.append((
+                    notice['provider_diagnostic'], diagnostics[-1],
+                ))
                 assert notice['provider_diagnostic']['backend_diagnostics'][
                     'projected_liquidus_status'
                 ] == status
@@ -382,12 +388,41 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 ] == notice
             assert len(diagnostics) == 2
         assert any(direct for _temperature_C, direct in injected)
-        assert diagnostics[-1]['backend_status'] == 'out_of_domain'
+        # The direct unavailable/not_converged result keeps its failure status.
+        # An out_of_domain sample re-enters the explicit projected retry at
+        # magemin.py:2091; this test injects out_of_domain there too, so the
+        # outer provider status remains out_of_domain.
+        assert diagnostics[-1]['backend_status'] == status
+        if status == 'out_of_domain':
+            assert any(not direct for _temperature_C, direct in injected)
+        else:
+            assert all(direct for _temperature_C, direct in injected)
         assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_status'] == status
         assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_diagnostics'][
             'backend_status_reason'
         ] == ('silicate_window' if status == 'out_of_domain' else reason)
         assert 'injected projected-bulk solve refusal' in diagnostics[-1]['backend_warnings']
+        expected_reason = 'silicate_window' if status == 'out_of_domain' else reason
+        for merged, raw in merged_diagnostics:
+            backend_diagnostics = raw['backend_diagnostics']
+            assert raw['backend_status'] == status
+            assert raw['backend_status_reason'] == expected_reason
+            assert backend_diagnostics['projected_liquidus_status'] == status
+            assert backend_diagnostics['projected_liquidus_diagnostics'][
+                'backend_status_reason'
+            ] == expected_reason
+            assert merged['backend_status'] == raw['backend_status']
+            assert merged['backend_status_reason'] == raw['backend_status_reason']
+            assert merged['projected_liquidus_status'] == (
+                backend_diagnostics['projected_liquidus_status']
+            )
+            assert merged['projected_liquidus_diagnostics'] == (
+                backend_diagnostics['projected_liquidus_diagnostics']
+            )
+            assert merged['composition_projected_notice'] == (
+                backend_diagnostics['composition_projected_notice']
+            )
+            assert merged['composition_projected_notice']['authority'] == 'extrapolated'
         assert sim.atom_ledger.mol_by_account() == before
     finally:
         backend.close()
