@@ -36,8 +36,10 @@ def _install_fake_import(monkeypatch, fake_module):
             return fake_module
         raise ImportError(name)
 
+    # Keep unrelated package-resource imports on Python's real importer.
     monkeypatch.setattr(
-        vaporock_module.importlib, "import_module", fake_import_module
+        vaporock_module, "importlib",
+        types.SimpleNamespace(import_module=fake_import_module),
     )
     return calls
 
