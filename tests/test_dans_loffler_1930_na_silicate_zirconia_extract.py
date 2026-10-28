@@ -96,7 +96,8 @@ def _assert_render_pins(document: dict) -> None:
         row = rows[observation_id]
         assert row["values"]["T_C"] == "1500"
         assert row["values"]["T_C_as_published"] == "ca. 1500"
-        assert str(row["point_conditions"]["temperature_K"]["state"]["value"]) == "1773.15"
+        if observation_id != O_POINT_IDS[0]:
+            assert str(row["point_conditions"]["temperature_K"]["state"]["value"]) == "1773.15"
     assert rows["dans1930_p034_t13_r04_c04_O_Na2O_equilibrium_mol_fraction"]["values"]["component_amount_as_published"] == "(57) mol%"
     assert rows["dans1930_p034_t13_r04_c06_O_ZrO2_equilibrium_mol_fraction"]["values"]["component_amount_as_published"] == "(43) mol%"
 
@@ -167,6 +168,10 @@ def test_isolated_migration_has_typed_rows_and_printed_conditions(migrated) -> N
     assert all(row.identity.species.phase.value in {Phase.L, Phase.CR} for row in rows)
 
     migrated_by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in rows}
+    for observation_id in O_POINT_IDS:
+        row = migrated_by_id[observation_id]
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == Decimal("1773.15")
     approximate_ids = {
         observation_id
         for observation_id, row in migrated_by_id.items()
@@ -301,4 +306,4 @@ def test_isolated_migration_has_typed_rows_and_printed_conditions(migrated) -> N
     assert binary_invariant.identity.total_pressure_Pa.is_unknown
     assert binary_invariant.identity.total_pressure_Pa.reason == "not_printed"
     assert binary_invariant.identity.fO2_Pa.is_not_applicable
-    assert binary_invariant.point_conditions["temperature_K"].state.value == Decimal("1873.15")
+    assert binary_invariant.point_conditions["temperature_K"].state.value == Decimal("1773.15")
