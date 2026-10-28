@@ -265,7 +265,8 @@ def test_positive_trace_keeps_backend_verdict_without_stagewide_activity_badge()
 
     verdict_line = _verdict_line(html)
     assert "CONTAMINATED" in verdict_line
-    assert "trace · &lt;0.01 kg total" in verdict_line
+    assert "trace · &lt;0.01 kg total" not in verdict_line
+    assert _headline_value(html, "Total classified product mass") == "trace (&lt;0.01 kg)"
     assert "IDLE" not in verdict_line
     assert ">Fe</span><b>IDLE</b>" in html
     assert "backend verdict not emitted" not in html
@@ -292,9 +293,9 @@ def test_exact_zero_is_empty_not_trace() -> None:
     assert "MIXED" not in verdict_line
     assert "CONTAMINATED" not in verdict_line
     assert "INDETERMINATE" not in verdict_line
-    assert "empty · 0 kg total" in verdict_line
+    assert "empty · 0 kg total" not in verdict_line
     assert "trace · &lt;0.01 kg total" not in verdict_line
-    assert _headline_value(html, "Total classified product mass") == "0 kg"
+    assert _headline_value(html, "Total classified product mass") == "empty"
     assert "no material" in _headline_value(html, "Purity fraction")
     assert "1" not in _headline_value(html, "Purity fraction")
     assert "0%" not in html

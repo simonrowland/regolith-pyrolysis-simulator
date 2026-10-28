@@ -1,7 +1,7 @@
 (function registerStagePurityPanel(root) {
   "use strict";
 
-  const { fmtNum, prettySpecies, speciesColor, esc } = root.ReportLabels;
+  const { fmtNum, prettySpecies, speciesColor, stageMassQualifier, esc } = root.ReportLabels;
   const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
   const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
@@ -145,17 +145,13 @@
       : !hasNumber(stage.stage_number)
         ? pending("stage number is malformed")
         : `Stage ${esc(fmtNum(stage.stage_number))}`;
-    const massQualifier = hasNumber(stage.total_kg) && stage.total_kg === 0
-      ? `<span class="sec-p4-qualifier">empty · 0 kg total</span>`
-      : hasNumber(stage.total_kg) && stage.total_kg > 0 && stage.total_kg < 0.01
-        ? `<span class="sec-p4-qualifier">trace · &lt;0.01 kg total</span>`
-        : "";
+    const stageMass = stageMassQualifier(stage.total_kg);
 
     return `<article class="sec-p4-stage-card"><div class="sec-p4-stage-head">` +
       `<div><div class="sec-p4-stage-number">Product destination · ${stageNumber}</div><h3>${label}</h3></div>` +
-      `<div class="sec-p4-verdict-line">${verdict(stage)}${massQualifier}</div></div>` +
+      `<div class="sec-p4-verdict-line">${verdict(stage)}</div></div>` +
       `<div class="sec-p4-headline"><div><span>Total classified product mass</span>` +
-      `<b>${stageNumberValue(stage, "total_kg", "kg")}</b></div>` +
+      `<b>${stageMass === null ? stageNumberValue(stage, "total_kg", "kg") : esc(stageMass)}</b></div>` +
       `<div><span>Purity fraction</span><b>${purityValue(stage)}</b></div></div>` +
       `<details class="sec-p4-details"><summary>Accepted species, activity &amp; mass detail</summary>` +
       `<div class="sec-p4-detail-grid"><div class="sec-p4-breakdown"><h4>Accepted species</h4>${acceptedSpecies(stage)}</div>` +

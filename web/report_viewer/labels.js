@@ -65,6 +65,14 @@
 
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
 
+  function stageMassQualifier(totalKg) {
+    if (!hasNumber(totalKg)) return null;
+    if (totalKg < 0) return null;
+    if (totalKg === 0) return "empty";
+    if (totalKg > 0 && totalKg < 0.01) return "trace (<0.01 kg)";
+    return fmtNum(totalKg, "kg");
+  }
+
   function exactValue(value, unit = "") {
     return hasNumber(value)
       ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
@@ -187,6 +195,6 @@
   root.ReportLabels = Object.freeze({
     scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
     prettyChemText, speciesColor, hasNumber, exactValue, isHashLike,
-    priceAuthority, priceAuthorityNote, esc
+    priceAuthority, priceAuthorityNote, stageMassQualifier, esc
   });
 }(globalThis));

@@ -76,21 +76,31 @@ def _visible(markup: str) -> str:
     return " ".join(unescape(re.sub(r"<[^>]+>", " ", markup)).split())
 
 
-def test_stage_mass_qualifier_current_output_is_pinned_per_surface() -> None:
+def _stage_mass_outputs(surfaces: dict[str, str]) -> tuple[str, str, str]:
+    overview = re.search(
+        r'<td class="num">(.*?)</td><td class="num">', surfaces["overview"], re.DOTALL
+    )
+    p4 = re.search(
+        r"<span>Total classified product mass</span><b>(.*?)</b>",
+        surfaces["p4"],
+        re.DOTALL,
+    )
+    p15 = re.search(
+        r"<span>Total classified product mass</span><strong>(.*?)</strong>",
+        surfaces["p15"],
+        re.DOTALL,
+    )
+    assert overview and p4 and p15
+    return tuple(_visible(match.group(1)) for match in (overview, p4, p15))
+
+
+def test_stage_mass_qualifier_is_consistent_across_surfaces() -> None:
     rendered = {total: _render_surfaces(total) for total in (0.0, 0.004, 0.02)}
-    overview = {total: _visible(surfaces["overview"]) for total, surfaces in rendered.items()}
-    p4 = {total: _visible(surfaces["p4"]) for total, surfaces in rendered.items()}
-    p15 = {total: _visible(surfaces["p15"]) for total, surfaces in rendered.items()}
-
-    assert "trace (<0.01 kg total)" in overview[0.0]
-    assert "trace (<0.01 kg total)" in overview[0.004]
-    assert "trace (<0.01 kg total)" not in overview[0.02]
-
-    assert "empty · 0 kg total" in p4[0.0]
-    assert "trace · <0.01 kg total" in p4[0.004]
-    assert "trace · <0.01 kg total" not in p4[0.02]
-
-    assert "backend's empty-stage classification" in p15[0.0]
-    assert "trace (<0.01 kg)" not in p15[0.004]
-    assert "0.004 kg" in p15[0.004]
-    assert "0.02 kg" in p15[0.02]
+    expected = {
+        0.0: "empty",
+        0.004: "trace (<0.01 kg)",
+        0.02: "0.02 kg",
+    }
+    for total, surfaces in rendered.items():
+        assert _stage_mass_outputs(surfaces) == (expected[total],) * 3
+    assert "backend's empty-stage classification" in _visible(rendered[0.0]["p15"])
