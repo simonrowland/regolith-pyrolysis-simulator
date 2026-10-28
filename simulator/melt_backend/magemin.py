@@ -1436,6 +1436,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     raise _LiquidusFinderBudgetExceeded(
                         f'MAGEMin warm worker startup timed out: {exc.detail}',
                         diagnostics={
+                            'reason': 'engine_timeout',
                             'budget': 'magemin_worker_startup',
                             'exception_class': exc.exc_name,
                             'exception_message': exc.detail,
@@ -1724,6 +1725,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise _LiquidusFinderBudgetExceeded(
                 f'MAGEMin equilibrate timed out: {exc}',
                 diagnostics={
+                    'reason': 'engine_timeout',
                     'backend': 'MAGEMin',
                     'budget': budget,
                     'backend_failure_exception': type(exc).__name__,
@@ -1746,6 +1748,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 raise _LiquidusFinderBudgetExceeded(
                     f'MAGEMin liquidus sample timed out: {exc}',
                     diagnostics={
+                        'reason': 'engine_timeout',
                         'backend': 'MAGEMin',
                         'budget': budget,
                         'backend_failure_exception': exc.exception_type,
@@ -3836,6 +3839,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 raise _LiquidusFinderBudgetExceeded(
                     f'MAGEMin pure-phase probe timed out: {exc}',
                     diagnostics={
+                        'reason': 'engine_timeout',
                         'backend': 'MAGEMin',
                         'budget': budget,
                         'backend_failure_exception': exc.exception_type,
@@ -3847,6 +3851,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise _LiquidusFinderBudgetExceeded(
                 f'MAGEMin pure-phase probe timed out after {timeout_s:g}s',
                 diagnostics={
+                    'reason': 'engine_timeout',
                     'backend': 'MAGEMin',
                     'budget': 'magemin_pure_phase',
                     'timeout_s': timeout_s,
