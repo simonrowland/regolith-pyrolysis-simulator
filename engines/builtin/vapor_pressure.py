@@ -3081,9 +3081,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
         warnings: list[str] = []
         antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
-        melt_account_mol = dict(
-            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
-        )
         feo_activity_pressure_bar = vacuum_floor_bar
         feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
