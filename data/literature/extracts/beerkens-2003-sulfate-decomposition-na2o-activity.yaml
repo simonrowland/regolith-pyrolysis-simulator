@@ -6,11 +6,17 @@ source:
   doi: 10.1111/j.1151-2916.2003.tb03578.x
   year: 2003
 extraction:
-  method: >-
-    Born-digital pdftotext-layout reading with PDF-render verification of the tables and figure inventories. Table I reports measured total sulfur solubility at sodium-sulfate-gall saturation, and Table II reports sulfite solubility, but neither has a matching scalar quantity token in this seat. Figures 1–6 are recorded with no digitised points. The author-reported approximate Na2O activity at 1673 K is derived from Kpc, the sulfate-saturation result, and gas pressures; the necessary Kpc input is plotted or represented by a fit without a registered table asset, so it is retained in context pending the required TABLE_CSV lineage.
-  date: '2026-10-20'
-  worker: fam35-1021
+    method: >-
+      Born-digital pdftotext-layout reading with PDF-render verification of the tables, figure inventories, and sodium oxide activity passage. Table I reports measured total sulfur solubility at sodium-sulfate-gall saturation, and Table II reports sulfite solubility, but neither has a matching scalar quantity token in this seat. Figures 1–6 are recorded with no digitised points. The author's approximate float-glass Na2O activity at 1673 K is retained as a measured_tabulated activity point; its printed pressure and composition conditions are located on the source pages. The two activity fits remain unscored context because no activity-function quantity token exists.
+    date: '2026-10-28'
+    worker: recon-beerkens03
 review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observation_id: beerkens_2003_float_glass_activity_at_1673K
+    field: activity
+    value: 1.7e-8
+    locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
 species:
   S:
     observations: []
@@ -154,7 +160,8 @@ species:
           species: Na2O
           phase: soda–lime–silica glass melt
           temperature_as_printed: about 1600–1800 K; plotted axis 1550–1850 K
-          standard_state: pure liquid Na2O at the same temperature; ideal gas standard is 1 bar. The Na2O reference is liquid throughout the plotted range.
+          standard_state: >-
+            Pure sodium oxide in its most stable phase at the same temperature, following the general activity convention on PDF p. 1 / published p. 1893, §II. The source does not name the specific Na2O phase.
           axes_as_printed: {x: 'temperature K', y: 'chemical activity Na2O in melt'}
           caption: Sodium oxide activity measured in this study and compared with literature values for soda–lime–silica glass melts.
           series:
@@ -188,7 +195,94 @@ species:
             - {name: 0.75 wt% SO3, marker: short-dashed curve, marker_count: 0, evidence_class: model_derived}
           digitisation: deferred to a figure pass
   Na2O:
-    observations: []
+    observations:
+      - observation_id: beerkens_2003_float_glass_activity_at_1673K
+        type: activity_coefficient
+        locator:
+          source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+          page: 6
+          published_page: 1898
+          pdf_page_index: 5
+          section: 'VI. Results for the Sodium Oxide Activity'
+          note: Final paragraph of §VI before the §VII heading.
+        values:
+          T_K: '1673'
+          quantity: activity
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          activity: 1.7e-8
+          approximate: true
+          printed_activity_as_published: about 1.7 × 10^-8
+          derivation_as_published: >-
+            Using the known Ka value from Eq. (3), a(Na2SO4) = 1, p(SO2) = 0.666 bar, and p(O2) = 0.33 bar, the float-glass Na2O activity at 1673 K is about 1.7 × 10^-8.
+          estimated_maximum_error_as_published: '30%–40%'
+          estimated_error_component_1_as_published: 'about 15%–20%'
+          estimated_error_component_2_as_published: '15%'
+          composition_role: datum_state
+          composition_mol_basis: mole_fraction_calculated_from_weight_percent
+          composition_mol:
+            SiO2: '0.7212321703995182163965610544'
+            Na2O: '0.1297636248391307182437973734'
+            CaO: '0.1016783137802867136915562863'
+            MgO: '0.03276151920166133390067209129'
+            Al2O3: '0.008829794701524729680132244985'
+            K2O: '0.005734577077878288087280949865'
+        point_conditions:
+          pO2_Pa:
+            state: {tag: value, value: 33000}
+            locator:
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: 'VI. Results for the Sodium Oxide Activity'
+              note: p(O2) = 0.33 bar as printed; converted to Pa.
+          pSO2_Pa:
+            state: {tag: value, value: 66600}
+            locator:
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: 'VI. Results for the Sodium Oxide Activity'
+              note: p(SO2) = 0.666 bar as printed; converted to Pa.
+          composition:
+            state:
+              tag: value
+              value:
+                basis: oxide_weight_percent_as_published
+                amount_basis: mass_percent
+                components:
+                  - [SiO2, '72.2']
+                  - [Na2O, '13.4']
+                  - [CaO, '9.5']
+                  - [MgO, '2.2']
+                  - [Al2O3, '1.5']
+                  - [K2O, '0.9']
+            locator:
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: 'III(1)'
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+        phase: l
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase:
+                  tag: unknown
+                  reason: Source does not identify the specific Na2O phase.
+                polymorph:
+                  tag: unknown
+                  reason: Source does not identify a Na2O polymorph.
+              component_basis: Na2O
+          inferred: false
+        units: dimensionless
     context:
       - observation_id: beerkens_2003_sodium_oxide_activity_1673K_context
         type: derived_value_context
@@ -197,12 +291,13 @@ species:
           page: 6
           published_page: 1898
           pdf_page_index: 5
+          section: 'VI. Results for the Sodium Oxide Activity'
           note: >-
-            The text prints about 1.7×10^-8 for the float-glass Na2O activity at 1673 K. It is derived using Ka, a(Na2SO4)=1, p(SO2)=0.666 bar, and p(O2)=0.33 bar; the derivation also depends on the Kpc determination. Candidate token: activity. Kpc values are figure data or temperature fits rather than stored rows; no corpus TABLE_CSV asset exists for the inputs. Retained pending the required TABLE_CSV lineage (controller t-1382). The paper estimates a maximum error of 30–40% for the derived activity.
+            The final paragraph of §VI prints about 1.7 × 10^-8 for the float-glass Na2O activity at 1673 K. It states that the value uses Ka from Eq. (3), a(Na2SO4) = 1, p(SO2) = 0.666 bar, and p(O2) = 0.33 bar. The relative error components are about 15%–20% for Kpc and 15% for maximum sulfate solubility; the estimated maximum error is 30%–40%. The paper's general pure-phase activity convention is on PDF p. 1 / published p. 1893, §II, without naming a specific Na2O phase. The inputs are derivation context and point conditions, not separate observations or parent records.
         units: dimensionless activity
         values:
-          quantity: sodium_oxide_activity
-          method_class: measured_reduced
+          quantity: activity
+          method_class: measured_tabulated
           formula: Na2O
           temperature_K: 1673
           value_as_published: about 1.7 × 10^-8
@@ -210,12 +305,14 @@ species:
             sodium_sulfate_activity: 1
             sulfur_dioxide_partial_pressure_bar: 0.666
             oxygen_partial_pressure_bar: 0.33
-            equilibrium_constant: Ka from Eq. (3); Kpc determination as described in the paper
+            equilibrium_constant: Ka from Eq. (3)
           standard_state: >-
-            Pure liquid sodium oxide at the experiment temperature; the paper defines oxide and sulfate activities relative to pure phases at the same temperature. At 1673 K, pure Na2O is liquid above the JANAF Na-012 alpha-to-liquid transition at 1405.2 K (inferred stable phase).
-          standard_state_inferred: true
-          standard_state_basis: JANAF Na-012, alpha-to-liquid transition at 1405.2 K; 1673 K is above the pure oxide melting transition.
-          derivation_pending: corpus TABLE_CSV asset (controller, t-1382)
+            Pure sodium oxide in its most stable phase at the experiment temperature, following the source's general activity convention on PDF p. 1 / published p. 1893, §II. The specific phase is not named.
+          standard_state_inferred: false
+          standard_state_basis: The source says pure sodium oxide in its most stable phase at the same temperature; it does not name the specific phase.
+          estimated_maximum_error_as_published: '30%–40%'
+          estimated_error_component_1_as_published: 'about 15%–20%'
+          estimated_error_component_2_as_published: '15%'
       - observation_id: beerkens_2003_activity_and_equilibrium_fits_context
         type: model_parameters
         locator:
@@ -223,6 +320,7 @@ species:
           page: 5
           published_page: 1897
           pdf_page_index: 4
+          section: 'VI. Results for the Sodium Oxide Activity'
           note: >-
             Author-reported temperature relations; the article also gives the measured activity ranges in Figure 5. Candidate tokens checked: activity_coefficient_temperature_fit does not fit these activities, and log10_K_star does not fit Kcon/Kpc; these are not activity-coefficient or equilibrium-constant K* parameters.
         units: T in K; pressures in bar; concentrations mol/m3
