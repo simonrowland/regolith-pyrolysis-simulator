@@ -829,6 +829,31 @@ def test_deserialize_coating_margin_rederives_feasible_from_grounded_authority()
     assert margins["coating"].feasible is True
 
 
+def test_deserialize_legacy_non_coating_margin_defaults_non_authoritative() -> None:
+    margins = _deserialize_margins(
+        {
+            "delivered_stream_purity": {
+                "gate": "delivered_stream_purity",
+                "feasible": True,
+                "margin": 1.0,
+                "threshold": {
+                    "id": "purity-threshold",
+                    "value": 1.0,
+                    "units": "fraction",
+                    "source": "profile",
+                    "source_ref": "legacy profile",
+                },
+                "observed": 2.0,
+                "detail": "legacy purity margin",
+            }
+        }
+    )
+
+    assert margins["delivered_stream_purity"].status == "warning"
+    assert margins["delivered_stream_purity"].authoritative is False
+    assert margins["delivered_stream_purity"].output_status == "status_bearing"
+
+
 def test_legacy_unavailable_coating_margin_is_not_selected(tmp_path) -> None:
     spec = _base_spec(recipe_id="legacy-unavailable-coating")
     db_path = tmp_path / "results.sqlite"
@@ -2314,7 +2339,9 @@ def test_deserialize_legacy_coating_margin_defaults_non_authoritative() -> None:
         }
     )
 
+    assert margins["coating"].status == "warning"
     assert margins["coating"].authoritative is False
+    assert margins["coating"].output_status == "status_bearing"
 
 
 def test_fresh_authoritative_coating_margin_round_trips_authoritative(
