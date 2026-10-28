@@ -5358,7 +5358,9 @@ def test_yakovleva_2022_table1_context_survives_migration(tmp_path):
     # Exact printed cells checked on the PDF page render, published p. 402.
     assert compositions[0]["values"]["SiO2"] == "59.9"
     assert compositions[1]["values"]["MgO"] == "27.9"
+    assert compositions[1]["values"]["Na2O"] == "1.8"
     assert compositions[2]["values"]["MgO"] == "0.5"
+    assert compositions[2]["values"]["FeO"] == "–"
     assert compositions[3]["values"]["TiO2"] == "6.0"
     assert compositions[4]["values"]["K2O"] == "0.4"
     assert all(
