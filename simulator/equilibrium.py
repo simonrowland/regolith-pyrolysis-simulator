@@ -6,6 +6,8 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
+from simulator.accounting.account_views import merge_species_amounts_from_accounts
 from engines.antoine import (
     _AntoineCoefficientRefusal,
     _is_missing_antoine_intercept,
@@ -591,11 +593,17 @@ class EquilibriumMixin:
             # closure stays unbiased. Physics consumers use the ledger-owned
             # projection, which clamps only policy-admissible negative dust and
             # still refuses a materially negative normal account.
-            melt_account_mol = dict(
-                project_account_mol("process.cleaned_melt") or {}
+            melt_account_mol = merge_species_amounts_from_accounts(
+                {account: project_account_mol(account)
+                 for account in MELT_RESIDENT_ACCOUNTS},
+                MELT_RESIDENT_ACCOUNTS,
             )
         elif callable(mol_by_account):
-            melt_account_mol = dict(mol_by_account("process.cleaned_melt") or {})
+            melt_account_mol = merge_species_amounts_from_accounts(
+                {account: mol_by_account(account)
+                 for account in MELT_RESIDENT_ACCOUNTS},
+                MELT_RESIDENT_ACCOUNTS,
+            )
         else:
             melt_account_mol = {
                 oxide: float(wt_pct) / MOLAR_MASS[oxide] * 1000.0
@@ -609,6 +617,7 @@ class EquilibriumMixin:
             T_K=T_K,
             pressure_bar=feo_activity_pressure_bar,
             floor_bar=vacuum_floor_bar,
+            closed_ledger=callable(current_fO2),
         )
 
         # ================================================================
