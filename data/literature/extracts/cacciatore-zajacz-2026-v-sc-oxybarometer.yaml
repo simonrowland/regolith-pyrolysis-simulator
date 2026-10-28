@@ -8,7 +8,9 @@ source:
 extraction:
   method: Born-digital Table 3 transcription from pdftotext-layout; all 62 rows and the printed glass-component values and
     1σ standard errors were checked against 600 dpi physical PDF pages 6–9. Table 2 run conditions were checked against pages
-    4–5.
+    4–5. Table 1 starting-material wt% on pages 2-3 is each experiment's
+    initial_composition. FeO-tot is stored as FeOT. The FeO/Fe2O3 column is
+    the prepared-powder molar ratio, not an oxide weight.
   date: '2026-10-22'
   worker: codex-fam50-1022
 review_status: draft
@@ -21,6 +23,39 @@ experiments:
   sample:
     sample_id: E1_0_II H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.5'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '9.0'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_0 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.24 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-0-ii-h2-b-f
   locator:
     page: 4
@@ -29,6 +64,39 @@ experiments:
   sample:
     sample_id: E1_0_II H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.1'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.5'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_0 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.24 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-0-ii-h2-a-f
   locator:
     page: 4
@@ -37,6 +105,39 @@ experiments:
   sample:
     sample_id: E3_0_II H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.1'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_0 II IV A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.28 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-0-iv-sb-a-f
   locator:
     page: 4
@@ -45,6 +146,39 @@ experiments:
   sample:
     sample_id: E3_0_IV SB_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.1'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_0 II IV A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.28 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-0-ii-h2-b-f
   locator:
     page: 4
@@ -53,6 +187,39 @@ experiments:
   sample:
     sample_id: E3_0_II H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_0 II IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.27 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-0-iv-sb-b-f
   locator:
     page: 4
@@ -61,6 +228,39 @@ experiments:
   sample:
     sample_id: E3_0_IV SB_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_0 II IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.27 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e5-0-h2-a-f
   locator:
     page: 4
@@ -69,6 +269,39 @@ experiments:
   sample:
     sample_id: E5_0 H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.1'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E5_0 I II III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.33 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e5-0-ii-h2-a-f
   locator:
     page: 4
@@ -77,6 +310,39 @@ experiments:
   sample:
     sample_id: E5_0_II H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.1'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E5_0 I II III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.33 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e5-0-iii-h2-a-f
   locator:
     page: 4
@@ -85,6 +351,39 @@ experiments:
   sample:
     sample_id: E5_0_III H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.1'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E5_0 I II III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.33 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e5-0-h2-b-f
   locator:
     page: 4
@@ -93,6 +392,39 @@ experiments:
   sample:
     sample_id: E5_0 H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.3'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E5_0 I IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.31 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e5-0-iv-h2-b-f
   locator:
     page: 4
@@ -101,6 +433,39 @@ experiments:
   sample:
     sample_id: E5_0_IV H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.3'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E5_0 I IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.31 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-0-h2-a-f
   locator:
     page: 4
@@ -109,6 +474,39 @@ experiments:
   sample:
     sample_id: E4_0 H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.5'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '9.1'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.6'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_0 I III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.36 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-0-iii-h2l-a-f
   locator:
     page: 4
@@ -117,6 +515,39 @@ experiments:
   sample:
     sample_id: E4_0_III H2L_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.5'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '9.1'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.6'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_0 I III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.36 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-0-h2-b-f
   locator:
     page: 4
@@ -125,6 +556,39 @@ experiments:
   sample:
     sample_id: E4_0 H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '3.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_0 I III B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-0-iii-h2l-b-f
   locator:
     page: 4
@@ -133,6 +597,39 @@ experiments:
   sample:
     sample_id: E4_0_III H2L_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '3.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_0 I III B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-0-v-h2l-a2-f
   locator:
     page: 4
@@ -141,6 +638,39 @@ experiments:
   sample:
     sample_id: E2_0_V H2L_A2_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.5'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_0 V A_2'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.41 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-0-iii-h2-b-f
   locator:
     page: 4
@@ -149,6 +679,39 @@ experiments:
   sample:
     sample_id: E2_0_III H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_0 III IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.38 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-0-iv-h2-b-f
   locator:
     page: 4
@@ -157,6 +720,39 @@ experiments:
   sample:
     sample_id: E2_0_IV H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.2'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_0 III IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.38 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-0-v-h2l-b2-f
   locator:
     page: 4
@@ -165,6 +761,39 @@ experiments:
   sample:
     sample_id: E2_0_V H2L_B2_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.9'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.3'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_0 V B_2'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.41 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e6-0-ii-h2-b-f
   locator:
     page: 4
@@ -173,6 +802,39 @@ experiments:
   sample:
     sample_id: E6_0_II H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.9'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.3'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.1'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.9'
+          - - K2O
+            - '3.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E6_0 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.41 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-0-ii-sb-a
   locator:
     page: 4
@@ -181,6 +843,39 @@ experiments:
   sample:
     sample_id: E7_0_II SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '50.6'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '8.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.6'
+          - - CaO
+            - '10.2'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.6'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_0 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.43 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-0-ii-sb-b
   locator:
     page: 4
@@ -189,6 +884,39 @@ experiments:
   sample:
     sample_id: E7_0_II SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.1'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '14.4'
+          - - FeOT
+            - '8.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '9.0'
+          - - CaO
+            - '9.0'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '3.4'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_0 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.44 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-1-h2-a-f
   locator:
     page: 4
@@ -197,6 +925,39 @@ experiments:
   sample:
     sample_id: E1_1 H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.9'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '19.5'
+          - - FeOT
+            - '5.0'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '4.8'
+          - - CaO
+            - '8.7'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.7'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_1 I IV A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.25 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-1-iv-h2-a
   locator:
     page: 4
@@ -205,6 +966,39 @@ experiments:
   sample:
     sample_id: E1_1_IV H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.9'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '19.5'
+          - - FeOT
+            - '5.0'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '4.8'
+          - - CaO
+            - '8.7'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.7'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_1 I IV A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.25 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-1-iv-h2-a
   locator:
     page: 4
@@ -213,6 +1007,39 @@ experiments:
   sample:
     sample_id: E4_1_IV H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.9'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '17.8'
+          - - FeOT
+            - '8.7'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '6.4'
+          - - CaO
+            - '10.4'
+          - - P2O5
+            - '0.2'
+          - - Na2O
+            - '2.7'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_1 IV A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.36 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-1-ii-h2-b-f
   locator:
     page: 4
@@ -221,6 +1048,39 @@ experiments:
   sample:
     sample_id: E4_1_II H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.1'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '8.1'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '5.6'
+          - - CaO
+            - '9.5'
+          - - P2O5
+            - '0.8'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '2.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_1 II III IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-1-iii-h2-b
   locator:
     page: 4
@@ -229,6 +1089,39 @@ experiments:
   sample:
     sample_id: E4_1_III H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.1'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '8.1'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '5.6'
+          - - CaO
+            - '9.5'
+          - - P2O5
+            - '0.8'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '2.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_1 II III IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-1-iv-h2-b
   locator:
     page: 4
@@ -237,6 +1130,39 @@ experiments:
   sample:
     sample_id: E4_1_IV H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.1'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '16.0'
+          - - FeOT
+            - '8.1'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '5.6'
+          - - CaO
+            - '9.5'
+          - - P2O5
+            - '0.8'
+          - - Na2O
+            - '2.8'
+          - - K2O
+            - '2.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_1 II III IV B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-1-ii-h2-a-f
   locator:
     page: 4
@@ -245,6 +1171,39 @@ experiments:
   sample:
     sample_id: E2_1_II H2_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.8'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '18.5'
+          - - FeOT
+            - '8.0'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '5.8'
+          - - CaO
+            - '10.5'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.1'
+          - - K2O
+            - '0.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_1 II III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.39 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-1-iii-h2-a
   locator:
     page: 4
@@ -253,6 +1212,39 @@ experiments:
   sample:
     sample_id: E2_1_III H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '51.8'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '18.5'
+          - - FeOT
+            - '8.0'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '5.8'
+          - - CaO
+            - '10.5'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.1'
+          - - K2O
+            - '0.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_1 II III A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.39 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-1-ii-h2-b-f
   locator:
     page: 4
@@ -261,6 +1253,39 @@ experiments:
   sample:
     sample_id: E2_1_II H2_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '52.9'
+          - - TiO2
+            - '1.3'
+          - - Al2O3
+            - '16.9'
+          - - FeOT
+            - '7.8'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.8'
+          - - CaO
+            - '8.6'
+          - - P2O5
+            - '0.9'
+          - - Na2O
+            - '3.4'
+          - - K2O
+            - '3.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_1 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.38 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-1-ii-sb-a
   locator:
     page: 4
@@ -269,6 +1294,39 @@ experiments:
   sample:
     sample_id: E7_1_II SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.3'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '19.3'
+          - - FeOT
+            - '6.7'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.8'
+          - - CaO
+            - '10.0'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.2'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_1 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.44 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-1-ii-sb-b
   locator:
     page: 4
@@ -277,6 +1335,39 @@ experiments:
   sample:
     sample_id: E7_1_II SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.5'
+          - - TiO2
+            - '1.3'
+          - - Al2O3
+            - '18.2'
+          - - FeOT
+            - '6.6'
+          - - MnO
+            - '0.3'
+          - - MgO
+            - '4.1'
+          - - CaO
+            - '8.3'
+          - - P2O5
+            - '0.9'
+          - - Na2O
+            - '3.4'
+          - - K2O
+            - '3.4'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_1 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.44 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-2-h2-a
   locator:
     page: 4
@@ -285,6 +1376,39 @@ experiments:
   sample:
     sample_id: E1_2 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '59.8'
+          - - TiO2
+            - '1.3'
+          - - Al2O3
+            - '19.1'
+          - - FeOT
+            - '3.8'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.6'
+          - - CaO
+            - '6.6'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '4.1'
+          - - K2O
+            - '1.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_2 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.26 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-2-h2-b
   locator:
     page: 4
@@ -293,6 +1417,39 @@ experiments:
   sample:
     sample_id: E1_2 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '57.3'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '20.5'
+          - - FeOT
+            - '3.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.6'
+          - - CaO
+            - '6.6'
+          - - P2O5
+            - '0.9'
+          - - Na2O
+            - '3.9'
+          - - K2O
+            - '2.5'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_2 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.28 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-2-sb-a
   locator:
     page: 4
@@ -301,6 +1458,39 @@ experiments:
   sample:
     sample_id: E3_2 SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '57.4'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '18.9'
+          - - FeOT
+            - '5.3'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.2'
+          - - CaO
+            - '7.8'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '0.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_2 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.29 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-2-ii-h2-a
   locator:
     page: 4
@@ -309,6 +1499,39 @@ experiments:
   sample:
     sample_id: E4_2_II H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '53.6'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '19.4'
+          - - FeOT
+            - '7.1'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '5.1'
+          - - CaO
+            - '9.6'
+          - - P2O5
+            - '0.3'
+          - - Na2O
+            - '3.0'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_2 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.37 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-2-h2-b
   locator:
     page: 4
@@ -317,6 +1540,39 @@ experiments:
   sample:
     sample_id: E4_2 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '54.9'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '18.1'
+          - - FeOT
+            - '6.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.4'
+          - - CaO
+            - '7.9'
+          - - P2O5
+            - '0.9'
+          - - Na2O
+            - '3.1'
+          - - K2O
+            - '2.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_2 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.36 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-2-sb-a-f
   locator:
     page: 4
@@ -325,6 +1581,39 @@ experiments:
   sample:
     sample_id: E7_2 SB_A_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.5'
+          - - TiO2
+            - '1.5'
+          - - Al2O3
+            - '19.1'
+          - - FeOT
+            - '5.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.2'
+          - - CaO
+            - '8.6'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '3.5'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_2 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.45 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-2-sb-b-f
   locator:
     page: 4
@@ -333,6 +1622,39 @@ experiments:
   sample:
     sample_id: E7_2 SB_B_F
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.6'
+          - - TiO2
+            - '1.5'
+          - - Al2O3
+            - '18.4'
+          - - FeOT
+            - '5.5'
+          - - MnO
+            - '0.3'
+          - - MgO
+            - '3.8'
+          - - CaO
+            - '7.5'
+          - - P2O5
+            - '1.0'
+          - - Na2O
+            - '3.3'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_2 I II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.43 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-2-ii-sb-b
   locator:
     page: 4
@@ -341,6 +1663,39 @@ experiments:
   sample:
     sample_id: E7_2_II SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.6'
+          - - TiO2
+            - '1.5'
+          - - Al2O3
+            - '18.4'
+          - - FeOT
+            - '5.5'
+          - - MnO
+            - '0.3'
+          - - MgO
+            - '3.8'
+          - - CaO
+            - '7.5'
+          - - P2O5
+            - '1.0'
+          - - Na2O
+            - '3.3'
+          - - K2O
+            - '3.2'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_2 I II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.43 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-3-h2-a
   locator:
     page: 4
@@ -349,6 +1704,39 @@ experiments:
   sample:
     sample_id: E1_3 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '61.3'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '19.4'
+          - - FeOT
+            - '3.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '3.1'
+          - - CaO
+            - '5.4'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '4.3'
+          - - K2O
+            - '1.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_3 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.24 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-3-h2-b
   locator:
     page: 4
@@ -357,6 +1745,39 @@ experiments:
   sample:
     sample_id: E1_3 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '59.7'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '19.7'
+          - - FeOT
+            - '3.2'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.2'
+          - - CaO
+            - '5.5'
+          - - P2O5
+            - '0.9'
+          - - Na2O
+            - '3.7'
+          - - K2O
+            - '2.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_3 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.25 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-3-sb-a
   locator:
     page: 4
@@ -365,6 +1786,39 @@ experiments:
   sample:
     sample_id: E3_3 SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '59.7'
+          - - TiO2
+            - '1.3'
+          - - Al2O3
+            - '18.4'
+          - - FeOT
+            - '5.0'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.5'
+          - - CaO
+            - '6.8'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_3 I II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.33 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-3-ii-h2-a
   locator:
     page: 5
@@ -373,6 +1827,39 @@ experiments:
   sample:
     sample_id: E3_3_II H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '59.7'
+          - - TiO2
+            - '1.3'
+          - - Al2O3
+            - '18.4'
+          - - FeOT
+            - '5.0'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.5'
+          - - CaO
+            - '6.8'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '0.7'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_3 I II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.33 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-3-ii-h2-b
   locator:
     page: 5
@@ -381,6 +1868,39 @@ experiments:
   sample:
     sample_id: E3_3_II H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '57.3'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '19.8'
+          - - FeOT
+            - '4.8'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.5'
+          - - CaO
+            - '6.2'
+          - - P2O5
+            - '1.1'
+          - - Na2O
+            - '3.9'
+          - - K2O
+            - '2.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_3 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.32 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-3-h2-a
   locator:
     page: 5
@@ -389,6 +1909,39 @@ experiments:
   sample:
     sample_id: E4_3 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '56.4'
+          - - TiO2
+            - '1.1'
+          - - Al2O3
+            - '19.6'
+          - - FeOT
+            - '6.6'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.6'
+          - - CaO
+            - '7.1'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '1.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E4_3 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.35 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-3-ii-h2-a
   locator:
     page: 5
@@ -397,6 +1950,39 @@ experiments:
   sample:
     sample_id: E2_3_II H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '55.6'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '18.8'
+          - - FeOT
+            - '7.2'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '4.1'
+          - - CaO
+            - '8.2'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '3.5'
+          - - K2O
+            - '0.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E2_3 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.41 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-3-sb-a
   locator:
     page: 5
@@ -405,6 +1991,39 @@ experiments:
   sample:
     sample_id: E7_3 SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '58.7'
+          - - TiO2
+            - '1.7'
+          - - Al2O3
+            - '18.4'
+          - - FeOT
+            - '5.4'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '3.3'
+          - - CaO
+            - '6.7'
+          - - P2O5
+            - '0.6'
+          - - Na2O
+            - '4.0'
+          - - K2O
+            - '1.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_3 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.46 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-3-sb-b
   locator:
     page: 5
@@ -413,6 +2032,39 @@ experiments:
   sample:
     sample_id: E7_3 SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '57.6'
+          - - TiO2
+            - '1.4'
+          - - Al2O3
+            - '19.3'
+          - - FeOT
+            - '4.7'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.9'
+          - - CaO
+            - '6.3'
+          - - P2O5
+            - '0.8'
+          - - Na2O
+            - '3.7'
+          - - K2O
+            - '3.1'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E7_3 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.45 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-4-h2-a
   locator:
     page: 5
@@ -421,6 +2073,39 @@ experiments:
   sample:
     sample_id: E1_4 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '65.5'
+          - - TiO2
+            - '0.7'
+          - - Al2O3
+            - '18.9'
+          - - FeOT
+            - '2.5'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.2'
+          - - CaO
+            - '3.9'
+          - - P2O5
+            - '0.5'
+          - - Na2O
+            - '4.3'
+          - - K2O
+            - '1.3'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_4 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.26 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e1-4-h2-b
   locator:
     page: 5
@@ -429,6 +2114,39 @@ experiments:
   sample:
     sample_id: E1_4 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '64.1'
+          - - TiO2
+            - '0.7'
+          - - Al2O3
+            - '19.2'
+          - - FeOT
+            - '2.4'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '2.2'
+          - - CaO
+            - '3.8'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '3.9'
+          - - K2O
+            - '2.8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E1_4 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.25 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-4-sb-a
   locator:
     page: 5
@@ -437,6 +2155,39 @@ experiments:
   sample:
     sample_id: E3_4 SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '67.4'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.3'
+          - - FeOT
+            - '3.3'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '1.9'
+          - - CaO
+            - '4.9'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_4 I II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.30 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-4-ii-h2-a
   locator:
     page: 5
@@ -445,6 +2196,39 @@ experiments:
   sample:
     sample_id: E3_4_II H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '67.4'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '16.3'
+          - - FeOT
+            - '3.3'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '1.9'
+          - - CaO
+            - '4.9'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '0.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_4 I II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.30 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-4-sb-b
   locator:
     page: 5
@@ -453,6 +2237,39 @@ experiments:
   sample:
     sample_id: E3_4 SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '64.0'
+          - - TiO2
+            - '0.8'
+          - - Al2O3
+            - '18.6'
+          - - FeOT
+            - '3.1'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '1.9'
+          - - CaO
+            - '3.5'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '4.4'
+          - - K2O
+            - '2.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_4 I II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.32 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e3-4-ii-h2-b
   locator:
     page: 5
@@ -461,6 +2278,39 @@ experiments:
   sample:
     sample_id: E3_4_II H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '64.0'
+          - - TiO2
+            - '0.8'
+          - - Al2O3
+            - '18.6'
+          - - FeOT
+            - '3.1'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '1.9'
+          - - CaO
+            - '3.5'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '4.4'
+          - - K2O
+            - '2.9'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row: 'E3_4 I II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.32 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-4-h2-a
   locator:
     page: 5
@@ -469,6 +2319,39 @@ experiments:
   sample:
     sample_id: E4_4 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '61.6'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '18.8'
+          - - FeOT
+            - '4.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.5'
+          - - CaO
+            - '5.1'
+          - - P2O5
+            - '0.6'
+          - - Na2O
+            - '4.0'
+          - - K2O
+            - '1.2'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E4_4 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.36 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e4-4-h2-b
   locator:
     page: 5
@@ -477,6 +2360,39 @@ experiments:
   sample:
     sample_id: E4_4 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '60.8'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '19.6'
+          - - FeOT
+            - '4.2'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.0'
+          - - CaO
+            - '4.6'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '4.0'
+          - - K2O
+            - '3.1'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E4_4 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.37 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-4-h2-a
   locator:
     page: 5
@@ -485,6 +2401,39 @@ experiments:
   sample:
     sample_id: E2_4 H2_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '60.6'
+          - - TiO2
+            - '1.2'
+          - - Al2O3
+            - '18.3'
+          - - FeOT
+            - '5.9'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.6'
+          - - CaO
+            - '5.9'
+          - - P2O5
+            - '0.6'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '1.0'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E2_4 I A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.39 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e2-4-h2-b
   locator:
     page: 5
@@ -493,6 +2442,39 @@ experiments:
   sample:
     sample_id: E2_4 H2_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '60.5'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '18.9'
+          - - FeOT
+            - '5.2'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '2.2'
+          - - CaO
+            - '4.8'
+          - - P2O5
+            - '0.7'
+          - - Na2O
+            - '3.6'
+          - - K2O
+            - '2.9'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E2_4 I B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.41 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-4-ii-sb-a
   locator:
     page: 5
@@ -501,6 +2483,39 @@ experiments:
   sample:
     sample_id: E7_4_II SB_A
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '65.4'
+          - - TiO2
+            - '1.0'
+          - - Al2O3
+            - '17.4'
+          - - FeOT
+            - '3.7'
+          - - MnO
+            - '0.1'
+          - - MgO
+            - '1.7'
+          - - CaO
+            - '4.6'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '4.2'
+          - - K2O
+            - '1.5'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E7_4 II A'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.44 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 - experiment_id: cacciatore-zajacz-2026-v-sc-oxybarometer-e7-4-ii-sb-b
   locator:
     page: 5
@@ -509,6 +2524,39 @@ experiments:
   sample:
     sample_id: E7_4_II SB_B
     description: run-product glass sample name in Table 3; series is mapped to the matching Table 2 run
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '65.2'
+          - - TiO2
+            - '0.9'
+          - - Al2O3
+            - '17.6'
+          - - FeOT
+            - '3.2'
+          - - MnO
+            - '0.2'
+          - - MgO
+            - '1.6'
+          - - CaO
+            - '4.0'
+          - - P2O5
+            - '0.4'
+          - - Na2O
+            - '3.8'
+          - - K2O
+            - '3.4'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: 'E7_4 II B'
+        note: "Table 1 starting material, wt%, normalized to 100% anhydrous. FeO-tot is stored as FeOT. The printed FeO/Fe2O3 molar ratio 0.43 is the prepared-powder ratio from added Fe2O3 and metallic Fe, not an oxide weight."
 species:
   SiO2:
     observations:
