@@ -5900,12 +5900,12 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
         (
             "ammin-73-470-oneill-1988",
             "ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit",
-            r'''O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486.''',
+            "JANAF thermochemical tables, Chase et al. (1982), values assessed primarily from Mah et al. (1967)",
         ),
         (
             "arxiv-1602-00658-fegley-rock-steam-solubility",
             "arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation",
-            'Fegley, B., Jr., Jacobson, N. S., Williams, K. B., Plane, J. M., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", submitted to the Astrophysical Journal, arXiv:1602.00658.',
+            "Palme and O'Neill (2014)",
         ),
         (
             "berman-1988-internally-consistent-mineral-thermodynamic-data",
@@ -5920,12 +5920,17 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
         (
             "fegley-2016-rock-steam-solubility",
             "fegley-2016-rock-steam-solubility::fegley_2016_table3_bse_composition::rows:h=3547f3dd9048",
-            'Fegley, B. Jr., Jacobson, N. S., Williams, K. B., Plane, J. M. C., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", The Astrophysical Journal 824(2):103.',
+            "Palme & O'Neill (2014)",
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table2_continental_crust_composition::rows:h=a57975b5d50a",
+            "Wedepohl (1995)",
         ),
         (
             "hashimoto-nakano-2021-bubbles-to-chondrites-ii",
             "hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions",
-            'Hashimoto, A. & Nakano, Y. (2021), "Bubbles to Chondrites-II. Chemical fractionations in chondrites", Progress in Earth and Planetary Science 8:9.',
+            "Jarosewich (1990, table 5); Jarosewich (1990, table 2); Lodders (2003, table 1 and 3); Yanai et al. (1995); Ikeda and Takeda 1979; Kimura et al. 1979; Fujimaki et al. 1981; Nagahara 1981; Ikeda 1983; Kimura 1983; Ikeda (1983); Ikeda (1980); Hezel and Palme (2010); Ikeda (1982)",
         ),
         (
             "holzheid-1997-feo-nio-coo-activity-metal-saturated",
@@ -5935,7 +5940,7 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
         (
             "itoh-hino-banya-1997-mg-deoxidation",
             "itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters",
-            'Itoh, H., Hino, M. and Ban-Ya, S. (1997), "Deoxidation Equilibrium of Magnesium in Liquid Iron", Tetsu-to-Hagané 83(10), 623-628.',
+            "Yavoiskii et al.; Nadif and Gatellier; Turkdogan; Inoue and Suito; Kulikov; Gorobetz (references 6–11)",
         ),
         (
             "lpi-compendium-15013",
@@ -5981,7 +5986,7 @@ def test_compilation_assessed_rows_migrate_printed_identity(
         (
             "ta-yamanaka-1997-metsoc",
             "ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs",
-            'Yamanaka, A. & Tsuchiyama, A. (1997), "Evaporation experiments of Na from a Na2O-SiO2 melt by thermogravimetry: Measurement of evaporation coefficients", 60th Annual Meteoritical Society Meeting, abstract 5122.',
+            "Rego et al. (1985), Metallurgical Transactions 16B:313-323; Chase et al. (1985), JANAF Thermochemical Tables, 3rd ed., p. 1577",
         ),
         (
             "usgs-lunar-sourcebook-tab8-1",
@@ -5996,7 +6001,7 @@ def test_compilation_assessed_rows_migrate_printed_identity(
         (
             "visscher-fegley-2013-debris-disks",
             "visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions",
-            'Visscher, Channon & Fegley, Bruce (2013), "Chemistry of impact-generated silicate melt-vapor debris disks", The Astrophysical Journal Letters 767(1), L12.',
+            "Palme and O'Neill 2003; O'Neill 1991; Lodders 2000; Lodders and Fegley 2011; Warren and Kallemeyn 1990; Warren et al. 1995; Mittlefehldt et al. 2002; Ringwood 1960; Vdovykin 1970; Wiik 1972; Jarosewich 1990; Klock et al. 1998",
         ),
     ),
 )
