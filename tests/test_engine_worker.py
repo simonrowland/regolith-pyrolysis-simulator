@@ -5,6 +5,7 @@ import multiprocessing.process
 import os
 import queue
 import signal
+import struct
 import subprocess
 import sys
 import threading
@@ -87,6 +88,21 @@ def _handle_timeout_log_request(handler_started, request, _errlog):
         while True:
             time.sleep(0.05)
     return request.get('request_id')
+
+
+def _run_partial_frame_test_worker(
+    connection,
+    _bootstrap,
+    _handler,
+    _bootstrap_args,
+    _diagnostic_log_path,
+    _diagnostic_signal,
+):
+    connection.send(('ready', 'partial-frame-test-ready'))
+    connection.recv()
+    os.write(connection.fileno(), struct.pack('!i', 128) + b'partial')
+    while True:
+        time.sleep(1.0)
 
 
 def _recording_worker(
@@ -286,6 +302,53 @@ def test_timeout_discards_slot_and_next_call_respawns():
     assert worker.call(_points()[1], timeout_s=1.0)
     assert worker.start_count == 2
     worker.close()
+
+
+@pytest.mark.timeout(20)
+def test_partial_reply_times_out_kills_worker_and_pool_respawns(monkeypatch):
+    timeout_s = 0.25
+    original_target = engine_pool_module._run_engine_worker
+    monkeypatch.setattr(
+        engine_pool_module,
+        '_run_engine_worker',
+        _run_partial_frame_test_worker,
+    )
+    pool = EngineWorkerPool(
+        lambda _index: _test_worker(timeout_s=timeout_s),
+        size=1,
+    )
+    worker = pool.workers[0]
+    partial_process = worker.process
+    partial_connection = worker.connection
+    partial_pid = partial_process.pid
+    monkeypatch.setattr(engine_pool_module, '_run_engine_worker', original_target)
+
+    started_at = time.monotonic()
+    try:
+        future = pool.submit(_points()[0], timeout_s=timeout_s)
+        with pytest.raises(EngineWorkerTimeout) as exc_info:
+            future.result(timeout=timeout_s + 2.0)
+        elapsed = time.monotonic() - started_at
+
+        assert exc_info.value.phase == 'job'
+        assert exc_info.value.timeout_s == pytest.approx(timeout_s)
+        assert elapsed <= timeout_s + 1.5
+        assert worker.process is None
+        assert partial_connection.closed
+        assert partial_process.exitcode is not None
+        assert not partial_process.is_alive()
+        with pytest.raises(ProcessLookupError):
+            os.kill(partial_pid, 0)
+
+        replacement = pool.submit(_points()[1], timeout_s=1.0).result(
+            timeout=_RENDEZVOUS_TIMEOUT_S
+        )
+        assert isinstance(replacement, bytes)
+        assert replacement
+        assert worker.start_count == 2
+        assert worker.process is not partial_process
+    finally:
+        pool.close(cancel_pending=True)
 
 
 def test_remote_error_discards_tainted_slot_before_next_call():
