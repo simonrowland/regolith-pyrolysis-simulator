@@ -170,8 +170,12 @@ def test_isolated_migration_has_typed_rows_and_printed_conditions(migrated) -> N
     migrated_by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in rows}
     for observation_id in O_POINT_IDS:
         row = migrated_by_id[observation_id]
-        assert row.identity.temperature_K.is_value
-        assert row.identity.temperature_K.value == Decimal("1773.15")
+        if observation_id == O_POINT_IDS[0]:
+            assert row.identity.temperature_K.is_not_applicable
+            assert row.value.point == Decimal("1773.15")
+        else:
+            assert row.identity.temperature_K.is_value
+            assert row.identity.temperature_K.value == Decimal("1773.15")
     approximate_ids = {
         observation_id
         for observation_id, row in migrated_by_id.items()
