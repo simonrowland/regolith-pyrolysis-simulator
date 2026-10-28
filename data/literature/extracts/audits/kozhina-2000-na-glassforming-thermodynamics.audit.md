@@ -37,7 +37,7 @@ The paper does not tabulate total pressure or fO2 for these rows; neither is add
 
 ## Other source material
 
-- Figure 2 partial chemical-potential functions are figure-only candidates and were not digitized.
+- Figure 2 partial chemical-potential functions are figure-only candidates and were not digitized. The rendered PDF page 3 (printed page 93) confirms the figure and caption; locator: page 3, published page 93, PDF page index 2.
 - Equation 3 is retained literally in the paper's printed form. Its activity and chemical-potential sides have inconsistent signs; no correction was made.
 - The prose examples of very low Na2O activity are not Table 1 cells and were not converted into logarithmic observations.
 

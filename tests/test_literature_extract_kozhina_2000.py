@@ -81,6 +81,17 @@ def test_table_1_preserves_all_rows_cells_and_render_anchors() -> None:
         "referred to the corresponding properties of the pure oxides"
     )
     assert all(set(row) == {"system", "XNa2O", "T_K", "delta_Gf_kJ_per_mol", "delta_Hf_kJ_per_mol"} for row in table["values"]["rows_as_published"])
+    figure = next(
+        row
+        for row in document["species"]["Na2O"]["context"]
+        if row["observation_id"] == "kozhina_2000_figure_2_partial_properties_candidate"
+    )
+    assert figure["locator"] == {
+        "page": 3,
+        "published_page": 93,
+        "pdf_page_index": 2,
+        "figure": "2",
+    }
 
     mutated = deepcopy(document)
     mutated_table = mutated["species"]["Na2O"]["context"][0]["values"]["rows_as_published"]
