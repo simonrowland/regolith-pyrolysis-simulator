@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import tomllib
 from collections import defaultdict
 from pathlib import Path
@@ -11,6 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+_DECLARATION_FILES = ("pyproject.toml", "requirements.txt")
 _DIRECT_GIT_REQUIREMENT = re.compile(
     r"^\s*(?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)"
     r"(?:\[[^\]]+\])?\s*@\s*(?P<url>git\+\S+)"
@@ -100,6 +102,48 @@ def test_git_dependency_revisions_match_uv_lock() -> None:
     _assert_git_dependency_revisions_match(project, lock)
 
 
+def _is_dependency_declaration_file(path: str) -> bool:
+    if path.startswith("tests/fixtures/"):
+        return False
+
+    parts = path.split("/")
+    filename = parts[-1].lower()
+    return (
+        "requirements" in parts[:-1]
+        or filename == "pipfile"
+        or (
+            filename.endswith(".txt")
+            and ("requirements" in filename or "constraints" in filename)
+        )
+    )
+
+
+def _assert_supported_declaration_files(root: Path = ROOT) -> None:
+    tracked_files = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.split("\0")
+    unsupported = [
+        path
+        for path in tracked_files
+        if path
+        and _is_dependency_declaration_file(path)
+        and path not in _DECLARATION_FILES
+    ]
+
+    assert not unsupported, (
+        "Unlisted dependency declaration files; add them to "
+        f"_DECLARATION_FILES: {', '.join(unsupported)}"
+    )
+
+
+def test_only_supported_dependency_declaration_files_are_tracked() -> None:
+    _assert_supported_declaration_files()
+
+
 def _all_declared_requirements(
     project: dict, requirements_root: Path = ROOT
 ) -> list[tuple[str, str]]:
@@ -107,14 +151,15 @@ def _all_declared_requirements(
         (requirement, "pyproject.toml")
         for requirement in _project_requirements(project)
     ]
-    for requirements_file in sorted(requirements_root.glob("requirements*.txt")):
+    for declaration_file in _DECLARATION_FILES:
+        if declaration_file == "pyproject.toml":
+            continue
+        requirements_file = requirements_root / declaration_file
         # Pip files allow blank lines, full-line comments (including indentation),
-        # and inline comments introduced by whitespace before '#'. Join '\\'
-        # continuations before interpreting declarations. Skip requirement-file
-        # directives (-r/--requirement, -c/--constraint), editable installs
-        # (-e/--editable), and other option lines such as --index-url,
-        # --extra-index-url, --find-links, and --trusted-host: these configure pip
-        # but do not declare a dependency pin.
+        # inline comments introduced by whitespace before '#', and '\\'
+        # continuations. These are the only skipped constructs. Fail on pip
+        # options such as -r/--requirement, -c/--constraint, -e/--editable, and
+        # --index-url because this guard does not support resolving them yet.
         logical_requirement = ""
         logical_start_line = None
         for line_number, raw_line in enumerate(
@@ -126,9 +171,16 @@ def _all_declared_requirements(
             if not uncommented.strip():
                 continue
 
+            piece = uncommented.lstrip()
+            if piece.startswith("-"):
+                raise AssertionError(
+                    f"{requirements_file.name}:{line_number}: requirements-file "
+                    "options are not supported by this guard yet: "
+                    f"{piece.strip()}"
+                )
+
             if logical_start_line is None:
                 logical_start_line = line_number
-            piece = uncommented.lstrip()
             stripped_piece = piece.rstrip()
             continued = stripped_piece.endswith("\\")
             if continued:
@@ -138,7 +190,7 @@ def _all_declared_requirements(
                 continue
 
             requirement = logical_requirement.strip()
-            if requirement and not requirement.startswith("-"):
+            if requirement:
                 requirements.append(
                     (
                         requirement,
@@ -150,7 +202,7 @@ def _all_declared_requirements(
 
         if logical_start_line is not None:
             requirement = logical_requirement.strip()
-            if requirement and not requirement.startswith("-"):
+            if requirement:
                 requirements.append(
                     (
                         requirement,
@@ -165,10 +217,6 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
     requirements_text = (
         "    # PetThermoTools, Thermobar, PySulfSat and VapoRock are installed\n"
         "\n"
-        "--index-url https://example.com/simple\n"
-        "-r other-requirements.txt\n"
-        "-c constraints.txt\n"
-        "-e .\n"
         "synthetic-dep @ git+https://example.com/synthetic-dep@declared-\\\n"
         "    rev # continued revision\n"
     )
@@ -205,6 +253,33 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
     assert "synthetic-dep" in message
     assert "declared-rev" in message
     assert "locked-rev" in message
+
+
+def test_requirements_file_option_is_rejected_with_its_line(tmp_path: Path) -> None:
+    (tmp_path / "requirements.txt").write_text(
+        "# editable git requirements are not supported yet\n"
+        "\n"
+        "-e git+https://example.com/synthetic-dep@declared-rev#egg=synthetic-dep\n"
+    )
+
+    with pytest.raises(
+        AssertionError,
+        match=r"requirements\.txt:3: requirements-file options are not supported",
+    ):
+        _all_declared_requirements(
+            {"dependencies": [], "optional-dependencies": {}}, tmp_path
+        )
+
+
+def test_unlisted_tracked_requirements_file_is_rejected(tmp_path: Path) -> None:
+    subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
+    (tmp_path / "other-requirements.txt").write_text("synthetic-dep>=1.0\n")
+    subprocess.run(
+        ["git", "add", "--", "other-requirements.txt"], cwd=tmp_path, check=True
+    )
+
+    with pytest.raises(AssertionError, match="other-requirements.txt"):
+        _assert_supported_declaration_files(tmp_path)
 
 
 def _assert_declared_versions_match_uv_lock(
