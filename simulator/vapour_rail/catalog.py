@@ -970,7 +970,7 @@ class CompiledPressureEvaluator:
         low, high = self.valid_temperature_K
         out_of_range = temperature_K < low or temperature_K > high
 
-        temperature_notice = None
+        temperature_notice: dict[str, Any] = {}
         if out_of_range:
             if self.extrapolation_policy != DEFAULT_EXTRAPOLATION_POLICY:
                 raise CatalogCompileError(
@@ -983,16 +983,9 @@ class CompiledPressureEvaluator:
             # value is physical (family-keyed van 't Hoff / 1/T tangent /
             # composite thermo) — never attenuated linear-T slope invention
             # (b-145 composites; t-538 all non-composite families).
-            try:
-                log10_reference = self._out_of_domain_log10_continuation(temperature_K)
-            except (NasaCeaDomainError, ShomateDomainError) as exc:
-                log10_reference = self._reciprocal_T_tangent_log10(temperature_K)
-                temperature_notice = {
-                    "reason": str(exc),
-                    "authority_level": "extrapolated",
-                    "certified_band": {"temperature_K": (low, high)},
-                    "continuation": "reciprocal_T_tangent",
-                }
+            log10_reference = self._out_of_domain_log10_continuation(
+                temperature_K, temperature_notice=temperature_notice,
+            )
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
 
@@ -1267,8 +1260,11 @@ class CompiledPressureEvaluator:
         temperature = _finite_positive(temperature_K, "temperature_K")
         low, high = self.valid_temperature_K
         out_of_range = temperature < low or temperature > high
+        temperature_notice: dict[str, Any] = {}
         reference_log10 = (
-            self._out_of_domain_log10_continuation(temperature)
+            self._out_of_domain_log10_continuation(
+                temperature, temperature_notice=temperature_notice,
+            )
             if out_of_range
             else self.reference_model.log10_pressure(temperature)
         )
@@ -1326,11 +1322,13 @@ class CompiledPressureEvaluator:
             "activity_verdict": activity.verdict.value,
             "flux_disposition": "instrumented_not_selected",
         }
+        if temperature_notice:
+            payload["extrapolation_notice"] = dict(temperature_notice)
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
             notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
                 "extrapolation_notice"
-            ) or _pO2_floor_inversion_notice(
+            ) or temperature_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1341,7 +1339,9 @@ class CompiledPressureEvaluator:
                 payload["extrapolation_notice"] = dict(notice)
         return MappingProxyType(payload)
 
-    def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
+    def _out_of_domain_log10_continuation(
+        self, temperature_K: float, *, temperature_notice: dict[str, Any] | None = None,
+    ) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
 
         Owner-ratified anti-cliff policy: never drop to silent zero at the
@@ -1370,9 +1370,19 @@ class CompiledPressureEvaluator:
         """
         if self.reference_model.physical_composite_ood:
             # Compose the landed exchange and base-pressure models while their
-            # constituents accept T. evaluate() routes constituent-domain misses
-            # through the existing 1/T tangent and preserves the original reason.
-            return float(self.reference_model.log10_pressure(temperature_K))
+            # constituents accept T. Both scalar and typed consumers share the
+            # fallback and its original constituent-domain reason here.
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError) as exc:
+                if temperature_notice is not None:
+                    temperature_notice.update({
+                        "reason": str(exc),
+                        "authority_level": "extrapolated",
+                        "certified_band": {"temperature_K": self.valid_temperature_K},
+                        "continuation": "reciprocal_T_tangent",
+                    })
+                return self._reciprocal_T_tangent_log10(temperature_K)
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
