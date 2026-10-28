@@ -340,7 +340,12 @@ def test_b689_ags_h298_basis_does_not_spread_to_cp(tmp_path: Path) -> None:
     assert enthalpy.identity.subtype.value == "H(T)-H(298.15 K)"
     cell = _cell_at(enthalpy, "298.15")
     attempt = _attempt(Engine.VAPOROCK, cell)
-    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+    # With the declared basis, VapoRock reaches its AgS(g) lookup and refuses
+    # the absent species as OUTSIDE_SUPPORTED_SPECIES
+    # (compilation_tier.py:2467-2476).
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
     # That H298 declaration must not assign a mol-species basis to B689 Cp.
     heat_capacity = _observation(result, B689, "page-0003", Quantity.CP)
