@@ -87,27 +87,24 @@ experiments:
       state:
         tag: value
         value:
-          species: CO2-O2-Ar gas mixture
+          species: CO2-CO-Ar gas mixture
           flow_sccm:
             tag: unknown
-            reason: source reports Nml/min; this is not an sccm value
+            reason: not_published
           partial_pressure_Pa:
             tag: unknown
             reason: not_published
-      locator: &id001
-        page: 3
-        published_page: 416
-        section: Experimental method
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
     regime:
       regime_class:
         tag: unknown
         reason: not_published
-  point_conditions_note: The table reports row-wise CO2 and O2 partial pressures in the observations. No complete
-    slag composition or total pressure is tabulated.
-  gas_flow_as_printed:
-    value: 100 Nml/min; parenthetical 5 x 10^-6 Nm3/s
-    note: The two printed flow rates are inconsistent; neither is treated as a pressure.
-    locator: *id001
+  point_conditions_note: Table rows report CO2 and O2 partial pressures. No complete run-wise slag composition,
+    total pressure, or gas flow is stated for the distribution experiment.
 - experiment_id: fujisawa94-table3-homogeneous-melt-1523k
   method: distribution_equilibrium
   locator:
@@ -147,27 +144,24 @@ experiments:
       state:
         tag: value
         value:
-          species: CO2-O2-Ar gas mixture
+          species: CO2-CO-Ar gas mixture
           flow_sccm:
             tag: unknown
-            reason: source reports Nml/min; this is not an sccm value
+            reason: not_published
           partial_pressure_Pa:
             tag: unknown
             reason: not_published
-      locator: &id002
-        page: 3
-        published_page: 416
-        section: Experimental method
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
     regime:
       regime_class:
         tag: unknown
         reason: not_published
-  point_conditions_note: The table reports row-wise CO2 and O2 partial pressures and Sn content; no complete slag
-    composition or total pressure is tabulated.
-  gas_flow_as_printed:
-    value: 100 Nml/min; parenthetical 5 x 10^-6 Nm3/s
-    note: The two printed flow rates are inconsistent; neither is treated as a pressure.
-    locator: *id002
+  point_conditions_note: Table rows report CO2 and O2 partial pressures. No complete run-wise slag composition,
+    total pressure, or gas flow is stated for the distribution experiment.
 species:
   SnO2:
     observations:
@@ -269,7 +263,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -351,7 +345,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -436,7 +430,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -516,7 +510,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -596,7 +590,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -681,7 +675,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -765,7 +759,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -846,7 +840,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             table: '2'
@@ -918,12 +912,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.99920'
-          SnO2: '0.00080'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -956,26 +944,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.99920'
-              - - SnO2
-                - '0.00080'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r2
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1021,12 +995,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.99922'
-          SnO2: '0.00078'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1059,26 +1027,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.99922'
-              - - SnO2
-                - '0.00078'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r3
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1125,12 +1079,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.9984'
-          SnO2: '0.0016'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1163,26 +1111,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.9984'
-              - - SnO2
-                - '0.0016'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r4
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1229,12 +1163,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.9982'
-          SnO2: '0.0018'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1267,26 +1195,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.9982'
-              - - SnO2
-                - '0.0018'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r5
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1332,12 +1246,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.99936'
-          SnO2: '0.00064'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1370,26 +1278,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.99936'
-              - - SnO2
-                - '0.00064'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r6
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1435,12 +1329,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.99943'
-          SnO2: '0.00057'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1473,26 +1361,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.99943'
-              - - SnO2
-                - '0.00057'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r7
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1538,12 +1412,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.9984'
-          SnO2: '0.0016'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1576,26 +1444,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.9984'
-              - - SnO2
-                - '0.0016'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r8
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1641,12 +1495,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.9984'
-          SnO2: '0.0016'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1679,26 +1527,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.9984'
-              - - SnO2
-                - '0.0016'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     - observation_id: fujisawa94_t3_r9
       experiment: fujisawa94-table3-homogeneous-melt-1523k
@@ -1745,12 +1579,6 @@ species:
             page: 6
             published_page: 419
             table: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          NaO0.5: '0.9956'
-          SnO2: '0.0044'
-        composition_basis_note: NaO0.5 mole fraction is the complement of printed X_SnO2 for the homogeneous binary
-          NaO0.5-SnO2 liquid; N=n_Na/(n_Na+n_Sn) is defined in the paper.
       point_conditions:
         temperature_K:
           state:
@@ -1783,26 +1611,12 @@ species:
             note: Only gas partial pressures are printed.
         composition:
           state:
-            tag: value
-            value:
-              basis: printed_mole_fraction
-              amount_basis: mole_fraction
-              components:
-              - - NaO0.5
-                - '0.9956'
-              - - SnO2
-                - '0.0044'
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
           locator:
             page: 6
             table: '3'
             note: No complete run-wise slag composition is printed.
-          inference:
-            relation: binary_component_closure_from_printed_X_SnO2
-            inputs:
-            - printed X_SnO2
-            - homogeneous binary NaO0.5-SnO2 melt
-            - N=nNa/(nNa+nSn)
-            output_unit: mole_fraction
       standard_state: pure solid SnO2(s)
     context:
     - observation_id: fujisawa94_table1_parameter_context
@@ -1857,7 +1671,8 @@ species:
         log10_activity_as_printed: '-1.960'
         P_CO2_MPa_as_printed: '0.08'
         T_K: '1523'
-        printed_standard_state: NaO0.5(l), as printed; explicit reference convention not stated
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
         method: Activity determined by the EMF method using equations (1)-(5).
         points:
         - value: '-1.960'
@@ -1913,13 +1728,14 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             published_page: 418
             table: '2'
             note: Group average printed on row 4; represents Table 2 run rows 1-5.
-      standard_state: NaO0.5(l); reference convention not stated
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'
     - observation_id: fujisawa94_t2_group_2_log_a_NaO05
       experiment: fujisawa94-table2-saturated-slag-1523k
       type: activity_coefficient
@@ -1943,7 +1759,8 @@ species:
         log10_activity_as_printed: '-1.765'
         P_CO2_MPa_as_printed: '0.03'
         T_K: '1523'
-        printed_standard_state: NaO0.5(l), as printed; explicit reference convention not stated
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
         method: Activity determined by the EMF method using equations (1)-(5).
         points:
         - value: '-1.765'
@@ -1999,13 +1816,14 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             published_page: 418
             table: '2'
             note: Group average printed on row 7; represents Table 2 run rows 6.
-      standard_state: NaO0.5(l); reference convention not stated
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'
     - observation_id: fujisawa94_t2_group_3_log_a_NaO05
       experiment: fujisawa94-table2-saturated-slag-1523k
       type: activity_coefficient
@@ -2029,7 +1847,8 @@ species:
         log10_activity_as_printed: '-1.530'
         P_CO2_MPa_as_printed: '0.01'
         T_K: '1523'
-        printed_standard_state: NaO0.5(l), as printed; explicit reference convention not stated
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
         method: Activity determined by the EMF method using equations (1)-(5).
         points:
         - value: '-1.530'
@@ -2085,10 +1904,11 @@ species:
         composition:
           state:
             tag: unknown
-            reason: not_published
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
           locator:
             page: 5
             published_page: 418
             table: '2'
             note: Group average printed on row 8; represents Table 2 run rows 7-8.
-      standard_state: NaO0.5(l); reference convention not stated
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'
