@@ -274,9 +274,12 @@ source_caveats:
   - locator: {page: 1, published_page: 615, equation: '3'}
     quote: 'Therefore, the alkali oxide activity was calculated according to Equation [3].'
     note: >-
-      Numeric Na2O and K2O activity values are presented only as curves in
-      Figures 2, 3 and 5 and are not digitized. The reference equation prints
-      Na2O(l,s); the paper does not resolve liquid versus solid in this notation.
+      This extract has no numeric Na2O activity rows; the activity curves in
+      Figures 2, 3 and 5 are figure-only. The reference equation prints
+      Na2O(1, s), with the digit 1. Reading this as liquid/solid is an
+      interpretation; the paper does not resolve that notation. Kp is taken
+      externally from FACT. The printed pO2 = p_Na/4 relation is an activity
+      assumption, not a measured fO2.
   - locator: {page: 2, published_page: 616, table: 'II'}
     quote: 'NBO/T according to Equation [5]'
     note: >-

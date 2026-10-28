@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 443
-- Extracts (`literature_extract.v1`): 441
+- Sources: 444
+- Extracts (`literature_extract.v1`): 442
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 441
+- Extracts with no PDF: 442
 - Alias groups needing owner/controller resolution: 50
 - Extracts with private/non-public row locators: 74
 
@@ -289,6 +289,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `morita-1999-chromium-oxide-activity` | Morita, K., Mori, M., Guo, M., Ikagawa, T. & Sano, N. (1999), Activity of chromium oxide and phase relations for the CaO-SiO2-CrOx system at 1873 K under moderately reducing conditions, Steel Research 70:319-324. | 10.1002/srin.199905647 | ABSENT, `` | `raw/morita-1999-chromium-oxide-activity/morita-1999-chromium-oxide-activity.pdf` (present, a07669c8); `text/morita-1999-chromium-oxide-activity/` (27 files, exists); `tables/morita-1999-chromium-oxide-activity/` (0 files, ABSENT) | `data/literature/extracts/morita-1999-chromium-oxide-activity.yaml` (210 rows, draft) | `ledger/morita-1999-chromium-oxide-activity.yaml`: — (—) |
 | `morita-2000-sio2-activity-si-alloys` | Morita, K., Kume, K. & Sano, N. (2000), "A Newly Developed Method for Determining SiO2 Activity of the Silicate Slags Equilibrated with Molten Silicon Alloys," ISIJ International 40(6): 554–560. | 10.2355/isijinternational.40.554 | ABSENT, `` | `raw/morita-2000-sio2-activity-si-alloys/morita-2000-sio2-activity-si-alloys.pdf` (present, f4d38726); `text/morita-2000-sio2-activity-si-alloys/` (10 files, exists); `tables/morita-2000-sio2-activity-si-alloys/` (8 files, exists) | `data/literature/extracts/morita-2000-sio2-activity-si-alloys.yaml` (172 rows, draft) | `ledger/morita-2000-sio2-activity-si-alloys.yaml`: extracted (2026-10-03) |
 | `muan-1959-manganese-silica-air` | A. Muan (1959), “Phase Equilibria in the System Manganese Oxide—SiO2 in Air”, American Journal of Science, vol. 257 (April 1959), pp. 297–315. |  | ABSENT, `` | `raw/muan-1959-manganese-silica-air/muan-1959-manganese-silica-air.pdf` (present, 3623e3bb); `text/muan-1959-manganese-silica-air/` (19 files, exists); `tables/muan-1959-manganese-silica-air/` (0 files, ABSENT) | `data/literature/extracts/muan-1959-manganese-silica-air.yaml` (57 rows, draft) | `ledger/muan-1959-manganese-silica-air.yaml`: — (—) |
+| `mueller-2004-alkali-oxide-activity-coal-ash` | Mueller, M., Willenborg, W., Hilpert, K. & Singheiser, L. (2004), "Structural dependence of alkali oxide activity in coal ash slags", VII International Conference on Molten Slags, Fluxes and Salts, pp. 615–618. |  | ABSENT, `` | `raw/mueller-2004-alkali-oxide-activity-coal-ash/mueller-2004-alkali-oxide-activity-coal-ash.pdf` (present, 534310b3); `text/mueller-2004-alkali-oxide-activity-coal-ash/` (17 files, exists); `tables/mueller-2004-alkali-oxide-activity-coal-ash/` (0 files, ABSENT) | `data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml` (4 rows, draft) | `ledger/mueller-2004-alkali-oxide-activity-coal-ash.yaml`: — (—) |
 | `murchison-degassing-2023-springer` | Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067; English DOI 10.1134/S0038094623050064. | 10.1134/S0038094623050064 | ABSENT, `` | `raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf` (present, 906d6c21); `text/murchison-degassing-2023-springer/` (20 files, exists); `tables/murchison-degassing-2023-springer/` (0 files, ABSENT) | `data/literature/extracts/murchison-degassing-2023-springer.yaml` (27 rows, draft) | `ledger/murchison-degassing-2023-springer.yaml`: extracted (2026-09-12) |
 | `murchison-hydropyrolysis-1990s-gca` | Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E. and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI 10.1016/j.gca.2003.08.019 | 10.1016/j.gca.2003.08.019 | ABSENT, `` | `raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf` (present, b799d6c8); `text/murchison-hydropyrolysis-1990s-gca/` (24 files, exists); `tables/murchison-hydropyrolysis-1990s-gca/` (0 files, ABSENT) | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` (10 rows, draft) | `ledger/murchison-hydropyrolysis-1990s-gca.yaml`: extracted (2026-09-12) |
 | `nagabayashi-hino-banya-1989-phosphorus` | Nagabayashi, R., Hino, M. & Ban-ya, S. (1989), "Mathematical Expression of Phosphorus Distribution in Steelmaking Process by Quadratic Formalism", ISIJ International 29(2):140-147. |  | ABSENT, `` | `raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf` (present, 5662bae5); `text/nagabayashi-hino-banya-1989-phosphorus/` (55 files, exists); `tables/nagabayashi-hino-banya-1989-phosphorus/` (0 files, ABSENT) | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` (10 rows, draft, private_path) | `ledger/nagabayashi-hino-banya-1989-phosphorus.yaml`: acquired (2026-09-06) |
@@ -739,6 +740,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `morita-1999-chromium-oxide-activity`
 - `morita-2000-sio2-activity-si-alloys`
 - `muan-1959-manganese-silica-air`
+- `mueller-2004-alkali-oxide-activity-coal-ash`
 - `murchison-degassing-2023-springer`
 - `murchison-hydropyrolysis-1990s-gca`
 - `nagabayashi-hino-banya-1989-phosphorus`
