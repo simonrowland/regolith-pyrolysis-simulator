@@ -29,6 +29,7 @@ from simulator.melt_backend.melt_envelope import (
     MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
     consume_melt_extrapolation_envelope,
 )
+from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
@@ -45,6 +46,7 @@ from simulator.transport_regime import TransportRegimeRefusal
 
 from simulator.chemistry.kernel import select_backend_status
 _TYPED_PHYSICS_REFUSALS = (
+    _LiquidusFinderBudgetExceeded,
     VaporPressureRangeError,
     CertifiedPointRefusedError,
     TransportRegimeRefusal,
@@ -213,7 +215,11 @@ class RunExecutor:
                 config,
                 backend=_backend_from_worker_runtime(config, worker_runtime),
             )
-        except (CampaignPressureSetpointRefusal, EvaporationFluxRefusal) as exc:
+        except (
+            CampaignPressureSetpointRefusal,
+            EvaporationFluxRefusal,
+            _LiquidusFinderBudgetExceeded,
+        ) as exc:
             return self.execute_session(
                 session,
                 hours=hours,
@@ -231,7 +237,10 @@ class RunExecutor:
         hours: int,
         stop_at_stage0_exit: bool | None = None,
         initial_refusal: (
-            CampaignPressureSetpointRefusal | EvaporationFluxRefusal | None
+            CampaignPressureSetpointRefusal
+            | EvaporationFluxRefusal
+            | _LiquidusFinderBudgetExceeded
+            | None
         ) = None,
     ) -> RunExecution:
         sim = session.simulator
@@ -418,6 +427,9 @@ class RunExecutor:
             status = "refused"
             reason = _typed_refusal_reason(exc)
             error_message = str(exc)
+            diagnostic = getattr(exc, "diagnostic", None)
+            if isinstance(diagnostic, Mapping):
+                refusal_diagnostic = dict(diagnostic)
         except PoisonedHourError as exc:
             failure_exc = exc
             status = "failed"
@@ -796,6 +808,8 @@ def _backend_status_from_honest_exception(
     from simulator.backends import BackendUnavailableError
     from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 
+    if isinstance(exc, _LiquidusFinderBudgetExceeded):
+        return "refused"
     if isinstance(
         exc, (ImportError, EngineWorkerUnavailable, BackendUnavailableError)
     ):

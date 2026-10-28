@@ -28,7 +28,6 @@ from simulator.fe_redox import (
 )
 from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
-    _LiquidusFinderBudgetExceeded,
     LiquidusSampleError,
 )
 from simulator.engine_pool import EngineWorkerTimeout
@@ -2732,7 +2731,7 @@ class EvaporationMixin:
         if callable(register_gate_providers):
             try:
                 register_gate_providers()
-            except (TimeoutError, _LiquidusFinderBudgetExceeded):
+            except TimeoutError:
                 raise
             except Exception as exc:  # noqa: BLE001 - optional provider boundary
                 record_gate_curve_provider_outcome(
@@ -3563,6 +3562,8 @@ class EvaporationMixin:
                     effective_pressure_species_ids=effective_pressure_species_ids,
                 ),
             )
+        except TimeoutError:
+            raise
         except Exception as exc:  # noqa: BLE001 — typed failure, not live fallback
             self._last_vapour_batch_resolve_error = {
                 'status': 'unavailable',

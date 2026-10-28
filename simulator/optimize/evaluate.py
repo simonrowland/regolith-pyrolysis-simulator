@@ -144,6 +144,7 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
+from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
 from simulator.run_executor import RunExecutor
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -216,6 +217,7 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
     "certification_allowed",
 )
 _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
+    _LiquidusFinderBudgetExceeded,
     CampaignPressureSetpointRefusal,
     CertifiedPointRefusedError,
     KnudsenRegimeRefusal,

@@ -21,6 +21,7 @@ from simulator.optimize.sso_r_owner_surface import (
     OWNER_RECIPE_PO2_MBAR,
     OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
 )
+from simulator.melt_backend.liquidus import _LiquidusFinderBudgetExceeded
 from simulator.runner import PyrolysisRun
 from simulator.run_executor import RunExecution, RunExecutor
 from simulator.session import SimSession
@@ -103,11 +104,16 @@ def build_sso2_owner_recipe_execution(
     backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 ) -> RunExecution:
     setpoints_patch = sso2_owner_recipe_setpoints_patch()
-    dose_kg = _certified_full_feo_equiv_na_dose_kg(
-        mass_kg=float(mass_kg),
-        backend_name=backend_name,
-        setpoints_patch=setpoints_patch,
-    )
+    calibration_refusal = None
+    try:
+        dose_kg = _certified_full_feo_equiv_na_dose_kg(
+            mass_kg=float(mass_kg),
+            backend_name=backend_name,
+            setpoints_patch=setpoints_patch,
+        )
+    except _LiquidusFinderBudgetExceeded as exc:
+        calibration_refusal = exc
+        dose_kg = 0.0
     run = PyrolysisRun(
         feedstock_id=SSO2_FEEDSTOCK_ID,
         campaign="C2A_staged",
@@ -121,9 +127,39 @@ def build_sso2_owner_recipe_execution(
         ),
         setpoints_patch=setpoints_patch,
     )
-    session = SimSession().start(run._session_config())
-    _apply_certified_na_dose(session.simulator)
-    return RunExecutor().execute_session(session, hours=int(hours))
+    executor = RunExecutor()
+    session = SimSession()
+    try:
+        session.start(run._session_config())
+    except _LiquidusFinderBudgetExceeded as exc:
+        return executor.execute_session(
+            session,
+            hours=int(hours),
+            initial_refusal=exc,
+        )
+    if calibration_refusal is not None:
+        return executor.execute_session(
+            session,
+            hours=int(hours),
+            initial_refusal=calibration_refusal,
+        )
+    try:
+        _apply_certified_na_dose(session.simulator)
+    except _LiquidusFinderBudgetExceeded as exc:
+        # The owner-dose mutation runs before execute_session takes its normal
+        # per-hour rollback snapshots. Recreate a clean, undosed session for
+        # the refused result so no partial calibration state can be reported.
+        clean_session = SimSession()
+        try:
+            clean_session.start(run._session_config())
+        except _LiquidusFinderBudgetExceeded as startup_exc:
+            exc = startup_exc
+        return executor.execute_session(
+            clean_session,
+            hours=int(hours),
+            initial_refusal=exc,
+        )
+    return executor.execute_session(session, hours=int(hours))
 
 
 def _certified_full_feo_equiv_na_dose_kg(
@@ -262,12 +298,22 @@ def sso2_owner_recipe_evidence(
         ledger, SSO2_METAL_PHASE_ACCOUNTS
     )
     product_fe_kg = _product_species_kg(sim, "Fe")
-    native_split_count = _transition_count(ledger, "native_fe_saturation_split")
+    native_split_count_observed = _transition_count(
+        ledger, "native_fe_saturation_split"
+    )
+    refusal_reason = str(getattr(run_execution, "reason", "") or "")
+    compute_timeout_refusal = (
+        str(getattr(run_execution, "status", "")) == "refused"
+        and refusal_reason == "engine_compute_timeout"
+    )
+    native_split_count = (
+        None if compute_timeout_refusal else native_split_count_observed
+    )
     native_metal_partition_count = _transition_count(
         ledger, "native_fe_metal_partition"
     )
     native_partition_transition_count = (
-        native_split_count + native_metal_partition_count
+        native_split_count_observed + native_metal_partition_count
     )
     if (
         metal_status != "available"
@@ -285,10 +331,20 @@ def sso2_owner_recipe_evidence(
         run_execution,
         sim,
         partition_transition_counts={
-            "native_fe_saturation_split": native_split_count,
+            "native_fe_saturation_split": native_split_count_observed,
             "native_fe_metal_partition": native_metal_partition_count,
         },
     )
+    timeout_detail = str(
+        getattr(run_execution, "error_message", "")
+        or refusal_reason
+    )
+    if compute_timeout_refusal:
+        native_partition_basis = {
+            "status": "unavailable",
+            "status_reason": f"{refusal_reason}: {timeout_detail}",
+            "source": "run_execution.refusal_diagnostic",
+        }
     fe_tap_total_kg = sum(tap_kg_by_species.values())
     fe_tap_si_impurity_kg = sum(
         tap_kg_by_species.get(species, 0.0) for species in SSO2_SILICA_SPECIES
@@ -303,25 +359,29 @@ def sso2_owner_recipe_evidence(
     stage1_si_impurity_kg = sum(stage1_kg.get(species, 0.0) for species in SSO2_SILICA_SPECIES)
     stage1_si_impurity_wt_pct = _wt_pct(stage1_si_impurity_kg, stage1_total_kg)
     partition_basis_available = native_partition_basis.get("status") == "available"
-    dependency_status = (
-        "available"
-        if native_partition_transition_count > 0 and partition_basis_available
-        else "missing_fe_drain_vapor_partition"
-    )
-    dependency_reason = (
-        ""
-        if dependency_status == "available"
-        else (
-            "no committed native Fe partition transition observed for this run"
-            if native_partition_transition_count <= 0
-            else str(
-                native_partition_basis.get(
-                    "status_reason",
-                    "native Fe partition basis missing",
+    if compute_timeout_refusal:
+        dependency_status = "unavailable"
+        dependency_reason = f"{refusal_reason}: {timeout_detail}"
+    else:
+        dependency_status = (
+            "available"
+            if native_partition_transition_count > 0 and partition_basis_available
+            else "missing_fe_drain_vapor_partition"
+        )
+        dependency_reason = (
+            ""
+            if dependency_status == "available"
+            else (
+                "no committed native Fe partition transition observed for this run"
+                if native_partition_transition_count <= 0
+                else str(
+                    native_partition_basis.get(
+                        "status_reason",
+                        "native Fe partition basis missing",
+                    )
                 )
             )
         )
-    )
     mass_balance = _mass_balance_closure(run_execution, trace)
     alpha_fallback_notice = _unmeasured_alpha_fallback_notice(sim)
 

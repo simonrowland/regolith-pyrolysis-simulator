@@ -2720,6 +2720,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'campaign_hour': int(self.melt.campaign_hour),
                 'per_species': per_species,
             }
+        except TimeoutError:
+            raise
         except Exception as exc:  # noqa: BLE001 - diagnostics cannot gate chemistry
             record = {
                 'schema': 'phase_context_diagnostic_v1',
@@ -13632,13 +13634,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         hard_would_advance = None
         hard_reason = "freeze gate disabled"
         if self._freeze_gate_enabled():
-            from simulator.melt_backend.liquidus import (
-                _LiquidusFinderBudgetExceeded,
-            )
-
             try:
                 raw_liquid_fraction = self._freeze_gate_liquid_fraction_factor()
-            except (TimeoutError, _LiquidusFinderBudgetExceeded):
+            except TimeoutError:
                 raise
             except Exception as exc:
                 hard_reason = f"unknown: {exc}"

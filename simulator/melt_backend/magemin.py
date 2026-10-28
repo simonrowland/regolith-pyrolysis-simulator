@@ -358,6 +358,27 @@ class _MAGEMinEngineCallError(RuntimeError):
         super().__init__(f'{exception_type}: {message}')
 
 
+def _magemin_timeout_budget(
+    exception_type: str,
+    detail: str,
+    *,
+    fallback: str,
+) -> str:
+    if exception_type == 'EngineWorkerTimeout':
+        return 'magemin_warm_worker_call'
+    if (
+        exception_type == 'MAGEMinAggregateBudgetExceeded'
+        or 'MAGEMinAggregateBudgetExceeded' in detail
+    ):
+        return 'magemin_aggregate_liquidus'
+    if (
+        exception_type == 'MAGEMinSubprocessSlotTimeout'
+        or 'MAGEMinSubprocessSlotTimeout' in detail
+    ):
+        return 'magemin_subprocess_slot'
+    return fallback
+
+
 class _MAGEMinDeclaredInputError(_MAGEMinEngineCallError):
     """A caller-declared scalar could not be admitted for an engine call."""
 
@@ -1412,8 +1433,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'TimeoutError',
                     'TimeoutExpired',
                 }:
-                    raise TimeoutError(
-                        f'MAGEMin warm worker startup timed out: {exc.detail}'
+                    raise _LiquidusFinderBudgetExceeded(
+                        f'MAGEMin warm worker startup timed out: {exc.detail}',
+                        diagnostics={
+                            'budget': 'magemin_worker_startup',
+                            'exception_class': exc.exc_name,
+                            'exception_message': exc.detail,
+                        },
                     ) from exc
                 self._warn(
                     'MAGEMin warm pool failed to initialize: '
@@ -1689,13 +1715,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     # bounded slot guard before reporting the timeout.
                     timeout_retry_used = True
         except TimeoutError as exc:
+            detail = str(exc)
+            budget = _magemin_timeout_budget(
+                type(exc).__name__,
+                detail,
+                fallback='magemin_call',
+            )
             raise _LiquidusFinderBudgetExceeded(
                 f'MAGEMin equilibrate timed out: {exc}',
                 diagnostics={
-                    'reason': 'engine_timeout',
                     'backend': 'MAGEMin',
+                    'budget': budget,
                     'backend_failure_exception': type(exc).__name__,
-                    'backend_failure_message': str(exc),
+                    'backend_failure_message': detail,
                 },
             ) from exc
         except _MAGEMinEngineCallError as exc:
@@ -1706,11 +1738,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'MAGEMinAggregateBudgetExceeded',
                 'MAGEMinSubprocessSlotTimeout',
             }:
+                budget = _magemin_timeout_budget(
+                    exc.exception_type,
+                    exc.engine_message,
+                    fallback='magemin_call',
+                )
                 raise _LiquidusFinderBudgetExceeded(
                     f'MAGEMin liquidus sample timed out: {exc}',
                     diagnostics={
-                        'reason': 'engine_timeout',
                         'backend': 'MAGEMin',
+                        'budget': budget,
                         'backend_failure_exception': exc.exception_type,
                         'backend_failure_message': exc.engine_message,
                     },
@@ -3791,13 +3828,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'TimeoutError',
                 'TimeoutExpired',
             }:
-                raise TimeoutError(
-                    f'MAGEMin pure-phase probe timed out: {exc}'
+                budget = _magemin_timeout_budget(
+                    exc.exception_type,
+                    exc.engine_message,
+                    fallback='magemin_pure_phase',
+                )
+                raise _LiquidusFinderBudgetExceeded(
+                    f'MAGEMin pure-phase probe timed out: {exc}',
+                    diagnostics={
+                        'backend': 'MAGEMin',
+                        'budget': budget,
+                        'backend_failure_exception': exc.exception_type,
+                        'backend_failure_message': exc.engine_message,
+                    },
                 ) from exc
             raise
         except subprocess.TimeoutExpired as exc:
-            raise TimeoutError(
-                f'MAGEMin pure-phase probe timed out after {timeout_s:g}s'
+            raise _LiquidusFinderBudgetExceeded(
+                f'MAGEMin pure-phase probe timed out after {timeout_s:g}s',
+                diagnostics={
+                    'backend': 'MAGEMin',
+                    'budget': 'magemin_pure_phase',
+                    'timeout_s': timeout_s,
+                    'backend_failure_exception': type(exc).__name__,
+                    'backend_failure_message': str(exc),
+                },
             ) from exc
         except OSError as exc:
             raise PurePhaseAccessError(

@@ -52,10 +52,10 @@ LIQUIDUS_LIQUID_EPSILON = 1.0e-3
 #
 # NOT widened with not_attempted, unsupported or non_authoritative: those are
 # provider or intent-level tokens describing whether a probe ran at all, not
-# how a frac_M sample refused. A timeout stays 'not_converged' (see
-# STATUS_BY_TIMEOUT_CAUSE) rather than gaining a token, because a new member
-# here would also have to exist in the kernel vocabulary or IntentResult
-# construction raises.
+# how a frac_M sample refused. A compute timeout raises
+# _LiquidusFinderBudgetExceeded, which the run boundary records as a typed
+# engine_compute_timeout refusal; it is not a LiquidusSampleError status or a
+# kernel-vocabulary token.
 LIQUIDUS_REFUSAL_STATUSES = frozenset({
     'not_converged',
     'out_of_domain',
@@ -1193,8 +1193,10 @@ def _declared_float(value: Any, name: str) -> float:
     return float(value)
 
 
-class _LiquidusFinderBudgetExceeded(RuntimeError):
+class _LiquidusFinderBudgetExceeded(TimeoutError):
     """Hard wall expiry that refuses the liquidus run instead of branching."""
+
+    reason_code = "engine_compute_timeout"
 
     def __init__(
         self,
@@ -1203,6 +1205,12 @@ class _LiquidusFinderBudgetExceeded(RuntimeError):
         diagnostics: Mapping[str, Any] | None = None,
     ) -> None:
         self.diagnostics = dict(diagnostics or {})
+        self.reason = self.reason_code
+        self.diagnostic = {
+            "reason": self.reason_code,
+            "detail": str(message),
+            "budget": dict(self.diagnostics),
+        }
         super().__init__(str(message))
 
 
