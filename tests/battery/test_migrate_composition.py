@@ -682,10 +682,10 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
     convert = migrate_module.wt_pct_to_mole_fraction
     seen: list[dict[str, Decimal]] = []
 
-    def record_map(wt):
+    def record_map(wt, *, untyped_constituents=()):
         if "Li2O" in wt:
             seen.append({name: as_decimal(value) for name, value in wt.items()})
-        return convert(wt)
+        return convert(wt, untyped_constituents=untyped_constituents)
 
     monkeypatch.setattr(migrate_module, "wt_pct_to_mole_fraction", record_map)
     migrator = migrate_one_extract(REPO_ROOT, path)
