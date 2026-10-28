@@ -26,18 +26,18 @@ extraction:
   scope_notes:
     - 'Boiler-slag activity values are retained as typed refusals. The 5% and 10% prose summaries combine SiO2 and TiO2 treatments without per-treatment compositions; the untreated Table 1 analysis totals 92.9 mass percent, with the remainder unreported.'
     - 'The approximately 0.6 Pa and 0.3 Pa alkali partial pressures are retained as typed refusals because the source does not name a gas species.'
-    - 'The comparison of about two times higher Na2O activity for AlSi8Mg8Na5 than AlSi8Mg4Na5 gives no absolute activity value and refers to two compositions; it is retained as a typed refusal.'
+    - 'The comparison of about two times higher Na2O activity for AlSi8Mg8Na5 than AlSi8Mg4Na5 gives no absolute activity value and refers to two compositions; it is retained as context.'
     - 'Figure 5 is calculated and not extracted. Figs. 3–4 and 6–9 contain measured plotted values only; no values were digitized.'
 review_status: draft
 fidelity_samples:
   - species: Na2O
     observation_id: willenborg_2006_alsi8na1_na2o_activity_1400
-    field: activity_coefficient
+    field: activity
     value: 5e-14
     locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
   - species: Na2O
     observation_id: willenborg_2006_alsi8mg8na1_na2o_activity_1400
-    field: activity_coefficient
+    field: activity
     value: 2e-13
     locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
 species:
@@ -46,18 +46,17 @@ species:
       - observation_id: willenborg_2006_alsi8na1_na2o_activity_1400
         type: activity_coefficient
         locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
-        phase: l
-        standard_state: liquid Na2O
         regime: kems_effusion
         units: dimensionless activity
         uncertainty: {note: No per-run uncertainty is printed.}
-        note: 'The paper states AlSi8Na1 was partly molten and contained mullite and cristobalite after measurement; its activity is reported as the liquid-phase value.'
+        note: The paper reports AlSi8Na1 was partly molten and contained mullite and cristobalite after measurement.
         values:
-          quantity: activity_coefficient
+          quantity: activity
           method_class: quoted_attributed
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
-          activity_coefficient: 5e-14
+          activity: 5e-14
+          approximate: true
           activity_as_published: about 5 × 10^-14
           composition_role: datum_state
           reference_state_as_published: 'Eq. 3 defines aNa2O from Na2O(l,s) stoichiometric vaporization and Kp from the FACT pure-substance database.'
@@ -65,7 +64,8 @@ species:
           quote: 'The sodium oxide activity in AlSi8Na1 is about 5 × 10^-14 at 1400 °C.'
           points:
             - T_C: '1400'
-              activity_coefficient: 5e-14
+              activity: 5e-14
+              approximate: true
               composition_role: datum_state
               point_conditions:
                 temperature_K:
@@ -77,17 +77,16 @@ species:
       - observation_id: willenborg_2006_alsi8mg8na1_na2o_activity_1400
         type: activity_coefficient
         locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
-        phase: l
-        standard_state: liquid Na2O
         regime: kems_effusion
         units: dimensionless activity
         uncertainty: {note: No per-run uncertainty is printed.}
         values:
-          quantity: activity_coefficient
+          quantity: activity
           method_class: quoted_attributed
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
-          activity_coefficient: 2e-13
+          activity: 2e-13
+          approximate: true
           activity_as_published: about 2 × 10^-13
           composition_role: datum_state
           reference_state_as_published: 'Eq. 3 defines aNa2O from Na2O(l,s) stoichiometric vaporization and Kp from the FACT pure-substance database.'
@@ -95,7 +94,8 @@ species:
           quote: 'The sodium oxide activity in AlSi8Mg8Na1 is about 2 × 10^-13 at 1400 °C.'
           points:
             - T_C: '1400'
-              activity_coefficient: 2e-13
+              activity: 2e-13
+              approximate: true
               composition_role: datum_state
               point_conditions:
                 temperature_K:
@@ -104,28 +104,6 @@ species:
                 composition:
                   state: {tag: value, value: {amount_basis: mass_percent, components: [[SiO2, '74.06'], [Al2O3, '17.10'], [MgO, '7.43'], [Na2O, '1.02']]}}
                   locator: {page: 2, published_page: 2594, pdf_page_index: 1, table: '2', note: 'Table 2, AlSi8Mg8Na1 row; mass percent.'}
-      - observation_id: willenborg_2006_magnesia_sorbent_activity_comparison_typed_refusal
-        type: activity_coefficient
-        locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
-        phase: l
-        standard_state: liquid Na2O
-        regime: kems_effusion
-        units: relative activity as printed
-        values:
-          quantity: activity_coefficient_relation
-          method_class: quoted_attributed
-          attribution: 'Willenborg et al. (2006), present work.'
-          admission_status: typed_refusal
-          reason: 'No absolute activity value is printed, and the comparison refers to two compositions rather than one point identity; the sentence also gives no specific temperature.'
-          comparison_as_published: 'The sodium oxide activity in AlSi8Mg8Na5 is about 2 times higher than in AlSi8Mg4Na5.'
-          comparison_compositions_as_published: 'Table 2 rows AlSi8Mg8Na5 and AlSi8Mg4Na5.'
-          point_conditions:
-            temperature_K:
-              state: {tag: unknown, reason: 'No temperature is printed with this comparison.'}
-              locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
-            composition:
-              state: {tag: unknown, reason: 'The comparison refers to two different sorbent compositions, not one composition identity.'}
-              locator: {page: 2, published_page: 2594, pdf_page_index: 1, table: '2', note: 'Both comparison compositions are printed, but the relation has no single composition.'}
     context:
       - observation_id: willenborg_2006_kems_method_and_calibration
         type: method
@@ -152,13 +130,13 @@ species:
         locator: {page: 3, published_page: 2595, pdf_page_index: 2, section: Results and Discussion}
         units: dimensionless activity as printed
         values:
-          quantity: activity_coefficient
+          quantity: activity
           method_class: quoted_attributed
           admission_status: typed_refusal
           reason: 'identity incomplete: prose groups SiO2 and TiO2 treatments without an individual treatment composition for each value.'
           temperature_as_published: 1400 °C
           sodium_oxide_activity_as_published: 'Untreated slag about 3 × 10^-10; slag with 5% SiO2 or TiO2 about 2 × 10^-10; slag with 10% SiO2 or TiO2 about 6 × 10^-11.'
-          potassium_oxide_activity_as_published: 'Untreated slag about 2.5 × 10^-12; slag with 5% SiO2 or TiO2 about 1.2 × 10^-12; slag with 10% SiO2 or TiO2 about 5 × 10^-13.'
+          potassium_oxide_activity_as_published: 'Untreated slag about 2.5 × 10^-12; slag with 5% SiO2 or TiO2 1.2 × 10^-12; slag with 10% SiO2 or TiO2 5 × 10^-13.'
           underlying_series_as_published: Figures 3 and 4 show the temperature dependence; plotted values were not digitized.
       - observation_id: willenborg_2006_slag_alkali_partial_pressure_typed_refusal
         type: experiment_series

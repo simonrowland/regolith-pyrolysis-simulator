@@ -63,10 +63,12 @@ full_cell_audit:
     - 'PDF p. 3 / printed p. 2595 / Eq. 2, Eq. 3 and assumptions; pdftotext agrees with the 200-dpi render.'
     - 'PDF p. 3 / printed p. 2595 / untreated and additive-group Na2O/K2O activities at 1400 °C; values and grouping checked against render; grouped slag summaries are typed-refused.'
     - 'PDF p. 4 / printed p. 2596 / about 0.6 Pa, 0.3 Pa and 50% reduction; text agrees with render; gas species is not printed, so values are typed-refused.'
+    - 'PDF p. 4 / printed p. 2596 / calculated Fig. 5 minimum about 1.8 × 10^-14; pdftotext agrees with the 200-dpi render; recorded as a figure candidate, not a measurement.'
     - 'PDF p. 5 / printed p. 2597 / 5 × 10^-14 and 2 × 10^-13 at 1400 °C; text agrees with render; bound to Table 2 rows AlSi8Na1 and AlSi8Mg8Na1.'
-    - 'PDF p. 5 / printed p. 2597 / about 2-times comparison; text agrees with render; retained typed-refused because it has no absolute values, one composition, or a specific temperature.'
+    - 'PDF p. 5 / printed p. 2597 / about 2-times Na2O activity comparison; text agrees with render; retained only as context because there is no absolute value or single-composition identity.'
     - 'PDF p. 5 / printed p. 2597 / kinetic caveat: AlSi8Na1 partly molten and AlSi8Na05 almost unmolten; checked against render; the low-Na caveat is preserved in the audit, not promoted to an equilibrium measurement.'
-  render_pages: [2, 3, 4, 5]
+    - 'PDF p. 6 / printed p. 2598 / conclusion bounds below 10^-13 for Na2O and 10^-14 for K2O; pdftotext agrees with the 200-dpi render; retained as printed summary bounds, not point observations.'
+  render_pages: [2, 3, 4, 5, 6]
   render_resolution_dpi: 200
 prose_numeric_candidates:
   - page: 3
@@ -77,16 +79,22 @@ prose_numeric_candidates:
     note: Described as alkali partial pressures over untreated slag and slag with 10% SiO2; gas species is not specified.
   - page: 5
     values: ['5e-14', '2e-13']
-    note: Approximate Na2O activities at 1400 C for model sorbents AlSi8Na1 and AlSi8Mg8Na1, respectively.
+    note: Approximate Na2O activities at 1400 C for model sorbents AlSi8Na1 and AlSi8Mg8Na1, respectively; the paper says 'about'.
   - page: 5
     values: ['2 times']
     note: Relative Na2O activity of AlSi8Mg8Na5 versus AlSi8Mg4Na5; no absolute values printed.
+  - page: 4
+    values: ['about 1.8e-14']
+    note: Calculated Fig. 5 minimum from FactSage; listed as a figure-read candidate, not an experimental measurement.
   - page: 5
     values: ['about 3 orders of magnitude', '2.5 orders of magnitude']
     note: Relative Na2O and K2O activities of model sorbents against slag additives; no absolute values printed.
   - page: 5
     values: ['nearly the same', 'same range']
     note: Relative Na2O activity statements for AlSi8Na1 versus AlSi8Na3K3 and AlSi8Mg4Na03 versus AlSi8Na1; no pointwise values are printed.
+  - page: 6
+    values: ['<10^-13', '<10^-14']
+    note: Conclusion bounds for calculated and measured Na2O and K2O activities, respectively; not individual point observations.
 figure_read_candidates:
   - 'Figures 3 and 4: boiler-slag Na2O and K2O activity curves.'
   - 'Figures 5-9: calculated Fig. 5 excluded; measured model-sorbent activity curves in Figs. 6-9 are not digitized.'
