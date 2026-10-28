@@ -1,0 +1,19 @@
+source_id: kushiro-1971-apollo12-phase-equilibria
+method: >-
+  Table 3 columns 1 and 2 are the printed synthetic starting compositions Mixture A and Mixture B. Table 3 columns 3-6 are selected run-product microprobe analyses and are outside the requested starting-bulk and run-table scope. The paper explicitly says the natural whole-rock major-element abundances for nine rocks were published separately by Kushiro and Haramura (1971); this extract does not substitute synthetic mixtures for those natural rocks.
+starting_composition_link: >-
+  Table 3 Mixture A maps to experiment kushiro-1971-mixture-a and Mixture B to kushiro-1971-mixture-b. Their printed oxide wt% are retained under sample.initial_composition; Table 4 runs identify their matching experiment.
+schema_review:
+  phase_assemblage: >-
+    Table 4's multi-phase run assemblage is retained verbatim in context because no exact phase-assemblage observation type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES, no equilibrium-phase-assemblage quantity exists in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY, and simulator/battery/enums.py::Phase and simulator/battery/enums.py::PhaseRole enumerate individual phases and roles rather than an assemblage quantity. The transition temperatures use the existing transition_point type and transition_temperature quantity.
+tables:
+  - published_table: '3'
+    page: 10
+    published_page: 490
+    pdf_page_index: 9
+    printed_body_rows: 10 oxide rows
+    stored_composition_columns: [1, 2]
+    stored_numeric_cells: 20
+    excluded_columns: '3-6: selected microprobe analyses of run products, outside the requested starting-bulk-composition scope'
+    source_evidence: 'MinerU cell draft corroborated by the page render; pdftotext-layout has no article text.'
+    layout_check: 'Render confirms column 1 is Mixture A, column 2 is Mixture B; footnote (1) identifies A and footnote (2) identifies B.'

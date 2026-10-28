@@ -1,0 +1,81 @@
+schema_version: literature_extract.v1
+source_id: kushiro-1971-apollo12-phase-equilibria
+source:
+  citation: 'Kushiro, I., Nakamura, Y., Kitayama, K. & Akimoto, S. (1971). Petrology of some Apollo 12 crystalline rocks. Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 481–495. The M.I.T. Press.'
+  year: 1971
+  corpus_asset: raw/kushiro-1971-apollo12-phase-equilibria/kushiro-1971-apollo12-phase-equilibria.pdf
+extraction:
+  method: >-
+    Table 3 starting-material mixture columns and Table 4 quenching runs were transcribed from the MinerU cell drafts and checked cell by cell against page renders. The page-level pdftotext file contains no article text. The natural Apollo 12 whole-rock oxide analyses are stated to have been published separately by Kushiro and Haramura (1971); they are not printed in this paper. Table 3 product analyses are outside this extract's requested bulk-composition and run-conditions scope.
+  date: '2026-10-28'
+  worker: w1028naI-kushiro71
+review_status: draft
+experiments:
+  - experiment_id: kushiro-1971-mixture-a
+    method: quench_equilibration
+    locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3'}
+    sample:
+      form:
+        state: {tag: value, value: 'synthetic glass, Mixture A'}
+        locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mass_percent
+            components:
+              - [SiO2, '47.1']
+              - [Al2O3, '9.9']
+              - [TiO2, '3.1']
+              - [Cr2O3, '0.6']
+              - [FeO, '20.5']
+              - [MnO, '0.26']
+              - [MgO, '8.0']
+              - [CaO, '10.2']
+              - [Na2O, '0.28']
+              - [K2O, '0.06']
+        locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3', note: 'Table 3, column 1; Mixture A, described as close to olivine-poor rocks 12065 and 12052.'}
+  - experiment_id: kushiro-1971-mixture-b
+    method: quench_equilibration
+    locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3'}
+    sample:
+      form:
+        state: {tag: value, value: 'synthetic glass, Mixture B'}
+        locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mass_percent
+            components:
+              - [SiO2, '46.0']
+              - [Al2O3, '9.7']
+              - [TiO2, '3.0']
+              - [Cr2O3, '0.6']
+              - [FeO, '20.0']
+              - [MnO, '0.25']
+              - [MgO, '10.2']
+              - [CaO, '10.0']
+              - [Na2O, '0.27']
+              - [K2O, '0.06']
+        locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3', note: 'Table 3, column 2; Mixture B, described as a supposed original magma composition.'}
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: kushiro_1971_table3_starting_material_compositions
+        type: table_record
+        locator: {page: 10, published_page: 490, pdf_page_index: 9, table: '3'}
+        units: wt% oxide
+        attribution: 'Kushiro et al. report Mixture A as close to olivine-poor rocks 12065 and 12052, and Mixture B as a supposed original magma composition.'
+        values:
+          row_count: 2
+          rows:
+            - experiment: kushiro-1971-mixture-a
+              starting_material: Mixture A
+              printed_composition_wt_percent: {SiO2: '47.1', Al2O3: '9.9', TiO2: '3.1', Cr2O3: '0.6', FeO: '20.5', MnO: '0.26', MgO: '8.0', CaO: '10.2', Na2O: '0.28', K2O: '0.06'}
+            - experiment: kushiro-1971-mixture-b
+              starting_material: Mixture B
+              printed_composition_wt_percent: {SiO2: '46.0', Al2O3: '9.7', TiO2: '3.0', Cr2O3: '0.6', FeO: '20.0', MnO: '0.25', MgO: '10.2', CaO: '10.0', Na2O: '0.27', K2O: '0.06'}
