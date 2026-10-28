@@ -133,6 +133,9 @@ species:
       phase: cr
       standard_state: solid nepheline as printed
       units: kcal/mol
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±1.0 kcal/mol applies to ΔfH298 only; confidence level not stated.
       values:
         quantity: delta_fH
         method_class: compilation_assessed
@@ -141,6 +144,7 @@ species:
         series:
         - T_K: 298
           delta_fH: -501.0
+          sigma: 1.0
         - T_K: 300
           delta_fH: -501.01
         - T_K: 400
@@ -254,13 +258,514 @@ species:
         series:
         - T_K: 298
           entropy: 29.7
+  NaAlSi3O8:
+    observations:
+    - observation_id: schumm81_albite_low_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        published_page: 18
+        pdf_page_index: 23
+        note: Printed heading NaAlSi3O8 low albite; no numbered table caption.
+        column: cp
+      phase: cr
+      standard_state: solid low albite as printed
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: No separate Cp source annotation is printed.
+        series:
+        - T_K: 298
+          cp: 49.02
+        - T_K: 300
+          cp: 49.21
+        - T_K: 400
+          cp: 57.29
+        - T_K: 500
+          cp: 62.76
+        - T_K: 600
+          cp: 66.64
+        - T_K: 700
+          cp: 69.48
+        - T_K: 800
+          cp: 71.63
+        - T_K: 900
+          cp: 73.3
+        - T_K: 1000
+          cp: 74.65
+        - T_K: 1100
+          cp: 75.76
+        - T_K: 1200
+          cp: 76.71
+        - T_K: 1300
+          cp: 77.54
+        - T_K: 1400
+          cp: 78.31
+    - observation_id: schumm81_albite_low_H_minus_H298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        published_page: 18
+        pdf_page_index: 23
+        note: Printed heading NaAlSi3O8 low albite; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      standard_state: solid low albite as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (60KEL, 78HEM/KRU).'
+        series:
+        - T_K: 298
+          enthalpy_increment: 0.0
+        - T_K: 300
+          enthalpy_increment: 0.09
+        - T_K: 400
+          enthalpy_increment: 5.44
+        - T_K: 500
+          enthalpy_increment: 11.46
+        - T_K: 600
+          enthalpy_increment: 17.94
+        - T_K: 700
+          enthalpy_increment: 24.76
+        - T_K: 800
+          enthalpy_increment: 31.82
+        - T_K: 900
+          enthalpy_increment: 39.07
+        - T_K: 1000
+          enthalpy_increment: 46.47
+        - T_K: 1100
+          enthalpy_increment: 53.99
+        - T_K: 1200
+          enthalpy_increment: 61.61
+        - T_K: 1300
+          enthalpy_increment: 69.33
+        - T_K: 1400
+          enthalpy_increment: 77.12
+    - observation_id: schumm81_albite_low_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        published_page: 18
+        pdf_page_index: 23
+        note: Printed heading NaAlSi3O8 low albite; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      standard_state: solid low albite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB.'
+        series:
+        - T_K: 298
+          delta_fH: -940.94
+          sigma: 0.5
+        - T_K: 300
+          delta_fH: -940.95
+        - T_K: 400
+          delta_fH: -941.9
+        - T_K: 500
+          delta_fH: -941.81
+        - T_K: 600
+          delta_fH: -941.43
+        - T_K: 700
+          delta_fH: -940.88
+        - T_K: 800
+          delta_fH: -940.22
+        - T_K: 900
+          delta_fH: -939.52
+        - T_K: 1000
+          delta_fH: -941.32
+        - T_K: 1100
+          delta_fH: -940.51
+        - T_K: 1200
+          delta_fH: -939.68
+        - T_K: 1300
+          delta_fH: -938.83
+        - T_K: 1400
+          delta_fH: -937.99
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±0.50 kcal/mol applies to ΔfH298 only; confidence level not stated.
+    - observation_id: schumm81_albite_low_delta_fG
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        published_page: 18
+        pdf_page_index: 23
+        note: Printed heading NaAlSi3O8 low albite; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      standard_state: solid low albite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 77HEM/ROB; no separate ΔfG source annotation is printed.'
+        series:
+        - T_K: 298
+          delta_fG: -887.57
+        - T_K: 300
+          delta_fG: -887.24
+        - T_K: 400
+          delta_fG: -869.22
+        - T_K: 500
+          delta_fG: -851.05
+        - T_K: 600
+          delta_fG: -832.93
+        - T_K: 700
+          delta_fG: -814.89
+        - T_K: 800
+          delta_fG: -796.94
+        - T_K: 900
+          delta_fG: -779.06
+        - T_K: 1000
+          delta_fG: -761.09
+        - T_K: 1100
+          delta_fG: -743.11
+        - T_K: 1200
+          delta_fG: -725.2
+        - T_K: 1300
+          delta_fG: -707.37
+        - T_K: 1400
+          delta_fG: -689.59
+    - observation_id: schumm81_albite_low_S298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 24
+        published_page: 18
+        pdf_page_index: 23
+        note: Printed heading NaAlSi3O8 low albite; no numbered table caption.
+        column: S298
+      phase: cr
+      standard_state: solid low albite as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      uncertainty:
+        confidence_level: not_stated
+        S298: +/- 0.10 cal/deg,mol
+        note: Confidence level not stated.
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'S298: 76OPE/HEM.'
+        series:
+        - T_K: 298
+          entropy: 49.57
+    - observation_id: schumm81_albite_high_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 25
+        published_page: 19
+        pdf_page_index: 24
+        note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
+        column: cp
+      phase: cr
+      standard_state: solid high albite as printed
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: No separate Cp source annotation is printed.
+        series:
+        - T_K: 298
+          cp: 48.95
+        - T_K: 300
+          cp: 49.13
+        - T_K: 400
+          cp: 57.29
+        - T_K: 500
+          cp: 62.92
+        - T_K: 600
+          cp: 66.88
+        - T_K: 700
+          cp: 69.72
+        - T_K: 800
+          cp: 71.81
+        - T_K: 900
+          cp: 73.4
+        - T_K: 1000
+          cp: 74.63
+        - T_K: 1100
+          cp: 75.64
+        - T_K: 1200
+          cp: 76.49
+        - T_K: 1300
+          cp: 77.25
+        - T_K: 1391
+          cp: 79.9
+        - T_K: 1400
+          cp: 77.96
+    - observation_id: schumm81_albite_high_H_minus_H298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 25
+        published_page: 19
+        pdf_page_index: 24
+        note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      standard_state: solid high albite as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'H−H298 and S−S298: 78ROB/HEM (78HEM/KRU).'
+        series:
+        - T_K: 298
+          enthalpy_increment: 0.0
+        - T_K: 300
+          enthalpy_increment: 0.1
+        - T_K: 400
+          enthalpy_increment: 5.44
+        - T_K: 500
+          enthalpy_increment: 11.46
+        - T_K: 600
+          enthalpy_increment: 17.97
+        - T_K: 700
+          enthalpy_increment: 24.8
+        - T_K: 800
+          enthalpy_increment: 31.88
+        - T_K: 900
+          enthalpy_increment: 39.15
+        - T_K: 1000
+          enthalpy_increment: 46.55
+        - T_K: 1100
+          enthalpy_increment: 54.07
+        - T_K: 1200
+          enthalpy_increment: 61.68
+        - T_K: 1300
+          enthalpy_increment: 69.36
+        - T_K: 1391
+          enthalpy_increment: 76.42
+        - T_K: 1400
+          enthalpy_increment: 77.12
+    - observation_id: schumm81_albite_high_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 25
+        published_page: 19
+        pdf_page_index: 24
+        note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      standard_state: solid high albite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 68WAL, 68HOL/KLE.'
+        series:
+        - T_K: 298
+          delta_fH: -938.31
+          sigma: 0.6
+        - T_K: 300
+          delta_fH: -938.31
+        - T_K: 400
+          delta_fH: -939.28
+        - T_K: 500
+          delta_fH: -939.18
+        - T_K: 600
+          delta_fH: -938.78
+        - T_K: 700
+          delta_fH: -938.2
+        - T_K: 800
+          delta_fH: -937.53
+        - T_K: 900
+          delta_fH: -936.81
+        - T_K: 1000
+          delta_fH: -938.6
+        - T_K: 1100
+          delta_fH: -937.81
+        - T_K: 1200
+          delta_fH: -936.99
+        - T_K: 1300
+          delta_fH: -936.17
+        - T_K: 1391
+          delta_fH: -935.43
+        - T_K: 1400
+          delta_fH: -935.36
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±0.60 kcal/mol applies to ΔfH298 only; confidence level not stated.
+    - observation_id: schumm81_albite_high_delta_fG
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 25
+        published_page: 19
+        pdf_page_index: 24
+        note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      standard_state: solid high albite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 68WAL, 68HOL/KLE; no separate ΔfG source annotation is printed.'
+        series:
+        - T_K: 298
+          delta_fG: -886.29
+        - T_K: 300
+          delta_fG: -885.96
+        - T_K: 400
+          delta_fG: -868.4
+        - T_K: 500
+          delta_fG: -850.69
+        - T_K: 600
+          delta_fG: -833.02
+        - T_K: 700
+          delta_fG: -815.44
+        - T_K: 800
+          delta_fG: -797.95
+        - T_K: 900
+          delta_fG: -780.54
+        - T_K: 1000
+          delta_fG: -763.04
+        - T_K: 1100
+          delta_fG: -745.52
+        - T_K: 1200
+          delta_fG: -728.08
+        - T_K: 1300
+          delta_fG: -710.71
+        - T_K: 1391
+          delta_fG: -694.95
+        - T_K: 1400
+          delta_fG: -693.39
+    - observation_id: schumm81_albite_high_S298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 25
+        published_page: 19
+        pdf_page_index: 24
+        note: Printed heading NaAlSi3O8 high albite; no numbered table caption.
+        column: S298
+      phase: cr
+      standard_state: solid high albite as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      uncertainty:
+        confidence_level: not_stated
+        S298: +/- 0.10 cal/deg,mol
+        note: Confidence level not stated.
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'S298: 78ROB/HEM.'
+        series:
+        - T_K: 298
+          entropy: 54.11
 fidelity_samples:
-- path: species.NaAlSiO4.observations[schumm81_nepheline_cp].values.series[0]
-  value:
-    T_K: 298
-    cp: 26.21
-  locator:
-    page: 19
-    published_page: 13
-    note: Printed heading NaAlSiO4 nepheline.
-  note: Cp cell is 26.21 cal/deg,mol at 298 K.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_low_cp].values.series[0]
+    value:
+      T_K: 298
+      cp: 49.02
+    locator:
+      page: 24
+      published_page: 18
+      note: Printed heading NaAlSi3O8 low albite.
+    note: 298 K cp cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_low_H_minus_H298].values.series[0]
+    value:
+      T_K: 298
+      enthalpy_increment: 0.0
+    locator:
+      page: 24
+      published_page: 18
+      note: Printed heading NaAlSi3O8 low albite.
+    note: 298 K H_minus_H298 cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_low_delta_fH].values.series[0]
+    value:
+      T_K: 298
+      delta_fH: -940.94
+      sigma: 0.5
+    locator:
+      page: 24
+      published_page: 18
+      note: Printed heading NaAlSi3O8 low albite.
+    note: 298 K delta_fH cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_low_delta_fG].values.series[0]
+    value:
+      T_K: 298
+      delta_fG: -887.57
+    locator:
+      page: 24
+      published_page: 18
+      note: Printed heading NaAlSi3O8 low albite.
+    note: 298 K delta_fG cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_low_S298].values.series[0]
+    value:
+      T_K: 298
+      entropy: 49.57
+    locator:
+      page: 24
+      published_page: 18
+    note: S298 cell transcribed from the table heading; uncertainty retained on observation.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_high_cp].values.series[0]
+    value:
+      T_K: 298
+      cp: 48.95
+    locator:
+      page: 25
+      published_page: 19
+      note: Printed heading NaAlSi3O8 high albite.
+    note: 298 K cp cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_high_H_minus_H298].values.series[0]
+    value:
+      T_K: 298
+      enthalpy_increment: 0.0
+    locator:
+      page: 25
+      published_page: 19
+      note: Printed heading NaAlSi3O8 high albite.
+    note: 298 K H_minus_H298 cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_high_delta_fH].values.series[0]
+    value:
+      T_K: 298
+      delta_fH: -938.31
+      sigma: 0.6
+    locator:
+      page: 25
+      published_page: 19
+      note: Printed heading NaAlSi3O8 high albite.
+    note: 298 K delta_fH cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_high_delta_fG].values.series[0]
+    value:
+      T_K: 298
+      delta_fG: -886.29
+    locator:
+      page: 25
+      published_page: 19
+      note: Printed heading NaAlSi3O8 high albite.
+    note: 298 K delta_fG cell from the printed table.
+  - path: species.NaAlSi3O8.observations[schumm81_albite_high_S298].values.series[0]
+    value:
+      T_K: 298
+      entropy: 54.11
+    locator:
+      page: 25
+      published_page: 19
+    note: S298 cell transcribed from the table heading; uncertainty retained on observation.
+
+  - path: species.NaAlSiO4.observations[schumm81_nepheline_cp].values.series[0]
+    value:
+      T_K: 298
+      cp: 26.21
+    locator:
+      page: 19
+      published_page: 13
+      note: Printed heading NaAlSiO4 nepheline.
+    note: Cp cell is 26.21 cal/deg,mol at 298 K.

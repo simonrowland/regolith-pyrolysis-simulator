@@ -6,7 +6,7 @@
 - Cell reads: MinerU table `p019-t06.csv` and pdftotext-layout table agree on the digits, signs, exponents, and cell assignments for the four stored columns. The whole page render was checked for layout and every stored value, including the paired transition rows. No unresolved cell disagreements.
 - Printed source annotations: S298 and H298 cite `53KEL/TOD`; ΔfH298 cites `53KRA/NEU`. No separate Cp or ΔfG source annotation is printed. The bibliography expands these IDs to Kelley et al. (1953) and Kracek et al. (1953), respectively.
 - The printed `S−S298` column was not stored: this is an entropy increment, not absolute `S`. Schema check: `simulator/battery/enums.py`, `Quantity` (lines 62–94), defines `S` but no entropy-increment quantity; `simulator/battery/migrate.py`, `QUANTITY_ALIASES` and `TYPE_QUANTITY` (lines 435–470), has no exact alias for it. `tools/validate_literature_extracts.py:79` closes observation types and provides no alternate entropy-increment observation type. It is therefore not labeled as `S`.
-- `S298 = 29.7 ± 0.3 cal/mol` is copied as printed; confidence level is not stated.
+- `S298 = 29.7 ± 0.3 cal/mol` and `ΔfH298 = −501.0 ± 1.0 kcal/mol` are copied as printed; confidence levels are not stated. The ΔfH uncertainty is attached to the 298 K anchor only.
 
 | Printed T (K) | Stored numeric columns checked |
 |---:|---|
