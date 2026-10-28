@@ -3038,7 +3038,7 @@ def test_default_in_range_builtin_provider_keeps_fe_and_adds_status_bearing_feo(
     )
 
 
-def test_request_level_fo2_below_transport_floor_is_rejected(
+def test_request_level_fo2_below_transport_floor_is_flagged(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
@@ -3054,8 +3054,12 @@ def test_request_level_fo2_below_transport_floor_is_rejected(
         control_inputs={},
     )
 
-    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
-        provider.dispatch(request)
+    result = provider.dispatch(request)
+    assert result.status == 'ok'
+    assert result.diagnostic['pO2_bar'] == 1e-20
+    assert result.diagnostic['vapor_pressures_Pa']['SiO'] > 0
+    assert any('authority_level=extrapolated' in note and 'below transport model floor' in note
+               for note in result.control_audit.notes)
 
 
 def test_interval_required_foulant_vapor_row_is_not_certifying(
@@ -3198,8 +3202,8 @@ def test_al2o_provider_applies_single_cation_activity_square_once(
     )
 
 
-@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
-def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0])
+def test_explicit_transport_po2_rejects_invalid_values(
     vapor_pressure_data,
     pO2_bar,
 ):
