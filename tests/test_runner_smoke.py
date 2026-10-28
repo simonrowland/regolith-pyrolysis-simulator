@@ -3120,6 +3120,33 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         )
 
 
+def test_hourly_metadata_keeps_alpha_only_fe_extrapolation():
+    from simulator import condensation
+
+    record = condensation._wall_alpha_record("Fe", T_K=1700.0)
+    notice = {
+        "alpha_s_provenance_by_species": {"Fe": {"hot_wall": record}},
+    }
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.wall_deposit_by_segment_species_delta = {("hot_wall", "Fe"): 0.1}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        condensation_model=SimpleNamespace(last_sticking_alpha_provenance_notice=notice),
+        _last_vapour_batch_report={"metadata": {}, "channels_by_species": {}},
+    )
+
+    summary = build_per_hour_summary(sim, snapshot, include_fe_redox_split=False)
+
+    authority = summary["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
+    alpha = authority["alpha_s_provenance_by_species"]["Fe"]["hot_wall"]
+    assert alpha["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert alpha["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert alpha["output_status"] == "status_bearing"
+    assert authority["authoritative_for_deposit_mass"] is False
+
+
 def test_session_per_hour_summary_event_uses_runner_builder():
     """Regression: ``SimSession`` emits the SocketIO
     ``per_hour_summary`` source value by calling
