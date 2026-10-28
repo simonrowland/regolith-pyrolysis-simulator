@@ -68,6 +68,50 @@ print(throttle_mass_rate_kg_hr(values, {}).hex())""",
             id="volatile-throttle",
         ),
         pytest.param(
+            """from simulator.condensation import _wall_route_species_order
+print(_wall_route_species_order({s: 1.0 for s in {'Cr', 'Mn', 'Ca', 'Ti', 'TiO', 'SiO', 'Mg', 'Fe', 'Na', 'K'}}))""",
+            id="wall-route-non-c4b-tail",
+        ),
+        pytest.param(
+            """import json
+from types import SimpleNamespace
+from unittest.mock import patch
+from tests.test_extraction_ledger import _sim, _enable_c5_mre
+from simulator.condensation import CondensationModel
+from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
+sim = _sim({'feo': {'label': 'FeO', 'composition_wt_pct': {'FeO': 100.0}}})
+sim.load_batch('feo', mass_kg=1000.0)
+_enable_c5_mre(sim, target_species='FeO', max_voltage_V=0.75)
+sim.melt.campaign = CampaignPhase.C5
+sim._mre_voltage_sequence = [{'voltage': 0.75, 'species': ['FeO'], 'min_hold_hours': 1}]
+diagnostic = {'gas_products_produced_kg': {s: 1.0 for s in {'Na', 'K', 'Mg'}},
+              'gas_products_produced_mol': {'Mg': 1.0}, 'energy_kWh': 0.0}
+reads = {}
+def inventory(account, species):
+    key = (account, species)
+    reads[key] = reads.get(key, 0) + 1
+    return float(account == 'process.overhead_gas' and reads[key] > 1)
+def route(gases, **kwargs):
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(wall_temperature_C=900.0,
+        overhead_pressure_mbar=10.0, pipe_diameter_m=0.12,
+        species_partial_pressures_mbar={s: 1.0 for s in gases},
+        stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages})
+    flux = EvaporationFlux(species_kg_hr=gases)
+    flux.update_totals()
+    result = model.route(flux, MeltState(temperature_C=1700.0))
+    assert result.antoine_extrapolation_warnings
+    print(json.dumps([list(gases), result.antoine_extrapolation_warnings]))
+    raise SystemExit(0)
+with patch.object(sim._chem_kernel, 'dispatch', return_value=SimpleNamespace(
+        diagnostic=diagnostic, transition=None, status='ok')), \\
+     patch.object(sim, '_ledger_account_species_kg', side_effect=inventory), \\
+     patch.object(sim, '_route_mre_gas_products_to_condensation', side_effect=route):
+    sim._step_mre()
+raise AssertionError('MRE gas route was not reached')""",
+            id="mre-gas-antoine-warning-order",
+        ),
+        pytest.param(
             """from simulator.overhead import _mean_molar_mass_kg_mol
 values = {'Na': 1373.7356370603416, 'SO2': 4.4178619452227434e-10,
           'K': 65.25457231186826, 'S2': 1743125144.2783368,

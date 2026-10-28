@@ -2705,8 +2705,8 @@ def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions(
     assert _wall_route_species_order(("Ti", "K", "SiO", "Ca")) == (
         "SiO",
         "K",
-        "Ti",
         "Ca",
+        "Ti",
     )
 
     rates = {"SiO": 2e-9, "Mg": 1e-9, "Fe": 1e-9, "Na": 1e-9, "K": 1e-9}

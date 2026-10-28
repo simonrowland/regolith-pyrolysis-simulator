@@ -1904,8 +1904,11 @@ class ExtractionMixin:
 
         produced_metals = set(result.get('metals_produced_kg', {}) or {})
         produced_metals.update(result.get('metals_produced_mol', {}) or {})
-        produced_gases = set(result.get('gas_products_produced_kg', {}) or {})
-        produced_gases.update(result.get('gas_products_produced_mol', {}) or {})
+        produced_gases = sorted(
+            set(result.get('gas_products_produced_kg', {}) or {})
+            | set(result.get('gas_products_produced_mol', {}) or {}),
+            key=str,
+        )
         metal_before_kg = {
             metal: self._ledger_account_species_kg(
                 'process.metal_phase', metal)
