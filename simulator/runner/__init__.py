@@ -6356,7 +6356,12 @@ def main(argv: Optional[list[str]] = None) -> int:
             )
             f.write("\n")
 
-    return 0 if result["status"] not in {"failed", "refused"} else 1
+    exit_code = 0 if result["status"] not in {"failed", "refused"} else 1
+    if exit_code:
+        message = str(result.get("error_message") or result.get("reason") or "")
+        message = " ".join(message.splitlines())
+        print(f"{result['status']}: {message}", file=sys.stderr)
+    return exit_code
 
 
 def build_sio_yield_arg_parser() -> argparse.ArgumentParser:
