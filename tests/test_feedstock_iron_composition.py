@@ -15,6 +15,7 @@ from simulator.feedstock_composition import (
     fe2o3_equivalent_wt_pct,
     fe_metal,
     feot_equivalent_moles,
+    iron_oxide_feot_oxygen_wt_pct,
     measured_fe2o3,
     measured_feo,
     resolve_feedstock_composition,
@@ -66,6 +67,42 @@ def _oxygen_mass_fraction(species: str) -> float:
         formula.elements["O"] * ATOMIC_WEIGHTS_G_PER_MOL["O"]
     )
     return oxygen_g_per_mol / formula.molar_mass_g_per_mol()
+
+
+@pytest.mark.parametrize(
+    "composition",
+    [{}, {"FeO": 10.0}, {"Fe2O3": 10.0}, {"FeO": 2.0, "Fe2O3": 1.0}],
+)
+def test_iron_oxide_decomposition_conserves_fe_and_o_atoms(composition):
+    feot, oxygen = iron_oxide_feot_oxygen_wt_pct(composition)
+    projected = {"FeO": feot, "O": oxygen}
+
+    def atoms(masses, element):
+        return sum(
+            mass / formula.molar_mass_g_per_mol() * formula.elements.get(element, 0)
+            for species, mass in masses.items()
+            for formula in [resolve_species_formula(species)]
+        )
+
+    assert feot == total_fe(composition)
+    for element in ("Fe", "O"):
+        assert atoms(projected, element) == pytest.approx(
+            atoms(composition, element), rel=1e-14, abs=1e-15,
+        )
+    assert feot + oxygen == pytest.approx(sum(composition.values()))
+
+
+def test_iron_oxide_decomposition_matches_owner_oxygen_bounds():
+    feedstock = _measured_split()
+    feot, oxygen = iron_oxide_feot_oxygen_wt_pct(feedstock)
+    expected = total_oxygen_bounds(feedstock).lower.value_wt_pct
+
+    assert (
+        70.0 * _oxygen_mass_fraction("SiO2")
+        + feot * _oxygen_mass_fraction("FeO")
+        + oxygen
+    ) == pytest.approx(expected, rel=1e-14)
+    assert iron_oxide_feot_oxygen_wt_pct(_unknown_split()) == (3.0, 0.0)
 
 
 def test_unknown_split_metadata_covers_every_non_lunar_unmeasured_iron_entry() -> None:
