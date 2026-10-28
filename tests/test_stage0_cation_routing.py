@@ -14,6 +14,7 @@ import pytest
 from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -426,11 +427,11 @@ def test_caso4_bakeout_host_is_retained_and_carbon_cleanup_does_not_credit_it(
     )
 
     ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
-    # Declared weights sum to 75. Load scales every positive component so
-    # the masses sum to the batch: CaO is 5/75 of 1000 kg, not 5% of it.
-    declared = mars_caso4_feedstock["composition_wt_pct"]
-    declared_total = sum(float(value) for value in declared.values())
-    baseline_cao = mass_kg * float(declared["CaO"]) / declared_total
+    # The complete assay includes the oxygen recovered by the iron split;
+    # iron-free CaO shares the owner's batch-mass normalization.
+    baseline_cao = normalized_feedstock_component_masses_kg(
+        mars_caso4_feedstock, mass_kg
+    )["CaO"]
     assert ledger_melt.get("CaO", 0.0) == pytest.approx(baseline_cao, rel=0, abs=1e-6)
 
     ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
@@ -523,7 +524,6 @@ def test_caso4_carbon_requirement_shares_prepared_sulfate_basis(
     mars_caso4_sulfide_feedstock, analysis_scale, ranged_dose, legacy_declaration,
 ):
     from simulator.fe_redox import initialize_feedstock_iron
-    from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 
     feedstock = dict(mars_caso4_sulfide_feedstock)
     feedstock["composition_wt_pct"] = {
@@ -592,8 +592,9 @@ def test_caso4_sulfide_cleanup_is_replaced_by_a_retained_host(
     assert ledger_offgas.get("CO", 0.0) == pytest.approx(0.0, abs=1e-12)
     reagent_c = sim.atom_ledger.kg_by_account("reservoir.reagent.C")
     assert reagent_c.get("C", 0.0) == pytest.approx(exact_c_kg, rel=0, abs=1e-9)
+    prepared_c_kg = _expected_caso4_sulfide_carbon_cleanup(caso4_kg, registry)["C"]
     assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(
-        exact_c_kg, rel=0, abs=1e-9
+        prepared_c_kg, rel=0, abs=1e-9
     )
 
     assert "CaSO4" not in sim.inventory.salt_phase_kg
