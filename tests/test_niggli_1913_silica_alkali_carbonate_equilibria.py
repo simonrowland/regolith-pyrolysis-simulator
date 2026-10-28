@@ -67,6 +67,37 @@ def test_table_ii_render_pins_and_migrates_every_measured_co2_loss_point():
     assert all(point["locator"]["table"] == "VI" for point in table_vi)
     assert table_vi[0]["SiO2_mol_percent_as_printed"] == "7.1"
 
+    # PDF page 33 render: the separate Scheerer/Niggli comparison and Mallard
+    # results retain their printed basis and qualitative temperature labels.
+    table_viii_k = next(
+        item
+        for item in document["species"]["K2CO3"]["context"]
+        if item["observation_id"] == "niggli_1913_table_viii_k_comparison"
+    )
+    table_viii_na = next(
+        item
+        for item in document["species"]["Na2CO3"]["context"]
+        if item["observation_id"] == "niggli_1913_table_viii_na_comparison"
+    )
+    mallard = next(
+        item
+        for item in document["species"]["Na2CO3"]["context"]
+        if item["observation_id"] == "niggli_1913_mallard_soda_displacement"
+    )
+    assert len(table_viii_k["values"]["rows"]) == 6
+    assert table_viii_k["values"]["rows"][0] == ["3.0", "114", "96", "129"]
+    assert table_viii_k["values"]["rows"][-1] == ["60.0", "61", "61.5", None]
+    assert len(table_viii_na["values"]["rows"]) == 7
+    assert table_viii_na["values"]["rows"][0] == ["3.0", None, "193", "197"]
+    assert table_viii_na["values"]["rows"][-1] == [
+        "60",
+        "All displaced",
+        "All displaced",
+        "All displaced",
+    ]
+    assert len(mallard["values"]["rows"]) == 2
+    assert mallard["values"]["rows"][0] == ["20.0", "107", "129", "148"]
+
     # PDF page 8 render: Table II column (a), three different rows/temperatures.
     assert raw_points[0]["locator"]["page"] == 8
     assert (raw_points[0]["row"], raw_points[0]["T_C"], raw_points[0]["mass_loss_pct"]) == (
@@ -87,6 +118,14 @@ def test_table_ii_render_pins_and_migrates_every_measured_co2_loss_point():
 
     result = _migrate().result
     rows = _table_ii_rows(result)
+    assert len(result.observations) == 40
+    assert (
+        sum(
+            row.value.kind.value == "unavailable"
+            for row in result.observations.values()
+        )
+        == 0
+    )
     assert len(rows) == 30
     assert not result.validation.hard_issues
     assert all(row.value.kind.value != "unavailable" for row in rows)
@@ -122,6 +161,45 @@ def test_table_ii_render_pins_and_migrates_every_measured_co2_loss_point():
     assert {key: actual[key] for key in expected} == expected
     assert not any(row.identity.quantity.is_unknown for row in result.observations.values())
     assert not any(row.identity.species.phase.is_unknown for row in result.observations.values())
+
+    # PDF pages 18 and 25: the reported transition values migrate with their
+    # printed locations, and absent total pressure / fO2 remain unknown.
+    k2si2o5_melt = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "::niggli_1913_k2si2o5_melting_point"
+        )
+    )
+    assert k2si2o5_melt.value.point == Decimal("1288.15")
+    assert k2si2o5_melt.identity.quantity.value.value == "transition_temperature"
+    assert k2si2o5_melt.identity.species.phase.value.value == "cr"
+    assert k2si2o5_melt.locator.page == 18
+    assert k2si2o5_melt.point_conditions["temperature_K"].locator.page == 18
+    assert k2si2o5_melt.identity.total_pressure_Pa.is_unknown
+    assert "total_pressure_Pa" not in k2si2o5_melt.point_conditions
+    assert k2si2o5_melt.point_conditions["fO2_Pa"].state.is_unknown
+    assert document["species"]["K2Si2O5"]["observations"][0]["values"]["T_C"] == "1015"
+    assert document["species"]["K2Si2O5"]["observations"][0]["uncertainty"]["value"] == "10"
+
+    na2co3_melt = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "::niggli_1913_huttner_tammann_na2co3_melting_point"
+        )
+    )
+    na2sio3_melt = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "::niggli_1913_wallace_na2sio3_melting_point"
+        )
+    )
+    assert na2co3_melt.value.point == Decimal("1126.15")
+    assert na2sio3_melt.value.point == Decimal("1291.15")
+    assert na2co3_melt.locator.page == na2sio3_melt.locator.page == 25
+    assert na2co3_melt.point_conditions["temperature_K"].locator.page == 25
 
     final_solid = next(
         row

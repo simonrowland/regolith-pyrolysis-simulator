@@ -6,18 +6,19 @@ source:
   doi: 10.1021/ja02200a004
   year: 1913
   corpus_asset: raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
+review_status: draft
 extraction:
-  method: MinerU table drafts and pdftotext-layout were reconciled against page renders for all cells in Tables II
-    and VI. The reported Table II percentage loss is Niggli's calculation from gravimetric CO2 loss; the individual
-    raw weighing inputs are not tabulated, so it is attributed to the paper rather than represented as an independently
-    migrated raw measurement.
+  method: MinerU table drafts and pdftotext-layout were reconciled against page renders for all retained numeric cells
+    in Tables II, VI, and VIII, the adjacent Mallard table, and the melting-point passages. The reported Table II
+    percentage loss is Niggli's calculation from gravimetric CO2 loss; the individual raw weighing inputs are not
+    tabulated, so it is attributed to the paper rather than represented as an independently migrated raw measurement.
   date: '2026-10-28'
   worker: w1028naH-niggli13
-  review_status: draft
   scope_note: Table II contains potassium-system measured equilibrium CO2-loss data and auxiliary displaced-moles
-    values; Table VI contains the soda-system measured displaced-moles data. Table II's printed binary-mixture mole
-    fraction is completed from the stated K2CO3 + SiO2 basis for identity mapping; printed composition bases remain
-    separately recorded.
+    values; Table VI contains the soda-system measured displaced-moles data; Table VIII and the adjacent Mallard table
+    contain attributed comparison values. Printed melting points are included as transitions, and qualitative
+    eutectic descriptions remain context. Table II's printed binary-mixture mole fraction is completed from the stated
+    K2CO3 + SiO2 basis for identity mapping; printed composition bases remain separately recorded.
 schema_gaps:
 - locator: &id040
     page: 8
@@ -41,6 +42,36 @@ schema_gaps:
     (simulator/battery/migrate.py:11461-11527). The values are retained in the typed context record, not mapped
     to a near-miss yield token.
   values_retained_in: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap].values.points
+- locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 1725
+    table: VIII
+  quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
+  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
+    (simulator/battery/enums.py:614); its supported source fields and units do not accept mol-per-100-mol-SiO2
+    (simulator/battery/migrate.py:9493, 11461-11527). The comparison values are retained as context.
+  values_retained_in: species.K2CO3.context[niggli_1913_table_viii_comparison].values.rows; species.Na2CO3.context[niggli_1913_table_viii_comparison].values.rows
+- locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 1725
+    paragraph: Mallard results following Table VIII
+  quantity_as_printed: number of mols CO2 displaced by 100 mols SiO2
+  reason: No quantity token has the exact printed molar basis. Quantity.EVOLVED_GAS_YIELD is stored in mol_species_per_initial_kg
+    (simulator/battery/enums.py:614); its supported source fields and units do not accept mol-per-100-mol-SiO2
+    (simulator/battery/migrate.py:9493, 11461-11527). Values are retained as attributed context.
+  values_retained_in: species.Na2CO3.context[niggli_1913_mallard_soda_displacement].values.rows
+- locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 1706
+    paragraph: Lebeau results quoted in the K2CO3 dissociation discussion
+  quantity_as_printed: equilibrium pressure in mm
+  reason: The partial_pressure quantity token exists, but the source unit token mm is ambiguous; the unit parser
+    maps mm as length (simulator/battery/migrate.py:3420, 4911-4950), whereas pressure requires an explicit mmHg/Torr
+    token (simulator/battery/migrate.py:4868-4902). No mmHg assumption is made.
+  values_retained_in: species.K2CO3.context[niggli_1913_lebeau_pure_carbonate_pressure]
 fidelity_samples:
 - path: species.K2CO3.observations[niggli_1913_table_ii_potassium_co2_loss].values.points[0].mass_loss_pct
   value: '6.6'
@@ -1808,6 +1839,210 @@ species:
                     - '0.667'
               locator: *id039
           locator: *id039
+    - observation_id: niggli_1913_k2co3_melting_point_niggli
+      type: transition_point
+      locator: &id042
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: Niggli's potassium carbonate melting-point determination
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: melting_point
+        T_C: '891'
+        compound_as_printed: K2CO3
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1164.15'
+          locator: *id042
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id042
+          note: The source states no pressure for this melting-point determination.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id042
+          note: No oxygen fugacity or buffer is stated.
+    - observation_id: niggli_1913_quincke_k2co3_melting_point
+      type: transition_point
+      locator: &id043
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: Quincke
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '1200'
+        compound_as_printed: K2CO3
+        attribution: Quincke, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1473.15'}}
+          locator: *id043
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id043
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id043
+    - observation_id: niggli_1913_v_meyer_k2co3_melting_point
+      type: transition_point
+      locator: &id044
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: V. Meyer
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '878.6'
+        compound_as_printed: K2CO3
+        attribution: V. Meyer, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1151.75'}}
+          locator: *id044
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id044
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id044
+    - observation_id: niggli_1913_carnelley_k2co3_melting_point
+      type: transition_point
+      locator: &id045
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: Carnelley
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '834'
+        compound_as_printed: K2CO3
+        attribution: Carnelley, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1107.15'}}
+          locator: *id045
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id045
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id045
+    - observation_id: niggli_1913_le_chatelier_k2co3_melting_point
+      type: transition_point
+      locator: &id046
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: Le Chatelier
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '885'
+        compound_as_printed: K2CO3
+        attribution: Le Chatelier, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1158.15'}}
+          locator: *id046
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id046
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id046
+    - observation_id: niggli_1913_ramsay_eumorfopoulos_k2co3_melting_point
+      type: transition_point
+      locator: &id047
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: Ramsay and Eumorfopoulos
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '886'
+        compound_as_printed: K2CO3
+        attribution: Ramsay and Eumorfopoulos, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1159.15'}}
+          locator: *id047
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id047
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id047
+    - observation_id: niggli_1913_huttner_tammann_k2co3_melting_point
+      type: transition_point
+      locator: &id048
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+        paragraph: comparison of potassium carbonate melting points
+        row: Hüttner and Tammann
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '894'
+        compound_as_printed: K2CO3
+        attribution: Hüttner and Tammann, as cited by Niggli (1913).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1167.15'}}
+          locator: *id048
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id048
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id048
     context:
     - observation_id: niggli_1913_table_ii_co2_displaced_schema_gap
       type: thermodynamic_context
@@ -2030,8 +2265,144 @@ species:
           SiO2_mol_percent_as_printed: '66.7'
           linked_mass_loss_row: unnumbered-3
           locator: *id039
+    - observation_id: niggli_1913_lebeau_pure_carbonate_pressure
+      type: historical_context
+      locator:
+        page: 14
+        pdf_page_index: 13
+        published_page: 1706
+        paragraph: Lebeau results quoted in the K2CO3 dissociation discussion
+      units: °C and mm, as printed
+      values:
+        quantity: equilibrium_pressure_unit_ambiguous_as_printed
+        method_class: quoted_attributed
+        attribution: P. Lebeau, Compt. rend., 137, 1756 (1903).
+        pressure_unit_as_printed: mm
+        temperature_field: T_C
+        pressure_field: equilibrium_pressure_as_printed
+        rows:
+        - {T_C: '790', equilibrium_pressure_as_printed: '0.5'}
+        - {T_C: '810', equilibrium_pressure_as_printed: '1'}
+        - {T_C: '890', equilibrium_pressure_as_printed: '3'}
+        - {T_C: '960', equilibrium_pressure_as_printed: '5'}
+        - {T_C: '970', equilibrium_pressure_as_printed: '9'}
+        - {T_C: '1000', equilibrium_pressure_as_printed: '12'}
+        note: The printed abbreviation is mm; it is not expanded to mmHg.
+    - observation_id: niggli_1913_table_viii_k_comparison
+      type: table_context
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 1725
+        table: VIII
+      units: mol CO2 displaced per 100 mol SiO2, as printed
+      values:
+        quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        method_class: quoted_attributed
+        attribution: Scheerer (outer columns, in part recalculated) and Niggli (956 °C comparison column), Table VIII.
+        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+        system_as_printed: K2CO3 + SiO2
+        columns_as_printed:
+        - Original silica content mol per cent
+        - Rotglut, Scheerer
+        - 956°, Niggli
+        - Gelbglut, Scheerer
+        rows:
+        - ['3.0', '114', '96', '129']
+        - ['14.3', '94', '89', '107']
+        - ['20.0', '89', '87', '104']
+        - ['33.3', '81', '83', '99']
+        - ['50.0', '76', '73', '83']
+        - ['60.0', '61', '61.5', null]
+    - observation_id: niggli_1913_potassium_mixture_thermal_effect
+      type: descriptive_context
+      locator:
+        page: 17
+        pdf_page_index: 16
+        published_page: 1709
+        section: Behavior of the Melts
+      units: °C, as printed
+      values:
+        quantity: potassium_carbonate_silica_thermal_effect_unassigned
+        text_as_printed: Mixtures containing little silica exhibit a thermal effect about 880° on heating.
+        system_as_printed: K2CO3 + little SiO2; source does not give an exact mixture composition.
+        interpretation: Niggli could not ascertain whether this was approximately the K2CO3-K2SiO3 eutectic.
+  K2Si2O5:
+    observations:
+    - observation_id: niggli_1913_k2si2o5_melting_point
+      type: transition_point
+      locator: &id049
+        page: 18
+        pdf_page_index: 17
+        published_page: 1710
+        paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+      phase: cr
+      units: °C
+      uncertainty:
+        kind: printed
+        value: '10'
+        verbatim: ±10 °C
+        confidence_level: not_stated
+        basis: Printed width; confidence level not stated.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '1015'
+        value_as_printed: 1015 ± 10 °C
+        compound_as_printed: K2Si2O5
+        attribution: Niggli's experimental estimate from the printed solid/liquid bracket.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1288.15'}}
+          locator: *id049
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id049
+          note: The source states no pressure for this melting-point determination.
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id049
+          note: No oxygen fugacity or buffer is stated.
+    context:
+    - observation_id: niggli_1913_k2si2o5_melting_bracket
+      type: transition_bracket_inputs
+      locator: *id049
+      units: °C
+      values:
+        quantity: printed_melting_point_bracket_inputs
+        sample_as_printed: Purest crystalline K2Si2O5 samples with little glass.
+        solid_at_T_C: '1005'
+        all_melted_at_T_C: '1025'
   Na2CO3:
-    observations: []
+    observations:
+    - observation_id: niggli_1913_huttner_tammann_na2co3_melting_point
+      type: transition_point
+      locator: &id050
+        page: 25
+        pdf_page_index: 24
+        published_page: 1717
+        section: Properties of Sodium Metasilicate
+        paragraph: sodium carbonate melting point comparison
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '853'
+        compound_as_printed: Na2CO3
+        attribution: Hüttner and Tammann, Z. anorg. Chem., 43, 215 (1905).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1126.15'}}
+          locator: *id050
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id050
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id050
     context:
     - observation_id: niggli_1913_table_vi_co2_displaced_schema_gap
       type: table_context
@@ -2121,3 +2492,93 @@ species:
           co2_displaced_mol_per_100_mol_sio2_as_printed: '134'
           SiO2_mol_percent_as_printed: '33.1'
           locator: {page: 23, pdf_page_index: 22, published_page: 1715, table: VI, row: XII}
+    - observation_id: niggli_1913_table_viii_na_comparison
+      type: table_context
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 1725
+        table: VIII
+      units: mol CO2 displaced per 100 mol SiO2, as printed
+      values:
+        quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        method_class: quoted_attributed
+        attribution: Scheerer (outer columns, in part recalculated) and Niggli (956 °C comparison column), Table VIII.
+        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+        system_as_printed: Na2CO3 + SiO2
+        columns_as_printed:
+        - Original silica content mol per cent
+        - Rotglut, Scheerer
+        - 956°, Niggli
+        - Gelbglut, Scheerer
+        rows:
+        - ['3.0', null, '193', '197']
+        - ['9.9', null, '171', '186']
+        - ['14.3', '150', '156', '178']
+        - ['20.0', '135', '145', '168']
+        - ['33.3', '110', '134', '138']
+        - ['50', '99', '100', '100']
+        - ['60', 'All displaced', 'All displaced', 'All displaced']
+    - observation_id: niggli_1913_mallard_soda_displacement
+      type: table_context
+      locator:
+        page: 33
+        pdf_page_index: 32
+        published_page: 1725
+        paragraph: Mallard results following Table VIII
+      units: mol CO2 displaced per 100 mol SiO2, as printed
+      values:
+        quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        method_class: quoted_attributed
+        attribution: Mallard, Ann. chim. phys., [4] 28, 250 (1873).
+        schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+        system_as_printed: Na2CO3 + SiO2
+        temperature_labels_as_printed:
+        - At dark red heat
+        - At red heat
+        - At a higher temp.
+        rows:
+        - ['20.0', '107', '129', '148']
+        - ['8.7', '116', '143', null]
+        temperature_context_as_printed: The mean temperature was somewhat below 900 °C; highest temperature about 950 °C.
+    - observation_id: niggli_1913_sodium_eutectic_context
+      type: descriptive_context
+      locator:
+        page: 25
+        pdf_page_index: 24
+        published_page: 1717
+        section: Properties of Sodium Metasilicate
+      units: qualitative, as printed
+      values:
+        quantity: sodium_carbonate_silicate_eutectic_qualitative_context
+        statement_as_printed: The eutectic must lie very close to pure Na2CO3.
+        numeric_temperature: not_printed
+  Na2SiO3:
+    observations:
+    - observation_id: niggli_1913_wallace_na2sio3_melting_point
+      type: transition_point
+      locator: &id051
+        page: 25
+        pdf_page_index: 24
+        published_page: 1717
+        section: Properties of Sodium Metasilicate
+        paragraph: sodium metasilicate melting point comparison
+      phase: cr
+      units: °C
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        property_kind: melting_point
+        T_C: '1018'
+        compound_as_printed: Na2SiO3
+        attribution: R. Wallace, Z. anorg. Chem., 63, 1 (1909).
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1291.15'}}
+          locator: *id051
+        total_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id051
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *id051

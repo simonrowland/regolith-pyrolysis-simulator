@@ -64,14 +64,61 @@ tables:
     draft_table_index: 13
     pdf_page: 33
     published_page: 1725
-    printed_body_rows: 3
+    printed_body_rows: 14
     retained:
       - target: historical literature values in context
         evidence_class: quoted_attributed
         reason: values are attributed in the table to earlier workers.
-    excluded:
-      - reason: Niggli's 956-degree comparison column is interpolated/reconstructed, not new measured data.
     audit:
       method: rendered_pdf_page
       pdf_page: 33
-      note: Render confirms the comparison columns, historical values, qualitative labels, and printed row labels.
+      note: >-
+        Render confirms all numeric cells, the 14 body rows including the system divider, the comparison columns,
+        historical values, qualitative labels, and printed row labels. The Niggli column is retained as comparison
+        context and is not asserted to be a separate experiment series.
+  - printed_table: none
+    draft_table_key: p033-t14
+    draft_table_index: 14
+    pdf_page: 33
+    published_page: 1725
+    printed_body_rows: 2
+    row_assignment: >-
+      This adjacent quoted-results table has composition in column 1 and Mallard's dark-red-heat, red-heat, and
+      higher-temperature results in columns 2–4.
+    retained:
+      - target: species.Na2CO3.context[niggli_1913_mallard_soda_displacement]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        evidence_class: quoted_attributed
+        attribution: Mallard, Ann. chim. phys., [4] 28, 250 (1873).
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 33
+      note: Render confirms both rows, all five numeric cells, and the missing final cell in the 8.7 mol% row.
+prose_values:
+  - pdf_page: 14
+    published_page: 1706
+    locator: Lebeau results quoted in the K2CO3 dissociation discussion
+    target: species.K2CO3.context[niggli_1913_lebeau_pure_carbonate_pressure]
+    quantity_as_printed: equilibrium pressure in mm
+    disposition: context; the source's mm unit is not expanded to mmHg.
+  - pdf_page: 17
+    published_page: 1709
+    locator: Behavior of the Melts; potassium carbonate melting comparison
+    target: species.K2CO3.observations[]
+    quantity: transition_temperature
+    property_kind: melting_point
+    disposition: Niggli's measured 891 °C and six separately attributed comparison values.
+  - pdf_page: 18
+    published_page: 1710
+    locator: potassium disilicate melting bracket
+    target: species.K2Si2O5.observations[niggli_1913_k2si2o5_melting_point]
+    quantity: transition_temperature
+    evidence_class: quoted_attributed
+    disposition: Niggli's 1015 ± 10 °C estimate attributed to him; the 1005 °C solid / 1025 °C melted endpoints remain context because the transition schema accepts point fields only.
+  - pdf_page: 25
+    published_page: 1717
+    locator: Properties of Sodium Metasilicate
+    target: species.Na2CO3.observations[] and species.Na2SiO3.observations[]
+    quantity: transition_temperature
+    property_kind: melting_point
+    disposition: Quoted values 853 °C (Na2CO3) and 1018 °C (Na2SiO3); eutectic remains qualitative.
