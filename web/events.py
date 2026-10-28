@@ -2878,6 +2878,11 @@ def _product_story_payload(
         source = classification.get(source_name)
         if not isinstance(source, Mapping):
             continue
+        estimated_contributions = source.get('estimated_contributions')
+        if estimated_contributions:
+            story[name]['estimated_contributions'] = list(
+                estimated_contributions
+            )
         availability_flag = source.get('availability_flag')
         flag = source.get('flag')
         if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
@@ -2898,6 +2903,11 @@ def _product_story_payload(
         )
     rump = classification.get('refractory_ceramic_rump')
     if isinstance(rump, Mapping):
+        estimated_contributions = rump.get('estimated_contributions')
+        if estimated_contributions:
+            story['terminal_residue']['estimated_contributions'] = list(
+                estimated_contributions
+            )
         rump_flag = rump.get('availability_flag') or rump.get('flag')
         if (
             isinstance(rump_flag, Mapping)

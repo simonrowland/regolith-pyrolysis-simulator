@@ -71,6 +71,12 @@ def test_product_story_keeps_partial_flag_with_numeric_total():
         "reason": "missing LJ row",
         "upper_bound_kg": "unbounded",
     }]
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
     story = web_events._product_story_payload(
         sim,
         terminal_rump_by_species={},
@@ -78,6 +84,7 @@ def test_product_story_keeps_partial_flag_with_numeric_total():
             "ingots_metals": {
                 "status": "partial",
                 "excluded": excluded,
+                "estimated_contributions": estimated_contributions,
                 "flag": {"status": "partial", "reason": "missing LJ row"},
             }
         },
@@ -94,6 +101,43 @@ def test_product_story_keeps_partial_flag_with_numeric_total():
     assert story["metal_ingots"]["class_total_kg"] == 1.0
     assert story["metal_ingots"]["status"] == "partial"
     assert story["metal_ingots"]["excluded"] == excluded
+    assert story["metal_ingots"]["estimated_contributions"] == (
+        estimated_contributions
+    )
+
+
+def test_product_story_keeps_estimates_for_available_class():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "extrapolated",
+        "reason": "estimated carrier row",
+    }]
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={},
+        classification={
+            "ingots_metals": {
+                "status": "available",
+                "estimated_contributions": estimated_contributions,
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {"Fe": 1.0},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+
+    assert story["metal_ingots"]["class_total_kg"] == 1.0
+    assert story["metal_ingots"]["estimated_contributions"] == (
+        estimated_contributions
+    )
 
 
 def test_product_story_rump_composition_keeps_partial_flag_and_exclusion():

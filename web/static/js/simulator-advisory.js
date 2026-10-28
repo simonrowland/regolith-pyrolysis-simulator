@@ -204,17 +204,9 @@ function renderCeramicRumpPanel(payload) {
     const productClassStatus = payload && payload.product_class_status
         ? payload.product_class_status
         : availability && availability.status;
-    const estimatedContributions = Array.isArray(payload && payload.estimated_contributions)
-        ? payload.estimated_contributions
-        : availability && Array.isArray(availability.estimated_contributions)
-            ? availability.estimated_contributions
-            : [];
-    const estimatedSpecies = [...new Set(estimatedContributions
-        .filter(item => item && typeof item.species === 'string')
-        .map(item => item.species))].sort();
-    const estimateNote = estimatedSpecies.length
-        ? `includes estimated transport for ${estimatedSpecies.join(', ')}`
-        : '';
+    const estimateNote = advisoryEstimatedTransportText(
+        payload && payload.estimated_contributions,
+    );
     updateAdvisoryState('ceramic-rump-state', status);
     advisoryClear(content);
     if (!payload || (status === 'n/a' && !productClassStatus)) {
@@ -399,6 +391,21 @@ function advisoryPrettyKey(key) {
     return String(key).replace(/_/g, ' ');
 }
 
+function advisoryEstimatedTransportText(value) {
+    if (!Array.isArray(value)) return '';
+    const contributions = [...new Set(value
+        .filter((item) => item && typeof item.species === 'string')
+        .map((item) => {
+            const authority = typeof item.authority === 'string'
+                ? item.authority
+                : 'unspecified authority';
+            return `${item.species} (${authority})`;
+        }))].sort();
+    return contributions.length
+        ? `includes estimated transport for ${contributions.join(', ')}`
+        : '';
+}
+
 function advisoryIsProductMetadata(key) {
     return ['status', 'flag', 'availability_flag', 'excluded', 'reason']
         .includes(key);
@@ -475,7 +482,13 @@ function appendAdvisorySection(parent, title, mapping, unit, strictNumeric = fal
         appendCeramicLine(
             parent,
             advisoryPrettyKey(key),
-            advisoryNestedValue(value, valueUnit, metadata ? false : strictNumeric),
+            key === 'estimated_contributions'
+                ? advisoryEstimatedTransportText(value)
+                : advisoryNestedValue(
+                    value,
+                    valueUnit,
+                    metadata ? false : strictNumeric,
+                ),
         );
     }
     return true;

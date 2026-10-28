@@ -600,7 +600,6 @@ def product_class_availability(
                 "authority": "unavailable",
                 "reason": "; ".join(item["reason"] for item in excluded),
                 "excluded": excluded,
-                "estimated_contributions": estimated_contributions,
                 **({"total_basis": "lower_bound"} if status == "partial" else {}),
             }
         ),

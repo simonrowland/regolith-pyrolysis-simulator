@@ -261,9 +261,6 @@ def test_product_class_keeps_estimated_flux_and_ignores_empty_refusal():
     assert partial["estimated_contributions"] == available[
         "estimated_contributions"
     ]
-    assert partial["flag"]["estimated_contributions"] == partial[
-        "estimated_contributions"
-    ]
 
 
 def test_classifier_marks_refused_only_class_unavailable(two_hour_run, monkeypatch):
