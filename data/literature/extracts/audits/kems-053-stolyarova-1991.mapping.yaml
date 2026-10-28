@@ -135,6 +135,27 @@ cell_audit:
       Ca_method_2: '50.9 ± 5.0'
       CaO_method_1: '78.8 ± 5.0'
       CaO_method_2: '79.5 ± 6.0'
+phase_normalization:
+  printed_phase_phrase: CaO-SiO2 liquid oxide melt
+  stored_as_printed_field: phase_as_printed
+  identity_phase_token: l
+  token_owner: simulator/battery/enums.py::Phase.L
+  source_series_count: 7
+  migrated_observation_count: 59
+  row_count: 54 table activity points plus 5 Figure 3 points
+  source_locators:
+    tables:
+      page: 2
+      published_page: 3711
+      table_numbers: [IIa, IIb]
+    figure:
+      page: 4
+      published_page: 3713
+      figure_number: '3'
+  rule: >-
+    Store phase=l on the six activity series and Figure 3 Gibbs-integral series;
+    retain the source phrase in phase_as_printed. Gas partial-pressure
+    observations retain their measured gas phase.
 table_compare:
   output: kems-053-stolyarova-1991.compare.csv
   summary: matched=0, no-match=76, locator-error=173, unverifiable=62

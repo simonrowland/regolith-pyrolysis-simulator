@@ -6,7 +6,7 @@ The migrated uncertainty field is selected from `values.points[].sigma` by `simu
 
 ## Isolated migration and band check
 
-The real migrator emitted 144 observations, 0 hard issues, and 6 unavailable observations. Table Ia contributed 44 partial-pressure points with printed uncertainties. No Table Ia point has an unknown quantity or phase. Across the full source migration, the existing baseline still includes 60 phase-unknown observations and one quantity-unknown observation; those rows are outside this 44-point uncertainty recovery.
+The real migrator emitted 144 observations, 0 hard issues, and 6 unavailable observations. Table Ia contributed 44 partial-pressure points with printed uncertainties. No Table Ia point has an unknown quantity or phase. The six Table II activity series and Figure 3 contain 54 table points and 5 figure points; their phase phrase now migrates to the existing `l` token and remains in `phase_as_printed`. The gas-speciation observation without that phrase remains phase-unknown, and the one quantity-unknown observation is unchanged, as directed by the scope ruling.
 
 The pinned OpenIMCC 66ec4a3 source tree hash was `308672269d6e6090023f4a86c4fc0d83c4c24688`. Ten Table Ia rows were rescored with OpenIMCC. Their residuals stayed the same; the final score still withholds a decision band on all ten, so it reports `no_band` and no band verdict. The direct row uncertainty parser now resolves bands in dimensionless log units. The score-level band remains withheld by existing source qualification flags; no scorer tuning was done.
 
