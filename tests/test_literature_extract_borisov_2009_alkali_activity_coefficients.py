@@ -106,4 +106,3 @@ def test_borisov_2009_isolated_migration_preserves_conditions_and_refuses_absolu
     first = migrated["borisov_2009_table_4_darnk_36_na2o_relative_gamma"]
     assert first.identity.fO2_Pa.is_unknown
     assert first.point_conditions["log_fO2"].state.value == Decimal("-10.74")
-
