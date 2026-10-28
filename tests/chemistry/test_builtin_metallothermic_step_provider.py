@@ -56,9 +56,9 @@ from engines.builtin.metallothermic_step import (
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
-    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
 )
 from simulator.chemistry.ellingham_thermo import (
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_delta_g_kj_per_mol_o2,

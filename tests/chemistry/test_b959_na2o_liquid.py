@@ -3,7 +3,7 @@
 import pytest
 
 from simulator.chemistry.ellingham_thermo import ellingham_fit_segments
-from simulator.chemistry.melt_activity import (
+from simulator.chemistry.ellingham_thermo import (
     _na_activity_reference_standard_delta_g_kj_per_mol_o2,
 )
 

@@ -140,6 +140,7 @@ from engines.builtin.vapor_pressure import (
     _ELLINGHAM_THERMO,
 )
 from simulator.chemistry.ellingham_thermo import (
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
@@ -150,7 +151,6 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
-    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
