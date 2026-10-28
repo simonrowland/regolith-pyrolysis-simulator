@@ -38,8 +38,8 @@ notes:
     page: 41
     pdf_page_index: 40
     table: '99'
-- text: Sodium silicate glass (gl) and the au form of Na2SiO3 are outside the requested crystal/liquid/gas scope.
-    Table 100 contains K2SiO3 and K2Si2O5 but no K4SiO4 or K6Si2O7 row.
+- text: Table 99 includes the sodium silicate glass (gl) ΔfH cells; the au form of Na2SiO3 is excluded. Table 100
+    contains K2SiO3 and K2Si2O5 but no K4SiO4 or K6Si2O7 row.
   locator:
     page: 61
     pdf_page_index: 60
@@ -83,6 +83,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -131,6 +132,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -179,6 +181,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -191,11 +194,11 @@ species:
         T_K: 298.15
         value: '4.37'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table99_NaO2_c_S
@@ -234,6 +237,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -282,6 +286,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -320,6 +325,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -332,11 +338,11 @@ species:
         T_K: 298.15
         value: '2.74'
         fugacity_standard_state_as_printed: unit fugacity
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table99_NaO2_g_S
@@ -365,6 +371,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -403,6 +410,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -453,6 +461,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -501,6 +510,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -549,6 +559,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -561,11 +572,11 @@ species:
         T_K: 298.15
         value: '2.964'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table99_Na2O_c_S
@@ -604,6 +615,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -652,6 +664,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -690,6 +703,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -728,6 +742,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -766,6 +781,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -778,11 +794,11 @@ species:
         T_K: 298.15
         value: '3.3'
         fugacity_standard_state_as_printed: unit fugacity
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table99_Na2O_g_S
@@ -811,6 +827,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -849,6 +866,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -899,6 +917,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -947,6 +966,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -995,6 +1015,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1007,11 +1028,11 @@ species:
         T_K: 298.15
         value: '3.75'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table99_Na2O2_c_S
@@ -1050,6 +1071,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1098,6 +1120,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1148,6 +1171,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1196,6 +1220,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1244,6 +1269,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1255,6 +1281,64 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '27.21'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2SiO3_gl_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2SiO3 gl
+        column: ΔfH° at 298.15 K
+        table_row_number: 30
+        table_column_number: 6
+      phase: glass
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2SiO3 gl
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            note: Table 99 prints gl; it gives no quench statement for this assessed value.
+      units: kcal/mol
+      values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2SiO3
+        phase: glass
+        phase_as_printed: gl
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-368.1'
         standard_pressure_Pa: 101325
   Na2Si2O5:
     observations:
@@ -1270,6 +1354,8 @@ species:
         table_row_number: 34
         table_column_number: 6
       phase: cr
+      condensed_form:
+        polymorph: beta
       standard_state: the condensed phase under a pressure of one atmosphere
       point_conditions:
         temperature_K:
@@ -1294,6 +1380,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1305,8 +1392,6 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '-589.8'
-        form_as_printed: formerly beta
-        polymorph: beta
         standard_pressure_Pa: 101325
     - observation_id: nbs81_table99_Na2Si2O5_c_delta_fG
       type: gibbs_table
@@ -1320,6 +1405,8 @@ species:
         table_row_number: 34
         table_column_number: 7
       phase: cr
+      condensed_form:
+        polymorph: beta
       standard_state: the condensed phase under a pressure of one atmosphere
       point_conditions:
         temperature_K:
@@ -1344,6 +1431,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1355,8 +1443,6 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '-555.0'
-        form_as_printed: formerly beta
-        polymorph: beta
         standard_pressure_Pa: 101325
     - observation_id: nbs81_table99_Na2Si2O5_c_S
       type: heat_capacity_and_heat_content_series
@@ -1370,6 +1456,8 @@ species:
         table_row_number: 34
         table_column_number: 9
       phase: cr
+      condensed_form:
+        polymorph: beta
       standard_state: the condensed phase under a pressure of one atmosphere
       point_conditions:
         temperature_K:
@@ -1394,6 +1482,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1405,8 +1494,6 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '39.21'
-        form_as_printed: formerly beta
-        polymorph: beta
         standard_pressure_Pa: 101325
     - observation_id: nbs81_table99_Na2Si2O5_c2_delta_fH
       type: gibbs_table
@@ -1420,6 +1507,8 @@ species:
         table_row_number: 36
         table_column_number: 6
       phase: cr
+      condensed_form:
+        polymorph: alpha
       standard_state: the condensed phase under a pressure of one atmosphere
       point_conditions:
         temperature_K:
@@ -1444,6 +1533,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1455,8 +1545,6 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '-589.22'
-        form_as_printed: stable from 951 K to melting point at 1147 K; formerly alpha
-        polymorph: alpha
         standard_pressure_Pa: 101325
     - observation_id: nbs81_table99_Na2Si2O5_c3_delta_fH
       type: gibbs_table
@@ -1470,6 +1558,11 @@ species:
         table_row_number: 38
         table_column_number: 6
       phase: cr
+      condensed_form:
+        polymorph:
+          tag: unknown
+          reason: The printed word 'unstable' is not a Polymorph member.
+          rejection_kind: unrecognised
       standard_state: the condensed phase under a pressure of one atmosphere
       point_conditions:
         temperature_K:
@@ -1494,6 +1587,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1505,7 +1599,64 @@ species:
         standard_state_as_printed: the condensed phase under a pressure of one atmosphere
         T_K: 298.15
         value: '-587.28'
-        form_as_printed: unstable
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table99_Na2Si2O5_gl_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        row: Na2Si2O5 gl
+        column: ΔfH° at 298.15 K
+        table_row_number: 39
+        table_column_number: 6
+      phase: glass
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            row: Na2Si2O5 gl
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 61
+            pdf_page_index: 60
+            table: '99'
+            note: Table 99 prints gl; it gives no quench statement for this assessed value.
+      units: kcal/mol
+      values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Na2Si2O5
+        phase: glass
+        phase_as_printed: gl
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-584.56'
         standard_pressure_Pa: 101325
   Na4SiO4:
     observations:
@@ -1545,6 +1696,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1595,6 +1747,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1646,6 +1799,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1694,6 +1848,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1742,6 +1897,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1790,6 +1946,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1840,6 +1997,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1878,6 +2036,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1929,6 +2088,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -1977,6 +2137,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fG
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2025,6 +2186,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2063,6 +2225,7 @@ species:
             column: 298.15 K table heading
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: delta_fH
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2114,6 +2277,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2126,11 +2290,11 @@ species:
         T_K: 298.15
         value: '5.230'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table100_K2SiO3_c_S
@@ -2169,6 +2333,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2217,6 +2382,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2267,6 +2433,7 @@ species:
               atmosphere to 101325 pascal.
       units: kcal/mol
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: enthalpy_298K_minus_0K_as_printed
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2279,11 +2446,11 @@ species:
         T_K: 298.15
         value: '6.888'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py::Quantity.H_MINUS_H298) represents
           an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
-          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
-          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
-          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          or below 0 K (simulator/battery/identity.py::_parse_enthalpy_increment_subtype), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py::_enthalpy_increment_subtype). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py::_COMPILATION_CELL_QUANTITY),
           but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
           non-token quantity.
     - observation_id: nbs81_table100_K2Si2O5_c_S
@@ -2322,6 +2489,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
@@ -2370,6 +2538,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
+        attribution: "National Bureau of Standards — Technical Note 270-8"
         quantity: cp
         method_class: compilation_assessed
         evidence_class: compilation_assessed

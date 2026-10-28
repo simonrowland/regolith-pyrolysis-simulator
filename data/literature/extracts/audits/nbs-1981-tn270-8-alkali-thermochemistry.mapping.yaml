@@ -4,7 +4,7 @@ source_tables:
   pages:
   - 41
   - 61
-  in_scope_printed_rows: 11
+  in_scope_printed_rows: 13
   row_formula_column: 1
   row_state_column: 3
   formula_weight_column: 4
@@ -34,8 +34,9 @@ source_tables:
   phase_mapping:
     c: cr
     g: g
-    c2: cr (form preserved as printed; alpha qualifier retained)
-    c3: cr (form preserved as printed; unstable qualifier retained)
+    c2: cr (condensed_form.polymorph alpha; source also prints the stable temperature range)
+    c3: cr (typed unknown polymorph; source prints unstable)
+    gl: glass
   standard_state_locator:
     page: 10
     pdf_page_index: 9
@@ -79,6 +80,6 @@ source_tables:
     pdf_page_index: 9
     section: Conventions Regarding Pure Substances
 counts:
-  printed_formula_state_rows: 18
-  populated_requested_numeric_cells: 49
+  printed_formula_state_rows: 20
+  populated_requested_numeric_cells: 51
   quantity_unknown_H_298_minus_H_0_cells: 7

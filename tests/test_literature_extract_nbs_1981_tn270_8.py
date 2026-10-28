@@ -21,9 +21,11 @@ EXPECTED_ROW_CELL_COUNTS = {
     ("Na2O", "g"): 5,
     ("Na2O2", "c"): 5,
     ("Na2SiO3", "c"): 3,
+    ("Na2SiO3", "gl"): 1,
     ("Na2Si2O5", "c"): 3,
     ("Na2Si2O5", "c2"): 1,
     ("Na2Si2O5", "c3"): 1,
+    ("Na2Si2O5", "gl"): 1,
     ("Na4SiO4", "c"): 1,
     ("Na6Si2O7", "c"): 1,
     ("KO2", "c"): 4,
@@ -50,6 +52,8 @@ H298_MINUS_H0_IDS = frozenset(
 RENDER_ANCHORS = (
     ("nbs81_table99_Na2O_c_delta_fH", "-99.00", 41, "99"),
     ("nbs81_table99_Na6Si2O7_c_delta_fH", "-868.", 61, "99"),
+    ("nbs81_table99_Na2SiO3_gl_delta_fH", "-368.1", 61, "99"),
+    ("nbs81_table99_Na2Si2O5_gl_delta_fH", "-584.56", 61, "99"),
     ("nbs81_table100_KO2_c_delta_fH", "-68.10", 72, "100"),
     ("nbs81_table100_K2SiO3_c_S", "34.9", 88, "100"),
 )
@@ -102,10 +106,10 @@ def test_printed_rows_cells_and_render_anchors_are_pinned_and_mutation_checked()
         for record in observations.values()
     )
 
-    assert len(observations) == 49
-    assert len(row_cell_counts) == 18
+    assert len(observations) == 51
+    assert len(row_cell_counts) == 20
     assert row_cell_counts == EXPECTED_ROW_CELL_COUNTS
-    assert sum(1 for formula, _state in row_cell_counts if formula.startswith("Na")) == 11
+    assert sum(1 for formula, _state in row_cell_counts if formula.startswith("Na")) == 13
     assert sum(1 for formula, _state in row_cell_counts if formula.startswith("K")) == 7
     assert _render_anchor_grid(document) == RENDER_ANCHORS
     sample = next(
@@ -144,7 +148,7 @@ def test_isolated_migration_scores_exact_tokens_and_preserves_printed_conditions
         row.observation_id.rsplit("::", 1)[-1]: row
         for row in result.observations.values()
     }
-    assert len(observations) == 49
+    assert len(observations) == 51
 
     quantity_unknown_ids = {
         observation_id
@@ -171,11 +175,22 @@ def test_isolated_migration_scores_exact_tokens_and_preserves_printed_conditions
     for observation_id, source in source_observations.items():
         row = observations[observation_id]
         source_values = source["values"]
+        assert source_values["attribution"] == "National Bureau of Standards — Technical Note 270-8"
+        assert row.evidence.attribution == "National Bureau of Standards — Technical Note 270-8"
         phase_token = source_values["phase"]
         assert phase_token in phase_map
         assert row.identity.species.phase.is_value
         assert row.identity.species.phase.value == phase_map[phase_token]
         assert row.identity.species.formula == source_values["formula"]
+
+        if phase_token == "glass":
+            quench = source["point_conditions"]["quench_state"]
+            assert quench["state"]["value"] == "not_stated"
+            assert quench["locator"]["page"] == 61
+            migrated_quench = row.point_conditions["quench_state"]
+            assert migrated_quench.state.is_value
+            assert migrated_quench.state.value.value == "not_stated"
+            assert migrated_quench.locator.page == 61
 
         temperature = row.point_conditions["temperature_K"]
         assert temperature.state.is_value
@@ -227,6 +242,22 @@ def test_isolated_migration_scores_exact_tokens_and_preserves_printed_conditions
     assert observations["nbs81_table99_Na2O_c_delta_fH"].value.point == Decimal("-414.21600")
     assert observations["nbs81_table100_KO2_c_delta_fH"].value.point == Decimal("-284.93040")
     assert observations["nbs81_table100_K2SiO3_c_S"].value.point == Decimal("146.0216")
+    assert observations["nbs81_table99_Na2SiO3_gl_delta_fH"].value.point == Decimal("-1540.1304")
+    assert observations["nbs81_table99_Na2Si2O5_gl_delta_fH"].value.point == Decimal("-2445.79904")
+
+    for observation_id, expected in (
+        ("nbs81_table99_Na2Si2O5_c_delta_fH", "beta"),
+        ("nbs81_table99_Na2Si2O5_c_delta_fG", "beta"),
+        ("nbs81_table99_Na2Si2O5_c_S", "beta"),
+        ("nbs81_table99_Na2Si2O5_c2_delta_fH", "alpha"),
+    ):
+        polymorph = observations[observation_id].identity.species.polymorph
+        assert polymorph is not None and polymorph.is_value
+        assert polymorph.value.value == expected
+    unstable_polymorph = observations["nbs81_table99_Na2Si2O5_c3_delta_fH"].identity.species.polymorph
+    assert unstable_polymorph is not None and unstable_polymorph.is_unknown
+    assert "unstable" in (unstable_polymorph.reason or "")
+    assert unstable_polymorph.rejection_kind.value == "unrecognised"
 
     for observation_id in (
         "nbs81_table99_Na2O_c_delta_fH",
