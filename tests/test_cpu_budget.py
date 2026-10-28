@@ -22,6 +22,7 @@ def _run_probe(
     *,
     expected_test_count: int,
     junit_xml: Path | None = None,
+    xdist_workers: int | None = None,
 ) -> subprocess.CompletedProcess[str]:
     test_file = tmp_path / "test_cpu_budget_probe.py"
     test_file.write_text(textwrap.dedent(source), encoding="utf-8")
@@ -39,10 +40,16 @@ def _run_probe(
         "-o",
         "addopts=",
     ]
+    if xdist_workers is not None:
+        command.extend(("-n", str(xdist_workers)))
     if junit_xml is not None:
         command.extend(("--junitxml", str(junit_xml)))
     command.append(str(test_file))
     environment = {**os.environ, "PYTEST_ADDOPTS": ""}
+    if xdist_workers is not None:
+        for key in tuple(environment):
+            if key.startswith("PYTEST_XDIST_"):
+                environment.pop(key)
     result = subprocess.run(
         command,
         cwd=REPO_ROOT,
@@ -54,7 +61,12 @@ def _run_probe(
     )
     output = _output(result)
     assert "ERROR collecting" not in output, output
-    assert re.search(rf"collected {expected_test_count} items?\b", output), output
+    collection_count = re.search(
+        rf"collected {expected_test_count} items?\b", output
+    ) or re.search(
+        rf"\b\d+ workers? \[{expected_test_count} items?\]", output
+    )
+    assert collection_count is not None, output
     return result
 
 
@@ -62,23 +74,34 @@ def _output(result: subprocess.CompletedProcess[str]) -> str:
     return result.stdout + result.stderr
 
 
-def test_busy_loop_exceeding_cpu_budget_fails_with_cpu_message(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "xdist_workers",
+    [pytest.param(None, id="serial"), pytest.param(2, id="xdist-2")],
+)
+def test_busy_loop_exceeding_cpu_budget_fails_with_cpu_message(
+    tmp_path: Path,
+    xdist_workers: int | None,
+) -> None:
     result = _run_probe(
         tmp_path,
         """
+        import time
         import pytest
 
-        @pytest.mark.cpu_budget(1)
+        @pytest.mark.cpu_budget(0.1)
+        @pytest.mark.timeout(5)
         def test_busy_loop_exceeds_budget():
-            while True:
+            started = time.process_time()
+            while time.process_time() - started < 0.3:
                 pass
         """,
         expected_test_count=1,
+        xdist_workers=xdist_workers,
     )
 
     assert result.returncode == pytest.ExitCode.TESTS_FAILED
     assert "CPU budget exceeded:" in _output(result)
-    assert " s of 1 s" in _output(result)
+    assert " s of 0.1 s" in _output(result)
 
 
 def test_sleep_over_cpu_budget_wall_time_passes(tmp_path: Path) -> None:
@@ -88,7 +111,8 @@ def test_sleep_over_cpu_budget_wall_time_passes(tmp_path: Path) -> None:
         import time
         import pytest
 
-        @pytest.mark.cpu_budget(1)
+        @pytest.mark.cpu_budget(0.1)
+        @pytest.mark.timeout(5)
         def test_sleep_uses_little_cpu():
             time.sleep(1.25)
         """,
@@ -117,28 +141,86 @@ def test_sleep_over_wall_guard_fails_with_hang_message(tmp_path: Path) -> None:
     assert "wall-clock hang guard" in _output(result)
 
 
-def test_cpu_limit_is_restored_after_failure_for_next_test(tmp_path: Path) -> None:
-    next_test_ran = tmp_path / "next-test-ran"
+def test_reaped_child_cpu_counts_toward_the_budget(tmp_path: Path) -> None:
+    result = _run_probe(
+        tmp_path,
+        """
+        import subprocess
+        import pytest
+        import sys
+
+        @pytest.mark.cpu_budget(0.1)
+        @pytest.mark.timeout(5)
+        def test_child_cpu_exceeds_budget():
+            burn_cpu = "\\n".join((
+                "import time",
+                "started = time.process_time()",
+                "while time.process_time() - started < 0.35:",
+                "    pass",
+            ))
+            subprocess.run([sys.executable, "-c", burn_cpu], check=True)
+        """,
+        expected_test_count=1,
+    )
+
+    output = _output(result)
+    assert result.returncode == pytest.ExitCode.TESTS_FAILED, output
+    assert "CPU budget exceeded:" in output
+    assert " s of 0.1 s (wall " in output
+
+
+def test_long_lived_child_is_not_limited_by_the_next_test(tmp_path: Path) -> None:
+    child_limits = tmp_path / "child-limits.json"
+    child_finished = tmp_path / "child-finished"
     result = _run_probe(
         tmp_path,
         f"""
+        import json
+        import resource
+        import subprocess
+        import sys
+        import time
         from pathlib import Path
         import pytest
 
-        @pytest.mark.cpu_budget(1)
-        def test_00_busy_loop_fails():
-            while True:
-                pass
+        initial_limits = list(resource.getrlimit(resource.RLIMIT_CPU))
+        limits_file = Path({str(child_limits)!r})
+        finished_file = Path({str(child_finished)!r})
+        child_source = "\\n".join((
+            "import json, resource, sys, time",
+            "from pathlib import Path",
+            "limits, finished = map(Path, sys.argv[1:])",
+            "limits.write_text(json.dumps(resource.getrlimit(resource.RLIMIT_CPU)))",
+            "time.sleep(1.0)",
+            "finished.write_text('done')",
+        ))
+        child = None
 
-        def test_01_next_test_runs():
-            Path({str(next_test_ran)!r}).write_text("ran", encoding="utf-8")
+        @pytest.mark.cpu_budget(0.2)
+        @pytest.mark.timeout(5)
+        def test_00_spawn_long_lived_child():
+            global child
+            child = subprocess.Popen([
+                sys.executable, "-c", child_source,
+                str(limits_file), str(finished_file),
+            ])
+            deadline = time.monotonic() + 3
+            while not limits_file.exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            assert limits_file.exists()
+            assert json.loads(limits_file.read_text()) == initial_limits
+
+        @pytest.mark.cpu_budget(0.2)
+        @pytest.mark.timeout(5)
+        def test_01_child_survives_next_test():
+            assert child is not None
+            assert child.wait(timeout=3) == 0
+            assert finished_file.read_text() == "done"
         """,
         expected_test_count=2,
     )
 
-    assert result.returncode == pytest.ExitCode.TESTS_FAILED
-    assert "CPU budget exceeded:" in _output(result)
-    assert next_test_ran.read_text(encoding="utf-8") == "ran"
+    assert result.returncode == pytest.ExitCode.OK, _output(result)
 
 
 def test_wall_guard_scales_with_cpu_budget() -> None:
