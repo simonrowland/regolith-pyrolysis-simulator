@@ -538,7 +538,7 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
     rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
     assert len(rows) == 24
     expected = {
-        Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_UNKNOWN,
+        Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
         Engine.OPENIMCC: RefusalReason.IDENTITY_INCOMPLETE,
         Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
         Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
@@ -600,6 +600,22 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         assert FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION in flagged_strata(
             residual.notices
         )
+        for engine, reason in {
+            Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
+            Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
+            Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
+            Engine.THERMOENGINE: RefusalReason.UNSUPPORTED,
+            Engine.VAPOROCK: RefusalReason.UNSUPPORTED,
+        }.items():
+            refusal, _candidate = compile_residual(
+                observation,
+                engine,
+                context=context,
+                comparison_ids={observation.observation_id},
+            )
+            assert refusal.status is ResidualStatus.REFUSED
+            assert refusal.refusal is not None
+            assert refusal.refusal.reason is reason
     assert len(residuals) == 24
 
 
