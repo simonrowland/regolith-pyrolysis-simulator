@@ -4737,6 +4737,9 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
+        # The well-mixed headspace makes Na origins indistinguishable;
+        # the ledger attributes partial gas withdrawals pro rata.
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,
