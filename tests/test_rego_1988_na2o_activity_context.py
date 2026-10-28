@@ -89,6 +89,7 @@ def _assert_figure_rows_match(extract: dict, rows: list[dict[str, str]]) -> None
         assert values["activity"] == row["series_label"]
         assert values["printed_form"] == "log10"
         assert values["method_class"] == "figure_only"
+        assert observation["regime"] == "quench_equilibration"
         assert values["T_C"] == 1400
         assert all(row[f"read{index}_{axis}_px"] for index in (1, 2) for axis in ("x", "y"))
         assert row["render_dpi"] == "600"
@@ -319,8 +320,20 @@ def test_rego_1988_figure_reads_match_the_audit_csv() -> None:
         }
         assert observation["point_conditions"]["total_pressure"]["state"]["tag"] == "unknown"
         assert observation["point_conditions"]["oxygen"]["state"]["tag"] == "unknown"
+    # A third tight-crop read agreed with the NCC centre for both pairs that
+    # had exceeded 2 percent. The stroke-bbox centres were not retained.
     disagreed = [row["point_id"] for row in rows if row["disagreement"] == "1"]
-    assert disagreed == ["rego_1988_fig3_sq_06", "rego_1988_fig3_inv_01"]
+    assert disagreed == []
+    settled = {
+        "rego_1988_fig3_sq_06": ("3962.50", "1714.50", "0.30070", "0.04714"),
+        "rego_1988_fig3_inv_01": ("3650.00", "512.00", "0.02621", "0.42377"),
+    }
+    for point_id, (x_px, y_px, x_na, x_other) in settled.items():
+        row = by_point[point_id]
+        assert (row["read2_x_px"], row["read2_y_px"]) == (x_px, y_px)
+        assert row["read2_X_Na2O"] == x_na
+        assert row["read2_X_other"] == x_other
+        assert row["disagreement"] == "0"
     assert {row["figure"] for row in rows} == {"3", "5", "6"}
     assert sum(row["figure"] == "3" for row in rows) == 30
     assert sum(row["figure"] == "5" for row in rows) == 29
