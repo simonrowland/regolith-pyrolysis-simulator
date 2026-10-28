@@ -647,7 +647,10 @@ def test_classifier_handles_empty_product_ledger():
     )
     result = classify_products(sim)
     assert result['metals_plus_O2']['class_total_kg'] == 0.0
-    assert result['pure_silica_glass']['class_total_kg'] == 0.0
+    assert result['pure_silica_glass']['stage_3_capture_kg'] is None
+    assert result['pure_silica_glass']['class_total_kg'] is None
+    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert result['glass']['pure_silica_glass_kg'] is None
     assert result['refractory_ceramic_rump']['class_total_kg'] == 0.0
     assert result['unclassified']['total_kg'] == 0.0
 
@@ -660,12 +663,17 @@ def test_classifier_handles_missing_product_ledger_method():
         atom_ledger=None,
     )
     result = classify_products(sim)
-    # Empty everything.
+    # Missing Stage 3 is unavailable; the unrelated empty classes remain zero.
     for bucket in (
-        'metals_plus_O2', 'pure_silica_glass',
+        'metals_plus_O2',
         'industrial_mixed_glass', 'refractory_ceramic_rump',
     ):
         assert result[bucket]['class_total_kg'] == 0.0
+    assert result['pure_silica_glass']['stage_3_capture_kg'] is None
+    assert result['pure_silica_glass']['class_total_kg'] is None
+    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert result['glass']['class_total_kg'] is None
+    assert result['glass']['pure_silica_glass_kg'] is None
 
 
 def test_classifier_handles_non_coercible_product_kg():

@@ -147,6 +147,16 @@
     const silicaClassTotal = silica && hasNumber(silica.class_total_kg) ? silica.class_total_kg : null;
     const silicaCapture = silica && hasNumber(silica.stage_3_capture_kg) ? silica.stage_3_capture_kg : null;
     const silicaFlag = silica ? asMap(silica.flag) : null;
+    const silicaUnavailable = isSilicaStage && silica !== null && (
+      silica.class_total_kg === null
+      || silica.stage_3_capture_kg === null
+      || (typeof silicaFlag?.status === "string"
+        && silicaFlag.status.toLowerCase() === "unavailable")
+    );
+    const silicaUnavailableReason = silicaFlag
+      && typeof silicaFlag.reason === "string"
+      ? silicaFlag.reason
+      : "";
     const silicaProduct = silicaClassTotal !== null && silicaClassTotal > 0;
     const silicaFlaggedProduct = silicaProduct && silicaFlag !== null;
     const silicaQualified = silicaProduct && !silicaFlaggedProduct;
@@ -165,7 +175,9 @@
       ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
     let routeStatus = "collection not implied";
-    if (stage && isSilicaStage && silicaFlaggedProduct) {
+    if (isSilicaStage && silicaUnavailable) {
+      routeStatus = "silica capture unavailable";
+    } else if (stage && isSilicaStage && silicaFlaggedProduct) {
       routeStatus = "flagged silica product";
     } else if (stage && isSilicaStage && silicaQualified) {
       routeStatus = "qualified silica product";
@@ -181,9 +193,14 @@
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
     if (!stage) {
+      const pendingMessage = silicaUnavailable
+        ? `Silica capture unavailable${silicaUnavailableReason
+          ? ` · reason: ${silicaUnavailableReason}`
+          : ""}`
+        : "Terminal product-destination classification pending — not emitted";
       return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
         `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
-        `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc("Terminal product-destination classification pending — not emitted")}</div>` +
+        `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc(pendingMessage)}</div>` +
         `</article>`;
     }
 
@@ -203,7 +220,7 @@
       ? `<p class="sec-p15-stage-flag">${esc("flagged capture · not a product")}</p>`
       : "";
     let flaggedProduct = "";
-    if (silicaFlaggedProduct) {
+    if (silicaFlaggedProduct || (silicaUnavailable && silicaFlag !== null)) {
       const parts = [];
       if (typeof silicaFlag.status === "string" && silicaFlag.status.trim()) {
         parts.push(`status: ${silicaFlag.status.trim()}`);
