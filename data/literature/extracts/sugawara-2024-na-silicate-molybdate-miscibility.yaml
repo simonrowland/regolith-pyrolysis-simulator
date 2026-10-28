@@ -1,0 +1,334 @@
+schema_version: literature_extract.v1
+source_id: sugawara-2024-na-silicate-molybdate-miscibility
+source:
+  citation: Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and thermodynamic
+    analysis of liquid-liquid immiscibility in the system SiO2-Na2O-MoO3. Journal of Thermal Analysis and Calorimetry,
+    150, 7199-7206.
+  doi: 10.1007/s10973-024-13659-7
+  year: 2025
+  corpus_asset: raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
+  corpus_sha256: 196ffb5b0cc0f95232106dfa7397b4666f5cf9d5d38c408087eebee0a9e1453b
+review_status: draft
+extraction:
+  method: MinerU table draft and pdftotext machine reads, with full rendered-page layout checks for Tables 1, 2,
+    and 4. The measured Table 2 compositions are retained as context because their printed mol% basis and quenched
+    molybdate precipitate state do not map to a current closed phase-composition profile. Table 4 CALPHAD parameters
+    are context because the fitted phase-diagram inputs are not stored as measured rows.
+  date: '2026-10-28'
+  worker: w1028naD-sugawara24-namo
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: sugawara_2024_table1_experimental_compositions_and_run_products
+      type: composition
+      units: mol% as printed
+      locator:
+        page: 2
+        table: '1'
+        published_page: '7200'
+        note: All 11 printed sample rows; row and column assignments checked against the page render.
+      values:
+        quantity: experimental_charge_composition_and_run_products
+        system_as_printed: SiO2-Na2O-MoO3
+        column_headers_as_printed:
+        - Sample
+        - SiO2
+        - Na2O
+        - MoO3
+        - 1200 °C run products
+        - 1000 °C run products
+        - 1200 °C glass appearance
+        - 1000 °C glass appearance
+        rows_as_printed:
+        - - S50-13
+          - '43.50'
+          - '43.50'
+          - '13.00'
+          - SL
+          - n.d
+          - White
+          - ''
+        - - S35-15
+          - '29.75'
+          - '55.25'
+          - '15.00'
+          - SL
+          - SL
+          - White
+          - White
+        - - S40-15
+          - '34.00'
+          - '51.00'
+          - '15.00'
+          - SL
+          - SL + NS
+          - White
+          - White
+        - - S45-15
+          - '38.25'
+          - '46.75'
+          - '15.00'
+          - SL
+          - SL + ML + NS
+          - White
+          - White
+        - - S50-15
+          - '42.50'
+          - '42.50'
+          - '15.00'
+          - SL + ML
+          - SL + ML
+          - White
+          - Pale white
+        - - S55-15
+          - '46.75'
+          - '38.25'
+          - '15.00'
+          - SL + ML
+          - SL + ML
+          - Pale white
+          - Transparent
+        - - S62-15
+          - '52.70'
+          - '32.30'
+          - '15.00'
+          - SL + ML
+          - SL + ML
+          - White
+          - Transparent
+        - - S70-15
+          - '59.50'
+          - '25.50'
+          - '15.00'
+          - SL + ML + Qtz
+          - SL + ML + Qtz
+          - White
+          - Transparent
+        - - S30-25
+          - '22.50'
+          - '52.50'
+          - '25.00'
+          - SL
+          - SL
+          - White
+          - White
+        - - S40-25
+          - '30.00'
+          - '45.00'
+          - '25.00'
+          - SL + ML
+          - SL + ML
+          - White
+          - White
+        - - S50-25
+          - '37.50'
+          - '37.50'
+          - '25.00'
+          - SL + ML
+          - SL + ML
+          - White
+          - Transparent
+        printed_row_count: 11
+        source_method: MinerU table block and pdftotext; row/column layout verified by page render.
+    - observation_id: sugawara_2024_table2_phase_proportions_and_quenched_compositions
+      type: composition
+      units: mass% and mol% as printed
+      locator:
+        page: 4
+        table: '2'
+        published_page: '7202'
+        note: All 8 printed sample-temperature rows; all numeric columns checked against the page render.
+      values:
+        quantity: phase_proportions_and_chemical_composition_of_quenched_products
+        system_as_printed: SiO2-Na2O-MoO3
+        column_headers_as_printed:
+        - Sample
+        - Temperature/°C
+        - SL mass%
+        - ML mass%
+        - Qtz mass%
+        - Na2O loss mass%
+        - 'chemical composition mol%: SL then ML for SiO2, Na2O, MoO3'
+        composition_order_as_printed:
+        - SL
+        - ML
+        rows_as_printed:
+        - - S50-15
+          - '1200'
+          - '72.9'
+          - '26.5'
+          - ''
+          - '0.6'
+          - - '51.01'
+            - '11.53'
+          - - '40.37'
+            - '48.50'
+          - - '8.62'
+            - '39.97'
+        - - S55-15
+          - '1200'
+          - '65.1'
+          - '33.5'
+          - ''
+          - '1.3'
+          - - '62.01'
+            - '2.33'
+          - - '33.86'
+            - '47.84'
+          - - '4.12'
+            - '49.84'
+        - - S62-15
+          - '1200'
+          - '62.7'
+          - '37.3'
+          - ''
+          - '0.0'
+          - - '71.12'
+            - '1.43'
+          - - '26.53'
+            - '48.96'
+          - - '2.35'
+            - '49.61'
+        - - S70-15
+          - '1200'
+          - '54.6'
+          - '38.8'
+          - '6.6'
+          - '0.0'
+          - - '78.49'
+            - '3.76'
+          - - '19.45'
+            - '46.95'
+          - - '2.06'
+            - '49.29'
+        - - S50-15
+          - '1000'
+          - '61.7'
+          - '36.3'
+          - ''
+          - '2.0'
+          - - '58.61'
+            - '3.01'
+          - - '37.99'
+            - '49.46'
+          - - '3.40'
+            - '47.53'
+        - - S55-15
+          - '1000'
+          - '59.6'
+          - '38.3'
+          - ''
+          - '2.1'
+          - - '66.18'
+            - '0.62'
+          - - '32.09'
+            - '48.67'
+          - - '1.74'
+            - '50.71'
+        - - S62-15
+          - '1000'
+          - '59.2'
+          - '40.8'
+          - ''
+          - '0.0'
+          - - '73.64'
+            - '2.28'
+          - - '25.21'
+            - '49.69'
+          - - '1.15'
+            - '48.03'
+        - - S70-15
+          - '1000'
+          - '38.4'
+          - '41.9'
+          - '19.7'
+          - '0.0'
+          - - '76.66'
+            - '1.39'
+          - - '22.23'
+            - '50.67'
+          - - '1.11'
+            - '47.94'
+        printed_row_count: 8
+        method_class: measured_direct
+        analysis_as_printed: SL of S50 and S55 analyzed by XRF; other phase analyses by EPMA.
+        quench_as_printed: Sample rapidly cooled by immersing the bottom of the platinum crucible in water.
+        quench_state: asserted_altered
+        quench_state_locator:
+          page: 4
+          paragraph: Results of phase equilibrium experiments
+          note: The authors state that Mo-rich spherical particles in whitish glass were precipitated during cooling,
+            not evidence of equilibrium phase separation at high temperature.
+        schema_gap: The measured phase compositions are printed in mol%, but the equilibrium_phase_composition migrator
+          accepts wt_percent, mole_fraction, or ppm_mass. The molybdate liquid is measured as a quenched precipitate;
+          no closed solid phase role exists. Keep the complete table in context and do not relabel quenched products
+          as in-situ liquids.
+        source_method: MinerU table block and pdftotext; multi-number composition cells and all row/column assignments
+          verified against the page render.
+    - observation_id: sugawara_2024_table4_calphad_interaction_parameters
+      type: thermodynamic_example
+      units: as printed in table header
+      locator:
+        page: 6
+        table: '4'
+        published_page: '7204'
+        note: All six parameter rows checked against the page render.
+      values:
+        quantity: CALPHAD_Redlich_Kister_liquid_interaction_parameters
+        system_as_printed: SiO2-Na2O-MoO3
+        column_headers_as_printed:
+        - i-j
+        - k=0
+        - k=1
+        - k=2
+        rows_as_printed:
+        - - Mo2O6-Na2MoO4
+          - -161,000+72 T
+          - 10,000
+          - '0'
+        - - Si2O4-Mo2O6
+          - 70,000
+          - '0'
+          - '0'
+        - - Si2O4-Na2MoO4
+          - 55,000
+          - '0'
+          - '0'
+        - - Na2Si2O5-Na2MoO4
+          - 44,000
+          - '-5000'
+          - '0'
+        - - Na4Si2O6-Na2MoO4
+          - 12,000
+          - '0'
+          - 10,000
+        - - Na8Si2O8-Na2MoO4
+          - '0'
+          - '0'
+          - '0'
+        printed_row_count: 6
+        method_class: model_derived
+        model_as_printed: associate species model with Redlich–Kister polynomial
+        input_statement_as_printed: CALPHAD analysis used the phase-equilibrium relationship obtained in this study
+          (Fig. 4) and previously reported thermodynamic data.
+        lineage_note: The phase relationship in Fig. 4 is not digitized as measurements in this extract, so these
+          fitted parameters are retained as context and not emitted as model_derived observation rows.
+    - observation_id: sugawara_2024_phase_equilibrium_experiment_conditions
+      type: laboratory_conditions
+      units: as printed
+      locator:
+        page: 2
+        section: Experimental
+        published_page: '7200'
+      values:
+        quantity: experimental_temperature_duration_and_quench_method
+        temperature_conditions_C_as_printed:
+        - '1200'
+        - '1000'
+        heating_rate_C_per_hour_as_printed: '200'
+        hold_duration_hours_as_printed: '24'
+        quench_as_printed: The platinum crucible was taken out and rapidly cooled by immersing the bottom of crucible
+          in water.
+        total_pressure: not stated
+        fO2: not stated
