@@ -162,7 +162,7 @@ def _all_declared_requirements(
 
 def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> None:
     requirements_file = tmp_path / "requirements.txt"
-    requirements_file.write_text(
+    requirements_text = (
         "    # PetThermoTools, Thermobar, PySulfSat and VapoRock are installed\n"
         "\n"
         "--index-url https://example.com/simple\n"
@@ -171,6 +171,12 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
         "-e .\n"
         "synthetic-dep @ git+https://example.com/synthetic-dep@declared-\\\n"
         "    rev # continued revision\n"
+    )
+    requirements_file.write_text(requirements_text)
+    requirement_start_line = next(
+        line_number
+        for line_number, line in enumerate(requirements_text.splitlines(), start=1)
+        if line.startswith("synthetic-dep @ ")
     )
     lock = tomllib.loads(
         """
@@ -185,7 +191,7 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
     assert _all_declared_requirements(project, tmp_path) == [
         (
             "synthetic-dep @ git+https://example.com/synthetic-dep@declared-rev",
-            "requirements.txt:7",
+            f"requirements.txt:{requirement_start_line}",
         )
     ]
 
@@ -195,7 +201,7 @@ def test_requirements_file_git_revision_mismatch_is_rejected(tmp_path: Path) -> 
         )
 
     message = str(error.value)
-    assert "requirements.txt:1" in message
+    assert f"requirements.txt:{requirement_start_line}" in message
     assert "synthetic-dep" in message
     assert "declared-rev" in message
     assert "locked-rev" in message
