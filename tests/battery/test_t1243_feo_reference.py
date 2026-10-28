@@ -556,6 +556,16 @@ def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) 
             assert residual.status is ResidualStatus.REFUSED
             assert residual.refusal is not None
             assert residual.refusal.reason is reason
+            if engine is Engine.INTERNAL_ANALYTICAL:
+                assert (
+                    residual.refusal.detail["reason"]
+                    == "distin_activity_requires_joint_fe_metal_solve"
+                )
+            elif engine is Engine.OPENIMCC:
+                assert (
+                    residual.refusal.detail["reason"]
+                    == "distin_fe_metal_saturation_not_stated"
+                )
 
 
 def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
