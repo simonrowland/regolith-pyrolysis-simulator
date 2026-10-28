@@ -3363,6 +3363,2709 @@ species:
           Na2O: 3
           SiO2: 4
         note: Thermal effect on heating/cooling curve.
+    - observation_id: dans1930_p013_t03_r05_c07_point_13
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 13
+        column: '7'
+        table_row_number: 5
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '7'
+            table_row_number: 5
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '7'
+            table_row_number: 5
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '66.0'
+              - - SiO2
+                - '33.5'
+              - - ZrO2
+                - '0.5'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1070'
+        value: '1070'
+        T_C_as_published: '1070'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.66'
+          SiO2: '0.335'
+          ZrO2: '0.005'
+        composition_as_published: Na2O 66,0 mol%; SiO2 33,5 mol%; ZrO2 0,5 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r05_c08_point_13
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 13
+        column: '8'
+        table_row_number: 5
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '8'
+            table_row_number: 5
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '8'
+            table_row_number: 5
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '66.0'
+              - - SiO2
+                - '33.5'
+              - - ZrO2
+                - '0.5'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '960'
+        value: '960'
+        T_C_as_published: '960'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.66'
+          SiO2: '0.335'
+          ZrO2: '0.005'
+        composition_as_published: Na2O 66,0 mol%; SiO2 33,5 mol%; ZrO2 0,5 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r05_c09_point_13
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 13
+        column: '9'
+        table_row_number: 5
+        table_column_number: 9
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '9'
+            table_row_number: 5
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '9'
+            table_row_number: 5
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '66.0'
+              - - SiO2
+                - '33.5'
+              - - ZrO2
+                - '0.5'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1070'
+        value: '1070'
+        T_C_as_published: '1070'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.66'
+          SiO2: '0.335'
+          ZrO2: '0.005'
+        composition_as_published: Na2O 66,0 mol%; SiO2 33,5 mol%; ZrO2 0,5 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r05_c10_point_13
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 13
+        column: '10'
+        table_row_number: 5
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '10'
+            table_row_number: 5
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: '10'
+            table_row_number: 5
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '66.0'
+              - - SiO2
+                - '33.5'
+              - - ZrO2
+                - '0.5'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 13
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '958'
+        value: '958'
+        T_C_as_published: '958'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.66'
+          SiO2: '0.335'
+          ZrO2: '0.005'
+        composition_as_published: Na2O 66,0 mol%; SiO2 33,5 mol%; ZrO2 0,5 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r06_c08_point_14
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 14
+        column: '8'
+        table_row_number: 6
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '8'
+            table_row_number: 6
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '8'
+            table_row_number: 6
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.8'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '959'
+        value: '959'
+        T_C_as_published: '959'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.658'
+          SiO2: '0.33'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 65,8 mol%; SiO2 33,0 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.5'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r06_c09_point_14
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 14
+        column: '9'
+        table_row_number: 6
+        table_column_number: 9
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '9'
+            table_row_number: 6
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '9'
+            table_row_number: 6
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.8'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1049'
+        value: '1049'
+        T_C_as_published: '1049'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.658'
+          SiO2: '0.33'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 65,8 mol%; SiO2 33,0 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.5'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r06_c10_point_14
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 14
+        column: '10'
+        table_row_number: 6
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '10'
+            table_row_number: 6
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: '10'
+            table_row_number: 6
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.8'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 14
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '959'
+        value: '959'
+        T_C_as_published: '959'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.658'
+          SiO2: '0.33'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 65,8 mol%; SiO2 33,0 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.5'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r07_c08_point_15
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 15
+        column: '8'
+        table_row_number: 7
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '8'
+            table_row_number: 7
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '8'
+            table_row_number: 7
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.3'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '959'
+        value: '959'
+        T_C_as_published: '959'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.653'
+          SiO2: '0.33'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 65,3 mol%; SiO2 33,0 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r07_c09_point_15
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 15
+        column: '9'
+        table_row_number: 7
+        table_column_number: 9
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '9'
+            table_row_number: 7
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '9'
+            table_row_number: 7
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.3'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1055'
+        value: '1055'
+        T_C_as_published: '1055'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.653'
+          SiO2: '0.33'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 65,3 mol%; SiO2 33,0 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r07_c10_point_15
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 15
+        column: '10'
+        table_row_number: 7
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '10'
+            table_row_number: 7
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: '10'
+            table_row_number: 7
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '65.3'
+              - - SiO2
+                - '33.0'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 15
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '959'
+        value: '959'
+        T_C_as_published: '959'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.653'
+          SiO2: '0.33'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 65,3 mol%; SiO2 33,0 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '1.7'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r09_c08_point_16
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 16
+        column: '8'
+        table_row_number: 9
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: '8'
+            table_row_number: 9
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: '8'
+            table_row_number: 9
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '59.5'
+              - - SiO2
+                - '39.1'
+              - - ZrO2
+                - '1.4'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1107'
+        value: '1107'
+        T_C_as_published: '1107'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.595'
+          SiO2: '0.391'
+          ZrO2: '0.014'
+        composition_as_published: Na2O 59,5 mol%; SiO2 39,1 mol%; ZrO2 1,4 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '0.3'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r09_c10_point_16
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 16
+        column: '10'
+        table_row_number: 9
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: '10'
+            table_row_number: 9
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: '10'
+            table_row_number: 9
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '59.5'
+              - - SiO2
+                - '39.1'
+              - - ZrO2
+                - '1.4'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 16
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1106'
+        value: '1106'
+        T_C_as_published: '1106'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.595'
+          SiO2: '0.391'
+          ZrO2: '0.014'
+        composition_as_published: Na2O 59,5 mol%; SiO2 39,1 mol%; ZrO2 1,4 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '0.3'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r10_c07_point_17
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 17
+        column: '7'
+        table_row_number: 10
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '7'
+            table_row_number: 10
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '7'
+            table_row_number: 10
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '59.0'
+              - - SiO2
+                - '39.0'
+              - - ZrO2
+                - '2.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1113'
+        value: '1113'
+        T_C_as_published: '1113'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.59'
+          SiO2: '0.39'
+          ZrO2: '0.02'
+        composition_as_published: Na2O 59,0 mol%; SiO2 39,0 mol%; ZrO2 2,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '0.3'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r10_c08_point_17
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 17
+        column: '8'
+        table_row_number: 10
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '8'
+            table_row_number: 10
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '8'
+            table_row_number: 10
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '59.0'
+              - - SiO2
+                - '39.0'
+              - - ZrO2
+                - '2.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1105'
+        value: '1105'
+        T_C_as_published: '1105'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.59'
+          SiO2: '0.39'
+          ZrO2: '0.02'
+        composition_as_published: Na2O 59,0 mol%; SiO2 39,0 mol%; ZrO2 2,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '0.3'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r10_c10_point_17
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 17
+        column: '10'
+        table_row_number: 10
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '10'
+            table_row_number: 10
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: '10'
+            table_row_number: 10
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '59.0'
+              - - SiO2
+                - '39.0'
+              - - ZrO2
+                - '2.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 17
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1104'
+        value: '1104'
+        T_C_as_published: '1104'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.59'
+          SiO2: '0.39'
+          ZrO2: '0.02'
+        composition_as_published: Na2O 59,0 mol%; SiO2 39,0 mol%; ZrO2 2,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        sodium_carbonate_added_wt_pct_as_published: '0.3'
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r13_c07_point_18
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 18
+        column: '7'
+        table_row_number: 13
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '7'
+            table_row_number: 13
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '7'
+            table_row_number: 13
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.4'
+              - - SiO2
+                - '45.0'
+              - - ZrO2
+                - '0.6'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1022'
+        value: '1022'
+        T_C_as_published: '1022'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.544'
+          SiO2: '0.45'
+          ZrO2: '0.006'
+        composition_as_published: Na2O 54,4 mol%; SiO2 45,0 mol%; ZrO2 0,6 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r13_c08_point_18
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 18
+        column: '8'
+        table_row_number: 13
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '8'
+            table_row_number: 13
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '8'
+            table_row_number: 13
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.4'
+              - - SiO2
+                - '45.0'
+              - - ZrO2
+                - '0.6'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1006'
+        value: '1006'
+        T_C_as_published: '1006'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.544'
+          SiO2: '0.45'
+          ZrO2: '0.006'
+        composition_as_published: Na2O 54,4 mol%; SiO2 45,0 mol%; ZrO2 0,6 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r13_c10_point_18
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 18
+        column: '10'
+        table_row_number: 13
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '10'
+            table_row_number: 13
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: '10'
+            table_row_number: 13
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.4'
+              - - SiO2
+                - '45.0'
+              - - ZrO2
+                - '0.6'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 18
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1006'
+        value: '1006'
+        T_C_as_published: '1006'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.544'
+          SiO2: '0.45'
+          ZrO2: '0.006'
+        composition_as_published: Na2O 54,4 mol%; SiO2 45,0 mol%; ZrO2 0,6 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r14_c07_point_19
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 19
+        column: '7'
+        table_row_number: 14
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '7'
+            table_row_number: 14
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '7'
+            table_row_number: 14
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.0'
+              - - SiO2
+                - '44.8'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1020'
+        value: '1020'
+        T_C_as_published: '1020'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.54'
+          SiO2: '0.448'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 54,0 mol%; SiO2 44,8 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r14_c08_point_19
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 19
+        column: '8'
+        table_row_number: 14
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '8'
+            table_row_number: 14
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '8'
+            table_row_number: 14
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.0'
+              - - SiO2
+                - '44.8'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1007'
+        value: '1007'
+        T_C_as_published: '1007'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.54'
+          SiO2: '0.448'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 54,0 mol%; SiO2 44,8 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r14_c10_point_19
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 19
+        column: '10'
+        table_row_number: 14
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '10'
+            table_row_number: 14
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: '10'
+            table_row_number: 14
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.0'
+              - - SiO2
+                - '44.8'
+              - - ZrO2
+                - '1.2'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 19
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1007'
+        value: '1007'
+        T_C_as_published: '1007'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.54'
+          SiO2: '0.448'
+          ZrO2: '0.012'
+        composition_as_published: Na2O 54,0 mol%; SiO2 44,8 mol%; ZrO2 1,2 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r16_c07_point_20
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 20
+        column: '7'
+        table_row_number: 16
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: '7'
+            table_row_number: 16
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: '7'
+            table_row_number: 16
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '50.0'
+              - - SiO2
+                - '48.3'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1075'
+        value: '1075'
+        T_C_as_published: '1075'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.5'
+          SiO2: '0.483'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 50,0 mol%; SiO2 48,3 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r16_c09_point_20
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 20
+        column: '9'
+        table_row_number: 16
+        table_column_number: 9
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: '9'
+            table_row_number: 16
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: '9'
+            table_row_number: 16
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '50.0'
+              - - SiO2
+                - '48.3'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 20
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1074'
+        value: '1074'
+        T_C_as_published: '1074'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.5'
+          SiO2: '0.483'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 50,0 mol%; SiO2 48,3 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r18_c07_point_21
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 21
+        column: '7'
+        table_row_number: 18
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '7'
+            table_row_number: 18
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '7'
+            table_row_number: 18
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.6'
+              - - SiO2
+                - '49.6'
+              - - ZrO2
+                - '0.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1085'
+        value: '1085'
+        T_C_as_published: '1085'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.496'
+          SiO2: '0.496'
+          ZrO2: '0.007'
+        composition_as_published: Na2O 49,6 mol%; SiO2 49,6 mol%; ZrO2 0,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r18_c08_point_21
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 21
+        column: '8'
+        table_row_number: 18
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '8'
+            table_row_number: 18
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '8'
+            table_row_number: 18
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.6'
+              - - SiO2
+                - '49.6'
+              - - ZrO2
+                - '0.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1076'
+        value: '1076'
+        T_C_as_published: '1076'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.496'
+          SiO2: '0.496'
+          ZrO2: '0.007'
+        composition_as_published: Na2O 49,6 mol%; SiO2 49,6 mol%; ZrO2 0,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r18_c09_point_21
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 21
+        column: '9'
+        table_row_number: 18
+        table_column_number: 9
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '9'
+            table_row_number: 18
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '9'
+            table_row_number: 18
+            table_column_number: 9
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.6'
+              - - SiO2
+                - '49.6'
+              - - ZrO2
+                - '0.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1084'
+        value: '1084'
+        T_C_as_published: '1084'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.496'
+          SiO2: '0.496'
+          ZrO2: '0.007'
+        composition_as_published: Na2O 49,6 mol%; SiO2 49,6 mol%; ZrO2 0,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r18_c10_point_21
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 21
+        column: '10'
+        table_row_number: 18
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '10'
+            table_row_number: 18
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: '10'
+            table_row_number: 18
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.6'
+              - - SiO2
+                - '49.6'
+              - - ZrO2
+                - '0.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 21
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1076'
+        value: '1076'
+        T_C_as_published: '1076'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.496'
+          SiO2: '0.496'
+          ZrO2: '0.007'
+        composition_as_published: Na2O 49,6 mol%; SiO2 49,6 mol%; ZrO2 0,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r19_c08_point_22
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 22
+        column: '8'
+        table_row_number: 19
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: '8'
+            table_row_number: 19
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: '8'
+            table_row_number: 19
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.1'
+              - - SiO2
+                - '49.1'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1079'
+        value: '1079'
+        T_C_as_published: '1079'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.491'
+          SiO2: '0.491'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 49,1 mol%; SiO2 49,1 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r19_c10_point_22
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 22
+        column: '10'
+        table_row_number: 19
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: '10'
+            table_row_number: 19
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: '10'
+            table_row_number: 19
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '49.1'
+              - - SiO2
+                - '49.1'
+              - - ZrO2
+                - '1.7'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 22
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1076'
+        value: '1076'
+        T_C_as_published: '1076'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.491'
+          SiO2: '0.491'
+          ZrO2: '0.017'
+        composition_as_published: Na2O 49,1 mol%; SiO2 49,1 mol%; ZrO2 1,7 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r20_c07_point_23
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 23
+        column: '7'
+        table_row_number: 20
+        table_column_number: 7
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '7'
+            table_row_number: 20
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '7'
+            table_row_number: 20
+            table_column_number: 7
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '48.5'
+              - - SiO2
+                - '48.5'
+              - - ZrO2
+                - '3.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1097'
+        value: '1097'
+        T_C_as_published: '1097'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.485'
+          SiO2: '0.485'
+          ZrO2: '0.03'
+        composition_as_published: Na2O 48,5 mol%; SiO2 48,5 mol%; ZrO2 3,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r20_c08_point_23
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 23
+        column: '8'
+        table_row_number: 20
+        table_column_number: 8
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '8'
+            table_row_number: 20
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '8'
+            table_row_number: 20
+            table_column_number: 8
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '48.5'
+              - - SiO2
+                - '48.5'
+              - - ZrO2
+                - '3.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1077'
+        value: '1077'
+        T_C_as_published: '1077'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.485'
+          SiO2: '0.485'
+          ZrO2: '0.03'
+        composition_as_published: Na2O 48,5 mol%; SiO2 48,5 mol%; ZrO2 3,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
+    - observation_id: dans1930_p013_t03_r20_c10_point_23
+      type: transition_point
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 12
+        page: 13
+        table: '3'
+        row: point 23
+        column: '10'
+        table_row_number: 20
+        table_column_number: 10
+        note: Heating or cooling thermal effect as printed in Table 3.
+      phase: l
+      units: °C as printed
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '10'
+            table_row_number: 20
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_printed
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: '10'
+            table_row_number: 20
+            table_column_number: 10
+            note: Heating or cooling thermal effect as printed in Table 3.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '48.5'
+              - - SiO2
+                - '48.5'
+              - - ZrO2
+                - '3.0'
+          locator:
+            source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+            pdf_page_index: 12
+            page: 13
+            table: '3'
+            row: point 23
+            column: oxide composition (mol%)
+            note: Printed row composition; comma-decimal tokens checked against render.
+      values:
+        quantity: transition_temperature
+        property_kind: eutectic
+        method_class: measured_direct
+        admission_status: admitted
+        T_C: '1076'
+        value: '1076'
+        T_C_as_published: '1076'
+        system_as_published: Na2O-SiO2-ZrO2
+        composition_mol:
+          basis: printed_mole_fraction
+          Na2O: '0.485'
+          SiO2: '0.485'
+          ZrO2: '0.03'
+        composition_as_published: Na2O 48,5 mol%; SiO2 48,5 mol%; ZrO2 3,0 mol%
+        composition_columns:
+          Na2O: 3
+          SiO2: 4
+          ZrO2: 5
+        note: Heating or cooling thermal effect as printed in Table 3.
     context:
     - type: table_record
       observation_id: dans1930_table2_compilation_context
@@ -3438,3 +6141,6 @@ species:
           temperature_C: '1710'
           Na2O_mol_pct: —
           SiO2_mol_pct: —
+notes:
+- Table 3 also lists point compositions F, G, H, J, K, L and M; the corresponding summary-table composition observations retain
+  the Table 3 coordinates as related locators. Table 3 labels the 55.5/42.5/2.0 point J; the summary calls it I.
