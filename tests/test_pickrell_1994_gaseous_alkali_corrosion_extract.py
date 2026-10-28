@@ -74,6 +74,18 @@ def test_pickrell_extraction_migrates_with_exact_typed_quantity_gaps() -> None:
     assert all(row.value.kind.value == "unavailable" for row in rows.values())
     assert all(row.identity.quantity.is_unknown for row in rows.values())
     assert all(not row.identity.species.phase.is_unknown for row in rows.values())
+    ttz_source_ids = {
+        "pickrell_1994_prose_ttz_reaction_rate",
+        "pickrell_1994_prose_ttz_activation_energy",
+        "pickrell_1994_prose_ttz_thickness_after_15h",
+        "pickrell_1994_prose_ttz_zero_thickness_under_8h",
+        "pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes",
+    }
+    assert all(
+        row.identity.species.formula != "ZrO2"
+        for observation_id, row in rows.items()
+        if observation_id.split("::", 2)[1] in ttz_source_ids
+    )
     for observation_id, quantity_label in EXPECTED_QUANTITY_LABELS.items():
         source_rows = [
             row
@@ -182,14 +194,29 @@ def test_pickrell_extraction_migrates_with_exact_typed_quantity_gaps() -> None:
         (1100, 4.2),
     ]
     assert [point["n_exponent_as_printed"] for point in ttz_rates["values"]["points"]] == [3.0, 1.6, 1.1, 0.8]
+    assert [
+        point["n_exponent_locator"]
+        for point in ttz_rates["values"]["points"]
+    ] == [
+        {"page": 95, "published_page": 83, "section": "4.1.6"}
+    ] * 4
+    assert ttz_rates["derivation"]["raw_inputs"]["locator"]["page"] == 95
+    assert ttz_rates["derivation"]["raw_inputs"]["locator"]["published_page"] == 83
+    assert ttz_rates["derivation"]["raw_inputs"]["locator"]["figure"] == "25"
     assert by_id["pickrell_1994_prose_ttz_activation_energy"]["values"]["value"] == 229
+    ttz_ea = by_id["pickrell_1994_prose_ttz_activation_energy"]
+    assert (ttz_ea["locator"]["page"], ttz_ea["locator"]["published_page"]) == (97, 85)
+    assert (ttz_ea["derivation"]["locator"]["page"], ttz_ea["derivation"]["locator"]["published_page"]) == (97, 85)
+    assert ttz_ea["derivation"]["locator"]["figure"] == "26"
     ttz_thickness_observation = by_id["pickrell_1994_prose_ttz_thickness_after_15h"]
     ttz_thickness = ttz_thickness_observation["values"]
     assert (ttz_thickness["T_C"], ttz_thickness["exposure_time_h"], ttz_thickness["value"]) == (950, 15, 0.008)
+    assert (ttz_thickness_observation["locator"]["page"], ttz_thickness_observation["locator"]["published_page"]) == (95, 83)
     assert ttz_thickness_observation["point_conditions"]["atmosphere"]["state"]["value"] == CAMPAIGN_ATMOSPHERE
     ttz_zero_observation = by_id["pickrell_1994_prose_ttz_zero_thickness_under_8h"]
     ttz_zero = ttz_zero_observation["values"]
     assert (ttz_zero["exposure_time_operator"], ttz_zero["exposure_time_h"], ttz_zero["value"]) == ("<", 8, 0)
+    assert (ttz_zero_observation["locator"]["page"], ttz_zero_observation["locator"]["published_page"]) == (95, 83)
     assert "T_C" not in ttz_zero
     assert "temperature_C" not in ttz_zero_observation["point_conditions"]
     assert ttz_zero_observation["point_conditions"]["atmosphere"]["state"]["value"] == CAMPAIGN_ATMOSPHERE
@@ -197,12 +224,26 @@ def test_pickrell_extraction_migrates_with_exact_typed_quantity_gaps() -> None:
     assert [point["value"] for point in ttz_blanks] == [0.007, 0.010]
     assert all(point["T_C"] == 1000 and point["exposure_time_h"] == 12 for point in ttz_blanks)
     assert all(point["point_conditions"]["atmosphere"]["state"]["value"] == "without alkalis present" for point in ttz_blanks)
+    ttz_blank_observation = by_id["pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes"]
+    assert (ttz_blank_observation["locator"]["page"], ttz_blank_observation["locator"]["published_page"]) == (97, 85)
+    assert all(
+        (point["locator"]["page"], point["locator"]["published_page"]) == (97, 85)
+        and (point["point_conditions"]["temperature_C"]["locator"]["page"], point["point_conditions"]["temperature_C"]["locator"]["published_page"]) == (97, 85)
+        and (point["point_conditions"]["atmosphere"]["locator"]["page"], point["point_conditions"]["atmosphere"]["locator"]["published_page"]) == (97, 85)
+        for point in ttz_blanks
+    )
 
     aluminum_titanate = by_id["pickrell_1994_prose_aluminum_titanate_dimensional_change"]
     assert aluminum_titanate["values"]["value"] == 25
     assert aluminum_titanate["units"] == "%"
     assert "not a rate" in aluminum_titanate["values"]["note"]
     assert aluminum_titanate["values"]["T_C"] == 950
+    assert aluminum_titanate["values"]["source_detail_locator"] == {
+        "page": 100,
+        "published_page": 88,
+        "section": "4.1.7",
+    }
+    assert aluminum_titanate["locator"]["page"] == 132
 
     # These are measured-reduced fits. The plotted thickness-time values are not stored as parents.
     for observation_id, figure_page, figure in (

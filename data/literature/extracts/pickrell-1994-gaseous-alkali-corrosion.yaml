@@ -552,7 +552,7 @@ species:
                 atmosphere:
                   state: {tag: value, value: 'air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same campaign'}
                   locator: {page: 39, published_page: 27, section: '3.3'}
-  ZrO2:
+  transformation_toughened_zirconia_TTZ:
     observations:
       - observation_id: pickrell_1994_prose_ttz_reaction_rate
         type: rate_series
@@ -567,14 +567,14 @@ species:
           output_unit: um/h
           raw_inputs:
             state: {tag: value, value: not_printed}
-            locator: {page: 84, published_page: 72, figure: '25', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
+            locator: {page: 95, published_page: 83, figure: '25', note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.}
         values:
           quantity: reaction_layer_thickness_growth_rate_um_per_h
           method_class: measured_reduced
           points:
             - T_C: 950
               n_exponent_as_printed: 3.0
-              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              n_exponent_locator: {page: 95, published_page: 83, section: '4.1.6'}
               value: 0.4
               locator: {page: 132, published_page: 120, section: '5'}
               point_conditions:
@@ -586,7 +586,7 @@ species:
                   locator: {page: 39, published_page: 27, section: '3.3'}
             - T_C: 1000
               n_exponent_as_printed: 1.6
-              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              n_exponent_locator: {page: 95, published_page: 83, section: '4.1.6'}
               value: 1.1
               locator: {page: 132, published_page: 120, section: '5'}
               point_conditions:
@@ -598,7 +598,7 @@ species:
                   locator: {page: 39, published_page: 27, section: '3.3'}
             - T_C: 1050
               n_exponent_as_printed: 1.1
-              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              n_exponent_locator: {page: 95, published_page: 83, section: '4.1.6'}
               value: 3.4
               locator: {page: 132, published_page: 120, section: '5'}
               point_conditions:
@@ -610,7 +610,7 @@ species:
                   locator: {page: 39, published_page: 27, section: '3.3'}
             - T_C: 1100
               n_exponent_as_printed: 0.8
-              n_exponent_locator: {page: 84, published_page: 72, section: '4.1.6'}
+              n_exponent_locator: {page: 95, published_page: 83, section: '4.1.6'}
               value: 4.2
               locator: {page: 132, published_page: 120, section: '5'}
               point_conditions:
@@ -622,14 +622,14 @@ species:
                   locator: {page: 39, published_page: 27, section: '3.3'}
       - observation_id: pickrell_1994_prose_ttz_activation_energy
         type: rate_series
-        locator: {page: 85, published_page: 73, section: '4.1.6', note: Arrhenius-derived activation energy.}
+        locator: {page: 97, published_page: 85, section: '4.1.6', note: Arrhenius-derived activation energy.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion
         material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
         units: kJ/mol
         derived_from: [pickrell_1994_prose_ttz_reaction_rate]
         derivation:
-          locator: {page: 85, published_page: 73, section: '4.1.6', figure: '26'}
+          locator: {page: 97, published_page: 85, section: '4.1.6', figure: '26'}
           relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
           inputs: [pickrell_1994_prose_ttz_reaction_rate]
           output_unit: kJ/mol
@@ -640,7 +640,7 @@ species:
           value_unit_as_printed: kJ/mol
       - observation_id: pickrell_1994_prose_ttz_thickness_after_15h
         type: rate_series
-        locator: {page: 84, published_page: 72, section: '4.1.6', note: Measured reaction-layer thickness after 15 h at 950 C.}
+        locator: {page: 95, published_page: 83, section: '4.1.6', note: Measured reaction-layer thickness after 15 h at 950 C.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion
         material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
@@ -657,7 +657,7 @@ species:
           exposure_time_h: 15
       - observation_id: pickrell_1994_prose_ttz_zero_thickness_under_8h
         type: rate_series
-        locator: {page: 84, published_page: 72, section: '4.1.6', note: For all times below 8 h the measured reaction-layer thickness was zero; no temperature is assigned to this statement.}
+        locator: {page: 95, published_page: 83, section: '4.1.6', note: For all times below 8 h the measured reaction-layer thickness was zero; no temperature is assigned to this statement.}
         phase: cr
         regime: sodium_nitrate_vapor_corrosion
         material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
@@ -674,7 +674,7 @@ species:
           exposure_time_operator: '<'
       - observation_id: pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes
         type: rate_series
-        locator: {page: 85, published_page: 73, section: '4.1.6', note: Two separate alkali-free blank runs each average two samples after 12 h at 1000 C.}
+        locator: {page: 97, published_page: 85, section: '4.1.6', note: Two separate alkali-free blank runs each average two samples after 12 h at 1000 C.}
         phase: cr
         regime: alkali_free_thermal_blank
         material_as_reported: transformation-toughened zirconia (TTZ); stabilizer composition is not printed.
@@ -689,27 +689,27 @@ species:
               blank_set: first pair of samples
               n_samples_as_printed: 2
               value: 0.007
-              locator: {page: 85, published_page: 73, section: '4.1.6'}
+              locator: {page: 97, published_page: 85, section: '4.1.6'}
               point_conditions:
                 temperature_C:
                   state: {tag: value, value: {kind: point, point: '1000'}}
-                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                  locator: {page: 97, published_page: 85, section: '4.1.6'}
                 atmosphere:
                   state: {tag: value, value: without alkalis present}
-                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                  locator: {page: 97, published_page: 85, section: '4.1.6'}
             - T_C: 1000
               exposure_time_h: 12
               blank_set: second pair of samples
               n_samples_as_printed: 2
               value: 0.010
-              locator: {page: 85, published_page: 73, section: '4.1.6'}
+              locator: {page: 97, published_page: 85, section: '4.1.6'}
               point_conditions:
                 temperature_C:
                   state: {tag: value, value: {kind: point, point: '1000'}}
-                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                  locator: {page: 97, published_page: 85, section: '4.1.6'}
                 atmosphere:
                   state: {tag: value, value: without alkalis present}
-                  locator: {page: 85, published_page: 73, section: '4.1.6'}
+                  locator: {page: 97, published_page: 85, section: '4.1.6'}
   Al2TiO5:
     observations:
       - observation_id: pickrell_1994_prose_aluminum_titanate_dimensional_change
@@ -730,4 +730,4 @@ species:
           T_C: 950
           approximate: true
           note: Dimensional change as printed for short times; not a rate. The reaction product after 3 h at 950 C was too fragile for accurate micrometer measurement.
-          source_detail_locator: {page: 90, published_page: 78, section: '4.1.7'}
+          source_detail_locator: {page: 100, published_page: 88, section: '4.1.7'}
