@@ -1224,7 +1224,403 @@ species:
         series:
         - T_K: 298
           entropy: 31.85
+  KAlSi2O6:
+    observations:
+    - observation_id: schumm81_leucite_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: Printed heading KAlSi2O6 leucite; no numbered table caption.
+        column: cp
+      phase: cr
+      standard_state: solid leucite as printed
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: No separate Cp source annotation is printed.
+        series:
+        - T_K: 298
+          cp: 39.24
+          printed_row_index: 3
+        - T_K: 300
+          cp: 39.36
+          printed_row_index: 4
+        - T_K: 400
+          cp: 45.02
+          printed_row_index: 5
+        - T_K: 500
+          cp: 49.44
+          printed_row_index: 6
+        - T_K: 600
+          cp: 53.26
+          printed_row_index: 7
+        - T_K: 700
+          cp: 57.06
+          printed_row_index: 8
+        - T_K: 800
+          cp: 60.63
+          printed_row_index: 9
+        - T_K: 900
+          cp: 64.13
+          printed_row_index: 10
+        - T_K: 955
+          cp: 66.03
+          printed_row_index: 11
+        - T_K: 955
+          cp: 56.36
+          printed_row_index: 12
+        - T_K: 1000
+          cp: 56.5
+          printed_row_index: 13
+        - T_K: 1100
+          cp: 56.81
+          printed_row_index: 14
+        - T_K: 1200
+          cp: 57.13
+          printed_row_index: 15
+        - T_K: 1300
+          cp: 57.44
+          printed_row_index: 16
+        - T_K: 1400
+          cp: 57.76
+          printed_row_index: 17
+        - T_K: 1500
+          cp: 58.07
+          printed_row_index: 18
+        - T_K: 1600
+          cp: 58.38
+          printed_row_index: 19
+        - T_K: 1700
+          cp: 58.7
+          printed_row_index: 20
+        - T_K: 1800
+          cp: 59.01
+          printed_row_index: 21
+        - T_K: 1900
+          cp: 59.33
+          printed_row_index: 22
+        - T_K: 2000
+          cp: 59.64
+          printed_row_index: 23
+    - observation_id: schumm81_leucite_H_minus_H298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: Printed heading KAlSi2O6 leucite; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      standard_state: solid leucite as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'H−H298 and S−S298: 68PAN.'
+        series:
+        - T_K: 298
+          enthalpy_increment: 0.0
+          printed_row_index: 3
+        - T_K: 300
+          enthalpy_increment: 0.07
+          printed_row_index: 4
+        - T_K: 400
+          enthalpy_increment: 4.31
+          printed_row_index: 5
+        - T_K: 500
+          enthalpy_increment: 9.04
+          printed_row_index: 6
+        - T_K: 600
+          enthalpy_increment: 14.18
+          printed_row_index: 7
+        - T_K: 700
+          enthalpy_increment: 19.7
+          printed_row_index: 8
+        - T_K: 800
+          enthalpy_increment: 25.59
+          printed_row_index: 9
+        - T_K: 900
+          enthalpy_increment: 31.83
+          printed_row_index: 10
+        - T_K: 955
+          enthalpy_increment: 35.4
+          printed_row_index: 11
+        - T_K: 955
+          enthalpy_increment: 35.4
+          printed_row_index: 12
+        - T_K: 1000
+          enthalpy_increment: 37.94
+          printed_row_index: 13
+        - T_K: 1100
+          enthalpy_increment: 43.61
+          printed_row_index: 14
+        - T_K: 1200
+          enthalpy_increment: 49.31
+          printed_row_index: 15
+        - T_K: 1300
+          enthalpy_increment: 55.04
+          printed_row_index: 16
+        - T_K: 1400
+          enthalpy_increment: 60.8
+          printed_row_index: 17
+        - T_K: 1500
+          enthalpy_increment: 66.59
+          printed_row_index: 18
+        - T_K: 1600
+          enthalpy_increment: 72.41
+          printed_row_index: 19
+        - T_K: 1700
+          enthalpy_increment: 78.24
+          printed_row_index: 20
+        - T_K: 1800
+          enthalpy_increment: 84.15
+          printed_row_index: 21
+        - T_K: 1900
+          enthalpy_increment: 90.07
+          printed_row_index: 22
+        - T_K: 2000
+          enthalpy_increment: 96.01
+          printed_row_index: 23
+    - observation_id: schumm81_leucite_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: Printed heading KAlSi2O6 leucite; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      standard_state: solid leucite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH source: 66BAR/ADA.'
+        series:
+        - T_K: 298
+          delta_fH: -720.4
+          printed_row_index: 3
+          sigma: 1.0
+        - T_K: 300
+          delta_fH: -720.41
+          printed_row_index: 4
+        - T_K: 400
+          delta_fH: -721.23
+          printed_row_index: 5
+        - T_K: 500
+          delta_fH: -721.16
+          printed_row_index: 6
+        - T_K: 600
+          delta_fH: -720.8
+          printed_row_index: 7
+        - T_K: 700
+          delta_fH: -720.18
+          printed_row_index: 8
+        - T_K: 800
+          delta_fH: -719.32
+          printed_row_index: 9
+        - T_K: 900
+          delta_fH: -718.22
+          printed_row_index: 10
+        - T_K: 955
+          delta_fH: -720.07
+          printed_row_index: 11
+        - T_K: 955
+          delta_fH: -720.07
+          printed_row_index: 12
+        - T_K: 1000
+          delta_fH: -719.89
+          printed_row_index: 13
+        - T_K: 1100
+          delta_fH: -719.5
+          printed_row_index: 14
+        - T_K: 1200
+          delta_fH: -719.15
+          printed_row_index: 15
+        - T_K: 1300
+          delta_fH: -718.83
+          printed_row_index: 16
+        - T_K: 1400
+          delta_fH: -718.54
+          printed_row_index: 17
+        - T_K: 1500
+          delta_fH: -718.29
+          printed_row_index: 18
+        - T_K: 1600
+          delta_fH: -718.06
+          printed_row_index: 19
+        - T_K: 1700
+          delta_fH: -741.88
+          printed_row_index: 20
+        - T_K: 1800
+          delta_fH: -741.57
+          printed_row_index: 21
+        - T_K: 1900
+          delta_fH: -741.3
+          printed_row_index: 22
+        - T_K: 2000
+          delta_fH: -741.04
+          printed_row_index: 23
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±1.00 kcal/mol applies to the 298 K formation enthalpy anchor only; confidence level not stated.
+    - observation_id: schumm81_leucite_delta_fG
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: Printed heading KAlSi2O6 leucite; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      standard_state: solid leucite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH source: 66BAR/ADA; no separate ΔfG source annotation is printed.'
+        series:
+        - T_K: 298
+          delta_fG: -681.53
+          printed_row_index: 3
+        - T_K: 300
+          delta_fG: -681.28
+          printed_row_index: 4
+        - T_K: 400
+          delta_fG: -668.09
+          printed_row_index: 5
+        - T_K: 500
+          delta_fG: -654.8
+          printed_row_index: 6
+        - T_K: 600
+          delta_fG: -641.62
+          printed_row_index: 7
+        - T_K: 700
+          delta_fG: -628.39
+          printed_row_index: 8
+        - T_K: 800
+          delta_fG: -615.33
+          printed_row_index: 9
+        - T_K: 900
+          delta_fG: -602.12
+          printed_row_index: 10
+        - T_K: 955
+          delta_fG: -595.27
+          printed_row_index: 11
+        - T_K: 955
+          delta_fG: -595.27
+          printed_row_index: 12
+        - T_K: 1000
+          delta_fG: -589.39
+          printed_row_index: 13
+        - T_K: 1100
+          delta_fG: -576.35
+          printed_row_index: 14
+        - T_K: 1200
+          delta_fG: -563.36
+          printed_row_index: 15
+        - T_K: 1300
+          delta_fG: -550.39
+          printed_row_index: 16
+        - T_K: 1400
+          delta_fG: -537.45
+          printed_row_index: 17
+        - T_K: 1500
+          delta_fG: -524.52
+          printed_row_index: 18
+        - T_K: 1600
+          delta_fG: -511.61
+          printed_row_index: 19
+        - T_K: 1700
+          delta_fG: -498.53
+          printed_row_index: 20
+        - T_K: 1800
+          delta_fG: -484.18
+          printed_row_index: 21
+        - T_K: 1900
+          delta_fG: -475.69
+          printed_row_index: 22
+        - T_K: 2000
+          delta_fG: -455.62
+          printed_row_index: 23
+    - observation_id: schumm81_leucite_S298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: Printed heading KAlSi2O6 leucite; no numbered table caption.
+        column: S298
+      phase: cr
+      standard_state: solid leucite as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      uncertainty:
+        confidence_level: not_stated
+        S298: +/- 0.41 cal/deg,mol
+        note: Confidence level not stated.
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'S298: 53KEL/TOD, 78ROB/HEM.'
+        series:
+        - T_K: 298
+          entropy: 47.85
 fidelity_samples:
+  - path: species.KAlSi2O6.observations[schumm81_leucite_cp].values.series[0]
+    value:
+      T_K: 298
+      cp: 39.24
+      printed_row_index: 3
+    locator:
+      page: 29
+      published_page: 23
+    note: 298 K cp cell from the rendered printed table.
+  - path: species.KAlSi2O6.observations[schumm81_leucite_H_minus_H298].values.series[0]
+    value:
+      T_K: 298
+      enthalpy_increment: 0.0
+      printed_row_index: 3
+    locator:
+      page: 29
+      published_page: 23
+    note: 298 K H_minus_H298 cell from the rendered printed table.
+  - path: species.KAlSi2O6.observations[schumm81_leucite_delta_fH].values.series[0]
+    value:
+      T_K: 298
+      delta_fH: -720.4
+      printed_row_index: 3
+      sigma: 1.0
+    locator:
+      page: 29
+      published_page: 23
+    note: 298 K delta_fH cell from the rendered printed table.
+  - path: species.KAlSi2O6.observations[schumm81_leucite_delta_fG].values.series[0]
+    value:
+      T_K: 298
+      delta_fG: -681.53
+      printed_row_index: 3
+    locator:
+      page: 29
+      published_page: 23
+    note: 298 K delta_fG cell from the rendered printed table.
+  - path: species.KAlSi2O6.observations[schumm81_leucite_S298].values.series[0]
+    value:
+      T_K: 298
+      entropy: 47.85
+    locator:
+      page: 29
+      published_page: 23
+    note: S298 cell is copied from the table heading.
+
   - path: species.KAlSiO4.observations[schumm81_kaliophilite_cp].values.series[0]
     value:
       T_K: 298
