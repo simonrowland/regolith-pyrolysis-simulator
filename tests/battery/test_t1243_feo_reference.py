@@ -411,6 +411,17 @@ def _context(result) -> ScoreContext:
     )
 
 
+def _test_oxide_inventory(composition) -> dict[str, float]:
+    from simulator.accounting.formulas import parse_formula
+
+    inventory: dict[str, float] = {}
+    for oxide, amount in composition.components:
+        formula = parse_formula(oxide, species=oxide)
+        for element, atom_moles in formula.atom_moles(float(amount)).items():
+            inventory[element] = inventory.get(element, 0.0) + atom_moles
+    return inventory
+
+
 def _predict(engine, observation, **_kwargs):
     identity = observation.identity
     return EnginePrediction(
@@ -632,6 +643,83 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
     assert len(residuals) == 24
 
 
+def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration) -> None:
+    extract = load_yaml(
+        ROOT / "data/literature/extracts" / f"{_DISTIN}.yaml"
+    )
+    assert isinstance(extract, dict)
+    assert extract["source_evidence"]["liquid_iron_contact"] == {
+        "text": (
+            "In this method, liquid iron was levitated in contact with liquid "
+            "'FeO'-SiO2 slags and samples of slag and metal in equilibrium were "
+            "withdrawn for analysis."
+        ),
+        "locator": {"page": 73, "section": "Introduction"},
+    }
+    assert extract["source_evidence"]["atmosphere"]["text"] == (
+        "Melts were equilibrated in helium or argon + helium atmospheres of the "
+        "same composition and flow rate as previously employed, so that the "
+        "temperatures of equilibration were 1785°, 1880° and 1960°C."
+    )
+    assert extract["source_tables"]["experimental_results"]["standard_state"][
+        "text"
+    ] == (
+        "Activities of 'FeO' were obtained as the ratio of the oxygen content "
+        "of the iron in equilibrium with the slag to that in equilibrium with "
+        "pure 'FeO' at the same temperature."
+    )
+
+    result = migration
+    experiment = result.experiments[
+        f"{_DISTIN}::experiment::distin1971-1880c"
+    ]
+    condition = getattr(experiment, "fe_metal_saturated", None)
+    assert condition is not None
+    assert condition.state.is_value and condition.state.value is True
+    assert condition.locator is not None and condition.locator.page == 73
+    assert condition.inference is not None
+    assert condition.inference.relation == "extract_inference"
+    assert "not printed" in " ".join(condition.inference.inputs).casefold()
+
+
+def test_distin_scorer_sends_one_mole_excess_fe_on_closed_route(
+    migration, monkeypatch
+) -> None:
+    redox = pytest.importorskip("openimcc.redox")
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    context = _context(migration)
+    calls = []
+    original_evaluate_redox = redox.evaluate_redox
+
+    def capture_redox_call(inventory, temperature_K, mode):
+        calls.append((dict(inventory), temperature_K, mode))
+        return original_evaluate_redox(inventory, temperature_K, mode)
+
+    monkeypatch.setattr(redox, "evaluate_redox", capture_redox_call)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert len(calls) == 1
+    closed_inventory, _temperature_K, mode = calls[0]
+    composition_state = observation.identity.composition
+    assert composition_state is not None and composition_state.is_value
+    expected_inventory = _test_oxide_inventory(composition_state.value)
+    expected_inventory["Fe"] = expected_inventory.get("Fe", 0.0) + 1.0
+    assert mode == "closed"
+    assert closed_inventory == pytest.approx(expected_inventory, abs=1e-12)
+
+
 def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatch) -> None:
     redox = pytest.importorskip("openimcc.redox")
     observation = next(
@@ -659,8 +747,8 @@ def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatc
 
 
 def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
+    """Engine-level +0.5/+1/+2 invariance; the scorer route pins fixed +1 mol."""
     redox = pytest.importorskip("openimcc.redox")
-    from simulator.accounting.formulas import parse_formula
     from simulator.melt_backend.openimcc_bridge import imported_openimcc_commit
 
     assert imported_openimcc_commit() == "66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
@@ -672,12 +760,7 @@ def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> Non
     )
     identity = observation.identity
     assert identity.composition is not None and identity.composition.is_value
-    composition = identity.composition.value
-    inventory: dict[str, float] = {}
-    for oxide, amount in composition.components:
-        formula = parse_formula(oxide, species=oxide)
-        for element, atom_moles in formula.atom_moles(float(amount)).items():
-            inventory[element] = inventory.get(element, 0.0) + atom_moles
+    inventory = _test_oxide_inventory(identity.composition.value)
 
     activities = []
     for excess_fe_mol in (0.5, 1.0, 2.0):

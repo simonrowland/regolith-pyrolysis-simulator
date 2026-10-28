@@ -199,6 +199,7 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
 
 
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
+    """Golden pin for extracting the shared inventory and evidence helpers."""
     pytest.importorskip("openimcc")
     context, _observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
