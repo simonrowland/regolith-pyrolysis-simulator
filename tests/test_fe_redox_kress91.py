@@ -299,6 +299,8 @@ def test_finite_headspace_exchange_cannot_cross_equilibrium(ferric_mol):
         available_o2_mol=head_o2_mol, gas_log_fO2=gas_potential,
     )
     assert -ferric_mol / 2.0 < uptake < head_o2_mol
+    if feo_mol == 0.0:
+        assert uptake < 0.0  # An all-ferric melt can only release oxygen.
     liquid = kress91_intrinsic_state(
         feo_mol=feo_mol - 4.0 * uptake, fe2o3_mol=ferric_mol + 2.0 * uptake,
         mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1673.15,

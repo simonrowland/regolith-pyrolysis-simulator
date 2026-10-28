@@ -1417,25 +1417,30 @@ def test_redox_source_treats_denormal_capacity_as_no_melt_redox_capacity(monkeyp
     }
 
 
+@pytest.mark.parametrize(
+    "initial_fO2_log, capacity, source_terms",
+    [
+        (-9.0, 1e-9, {"redox_source:evaporative_metal_loss": 1000.0}),
+        (-2.02, 0.817, {"redox_source:evaporative_oxygen_loss": -225.8}),
+    ],
+)
 def test_redox_source_bounds_finite_absurd_candidate_fo2(
-    monkeypatch,
+    monkeypatch, initial_fO2_log, capacity, source_terms,
 ) -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     temperature_K = 1873.15
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
-    sim._sync_oxygen_reservoir_mirror()
+    _seed_melt_redox(sim, initial_fO2_log)
     before = sim._current_melt_redox_fO2_log()
     before_mol = sim.atom_ledger.mol_by_account()
     monkeypatch.setattr(
         sim,
         "_melt_redox_capacity_mol_per_ln_fO2",
-        lambda **_: 1e-9,
+        lambda **_: capacity,
     )
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
-        {"redox_source:evaporative_metal_loss": 1000.0},
+        source_terms,
         exchange_direction="redox_source:evaporative_loss",
         temperature_K=temperature_K,
     )
