@@ -10372,6 +10372,7 @@ def test_battery_melts_invalid_observation_refuses_before_native(
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
 @pytest.mark.parametrize('route', ['direct', 'kernel'])
 def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeypatch):
+    from simulator.accounting.ledger import AtomLedger
     from simulator.environment import vacuum_floor_bar_for_environment
     from simulator.state import Atmosphere
 
@@ -10401,7 +10402,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     assert sim._backend_accepts_kwarg('vapor_transport_floor_bar')
 
     def native_solve(**kwargs):
-        assert kwargs['fO2_log'] == -12.0
+        assert kwargs['fO2_log'] == pytest.approx(expected_intrinsic_fO2_log)
         assert backend._vapor_transport_pO2_admission == 'environment'
         backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=kwargs['temperature_C'],
@@ -10422,6 +10423,15 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
         s: w / resolve_species_formula(s).molar_mass_kg_per_mol()
         for s, w in _melts_domain_composition().items()
     }
+    sim.atom_ledger = AtomLedger()
+    sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt', melt_mol, source='fixture',
+        material_origin='feedstock',
+    )
+    # Core dispatch derives intrinsic redox from iron inventory; the stale
+    # -12 mirror above must not substitute for that ledger-owned potential.
+    expected_intrinsic_fO2_log = sim._current_melt_redox_fO2_log()
+    assert expected_intrinsic_fO2_log != -12.0
     sim._backend_failed = False
     sim.species_formula_registry = {}
     sim._chem_registry = types.SimpleNamespace(authoritative_for=lambda _intent: None)
@@ -10461,6 +10471,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
         # Diagnostic MELTS vapour is discarded before the builtin refresh.
         assert result.vapor_pressures_Pa == {}
     assert helper.calls[-1]['fO2_log'] == pytest.approx(math.log10(floor))
+    expected_intrinsic_fO2_log = -12.0
     backend.equilibrate(
         temperature_C=1600.0,
         composition_kg={'SiO2': 49.0, 'Al2O3': 15.0, 'FeO': 10.0,
