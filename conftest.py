@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import importlib.util as _importlib_util
+import math
 from pathlib import Path as _Path
+import resource
+import signal
 import sys as _sys
+import time
 
 _BLAS_POLICY_NAME = "simulator._blas_policy"
 _blas_policy = _sys.modules.get(_BLAS_POLICY_NAME)
@@ -29,6 +33,7 @@ else:
     _blas_policy.prepare()
 
 from collections.abc import Iterator
+from dataclasses import dataclass
 
 import json
 import os
@@ -42,6 +47,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from tests._cpu_budget import cpu_budget_seconds, wall_guard_seconds
 
 from _pytest_session_safety import (
     CHILD_HANDSHAKE_TIMEOUT_SECONDS,
@@ -284,6 +291,17 @@ def runner_golden_loader(tmp_path_factory):
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    for item in items:
+        if item.get_closest_marker("cpu_budget") is None:
+            continue
+        try:
+            budget_seconds = cpu_budget_seconds(item)
+        except ValueError as exc:
+            raise pytest.UsageError(f"{item.nodeid}: {exc}") from exc
+        if item.get_closest_marker("timeout") is not None:
+            continue
+        item.add_marker(pytest.mark.timeout(wall_guard_seconds(budget_seconds)))
+
     if PLAYWRIGHT_SYNC_API is not None:
         return
     for item in items:
@@ -307,6 +325,97 @@ _DOCS_PRIVATE_AUDIT_ROOT: Path | None = None
 _DOCS_PRIVATE_ACTIVE_TEST_NODEID: str | None = None
 _DOCS_PRIVATE_AUDIT_INSTALLED = False
 _DOCS_PRIVATE_AUDIT_SESSION_DIR: Path | None = None
+
+
+class CpuBudgetExceeded(TimeoutError):
+    """Raised in the pytest worker when one test exceeds its process CPU budget."""
+
+
+@dataclass
+class _CpuBudgetState:
+    budget_seconds: float
+    started_cpu_seconds: float
+    previous_limits: tuple[int, int]
+    previous_handler: object
+    exceeded: bool = False
+    failure_message: str | None = None
+
+
+_CPU_BUDGET_STATE: pytest.StashKey[_CpuBudgetState] = pytest.StashKey()
+
+
+def _cpu_budget_failure_message(state: _CpuBudgetState) -> str:
+    used_seconds = max(0.0, time.process_time() - state.started_cpu_seconds)
+    return (
+        f"CPU budget exceeded: {used_seconds:.3f} s of "
+        f"{state.budget_seconds:g} s"
+    )
+
+
+def _start_cpu_budget(item: pytest.Item) -> _CpuBudgetState:
+    """Limit this worker process's user+system CPU; child-pool CPU is not counted.
+
+    ``RUSAGE_CHILDREN`` cannot account for pool children that remain alive and
+    therefore unreaped, so those tests retain the wall-clock hang guard.
+    """
+    budget_seconds = cpu_budget_seconds(item)
+    started_cpu_seconds = time.process_time()
+    previous_limits = resource.getrlimit(resource.RLIMIT_CPU)
+    previous_handler = signal.getsignal(signal.SIGXCPU)
+    state = _CpuBudgetState(
+        budget_seconds=budget_seconds,
+        started_cpu_seconds=started_cpu_seconds,
+        previous_limits=previous_limits,
+        previous_handler=previous_handler,
+    )
+
+    def fail_on_cpu_limit(_signum: int, _frame: object) -> None:
+        state.exceeded = True
+        state.failure_message = _cpu_budget_failure_message(state)
+        raise CpuBudgetExceeded(state.failure_message)
+
+    target_soft_limit = math.ceil(started_cpu_seconds + budget_seconds)
+    hard_limit = previous_limits[1]
+    if hard_limit != resource.RLIM_INFINITY and target_soft_limit > hard_limit:
+        raise pytest.UsageError(
+            f"{item.nodeid}: RLIMIT_CPU hard limit {hard_limit} s cannot support "
+            f"the requested {budget_seconds:g} s CPU budget"
+        )
+
+    try:
+        signal.signal(signal.SIGXCPU, fail_on_cpu_limit)
+        resource.setrlimit(
+            resource.RLIMIT_CPU,
+            (target_soft_limit, hard_limit),
+        )
+    except BaseException:
+        signal.signal(signal.SIGXCPU, previous_handler)
+        raise
+
+    item.stash[_CPU_BUDGET_STATE] = state
+    return state
+
+
+def _finish_cpu_budget(item: pytest.Item, state: _CpuBudgetState) -> None:
+    try:
+        resource.setrlimit(resource.RLIMIT_CPU, state.previous_limits)
+    finally:
+        try:
+            signal.signal(signal.SIGXCPU, state.previous_handler)
+        finally:
+            if _CPU_BUDGET_STATE in item.stash:
+                del item.stash[_CPU_BUDGET_STATE]
+
+
+def _wall_guard_failure(report: pytest.TestReport) -> None:
+    if not report.failed:
+        return
+    failure = str(report.longrepr)
+    if "pytest-timeout" not in failure.lower():
+        return
+    match = re.search(r"Timeout\s*\(>([^)]*)\)", failure, flags=re.IGNORECASE)
+    guard = f" ({match.group(1)})" if match is not None else ""
+    report.longrepr = f"wall-clock hang guard exceeded{guard}"
 
 
 def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
@@ -511,16 +620,48 @@ def pytest_runtest_protocol(
     item: pytest.Item, nextitem: pytest.Item | None
 ) -> Iterator[object]:
     del nextitem
-    if not _DOCS_PRIVATE_AUDIT_INSTALLED:
-        yield
-        return
-    global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
-    previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
-    _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
+    cpu_budget = _start_cpu_budget(item)
     try:
-        yield
+        if not _DOCS_PRIVATE_AUDIT_INSTALLED:
+            yield
+            return
+        global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+        previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
+        try:
+            yield
+        finally:
+            _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
     finally:
-        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
+        _finish_cpu_budget(item, cpu_budget)
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(
+    item: pytest.Item,
+    call: pytest.CallInfo[object],
+) -> Iterator[object]:
+    del call
+    outcome = yield
+    report = outcome.get_result()
+    _wall_guard_failure(report)
+
+    if _CPU_BUDGET_STATE not in item.stash:
+        return
+    state = item.stash[_CPU_BUDGET_STATE]
+    elapsed_cpu_seconds = time.process_time() - state.started_cpu_seconds
+    if state.exceeded and not report.failed:
+        report.outcome = "failed"
+        report.longrepr = state.failure_message or _cpu_budget_failure_message(state)
+    elif (
+        report.when == "teardown"
+        and elapsed_cpu_seconds > state.budget_seconds
+        and not state.exceeded
+    ):
+        state.exceeded = True
+        state.failure_message = _cpu_budget_failure_message(state)
+        report.outcome = "failed"
+        report.longrepr = state.failure_message
 
 
 @pytest.hookimpl(optionalhook=True, tryfirst=True)
