@@ -618,18 +618,19 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     if not engine_available:
         pytest.skip('shipped curve pins require the MAGEMin engine')
 
+    # d-297: <=1.0 wt% projections succeed normally; notice retains the drop, so ':composition_projected' is gone.
     expected = {
         'lunar_mare_low_ti_C0_24h': [
             (
                 'C0',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 918.75,
                 1370.3125,
                 ((918.75, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C0B',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 918.75,
                 1370.3125,
                 ((918.75, 0.0), (1370.3125, 1.0)),
@@ -643,28 +644,28 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             ),
             (
                 'C2A_STAGED',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 1042.1875,
                 1375.0,
                 ((1042.1875, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C2A_STAGED',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 1040.625,
                 1375.0,
                 ((1040.625, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C3_NA',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 1040.625,
                 1375.0,
                 ((1040.625, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C3_NA',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 1040.625,
                 1375.0,
                 ((1040.625, 0.0), (1375.0, 1.0)),
@@ -673,7 +674,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         'mars_basalt_C2A_12h': [
             (
                 'C2A',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                'gate_liquid_fraction:fallback:magemin-shadow',
                 1018.75,
                 1320.3125,
                 ((1018.75, 0.0), (1320.3125, 1.0)),
