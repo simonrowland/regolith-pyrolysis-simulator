@@ -2556,6 +2556,28 @@ def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
     )
 
 
+def test_magemin_ferrous_projection_oxygen_defect_pin():
+    projection = MAGEMinBackend()._build_db_bulk_projection({"FeO": 10.0})
+
+    assert {
+        key: value.hex() for key, value in projection.composition_wt_pct.items()
+    } == {"FeOt": "0x1.4000000000000p+3", "O": "0x1.1d0b54caaddc1p+0"}
+
+
+@pytest.mark.xfail(strict=True, reason="b-911: synthetic O exceeds owner inventory")
+def test_magemin_ferrous_projection_preserves_oxygen_atoms():
+    projection = MAGEMinBackend()._build_db_bulk_projection({"FeO": 10.0})
+    feo_mass = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    oxygen_mass = resolve_species_formula("O").molar_mass_g_per_mol()
+
+    input_o_mol = 10.0 / feo_mass
+    output_o_mol = (
+        projection.composition_wt_pct["FeOt"] / feo_mass
+        + projection.composition_wt_pct.get("O", 0.0) / oxygen_mass
+    )
+    assert output_o_mol == pytest.approx(input_o_mol, rel=1e-14)
+
+
 def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     backend = MAGEMinBackend()
     composition = {
