@@ -292,6 +292,145 @@ def test_formation_references_follow_b1259_temperature_schedules() -> None:
     )
 
 
+def test_element_reference_state_observations_follow_temperature_schedule() -> None:
+    generated = _generation("b1259-ht-0025-potassium-reference-state")
+    potassium = _observations_for(
+        generated, Quantity.S, temperature="1000", formula="K"
+    )
+    assert len(potassium) == 1
+
+    reference = generator._element_reference_species("K", Decimal("1000"))
+    assert reference is not None
+    expected_species, _atoms = reference
+    assert potassium[0].identity.species == expected_species
+
+
+def test_element_reference_state_selector_keeps_compound_reference_rows() -> None:
+    record = _load("b1259-ht-0107-lead-monoxide-reference-state")
+    prior_phase, _prior_polymorph = generator._phase_state(record)
+    assert prior_phase.is_value
+    assert prior_phase.value is Phase.G
+
+    generated = generator.generate_record(record)
+    entropy = _observations_for(generated, Quantity.S, formula="PbO")
+    assert len(entropy) == 24
+    assert all(
+        observation.identity.species.phase == prior_phase
+        for observation in entropy
+    )
+
+
+def test_element_reference_state_boiling_rows_pair_entropy_with_phase() -> None:
+    for record_id, formula, temperature, condensed_s, gas_s in (
+        (
+            "b1259-ht-0025-potassium-reference-state",
+            "K",
+            "1043.7",
+            Decimal("26.300"),
+            Decimal("44.547"),
+        ),
+        (
+            "b1259-ht-0031-sodium-reference-state",
+            "Na",
+            "1176.9",
+            Decimal("23.688"),
+            Decimal("43.473"),
+        ),
+        (
+            "b1259-ht-0027-magnesium-reference-state",
+            "Mg",
+            "1363",
+            Decimal("20.710"),
+            Decimal("43.050"),
+        ),
+        (
+            "b1259-ht-0012-calcium-reference-state",
+            "Ca",
+            "1756",
+            Decimal("25.070"),
+            Decimal("45.800"),
+        ),
+    ):
+        generated = _generation(record_id)
+        entropy = _observations_for(
+            generated,
+            Quantity.S,
+            temperature=temperature,
+            formula=formula,
+        )
+        assert len(entropy) == 2
+        condensed = next(
+            observation
+            for observation in entropy
+            if "as_published=" + repr(str(condensed_s))
+            in (observation.locator.note or "")
+        )
+        gas = next(
+            observation
+            for observation in entropy
+            if "as_published=" + repr(str(gas_s))
+            in (observation.locator.note or "")
+        )
+        assert condensed.identity.species.phase.value is Phase.L
+        assert gas.identity.species.phase.value is Phase.G
+        assert gas.value.point > condensed.value.point
+
+
+def test_element_reference_transition_bad_enthalpy_stays_unknown() -> None:
+    record = _load("b1259-ht-0025-potassium-reference-state")
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1043.7"
+            and row.get("entropy", {}).get("as_published") == "44.547"
+        ):
+            row["H_minus_H298"]["as_published"] = "30.014"
+            row["H_minus_H298"]["value"] = 30.014
+            # Keep the Planck identity: 44.547 - 1000*30.014/1043.7
+            # is 15.789694..., which prints as 15.790 at three decimals.
+            row["gibbs_function"]["as_published"] = "15.790"
+            row["gibbs_function"]["value"] = 15.790
+    generated = generator.generate_record(record)
+    entropy = _observations_for(
+        generated, Quantity.S, temperature="1043.7", formula="K"
+    )
+    assert len(entropy) == 2
+    assert all(observation.identity.species.phase.is_unknown for observation in entropy)
+
+
+def test_calcium_reference_state_rows_above_boiling_are_gas() -> None:
+    generated = _generation("b1259-ht-0012-calcium-reference-state")
+    for temperature in ("1800", "1900", "2000"):
+        entropy = _observations_for(
+            generated, Quantity.S, temperature=temperature, formula="Ca"
+        )
+        assert len(entropy) == 1
+        assert entropy[0].identity.species.phase.value is Phase.G
+
+
+def test_calcium_reference_state_gas_entropy_below_condensed_floor_stays_unknown() -> None:
+    record = _load("b1259-ht-0012-calcium-reference-state")
+    for row in record["rows"]:
+        if (
+            row.get("kind") == "data"
+            and row.get("temperature", {}).get("as_published") == "1800"
+        ):
+            row["entropy"]["as_published"] = "24.000"
+            row["entropy"]["value"] = 24.0
+            # Keep the Planck identity: 24.000 - 1000*49.829/1800
+            # is -3.682777..., which prints as -3.683 at the table's
+            # three-decimal precision.
+            row["gibbs_function"]["as_published"] = "-3.683"
+            row["gibbs_function"]["value"] = -3.683
+
+    generated = generator.generate_record(record)
+    entropy = _observations_for(
+        generated, Quantity.S, temperature="1800", formula="Ca"
+    )
+    assert len(entropy) == 1
+    assert entropy[0].identity.species.phase.is_unknown
+
+
 def test_reference_schedule_transition_rows_match_b1259_tables() -> None:
     expectations = (
         ("Ba", "643", "648", Phase.CR, Polymorph.BETA),
