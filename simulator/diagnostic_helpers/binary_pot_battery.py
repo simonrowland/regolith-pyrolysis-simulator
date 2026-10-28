@@ -1090,6 +1090,18 @@ def engine_flags_from_result(
         _ALPHAMELTS_ACTIVITY_REPAIR_NOTICE_PREFIX,
     )
 
+    gas_only = diagnostics.get("fo2_gas_only")
+    if isinstance(gas_only, Mapping):
+        reason = gas_only.get("notice")
+        if isinstance(reason, str) and reason:
+            notices.append(
+                {
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "authority": None,
+                    "reason": reason,
+                }
+            )
+
     for warning in getattr(result, "warnings", None) or ():
         if (
             isinstance(warning, str)
@@ -3465,7 +3477,8 @@ def _crash_cell_from_returncode(
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_ENGINE_CRASH,
-            f"{sig_name} (returncode {returncode})",
+            f"{sig_name} (returncode {returncode})"
+            + (f": {stderr[-4000:]}" if stderr else ""),
         )
         engine_status = REFUSAL_ENGINE_CRASH
         exit_signal = sig

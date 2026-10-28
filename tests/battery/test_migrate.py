@@ -77,6 +77,7 @@ from simulator.battery.migrate import (
     source_derivation_from_source,
     _derivation_inputs_requirement_error,
     load_migrated_context,
+    QUANTITY_SOURCE_FIELDS,
     map_phase,
     map_quantity,
     parse_quantity_suffix,
@@ -8865,6 +8866,172 @@ def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantit
     assert QUANTITY_ALIASES[alias] is expected
 
 
+def test_adamkovicova_crystal_cooling_is_the_enthalpy_increment() -> None:
+    """Table I cooling is H(T)-H(298 K). Eq. (1) Hrel is that column plus ΔHsol."""
+
+    extract = REPO_ROOT / "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml"
+    document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    observations = document["species"]["CaSiO3"]["observations"]
+    cooling = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table1_solid_cooling_measured"
+    )
+    # Table I, pdftotext lines 154-159. 448.8 - 139.6 = 309.2, the printed mean −ΔHsol.
+    assert [point["minus_delta_H_cool_kJ_mol-1"] for point in cooling["values"]["points"]] == [
+        139.6, 150.6, 157.1, 165.0, 173.9, 183.3,
+    ]
+    crystal_hrel = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced"
+    )
+    melt_hrel = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced"
+    )
+    assert [point["H_rel_kJ_mol-1"] for point in crystal_hrel["values"]["points"]] == [
+        448.8, 459.8, 466.3, 474.2, 483.1, 492.5,
+    ]
+    assert [point["H_rel_kJ_mol-1"] for point in melt_hrel["values"]["points"]] == [
+        557.6, 559.4, 561.2, 567.8, 577.9,
+    ]
+    assert "H_rel_kJ_mol-1" not in QUANTITY_SOURCE_FIELDS[Quantity.H_MINUS_H298]
+
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assert not migrator.result.validation.hard_issues
+
+    source_id = "adamkovicova-1980-casio3-heat-of-fusion"
+    by_stem = {
+        observation.observation_id.removeprefix(f"{source_id}::").split(":h=", 1)[0]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+    }
+    expected_cooling = {
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1506": "139.6",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1576": "150.6",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1630": "157.1",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1678": "165.0",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1730": "173.9",
+        "adamkovicova_1980_table1_solid_cooling_measured::T=1780": "183.3",
+    }
+    for row_id, value in expected_cooling.items():
+        observation = by_stem[row_id]
+        assert observation.identity.quantity.value is Quantity.H_MINUS_H298
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.identity.species.polymorph.value is Polymorph.PSEUDOWOLLASTONITE
+        assert observation.identity.per.value is PerBasis.MOL_SPECIES
+        assert observation.identity.subtype.value == "H(T)-H(298 K)"
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(value)
+        assert observation.derivation is not None
+        assert observation.derivation.relation == "negative_cooling_enthalpy_to_H_minus_H298"
+        temperature = Decimal(row_id.rsplit("=", 1)[1])
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == temperature
+        located = observation.point_conditions["temperature_K"]
+        assert located.state.is_value
+        assert located.state.value == temperature
+        assert located.locator == observation.locator
+    assert not any(
+        entry.observation_id in {
+            by_stem[row_id].observation_id for row_id in expected_cooling
+        }
+        and "quantity" in (entry.axes or ())
+        for entry in migrator.result.queue
+    )
+
+    hrel_stems = [
+        stem
+        for stem in by_stem
+        if "relative_enthalpy_measured_reduced::T=" in stem
+    ]
+    assert len(hrel_stems) == 11
+    for stem in hrel_stems:
+        observation = by_stem[stem]
+        assert observation.identity.quantity.tag is StateTag.UNKNOWN
+        assert "relative_enthalpy" in (observation.identity.quantity.reason or "")
+        assert observation.identity.quantity.value is not Quantity.H_MINUS_H298
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.identity.species.phase.value is not Phase.L
+        subtype = observation.identity.subtype
+        assert subtype is None or not subtype.is_value or subtype.value != "H(T)-H(298 K)"
+
+    melt_cooling = [
+        observation
+        for stem, observation in by_stem.items()
+        if stem.startswith("adamkovicova_1980_table3_melt_cooling_measured::T=")
+    ]
+    assert len(melt_cooling) == 5
+    assert all(
+        observation.identity.quantity.tag is StateTag.UNKNOWN
+        and "sample_dependent_enthalpy_change_on_cooling"
+        in (observation.identity.quantity.reason or "")
+        and observation.value.kind is ValueKind.UNAVAILABLE
+        and (
+            observation.identity.species.phase.value is not Phase.L
+            if observation.identity.species.phase.is_value
+            else True
+        )
+        for observation in melt_cooling
+    )
+    melt_note = next(
+        row
+        for row in observations
+        if row["observation_id"] == "adamkovicova_1980_table3_melt_cooling_measured"
+    )["values"]["note"]
+    assert "glass" in melt_note
+    assert "not liquid H(T)-H(298 K)" in melt_note
+
+    located_rows = [
+        observation
+        for observation in by_stem.values()
+        if "::T=" in observation.observation_id
+    ]
+    assert located_rows
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == observation.identity.temperature_K.value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in located_rows
+    )
+
+    cp_rows = {
+        observation.observation_id.removeprefix(f"{source_id}::"): observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "melt_heat_capacity" in observation.observation_id
+    }
+    assert {
+        row_id: observation.value.point
+        for row_id, observation in cp_rows.items()
+    } == {
+        "adamkovicova_1980_melt_heat_capacity_stated": Decimal("149.85000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote": Decimal("150.73000"),
+        "adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote": Decimal("146.54000"),
+    }
+    assert all(
+        observation.identity.quantity.value is Quantity.CP
+        and observation.identity.species.phase.value is Phase.L
+        and observation.identity.per.value is PerBasis.MOL_SPECIES
+        for observation in cp_rows.values()
+    )
+    fit_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == source_id
+        and "relative_enthalpy_fit_eq" in observation.observation_id
+    ]
+    assert len(fit_rows) == 2
+    assert all(observation.identity.quantity.is_unknown for observation in fit_rows)
+
+
 def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
     cases = [
         (
@@ -11226,6 +11393,12 @@ def test_calorie_conventions_remain_distinct_and_unknown_variants_refuse() -> No
     assert _convert_compilation_amount(
         Decimal("1"), Quantity.H_MINUS_H298, "cal.16 mole−1"
     ) is None
+    assert _convert_compilation_amount(
+        Decimal("448.8"), Quantity.H_MINUS_H298, "kJ mol−1 CaSiO3"
+    ) == (Decimal("448.8"), "identity:kJ_per_mol")
+    assert _convert_compilation_amount(
+        Decimal("0.14985"), Quantity.CP, "kJ mol−1 K−1 CaSiO3"
+    ) == (Decimal("149.85000"), "kJ_to_J_exact")
     unknown = select_declared_source(
         Quantity.H_MINUS_H298,
         None,
@@ -11718,6 +11891,45 @@ def test_g5_compilation_column_explode_migrate(tmp_path: Path) -> None:
         "gibbs_function" in (entry.why or "")
         for entry in result.queue
         if "page-0003" in (entry.observation_id or "")
+    )
+
+
+def test_h298_compilation_migration_emits_printed_anchor_and_basis(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(root, "pankratz-1984-usbm-b677", "table-0007.json")
+    _copy_compilation_record(root, "pankratz-1987-usbm-b689", "page-0003.json")
+    _copy_compilation_record(root, "pankratz-1994-usbm-b696", "page-0006.json")
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-ht-0001-silver-reference-state.json",
+    )
+
+    result = migrate(root, write=False)
+    expected_sources = {
+        "pankratz-1984-usbm-b677",
+        "pankratz-1987-usbm-b689",
+        "pankratz-1994-usbm-b696",
+        "robie-waldbaum-1968-usgs-b1259",
+    }
+    h_rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id in expected_sources
+        and quantity_token(obs.identity) is Quantity.H_MINUS_H298
+    ]
+    assert {obs.source_id for obs in h_rows} == expected_sources
+    assert all(
+        obs.identity.subtype.is_value
+        and obs.identity.subtype.value == "H(T)-H(298.15 K)"
+        for obs in h_rows
+    )
+    assert all(
+        obs.identity.per.is_value
+        and obs.identity.per.value is PerBasis.MOL_SPECIES
+        for obs in h_rows
     )
 
 

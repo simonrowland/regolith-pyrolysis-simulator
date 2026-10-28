@@ -12,6 +12,7 @@ import yaml
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
+    PerBasis,
     Phase,
     Polymorph,
     Quantity,
@@ -192,6 +193,10 @@ def test_silver_400k_gibbs_function_sign_convention() -> None:
     assert "as_published='12.010'" in (entropy[0].locator.note or "")
     assert entropy[0].value.point == Decimal("12.010") * THERMOCHEMICAL_CALORIE_J
     assert enthalpy[0].value.point == Decimal("0.625") * THERMOCHEMICAL_CALORIE_J
+    assert enthalpy[0].identity.per.is_value
+    assert enthalpy[0].identity.per.value is PerBasis.MOL_SPECIES
+    assert enthalpy[0].identity.subtype.is_value
+    assert enthalpy[0].identity.subtype.value == "H(T)-H(298.15 K)"
     results = [
         row
         for row in generated.report["identity_results"]

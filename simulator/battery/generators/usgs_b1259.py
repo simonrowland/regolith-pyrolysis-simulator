@@ -38,6 +38,7 @@ from simulator.battery.generators.usgs_b1544 import (
 from simulator.battery.identity import (
     LN10,
     THERMOCHEMICAL_CALORIE_J,
+    _format_enthalpy_increment_subtype,
     atm_to_pa,
     log10K_from_delta_fG_kJ_mol,
 )
@@ -1543,6 +1544,10 @@ def _observation(
         "temperature_K": State.of(temperature),
         "standard_pressure_Pa": State.of(STANDARD_PRESSURE_PA),
     }
+    if quantity is Quantity.H_MINUS_H298:
+        known["subtype"] = State.of(
+            _format_enthalpy_increment_subtype(REFERENCE_TEMPERATURE_K)
+        )
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(
             species, basis, temperature
