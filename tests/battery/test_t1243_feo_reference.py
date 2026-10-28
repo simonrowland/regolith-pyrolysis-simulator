@@ -435,8 +435,9 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     # identity.fO2_Pa as 1e5 Pa times 10 to that power. Those 57 rows now
     # match the stub's copied identity, so they carry a dex residual. Table 2
     # prints no per-row gamma uncertainty, so the decision rule stays missing.
-    # Composition and species phase stay unknown on the other rows, and none
-    # of the refusals is the reference state.
+    # Composition remains unknown on 15 rows; Distin's phase now maps to liquid,
+    # leaving its missing independent fO2 as the refusal. Neither refusal is the
+    # reference state.
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
@@ -515,7 +516,7 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     assert ad10_scored == 1
     assert refusal_fields == {
         ("composition",): 15,
-        ("species.phase",): 24,
+        ("fO2_Pa",): 24,
     }
     assert extrapolated == 32
 
