@@ -111,3 +111,77 @@ def test_real_janaf_tabulated_delta_fg_points_use_the_exploded_buffer(
     assert first.value.kind is ValueKind.UNAVAILABLE
     assert first.value.unavailable_reason == "unsupported printed unit for delta_fG"
     assert first.point_conditions["temperature_K"].state.value == Decimal("298.15")
+
+
+def test_real_rows_that_fail_series_admission_stay_as_parent_context(
+    tmp_path: Path,
+) -> None:
+    cases = (
+        (
+            "kems-011-wetzel-gail-2013.yaml",
+            (
+                "wetzel_gail_2013_table5_quoted_model",
+                "wetzel_gail_2013_table5_quoted_model_gibbs",
+                "wetzel_gail_2013_table6_quoted_model",
+                "wetzel_gail_2013_table6_quoted_model_gibbs",
+            ),
+            38,
+            17,
+            28,
+        ),
+        (
+            "kems-035-sauerborn-2005.yaml",
+            ("sauerborn_2005_table57_evidence_ranking_deep2",),
+            4,
+            74,
+            2,
+        ),
+    )
+
+    for (
+        filename,
+        parent_ids,
+        expected_rows,
+        expected_observations,
+        expected_hard,
+    ) in cases:
+        source_id = Path(filename).stem
+        document = yaml.safe_load(
+            (REPO_ROOT / "data" / "literature" / "extracts" / filename).read_text(
+                encoding="utf-8"
+            )
+        )
+        raw_parents = {
+            str(observation["observation_id"]): observation
+            for _formula, observation in iter_extract_observations(document)
+            if observation.get("observation_id") in parent_ids
+        }
+        assert set(raw_parents) == set(parent_ids)
+        assert sum(
+            len(raw_parents[parent_id]["values"]["rows"])
+            for parent_id in parent_ids
+        ) == expected_rows
+
+        result = _migrate_real_extract(
+            tmp_path / source_id,
+            filename,
+            write=False,
+        )
+        observations = _source_observations(result, filename)
+        assert len(observations) == expected_observations
+        assert result.validation is not None
+        assert len(result.validation.hard_issues) == expected_hard
+
+        for parent_id in parent_ids:
+            observation_id = f"{source_id}::{parent_id}"
+            parent = result.observations[observation_id]
+            assert parent.value.kind is ValueKind.CATEGORICAL
+            assert parent.value.categorical == "bound_not_point_ordering"
+            assert all(
+                "derived_from" not in row
+                for row in raw_parents[parent_id]["values"]["rows"]
+            )
+            assert not any(
+                observation.observation_id.startswith(f"{observation_id}::")
+                for observation in observations
+            )
