@@ -46,6 +46,7 @@ from simulator.melt_backend.base import LiquidFractionInvalidError, MeltComposit
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
     feot_equivalent_moles,
+    iron_oxide_feot_oxygen_wt_pct,
 )
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
@@ -2392,15 +2393,8 @@ def test_magemin_pressure_conversion_helpers_are_exact():
 
 
 def test_magemin_feot_conversion_uses_iupac_2feo_mass():
-    # Current standard atomic weights: Fe 55.845, O 15.999 g/mol.
-    feo_molar_mass = (
-        MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
-        + MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
-    )
-    fe2o3_molar_mass = (
-        2 * MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
-        + 3 * MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
-    )
+    feo_molar_mass = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    fe2o3_molar_mass = resolve_species_formula("Fe2O3").molar_mass_g_per_mol()
     feot_numerator = 2 * feo_molar_mass
 
     assert feot_numerator == pytest.approx(143.688)
@@ -2541,7 +2535,7 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     expected_feot = 10.0 + FEOT_FROM_FE2O3
     assert vector[feot_index] == pytest.approx(expected_feot)
     assert vector[oxygen_index] == pytest.approx(
-        MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
+        iron_oxide_feot_oxygen_wt_pct({"Fe2O3": 1.0})[1]
     )
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(11.0)
 
@@ -2552,19 +2546,18 @@ def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
     assert vector[oxygen_index] == pytest.approx(
-        1.0 * MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
+        iron_oxide_feot_oxygen_wt_pct({"Fe2O3": 1.0})[1]
     )
 
 
-def test_magemin_ferrous_projection_oxygen_defect_pin():
+def test_magemin_ferrous_projection_has_no_synthetic_oxygen():
     projection = MAGEMinBackend()._build_db_bulk_projection({"FeO": 10.0})
 
     assert {
         key: value.hex() for key, value in projection.composition_wt_pct.items()
-    } == {"FeOt": "0x1.4000000000000p+3", "O": "0x1.1d0b54caaddc1p+0"}
+    } == {"FeOt": "0x1.4000000000000p+3"}
 
 
-@pytest.mark.xfail(strict=True, reason="b-911: synthetic O exceeds owner inventory")
 def test_magemin_ferrous_projection_preserves_oxygen_atoms():
     projection = MAGEMinBackend()._build_db_bulk_projection({"FeO": 10.0})
     feo_mass = resolve_species_formula("FeO").molar_mass_g_per_mol()
@@ -2578,7 +2571,7 @@ def test_magemin_ferrous_projection_preserves_oxygen_atoms():
     assert output_o_mol == pytest.approx(input_o_mol, rel=1e-14)
 
 
-def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
+def test_magemin_ig_bulk_vector_preserves_owner_fe_and_o():
     backend = MAGEMinBackend()
     composition = {
         "SiO2": 49.0,
@@ -2591,8 +2584,9 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    feo_excess_o = 16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-    assert vector[oxygen_index] == pytest.approx(feo_excess_o)
+    expected_feot, expected_o = iron_oxide_feot_oxygen_wt_pct(composition)
+    assert vector[feot_index] == expected_feot
+    assert vector[oxygen_index] == expected_o
     feo_molar_mass = resolve_species_formula("FeO").molar_mass_g_per_mol()
     ledger_fe_moles = feot_equivalent_moles(
         {"FeO": composition["FeO"] / feo_molar_mass}
@@ -2601,7 +2595,7 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
         {"FeO": vector[feot_index] / feo_molar_mass}
     )
     assert magemin_fe_moles == ledger_fe_moles
-    assert vector[oxygen_index] > 0.0
+    assert vector[oxygen_index] == 0.0
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
