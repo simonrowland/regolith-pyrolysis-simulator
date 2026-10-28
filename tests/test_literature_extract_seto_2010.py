@@ -22,6 +22,24 @@ _PINS = {
     "seto_2010_table2_r2_als_1473k": ("log10_a_Na2O_as_printed", "-7.98"),
     "seto_2010_table2_r3_als_1473k": ("RT_ln_a_Na2O_kJ_mol_as_printed", "-216.6"),
 }
+# Printed Table 1 and Table 2 mole percents, as mole fractions.
+_PRINTED_MOLE_FRACTIONS = {
+    "seto_2010_table1_r1_sls_1473k": {
+        "SiO2": Decimal("0.84"), "Na2O": Decimal("0.16"), "CaO": Decimal("0"),
+    },
+    "seto_2010_table1_r2_sls_1473k": {
+        "SiO2": Decimal("0.74"), "Na2O": Decimal("0.16"), "CaO": Decimal("0.1"),
+    },
+    "seto_2010_table2_r1_als_1473k": {
+        "SiO2": Decimal("0.70"), "Na2O": Decimal("0.30"), "Al2O3": Decimal("0"),
+    },
+    "seto_2010_table2_r2_als_1473k": {
+        "SiO2": Decimal("0.65"), "Na2O": Decimal("0.3"), "Al2O3": Decimal("0.05"),
+    },
+    "seto_2010_table2_r3_als_1473k": {
+        "SiO2": Decimal("0.6"), "Na2O": Decimal("0.3"), "Al2O3": Decimal("0.1"),
+    },
+}
 _TABLE_1_ROWS = {
     "seto_2010_table1_r1_sls_1473k": {
         "composition_as_printed": "84SiO2-16Na2O-0CaO (mol%)",
@@ -98,27 +116,20 @@ def test_seto_2010_migrates_with_printed_temperature_and_composition_only(tmp_pa
     assert {axis for entry in result.queue for axis in entry.axes} == {
         "reference_state", "value"
     }
-    for row in rows.values():
+    for row_id, row in rows.items():
+        printed = _PRINTED_MOLE_FRACTIONS[row_id]
         assert row.identity.temperature_K.value == 1473
-        # The printed composition remains in the typed-refused source rows;
-        # the quantity schema cannot promote it into activity identity here.
-        assert row.identity.composition.is_unknown
+        # b-1052 binds the explicit point-condition composition as identity.
+        assert row.identity.composition.is_value
+        assert dict(row.identity.composition.value.components) == printed
         assert row.point_conditions["composition"].state.is_value
+        assert dict(row.point_conditions["composition"].state.value.components) == printed
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
         assert row.value.unavailable_reason
         assert row.admission.status.value == "rejected"
     assert sum(row.value.kind.value == "unavailable" for row in rows.values()) == 5
     assert sum(row.value.kind.value != "unavailable" for row in rows.values()) == 0
-    assert dict(rows["seto_2010_table1_r2_sls_1473k"].point_conditions["composition"].state.value.components) == {
-        "SiO2": Decimal("0.74"), "Na2O": Decimal("0.16"), "CaO": Decimal("0.1")
-    }
-    assert dict(rows["seto_2010_table2_r2_als_1473k"].point_conditions["composition"].state.value.components) == {
-        "SiO2": Decimal("0.65"), "Na2O": Decimal("0.3"), "Al2O3": Decimal("0.05")
-    }
-    assert dict(rows["seto_2010_table2_r3_als_1473k"].point_conditions["composition"].state.value.components) == {
-        "SiO2": Decimal("0.6"), "Na2O": Decimal("0.3"), "Al2O3": Decimal("0.1")
-    }
 
 
 def test_seto_2010_source_pin_fails_if_value_is_mutated() -> None:

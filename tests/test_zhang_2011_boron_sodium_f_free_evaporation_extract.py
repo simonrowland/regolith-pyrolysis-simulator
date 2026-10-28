@@ -109,11 +109,6 @@ def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
         observation = by_id[observation_id]
         assert observation.identity.temperature_K.tag is StateTag.VALUE
         assert observation.identity.temperature_K.value == Decimal(str(temperature_c + 273.15))
-        # The source prints this composition (and the point condition below
-        # carries it at Table 2). Current mass_loss_rate migration does not
-        # bind it into identity; see the extract's recorded migrator gap.
-        assert observation.identity.composition.tag is StateTag.UNKNOWN
-        assert "no composition field" in observation.identity.composition.reason
         assert observation.identity.total_pressure_Pa.tag is StateTag.UNKNOWN
         assert observation.identity.fO2_Pa.tag is StateTag.UNKNOWN
         assert observation.identity.sample_mass_kg.tag is StateTag.UNKNOWN
@@ -137,8 +132,13 @@ def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
             printed = {**table2["CS-3"], "ZrO2": Decimal("2")}
         else:
             printed = table2[_slag_id]
+        printed_mole_fractions = wt_pct_to_mole_fraction(printed)
+        # b-1052 binds that printed composition into identity as well as
+        # the Table 2 point condition.
+        assert observation.identity.composition.tag is StateTag.VALUE
+        assert observation.identity.composition.value == printed_mole_fractions
         assert observation.point_conditions["composition"].state.value == (
-            wt_pct_to_mole_fraction(printed)
+            printed_mole_fractions
         )
         assert observation.value.kind is ValueKind.UNAVAILABLE
         assert "unmapped mass loss rate unit" in observation.value.unavailable_reason
