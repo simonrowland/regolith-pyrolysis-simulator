@@ -4262,6 +4262,7 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        canonical_species_order = species_order
         if any(reaction.get('uptake_mol', 0.0) > 0.0 for reaction in
                route_result.stage3_reactive_alkali_by_species.values()):
             # Commit actual gas-side oxygen sources before reactions debit
@@ -4286,6 +4287,7 @@ class EvaporationMixin:
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
         committed_species_kg_hr: dict[str, float] = {}
+        evaporation_transitions = {}
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
@@ -4300,9 +4302,11 @@ class EvaporationMixin:
                 route_result,
                 species,
                 rate_kg_hr,
+                apply_evaporative_redox_source_terms=False,
             )
             if route_outcome.get('evaporation_transition') is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
+                evaporation_transitions[species] = route_outcome['evaporation_transition']
             overhead_after_kg = float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     species, 0.0,
@@ -4319,6 +4323,22 @@ class EvaporationMixin:
             residual_species_kg_hr[species] = max(
                 0.0, overhead_after_kg - overhead_before_kg,
             )
+
+        # Premise: the finite-capacity redox clamp is sequential and nonlinear;
+        # ledger order can change when its bound is reached. Algebra: in general
+        # clamp(clamp(B + s1) + s2) != clamp(clamp(B + s2) + s1) when opposing
+        # carrier sources straddle a bound. Unit check: B and each s are mol O2
+        # equivalent. Limiting case: with one committed carrier this is the old
+        # single-transition result; with none, there is no redox update.
+        # Ledger commits may be reordered to prevent Stage-3 overdrafts, so
+        # apply each transition once after the loop in canonical carrier order.
+        for species in canonical_species_order:
+            transition = evaporation_transitions.get(species)
+            if transition is not None:
+                self._apply_evaporative_redox_source_terms(
+                    transition,
+                    exchange_direction='redox_source:evaporative_loss',
+                )
 
         self._apply_organic_tar_wall_deposit()
         self._sync_oxygen_kg_counters()
