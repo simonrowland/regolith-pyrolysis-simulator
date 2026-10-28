@@ -60,6 +60,81 @@ def _load_yaml(name: str) -> dict:
         return yaml.safe_load(handle) or {}
 
 
+@pytest.mark.parametrize("mode", ["oxide", "sulfide", "missing"])
+def test_allocation_notices_survive_load_timeline_and_report(monkeypatch, mode):
+    from dataclasses import replace
+
+    from engines.builtin.foulant_disposition import load_foulant_registry
+    from simulator.stage0_harness import _diagnostic_events, _timeline_entry_from_step
+    from tests.test_stage0_cation_routing import _sim
+    from tests.test_subsolidus_bakeout import _molar
+
+    hosts = {host: _molar(host) for host in ("CaSO4", "MgSO4", "FeSO4")}
+    feed = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": _molar("C"),
+            "cation_sulfate_product": "sulfide" if mode == "sulfide" else "oxide",
+            "reactions": ["sulfate_so3_to_so2_co"],
+        },
+        "composition_wt_pct": {
+            "SiO2": 100 - sum(hosts.values()) / 10,
+            **{host: kg / 10 for host, kg in hosts.items()},
+        },
+    }
+    sim = _sim({"feed": feed})
+    registry = load_foulant_registry(DATA_DIR / "foulant_thermo.yaml")
+    if mode == "missing":
+        rows = dict(registry.foulant_dG)
+        del rows["CaSO4_thermal_decomp"]
+        registry = replace(registry, foulant_dG=rows)
+        monkeypatch.setattr(sim, "_load_foulant_registry_cached", lambda: registry)
+    sim.load_batch("feed", mass_kg=1000, additives_kg={"C": _molar("C")})
+    ledger_before = sim.atom_ledger.mol_by_account()
+    diagnostic = next(row for row in sim._stage0_foulant_diagnostics
+                      if row.get("reaction_family") == "sulfate_carbon_allocation")
+    events = _diagnostic_events(diagnostic, registry)
+    timeline = _timeline_entry_from_step(
+        hour=0, sim=sim, step=SimpleNamespace(snapshot=SimpleNamespace()),
+        registry=registry, step_diagnostic_events=events,
+    )
+    projected = next(event for event in timeline.by_group["other_mineral_contaminant"]
+                     if event["reaction_family"] == "sulfate_carbon_allocation")
+    assert projected["raw"] == diagnostic
+    assert not {"carrier", "species", "source_component", "feed_kg"} & projected.keys()
+
+    partition = AccountingQueries(sim).stage0_foulant_partition_by_group()
+    assert partition["other_mineral_contaminant"]["diagnostics"] == [diagnostic]
+    # Allocation metadata contributes no source debit or mass to the report.
+    sim._stage0_foulant_diagnostics.remove(diagnostic)
+    without_notice = AccountingQueries(sim).stage0_foulant_partition_by_group()
+    mass_projection = {group: {key: value for key, value in payload.items()
+                               if key != "diagnostics"}
+                       for group, payload in partition.items()}
+    assert mass_projection == without_notice
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+    sim.atom_ledger.assert_balanced()
+
+    rendered = format_stage0_foulant_report_markdown(partition)
+    for flag in diagnostic["notice_flags"]:
+        assert flag in rendered
+    if mode == "sulfide":
+        assert "sulfate_carbon_missing_dG_canonical_order" in rendered
+    else:
+        assert "sulfate_carbon_dG_extrapolated" in rendered
+        fe_source = diagnostic["dG_sources"]["FeSO4"]
+        source_row = registry.foulant_dG["FeSO4_thermal_decomp"]
+        assert fe_source["source_band_K"] == [
+            source_row["points"][0]["T_K"], source_row["points"][-1]["T_K"],
+        ]
+        assert fe_source["authority_level"] == "extrapolated"
+        assert fe_source["source"] in rendered
+        assert f"source_band_K={fe_source['source_band_K']}" in rendered
+        assert "authority=extrapolated" in rendered
+    if mode == "missing":
+        assert "sulfate_carbon_missing_dG_canonical_order" in rendered
+
+
 def test_stage0_foulant_partition_mass_closure_raises_on_gap():
     sim = _sim_with_diagnostics({
         "reaction_family": "volatilization",

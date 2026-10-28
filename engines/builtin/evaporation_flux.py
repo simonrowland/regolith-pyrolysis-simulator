@@ -1053,6 +1053,15 @@ def _solid_host_bakeout_result(
             unavailable_reactions=unavailable,
         )
 
+    competing_hosts = sorted(
+        host for host in host_remaining
+        if sum(row["host_species"] == host for row in priced) > 1
+    )
+    if competing_hosts:
+        return _done(
+            "refused", "competing_solid_host_channels",
+            competing_hosts=competing_hosts,
+        )
     priced.sort(key=lambda row: row["reaction_id"])
 
     def _gas_kg_h(row: Mapping[str, Any], extent: float) -> float:

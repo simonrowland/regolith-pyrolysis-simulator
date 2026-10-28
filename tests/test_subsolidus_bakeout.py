@@ -311,6 +311,31 @@ def _sulfate_reaction(**overrides):
     return reaction
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+def test_competing_bakeout_channels_refuse_before_host_allocation(reverse):
+    reactions = [_sulfate_reaction(reaction_id=name) for name in ("a", "b")]
+    reactions[1]["driving_gas_species_id"] = "SO3"
+    reactions[1]["stoichiometry"] = [
+        {"species_id": "CaSO4", "phase": "anhydrite", "nu_mol_per_mol_rxn": -1.0},
+        {"species_id": "CaO", "phase": "crystal", "nu_mol_per_mol_rxn": 1.0},
+        {"species_id": "SO3", "phase": "gas", "nu_mol_per_mol_rxn": 1.0},
+    ]
+    if reverse:
+        reactions.reverse()
+    result = _dispatch_bakeout(
+        temperature_C=726.85,
+        vapour_batch_flux_pressures_Pa={"SO2": 20.0, "SO3": 20.0},
+        solid_host_area_m2=1.0, max_throughput_kg_hr=1e6, dt_hr=1.0,
+        alpha={"SO2": 0.4, "SO3": 0.4},
+        molar_mass_kg_mol={s: _molar(s) for s in ("SO2", "SO3", "O2", "CaO")},
+        reactions=reactions,
+    )
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "competing_solid_host_channels"
+    assert result.transition is None
+    assert not result.diagnostic.get("accepted_extent_mol_by_reaction")
+
+
 def test_solid_host_below_400_k_is_unavailable():
     result = _dispatch_bakeout(
         temperature_C=25.0,
@@ -817,7 +842,7 @@ def test_c0_same_step_pipe_cap_numeric_pin():
     assert flux.species_kg_hr["K"] == pytest.approx(0.000020450135762602575)
 
 
-def test_competing_branches_share_one_host_inventory():
+def test_competing_branches_refuse_without_a_thermodynamic_allocation():
     temperature_K = 900.0
     alpha = 0.25
     p_eq = 8.0
@@ -851,10 +876,10 @@ def test_competing_branches_share_one_host_inventory():
             ),
         ],
     )
-    accepted = result.diagnostic["accepted_extent_mol_by_reaction"]
-    assert accepted["a_branch"] == pytest.approx(0.8, rel=1e-9)
-    assert accepted["b_branch"] == pytest.approx(0.2, rel=1e-9)
-    assert accepted["a_branch"] + accepted["b_branch"] == pytest.approx(1.0, rel=1e-9)
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "competing_solid_host_channels"
+    assert result.diagnostic["competing_hosts"] == ["FeS_troilite"]
+    assert "accepted_extent_mol_by_reaction" not in result.diagnostic
 
 
 def test_refused_reaction_does_not_enter_released_demand():

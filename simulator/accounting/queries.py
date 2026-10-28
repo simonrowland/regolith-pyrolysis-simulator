@@ -740,10 +740,17 @@ class AccountingQueries:
             for row in rows:
                 _add_stage0_foulant_partition_row(groups, row)
 
-        return _finalize_stage0_foulant_partition_groups(
+        result = _finalize_stage0_foulant_partition_groups(
             groups,
             expected_source_debit_kg,
         )
+        allocation_diagnostics = [
+            dict(diagnostic) for diagnostic in diagnostics
+            if diagnostic.get("reaction_family") == "sulfate_carbon_allocation"
+        ]
+        if allocation_diagnostics:
+            result["other_mineral_contaminant"]["diagnostics"] = allocation_diagnostics
+        return result
 
     def stage0_foulant_hourly_by_group(
         self,
