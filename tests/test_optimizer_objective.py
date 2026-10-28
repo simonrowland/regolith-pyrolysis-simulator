@@ -1937,8 +1937,14 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # CrO2 uses the inherited Cr proxy and stays visibly non-measured.
-    assert execution.simulator._alpha_authority_status_by_species_engaged["CrO2"] == "proxy/bridge"
+    # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
+    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
+    # provider fallback warnings and committed-run authority have distinct scopes.
+    assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
+    assert not any(
+        transition.reason == "evaporate_CrO2"
+        for transition in execution.simulator.atom_ledger.transitions
+    )
     assert fallback["total_engagement_count"] > 0
     assert fallback == {
         "severity": "warning",
@@ -1962,11 +1968,11 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     # Legacy opt-in controls cannot remove a flagged CrO2 prediction.
     default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
     assert all("CrO2" not in hourly for hourly in missing_by_hour)
-    assert any(
+    assert not any(
         transition.reason == "evaporate_CrO2"
         for transition in default_sim.atom_ledger.transitions
     )
-    assert default_sim._alpha_authority_status_by_species_engaged["CrO2"] == "proxy/bridge"
+    assert "CrO2" not in default_sim._alpha_authority_status_by_species_engaged
 
 
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
