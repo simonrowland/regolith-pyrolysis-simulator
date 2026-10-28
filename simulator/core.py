@@ -13599,8 +13599,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         hard_would_advance = None
         hard_reason = "freeze gate disabled"
         if self._freeze_gate_enabled():
+            from simulator.melt_backend.liquidus import (
+                _LiquidusFinderBudgetExceeded,
+            )
+
             try:
                 raw_liquid_fraction = self._freeze_gate_liquid_fraction_factor()
+            except (TimeoutError, _LiquidusFinderBudgetExceeded):
+                raise
             except Exception as exc:
                 hard_reason = f"unknown: {exc}"
             else:

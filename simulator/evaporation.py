@@ -27,7 +27,10 @@ from simulator.fe_redox import (
     normalize_redox_state,
 )
 from simulator.melt_backend.base import MeltCompositionError
-from simulator.melt_backend.liquidus import LIQUIDUS_LIQUID_EPSILON
+from simulator.melt_backend.liquidus import (
+    LIQUIDUS_LIQUID_EPSILON,
+    _LiquidusFinderBudgetExceeded,
+)
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -2677,6 +2680,8 @@ class EvaporationMixin:
         if callable(register_gate_providers):
             try:
                 register_gate_providers()
+            except (TimeoutError, _LiquidusFinderBudgetExceeded):
+                raise
             except Exception as exc:  # noqa: BLE001 - optional provider boundary
                 record_gate_curve_provider_outcome(
                     self,
@@ -2841,6 +2846,8 @@ class EvaporationMixin:
             )
             reasons.append(f'backend liquidus provider unavailable: {exc}')
             return None
+        except (TimeoutError, _LiquidusFinderBudgetExceeded):
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             record_gate_curve_provider_outcome(
                 self,
