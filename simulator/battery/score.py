@@ -964,7 +964,9 @@ def vapour_crystalline_sample_liquid_engine_refusal(
         return detail
     compound = reservoir[0]
 
-    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.reference_data.janaf import (
+        janaf_fusion_energy,
+    )
 
     try:
         janaf_fusion_energy(compound, temperature_K)
@@ -1765,14 +1767,16 @@ def _fusion_energy_when_polymorph_absent(
     notice means the value must stay on the solid number.
     """
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     fusion = janaf_fusion_energy(formula, temperature_K)
@@ -1939,9 +1943,11 @@ def _janaf_fusion_energy_for_reference(
 ):
     """Resolve the JANAF pair for the phase named by the source reference."""
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+    )
     from simulator.battery.generators.janaf import (
         _fusion_table_pair,
-        _janaf_fusion_energy_for_pair,
         JANAFFusionPolymorphUnavailable,
     )
 
@@ -2181,7 +2187,7 @@ def _least_squares_line(
 def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
     """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
 
-    from simulator.battery.generators.janaf import (
+    from simulator.reference_data.janaf import (
         _fusion_table_points,
         _interpolate_formation_gibbs,
     )
@@ -2697,13 +2703,15 @@ def fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    from simulator.reference_data.janaf import (
+        _janaf_fusion_energy_for_pair,
+        janaf_fusion_energy,
+    )
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
 
     # d-165: a source that records the solid but not its polymorph stays on the

@@ -666,7 +666,7 @@ def test_ineligible_oxygen_partner_is_not_the_co_measured_condition(monkeypatch,
     def fail_janaf(*_args, **_kwargs):
         raise AssertionError("an ineligible partner must not evaluate JANAF K_O")
 
-    monkeypatch.setattr("simulator.battery.generators.janaf._fusion_table_points", fail_janaf)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", fail_janaf)
     selected = resolve_source_oxygen(sample, (sample, atomic, molecular), None)
     assert isinstance(selected, SourceOxygenFallback)
     assert selected.reason is FallbackReason.AMBIGUOUS
