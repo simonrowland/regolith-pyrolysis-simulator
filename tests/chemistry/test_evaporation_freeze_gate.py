@@ -613,7 +613,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     if not engine_available:
         pytest.skip('shipped curve pins require the MAGEMin engine')
 
-    # b-899 one redox state, d-166 regen; bounds staged for owner sign-off.
+    # b-899 inventory redox with d-298/d-299; measured live runner bounds.
     expected = {
         'lunar_mare_low_ti_C0_24h': [
             (
@@ -633,37 +633,44 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                918.75,
-                1370.3125,
-                ((918.75, 0.0), (1370.3125, 1.0)),
+                1031.25,
+                1375.0,
+                ((1031.25, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1042.1875,
+                1029.6875,
                 1375.0,
-                ((1042.1875, 0.0), (1375.0, 1.0)),
+                ((1029.6875, 0.0), (1375.0, 1.0)),
             ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
+                1028.125,
                 1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                ((1028.125, 0.0), (1375.0, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1025.0,
+                1373.4375,
+                ((1025.0, 0.0), (1373.4375, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                1025.0,
+                1373.4375,
+                ((1025.0, 0.0), (1373.4375, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
-                1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                1025.0,
+                1373.4375,
+                ((1025.0, 0.0), (1373.4375, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
@@ -675,7 +682,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((920.3125, 0.0), (1318.75, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # Executable capture: 12 hours, five hour-local curve reads per hour.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -684,7 +691,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ] * 60,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
