@@ -108,6 +108,20 @@ def test_printed_rows_cells_and_render_anchors_are_pinned_and_mutation_checked()
     assert sum(1 for formula, _state in row_cell_counts if formula.startswith("Na")) == 11
     assert sum(1 for formula, _state in row_cell_counts if formula.startswith("K")) == 7
     assert _render_anchor_grid(document) == RENDER_ANCHORS
+    sample = next(
+        sample
+        for sample in document["fidelity_samples"]
+        if sample["path"]
+        == "species.Na2O.observations[nbs81_table99_Na2O_c_delta_fH].values.value"
+    )
+    assert sample["value"] == RENDER_ANCHORS[0][1]
+    assert sample["locator"] == {
+        "page": 41,
+        "pdf_page_index": 40,
+        "table": "99",
+        "row": "Na2O c",
+        "column": "ΔfH° at 298.15 K",
+    }
 
     changed = deepcopy(document)
     target = _observation_records(changed)["nbs81_table99_Na2O_c_delta_fH"]
