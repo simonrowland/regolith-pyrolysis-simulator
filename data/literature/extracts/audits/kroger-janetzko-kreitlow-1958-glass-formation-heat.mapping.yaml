@@ -94,11 +94,11 @@ tables:
     typed_as: printed summary attached to corresponding measured observations
     audit: Both machine reads and page render confirm every stored direct and solution cell. The third “aus Bildungswärmen” column is excluded as an older calculated comparator, not a measurement.
 cross_reference_1956:
-  source: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  source: Kröger and Janetzko, Glastechnische Berichte 29 (1956), 393–400 (reference [2])
   result: No exact glass/batch measurement duplicated. The 1956 direct 1:1:6 batch result (117.8 ± 2.5 cal/g; 100 kg basis 11780 kcal) is a different composition and is not a 1958 technical-glass row. The 1958 article cites prior soda, quartz and limestone solution heats [2]; those values are auxiliary inputs, not repeated glass-formation observations. No Table 16 “aus Bildungswärmen” comparator is admitted as measured data.
 schema_gap:
-  observation_type: tools/validate_literature_extracts.py:79 OBSERVATION_TYPES includes gibbs_table, so the measured rows have an observation type.
-  quantity: simulator/battery/migrate.py:435 TYPE_QUANTITY maps gibbs_table by default to delta_fG; :453 QUANTITY_ALIASES has no exact batch-to-glass-plus-gas reaction heat token. The extract supplies explicit heat_of_glass_formation_from_batch so it migrates quantity-unknown instead of incorrectly inheriting delta_fG.
-  rejected_near_miss: simulator/battery/enums.py:84 Quantity.DELTA_FH is formation from elements, not the printed batch → glass + gas reaction. No delta_fH or delta_fG was assigned.
-  phase: simulator/battery/migrate.py:392 PHASE_MAP contains glass; simulator/battery/enums.py:308-310 includes GLASS as a phase role. No phase gap is claimed.
-  printed_composition: Retained literally as printed mass percentages; no phase-composition token or conversion is asserted.
+  observation_type: tools/validate_literature_extracts.py:96-99 OBSERVATION_TYPES includes gibbs_table, so the measured rows have an observation type.
+  quantity: simulator/battery/migrate.py:442 TYPE_QUANTITY maps gibbs_table by default to delta_fG; :460 QUANTITY_ALIASES has no exact batch-to-glass-plus-gas reaction heat token. The extract supplies explicit heat_of_glass_formation_from_batch so it migrates quantity-unknown instead of incorrectly inheriting delta_fG.
+  rejected_near_miss: simulator/battery/enums.py:89 Quantity.DELTA_FH is formation from elements, not the printed batch → glass + gas reaction. No delta_fH or delta_fG was assigned.
+  phase: simulator/battery/migrate.py:399 PHASE_MAP contains glass; simulator/battery/enums.py:322 includes GLASS as a phase role. No phase gap is claimed.
+  printed_composition: Tabelle 12a prints Sulfatglas compositions in kilograms; retained as plain printed maps without a percent or mole-fraction basis.
