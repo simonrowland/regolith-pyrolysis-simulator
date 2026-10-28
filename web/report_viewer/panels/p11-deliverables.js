@@ -309,8 +309,16 @@
 
   function formatConservativeUpperBoundKg(value) {
     if (value <= 0) return fmtNum(value, "kg");
-    const place = 10 ** (Math.floor(Math.log10(value)) - 2);
-    return fmtNum(Math.ceil(value / place) * place, "kg");
+    const roundedText = value.toPrecision(3);
+    const roundedValue = Number(roundedText);
+    if (roundedValue >= value) return fmtNum(roundedValue, "kg");
+
+    const [coefficient, exponentText] = roundedText.toLowerCase().split("e");
+    const decimalPlaces = (coefficient.split(".")[1] || "").length;
+    const exponent = exponentText ? Number(exponentText) : 0;
+    const lastDisplayedPlace = 10 ** (exponent - decimalPlaces);
+    // Advance one displayed digit so the shortened value still bounds upward.
+    return fmtNum(roundedValue + lastDisplayedPlace, "kg");
   }
 
   function producerFlag(record) {
