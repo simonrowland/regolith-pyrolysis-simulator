@@ -1,0 +1,77 @@
+source_id: niggli-1913-silica-alkali-carbonate-equilibria
+source:
+  citation: 'Paul Niggli (1913), J. Am. Chem. Soc. 35(11), 1693–1727, DOI 10.1021/ja02200a004'
+mapping_status: manual_transcription
+reason: >-
+  The table draft compare utility only recognizes value, pressure, activity, gamma, and T_m_K fields
+  (tools/mineru_table_draft.py::_numeric_points); it does not recognize mass_loss_pct or descriptive
+  schema-gap context fields. The table mapping is recorded here and numeric transcription was checked
+  against rendered source pages.
+tables:
+  - printed_table: II
+    draft_table_key: p008-t04
+    draft_table_index: 4
+    pdf_page: 8
+    published_page: 1700
+    printed_body_rows: 18
+    row_assignment: >-
+      Column 1 is the printed row label; columns 2–4 are initial K2CO3/SiO2 composition in wt% and
+      mol% SiO2. Columns 5/7/9 are measured weight loss at 898/956/998 °C (Table II column (a));
+      columns 6/8/10 are calculated displaced CO2 per 100 mol SiO2 (column (b)).
+    retained:
+      - column: 5/7/9
+        target: species.K2CO3.observations[].values.points[].mass_loss_pct
+        quantity: mass_loss_fraction
+        unit: '%'
+        evidence_class: quoted_attributed
+        reason: Niggli's percentages calculated from gravimetric loss; individual raw weighings are not tabulated.
+      - column: 6/8/10
+        target: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        reason: no exact quantity/unit token for the printed mol/100 mol SiO2 basis.
+    excluded:
+      - columns: 11/12
+        reason: theoretical calculated loss for 1 mol SiO2 displacing 1 mol CO2, not a measurement.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 8
+      note: >-
+        MinerU table QA digit agreement was 0.625; the page render settles all stored numeric cells and
+        confirms the multirow headers and row/column assignment. The row-by-row values are listed in
+        the audit report.
+  - printed_table: VI
+    draft_table_key: p023-t11
+    draft_table_index: 11
+    pdf_page: 23
+    published_page: 1715
+    printed_body_rows: 14
+    row_assignment: >-
+      The table reports initial mixture mol% SiO2 and measured number of mols CO2 displaced per 100 mols
+      SiO2 at the printed temperatures. The additional equilibrium-species columns are derived allocations.
+    retained:
+      - target: species.K2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        reason: no exact quantity/unit token for the printed mol/100 mol SiO2 basis.
+    excluded:
+      - reason: Stoichiometric equilibrium-species columns are calculations, not measured liquid speciation.
+      - reason: The 100% endpoint is a derived metasilicate endpoint, not an additional measured run.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 23
+      note: MinerU table QA digit agreement was 0.564; every retained numeric cell was checked on the render.
+  - printed_table: VIII
+    draft_table_key: p033-t13
+    draft_table_index: 13
+    pdf_page: 33
+    published_page: 1725
+    printed_body_rows: 3
+    retained:
+      - target: historical literature values in context
+        evidence_class: quoted_attributed
+        reason: values are attributed in the table to earlier workers.
+    excluded:
+      - reason: Niggli's 956-degree comparison column is interpolated/reconstructed, not new measured data.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 33
+      note: Render confirms the comparison columns, historical values, qualitative labels, and printed row labels.
