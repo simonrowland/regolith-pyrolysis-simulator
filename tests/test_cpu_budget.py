@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
+import textwrap
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -18,15 +20,16 @@ def _run_probe(
     tmp_path: Path,
     source: str,
     *,
+    expected_test_count: int,
     junit_xml: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     test_file = tmp_path / "test_cpu_budget_probe.py"
-    test_file.write_text(source, encoding="utf-8")
+    test_file.write_text(textwrap.dedent(source), encoding="utf-8")
     command = [
         sys.executable,
         "-m",
         "pytest",
-        "-q",
+        "-v",
         "-p",
         "no:cacheprovider",
         "-p",
@@ -40,7 +43,7 @@ def _run_probe(
         command.extend(("--junitxml", str(junit_xml)))
     command.append(str(test_file))
     environment = {**os.environ, "PYTEST_ADDOPTS": ""}
-    return subprocess.run(
+    result = subprocess.run(
         command,
         cwd=REPO_ROOT,
         env=environment,
@@ -49,6 +52,10 @@ def _run_probe(
         timeout=30,
         check=False,
     )
+    output = _output(result)
+    assert "ERROR collecting" not in output, output
+    assert re.search(rf"collected {expected_test_count} items?\b", output), output
+    return result
 
 
 def _output(result: subprocess.CompletedProcess[str]) -> str:
@@ -66,6 +73,7 @@ def test_busy_loop_exceeding_cpu_budget_fails_with_cpu_message(tmp_path: Path) -
             while True:
                 pass
         """,
+        expected_test_count=1,
     )
 
     assert result.returncode == pytest.ExitCode.TESTS_FAILED
@@ -84,6 +92,7 @@ def test_sleep_over_cpu_budget_wall_time_passes(tmp_path: Path) -> None:
         def test_sleep_uses_little_cpu():
             time.sleep(1.25)
         """,
+        expected_test_count=1,
     )
 
     assert result.returncode == pytest.ExitCode.OK, _output(result)
@@ -101,6 +110,7 @@ def test_sleep_over_wall_guard_fails_with_hang_message(tmp_path: Path) -> None:
         def test_sleep_exceeds_wall_guard():
             time.sleep(5)
         """,
+        expected_test_count=1,
     )
 
     assert result.returncode == pytest.ExitCode.TESTS_FAILED
@@ -123,6 +133,7 @@ def test_cpu_limit_is_restored_after_failure_for_next_test(tmp_path: Path) -> No
         def test_01_next_test_runs():
             Path({str(next_test_ran)!r}).write_text("ran", encoding="utf-8")
         """,
+        expected_test_count=2,
     )
 
     assert result.returncode == pytest.ExitCode.TESTS_FAILED
@@ -149,6 +160,7 @@ def test_junit_xml_records_cpu_and_wall_seconds(tmp_path: Path) -> None:
         def test_receipt():
             time.sleep(0.05)
         """,
+        expected_test_count=1,
         junit_xml=junit_xml,
     )
 
