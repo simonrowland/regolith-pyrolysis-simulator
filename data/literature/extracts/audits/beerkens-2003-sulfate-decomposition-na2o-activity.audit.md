@@ -53,10 +53,12 @@ passed in 196.65s**. Its mutation check changes the model-glass fit from
 rejects the mutation. The remote gate request produced no output for more than
 ten minutes and was stopped for the authorized local fallback.
 
-A scan of tracked extracts found this is the only observation combining a
-direct `point_conditions.composition` with a migrator-readable composition map
-under `values`. The owner-level precedence fix therefore affects this added
-row only; no existing migrated observation is expected to change.
+There is no migrator change in this reconciliation. The point-condition
+composition remains the printed mass-percent map located on PDF p. 4 / published
+p. 1896 / §III(1); migration converts it with the existing
+`simulator.battery.migrate.wt_pct_to_mole_fraction` helper. The stored
+`values.composition_mol` fractions use that same existing conversion for the
+observation identity.
 
 A broader local attempt also included `tests/battery/test_migrate.py`; the
 session watchdog reported a timeout and the 900-second foreground cap ended

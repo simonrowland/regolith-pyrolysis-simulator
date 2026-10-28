@@ -9,6 +9,7 @@ from simulator.battery.enums import (
     Quantity,
     ReferenceStateConvention,
 )
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 
 
@@ -120,6 +121,17 @@ def _assert_beerkens_activity_source_pins(extract: dict) -> None:
         ["K2O", "0.9"],
     ]
     assert composition_condition["locator"]["page"] == 4
+    printed_composition = {
+        component: amount
+        for component, amount in composition_condition["state"]["value"]["components"]
+    }
+    expected_mole_fractions = dict(
+        wt_pct_to_mole_fraction(printed_composition).components
+    )
+    assert {
+        component: Decimal(amount)
+        for component, amount in point["values"]["composition_mol"].items()
+    } == expected_mole_fractions
     standard_state = point["standard_state"]
     assert standard_state["state"]["value"]["convention"] == (
         "raoultian_pure_endmember"
