@@ -167,7 +167,10 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
     assert entropy.identity.subtype.is_not_applicable
     assert enthalpy.identity.subtype.value == "H(T)-H(298.15 K)"
     assert ":149" in enthalpy.identity.subtype.reason
-    assert _per_is_unknown(gibbs)
+    assert gibbs.identity.per is not None
+    assert gibbs.identity.per.is_value
+    assert gibbs.identity.per.value is PerBasis.MOL_SPECIES
+    assert gibbs.identity.per.reason is None
     document = _record_doc(B677, "table-0096.json")
     _assert_cell_matches_reader(
         heat_capacity, document, Quantity.CP, "1600", printed_token="4.975", column=1
@@ -231,7 +234,10 @@ def test_b677_mgo_formation_maps_mol_species_without_a_reaction(tmp_path: Path) 
     assert "0.5" in gibbs.identity.per.reason
     assert gibbs.identity.standard_pressure_Pa.value == atm_to_pa(1)
     assert gibbs.identity.reaction.is_unknown
-    assert _per_is_unknown(heat_capacity)
+    assert heat_capacity.identity.per is not None
+    assert heat_capacity.identity.per.is_value
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert heat_capacity.identity.per.reason is None
     document = _record_doc(B677, "table-1203.json")
     _assert_cell_matches_reader(
         gibbs,
@@ -332,7 +338,7 @@ def test_b2131_cao_logkf_maps_mol_species_at_one_bar(tmp_path: Path) -> None:
     assert attempt.refusal_detail["reason"] == "ellingham-phase-or-polymorph-not-in-fit"
 
 
-def test_b689_ags_h298_basis_does_not_spread_to_cp(tmp_path: Path) -> None:
+def test_b689_ags_cp_converter_basis_is_independent_of_enthalpy(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B689, "page-0003.json")
     enthalpy = _observation(result, B689, "page-0003", Quantity.H_MINUS_H298)
     # Green declares the 298.15 K, mol-species basis for B689 H(T)-H(298.15 K).
@@ -347,35 +353,49 @@ def test_b689_ags_h298_basis_does_not_spread_to_cp(tmp_path: Path) -> None:
     assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
     assert attempt.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
-    # That H298 declaration must not assign a mol-species basis to B689 Cp.
+    # Cp gets its molar basis from its own converter trail, not the H298 row.
     heat_capacity = _observation(result, B689, "page-0003", Quantity.CP)
-    assert _per_is_unknown(heat_capacity)
+    assert heat_capacity.identity.per is not None
+    assert heat_capacity.identity.per.is_value
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert heat_capacity.identity.per.reason is None
+    assert heat_capacity.identity.subtype.is_not_applicable
     cp_attempt = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "298.15"))
-    assert cp_attempt.refusal_detail["reason"] == _MISSING_GAS
+    assert cp_attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert cp_attempt.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
 
-def test_b696_ago_gas_stays_missing_mol_basis(tmp_path: Path) -> None:
+def test_b696_ago_gas_converter_basis_reaches_unsupported_species(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B696, "page-0006.json")
     heat_capacity = _observation(result, B696, "page-0006", Quantity.CP)
-    assert _per_is_unknown(heat_capacity)
+    assert heat_capacity.identity.per is not None
+    assert heat_capacity.identity.per.is_value
+    assert heat_capacity.identity.per.value is PerBasis.MOL_SPECIES
+    assert heat_capacity.identity.per.reason is None
     cell = _cell_at(heat_capacity, "1000")
     attempt = _attempt(Engine.VAPOROCK, cell)
-    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+    assert attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert attempt.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
 
 
-def test_b677_silver_stays_unmapped(tmp_path: Path) -> None:
+def test_b677_silver_converter_basis_reaches_model_refusals(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B677, "table-0008.json")
     heat_capacity = _observation(result, B677, "table-0008", Quantity.CP)
     gibbs = _observation(result, B677, "table-0008", Quantity.DELTA_FG)
-    assert _per_is_unknown(heat_capacity)
-    assert _per_is_unknown(gibbs)
+    for observation in (heat_capacity, gibbs):
+        assert observation.identity.per is not None
+        assert observation.identity.per.is_value
+        assert observation.identity.per.value is PerBasis.MOL_SPECIES
+        assert observation.identity.per.reason is None
     gas = _attempt(Engine.VAPOROCK, _cell_at(heat_capacity, "1000"))
     formation = _attempt(Engine.INTERNAL_ANALYTICAL, _cell_at(gibbs, "1000"))
-    assert gas.refusal_detail["reason"] == _MISSING_GAS
-    assert formation.refusal_detail["reason"] == _MISSING_PER
+    assert gas.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert gas.refusal_detail["reason"] == "vaporock-species-not-in-janaf-table"
+    assert formation.refusal_reason is RefusalReason.UNSUPPORTED
+    assert formation.refusal_detail["reason"] == "engine-thermo-does-not-emit"
 
 
-def test_b592_aluminum_gas_outside_interval_stays_unmapped(tmp_path: Path) -> None:
+def test_b592_aluminum_gas_outside_interval_uses_converter_basis(tmp_path: Path) -> None:
     result = _migrate_record(tmp_path, B592, "table-006-0003.json")
     entropy = _observation(
         result,
@@ -384,9 +404,14 @@ def test_b592_aluminum_gas_outside_interval_stays_unmapped(tmp_path: Path) -> No
         Quantity.S,
         contains="entropy_recommended",
     )
-    assert _per_is_unknown(entropy)
+    assert entropy.identity.per is not None
+    assert entropy.identity.per.is_value
+    assert entropy.identity.per.value is PerBasis.MOL_SPECIES
+    assert entropy.identity.per.reason is None
     attempt = _attempt(Engine.VAPOROCK, _cell_at(entropy, "298.15"))
-    assert attempt.refusal_detail["reason"] == _MISSING_GAS
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert attempt.refusal_detail["reason"] == "standard-pressure-unknown"
 
 
 def test_b2131_silver_stays_unmapped(tmp_path: Path) -> None:
