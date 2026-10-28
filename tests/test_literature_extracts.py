@@ -5975,7 +5975,7 @@ def test_compilation_assessed_rows_migrate_printed_identity(
         ),
         (
             "robie-hemingway-wilson-1980-usgs-of-80-908",
-            "robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_gehlenite_summary_29815",
+            "robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_ca2sio4_alpha_summary_29815_absent",
             "Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report 80-908.",
         ),
         (
