@@ -278,6 +278,11 @@ inventory. Its `forecast_engine` member appears only when the detached forecast
 has a recognized engine identity; consumers must tolerate older notices that
 omit it.
 
+When C3 alkali-credit metadata is present, the optional
+`c3_alkali_credit_unused_by_design_kg_by_species` map identifies a requested
+credit dose that the selected campaign path does not draw. In the V1c staged
+Na-only path, a configured K dose is reported here as unused by design.
+
 ```jsonc
 "run_metadata": {
   "schema_version": "1.9.0",

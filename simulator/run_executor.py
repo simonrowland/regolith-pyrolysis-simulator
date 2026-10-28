@@ -13,6 +13,7 @@ from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator.accounting.ledger import snapshot_atom_ledger
 from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
+    CampaignEndpointRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
 )
@@ -51,6 +52,7 @@ _TYPED_PHYSICS_REFUSALS = (
 )
 _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
+    CampaignEndpointRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
     EvaporationFluxRefusal,
@@ -401,6 +403,7 @@ class RunExecutor:
                     status = "partial"
         except (
             KnudsenRegimeRefusal,
+            CampaignEndpointRefusal,
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
             EvaporationFluxRefusal,

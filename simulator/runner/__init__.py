@@ -1448,6 +1448,16 @@ class PyrolysisRun:
             run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = (
                 c3_credit_outstanding_kg
             )
+        c3_credit_unused_by_design = (
+            sim.campaign_mgr.c3_alkali_credit_unused_by_design(
+                sim.record.path,
+                c3_credit_dose_kg,
+            )
+        )
+        if c3_credit_unused_by_design:
+            run_metadata[
+                "c3_alkali_credit_unused_by_design_kg_by_species"
+            ] = c3_credit_unused_by_design
         if execution.reduced_real_cache:
             run_metadata["reduced_real_cache"] = _safe_failure_value(
                 lambda: _json_safe(execution.reduced_real_cache),

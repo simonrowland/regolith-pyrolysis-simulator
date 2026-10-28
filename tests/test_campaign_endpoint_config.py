@@ -111,6 +111,28 @@ def test_c2a_staged_endpoint_refuses_unknown_species():
         )
 
 
+def test_c3_shuttle_phase_uses_setpoint_split_and_refuses_missing_row():
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+
+    assert manager.c3_shuttle_phase(2, staged=False) == ("inject", False)
+    assert manager.c3_shuttle_phase(3, staged=False) == ("bakeout", True)
+    assert manager.c3_shuttle_phase(3, staged=True) == ("inject", False)
+    assert manager.c3_shuttle_phase(4, staged=True) == ("bakeout", False)
+
+    setpoints["campaigns"]["C3"]["shuttle_cycle_hours"]["staged"] = {
+        "inject_hr": 1.5,
+        "bakeout_hr": 1.5,
+    }
+    assert manager.c3_shuttle_phase(1, staged=True) == ("inject", False)
+    assert manager.c3_shuttle_phase(2, staged=True) == ("bakeout", True)
+
+    del setpoints["campaigns"]["C3"]["shuttle_cycle_hours"]["staged"]
+    with pytest.raises(CampaignEndpointRefusal) as exc_info:
+        manager.c3_shuttle_phase(1, staged=True)
+    assert exc_info.value.reason == "campaign_setpoint_missing"
+
+
 def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
     manager = CampaignManager(_setpoints())
     manager._c2a_staged_cumulative_yield_mol_by_species = {"Na": 2.0}

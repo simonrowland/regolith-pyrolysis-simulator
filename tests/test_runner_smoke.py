@@ -1157,6 +1157,9 @@ def test_staged_c3_current_k_and_bakeout_behavior_is_pinned():
     assert metadata["c3_alkali_credit_drawn_kg_by_species"]["K"] == pytest.approx(
         0.0
     )
+    assert metadata["c3_alkali_credit_unused_by_design_kg_by_species"] == {
+        "K": pytest.approx(0.023)
+    }
     assert payload["shuttle_refusal_history"] == []
 
     recycled_na_kg = AccountingQueries(sim).recycled_to_reagent_kg_cumulative()[
@@ -1167,6 +1170,20 @@ def test_staged_c3_current_k_and_bakeout_behavior_is_pinned():
         0.011085595572037659,
         abs=1e-10,
     )
+
+
+def test_c3_missing_schedule_row_is_a_typed_campaign_refusal():
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+        setpoints_patch={
+            "campaigns": {"C3": {"shuttle_cycle_hours": {"ordinary": None}}}
+        },
+    ).run()
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "campaign_setpoint_missing"
 
 
 def test_c3_alkali_dose_deadband_does_not_route_tiny_continuous_draws():

@@ -368,6 +368,13 @@ campaigns:
     alkali_dosing:
       Na_kg: 0.0
       K_kg: 0.0
+    shuttle_cycle_hours:
+      ordinary:
+        inject_hr: 3
+        bakeout_hr: 3
+      staged:
+        inject_hr: 3
+        bakeout_hr: 0
     K_phase:
       name: "Deprecated K FeO reduction diagnostic"
       T_inject_C: [760, 820]

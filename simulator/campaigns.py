@@ -1932,6 +1932,74 @@ class CampaignManager:
                 target_T = float(melt.temperature_C)
         return (self._clamp_to_furnace_max(target_T), ramp_rate)
 
+    def c3_shuttle_phase(
+        self,
+        campaign_hour: int,
+        *,
+        staged: bool,
+    ) -> tuple[str, bool]:
+        """Resolve the setpoint-owned C3 phase and bakeout entry tick.
+
+        Staged C3 starts its campaign clock at hour 1, while ordinary C3
+        starts at hour 0. The distinction is kept here so temperature
+        targeting and extraction use the same schedule and boundary rules.
+        """
+        profile = 'staged' if staged else 'ordinary'
+        c3_config = self.campaigns.get('C3')
+        schedules = (
+            c3_config.get('shuttle_cycle_hours')
+            if isinstance(c3_config, Mapping)
+            else None
+        )
+        row = schedules.get(profile) if isinstance(schedules, Mapping) else None
+        setpoint_path = f'campaigns.C3.shuttle_cycle_hours.{profile}'
+        if not isinstance(row, Mapping) or any(
+            key not in row for key in ('inject_hr', 'bakeout_hr')
+        ):
+            raise CampaignEndpointRefusal({
+                'reason_refused': 'campaign_setpoint_missing',
+                'setpoint_path': setpoint_path,
+            })
+        inject_hours = self._required_float(
+            row['inject_hr'], f'{setpoint_path}.inject_hr'
+        )
+        bakeout_hours = self._required_float(
+            row['bakeout_hr'], f'{setpoint_path}.bakeout_hr'
+        )
+        if inject_hours < 0.0 or bakeout_hours < 0.0:
+            raise ValueError(f'{setpoint_path} hours must be non-negative')
+        cycle_hours = inject_hours + bakeout_hours
+        if cycle_hours <= 0.0:
+            raise ValueError(f'{setpoint_path} must have positive total hours')
+
+        if staged:
+            is_injection = campaign_hour <= inject_hours
+            entering_bakeout = (
+                bakeout_hours > 0.0
+                and campaign_hour > inject_hours
+                and campaign_hour - 1 <= inject_hours
+            )
+        else:
+            cycle_hour = campaign_hour % cycle_hours
+            is_injection = cycle_hour < inject_hours
+            entering_bakeout = (
+                bakeout_hours > 0.0
+                and cycle_hour >= inject_hours
+                and cycle_hour - 1 < inject_hours
+            )
+        return ('inject' if is_injection else 'bakeout', entering_bakeout)
+
+    @staticmethod
+    def c3_alkali_credit_unused_by_design(
+        path: str,
+        dose_kg_by_species: Mapping[str, float],
+    ) -> dict[str, float]:
+        """Report staged K credit requests that the V1c Na-only path skips."""
+        if path != 'A_staged':
+            return {}
+        k_dose_kg = float(dose_kg_by_species.get('K', 0.0))
+        return {'K': k_dose_kg} if k_dose_kg > 0.0 else {}
+
     def _clamp_to_furnace_max(self, target_T: Optional[float]) -> Optional[float]:
         if target_T is None:
             return None
@@ -2040,8 +2108,12 @@ class CampaignManager:
             inject_target = self._float(ovr.get('inject_target_C'), default_inject)
             bakeout_target = self._float(ovr.get('bakeout_target_C'), default_bakeout)
             ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
-            cycle_period = 6  # hours per inject-bakeout cycle
-            if campaign_hour % cycle_period < 3:
+            staged = (
+                campaign == CampaignPhase.C3_NA
+                and self._active_c3_na_scoped_overrides is not None
+            )
+            phase, _ = self.c3_shuttle_phase(campaign_hour, staged=staged)
+            if phase == 'inject':
                 return (inject_target, ramp_rate)  # injection phase
             else:
                 return (bakeout_target, ramp_rate)  # bakeout phase
