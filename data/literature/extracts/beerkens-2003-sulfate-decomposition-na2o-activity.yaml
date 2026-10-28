@@ -11,6 +11,12 @@ extraction:
     date: '2026-10-28'
     worker: recon-beerkens03
 review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observation_id: beerkens_2003_float_glass_activity_at_1673K
+    field: activity
+    value: 1.7e-8
+    locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
 species:
   S:
     observations: []
@@ -200,7 +206,7 @@ species:
           section: 'VI. Results for the Sodium Oxide Activity'
           note: Final paragraph of §VI before the §VII heading.
         values:
-          T_C: '1399.85'
+          T_K: '1673'
           quantity: activity
           method_class: measured_tabulated
           evidence_class: measured_tabulated
@@ -213,13 +219,14 @@ species:
           estimated_error_component_1_as_published: 'about 15%–20%'
           estimated_error_component_2_as_published: '15%'
           composition_role: datum_state
-          composition_mass_percent:
-            SiO2: '72.2'
-            Na2O: '13.4'
-            CaO: '9.5'
-            MgO: '2.2'
-            Al2O3: '1.5'
-            K2O: '0.9'
+          composition_mol_basis: mole_fraction_calculated_from_weight_percent
+          composition_mol:
+            SiO2: '0.7212321703995182163965610544'
+            Na2O: '0.1297636248391307182437973734'
+            CaO: '0.1016783137802867136915562863'
+            MgO: '0.03276151920166133390067209129'
+            Al2O3: '0.008829794701524729680132244985'
+            K2O: '0.005734577077878288087280949865'
         point_conditions:
           pO2_Pa:
             state: {tag: value, value: 33000}
@@ -313,6 +320,7 @@ species:
           page: 5
           published_page: 1897
           pdf_page_index: 4
+          section: 'VI. Results for the Sodium Oxide Activity'
           note: >-
             Author-reported temperature relations; the article also gives the measured activity ranges in Figure 5. Candidate tokens checked: activity_coefficient_temperature_fit does not fit these activities, and log10_K_star does not fit Kcon/Kpc; these are not activity-coefficient or equilibrium-constant K* parameters.
         units: T in K; pressures in bar; concentrations mol/m3

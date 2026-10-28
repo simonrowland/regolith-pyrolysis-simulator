@@ -66,7 +66,8 @@ def _assert_beerkens_activity_source_pins(extract: dict) -> None:
     assert (
         fit_context["locator"]["page"],
         fit_context["locator"]["published_page"],
-    ) == (5, 1897)
+        fit_context["locator"]["section"],
+    ) == (5, 1897, "VI. Results for the Sodium Oxide Activity")
     assert activity_context["locator"]["section"] == "VI. Results for the Sodium Oxide Activity"
     assert activity_context["values"]["quantity"] == "activity"
     assert activity_context["values"]["method_class"] == "measured_tabulated"
@@ -84,7 +85,7 @@ def _assert_beerkens_activity_source_pins(extract: dict) -> None:
     assert point["locator"]["published_page"] == 1898
     assert point["locator"]["pdf_page_index"] == 5
     assert point["locator"]["section"] == "VI. Results for the Sodium Oxide Activity"
-    assert point["values"]["T_C"] == "1399.85"
+    assert point["values"]["T_K"] == "1673"
     assert point["values"]["quantity"] == "activity"
     assert point["values"]["method_class"] == "measured_tabulated"
     assert point["values"]["evidence_class"] == "measured_tabulated"
@@ -96,14 +97,9 @@ def _assert_beerkens_activity_source_pins(extract: dict) -> None:
         "about 15%–20%"
     )
     assert point["values"]["estimated_error_component_2_as_published"] == "15%"
-    assert point["values"]["composition_mass_percent"] == {
-        "SiO2": "72.2",
-        "Na2O": "13.4",
-        "CaO": "9.5",
-        "MgO": "2.2",
-        "Al2O3": "1.5",
-        "K2O": "0.9",
-    }
+    assert point["values"]["composition_mol_basis"] == (
+        "mole_fraction_calculated_from_weight_percent"
+    )
     assert point["point_conditions"]["pO2_Pa"]["state"] == {
         "tag": "value",
         "value": 33000,
@@ -197,3 +193,4 @@ def test_beerkens_activity_point_survives_isolated_migration() -> None:
     assert point.point_conditions["pSO2_Pa"].state.value == Decimal("66600")
     assert point.point_conditions["pSO2_Pa"].locator.page == 6
     assert point.point_conditions["composition"].locator.page == 4
+    assert point.point_conditions["composition"].locator.published_page == 1896
