@@ -265,7 +265,18 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
                 ]
             },
         },
-        {"x": {"label": "X", "composition_wt_pct": {"FeO": 100.0}}},
+        # This one-rung exhaustion case requires an explicitly all-ferrous
+        # charge, rather than an FeOt assay with a predicted ferric fraction.
+        {"x": {
+            "label": "X", "composition_wt_pct": {"FeO": 100.0, "Fe2O3": 0.0},
+            "composition_basis": {
+                oxide: {
+                    "method": "defined pure FeO fixture",
+                    "source": "test_plant_mre_isolated_from_reproduction_loader_and_driver",
+                }
+                for oxide in ("FeO", "Fe2O3")
+            },
+        }},
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("x", mass_kg=0.02)
