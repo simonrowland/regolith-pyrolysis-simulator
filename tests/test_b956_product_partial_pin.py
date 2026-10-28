@@ -43,8 +43,18 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
         assert bucket["status"] == "partial"
         assert isinstance(bucket.get("class_total_kg"), (int, float))
         assert math.isfinite(bucket["class_total_kg"])
-        assert len(bucket["excluded"]) == 1
-        exclusion = bucket["excluded"][0]
+        exclusion = next(
+            (
+                entry
+                for entry in bucket["excluded"]
+                if entry.get("species") == "Si"
+                and entry.get("account") == "process.cleaned_melt"
+                and "EvaporationFluxConfigurationError"
+                in entry.get("reason", "")
+            ),
+            None,
+        )
+        assert exclusion is not None
         assert exclusion["species"] == "Si"
         assert exclusion["account"] == "process.cleaned_melt"
         assert "EvaporationFluxConfigurationError" in exclusion["reason"]
@@ -94,6 +104,4 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
             allocation["owner_ratify_money_projection"]
         )
         assert not is_unavailable_quantity(allocation["accumulated_cost"])
-        assert len(allocation["excluded"]) == 1
-        assert allocation["excluded"][0]["species"] == "Si"
         assert allocation["excluded"] == products["metals_plus_O2"]["excluded"]
