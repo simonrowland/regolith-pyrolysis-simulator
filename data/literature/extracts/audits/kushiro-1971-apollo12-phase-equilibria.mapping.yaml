@@ -1,19 +1,59 @@
 source_id: kushiro-1971-apollo12-phase-equilibria
-method: >-
-  Table 3 columns 1 and 2 are the printed synthetic starting compositions Mixture A and Mixture B. Table 3 columns 3-6 are selected run-product microprobe analyses and are outside the requested starting-bulk and run-table scope. The paper explicitly says the natural whole-rock major-element abundances for nine rocks were published separately by Kushiro and Haramura (1971); this extract does not substitute synthetic mixtures for those natural rocks.
-starting_composition_link: >-
-  Table 3 Mixture A maps to experiment kushiro-1971-mixture-a and Mixture B to kushiro-1971-mixture-b. Their printed oxide wt% are retained under sample.initial_composition; Table 4 runs identify their matching experiment.
+method: Tables 1 and 2 contain natural-rock mineral analyses and are outside the requested starting-bulk and run-table scope. Table 3 columns 1 and 2 are the printed synthetic starting compositions Mixture A and Mixture B; columns 3-6 are selected run-product microprobe analyses and are outside the requested scope. The paper explicitly says the natural whole-rock major-element abundances for nine rocks were published separately by Kushiro and Haramura (1971); this extract does not substitute synthetic mixtures for those natural rocks.
+starting_composition_link: Table 3 Mixture A maps to experiment kushiro-1971-mixture-a and Mixture B to kushiro-1971-mixture-b. Their printed oxide wt% are retained under sample.initial_composition; Table 4 runs identify their matching experiment.
 schema_review:
-  phase_assemblage: >-
-    Table 4's multi-phase run assemblage is retained verbatim in context because no exact phase-assemblage observation type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES, no equilibrium-phase-assemblage quantity exists in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY, and simulator/battery/enums.py::Phase and simulator/battery/enums.py::PhaseRole enumerate individual phases and roles rather than an assemblage quantity. The transition temperatures use the existing transition_point type and transition_temperature quantity.
+  phase_assemblage: Table 4's multi-phase run assemblage is retained verbatim in context because no exact phase-assemblage observation type exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES, no equilibrium-phase-assemblage quantity exists in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY, and simulator/battery/enums.py::Phase and simulator/battery/enums.py::PhaseRole enumerate individual phases and roles rather than an assemblage quantity. The transition temperatures use the existing transition_point type and transition_temperature quantity.
+  transition_interval: The mixture A chromite onset is retained as a typed transition_temperature refusal because it is printed as an interval, not a scalar point. simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS selects scalar transition-temperature fields such as T_C; neither endpoint is promoted to a scored point.
 tables:
-  - published_table: '3'
-    page: 10
-    published_page: 490
-    pdf_page_index: 9
-    printed_body_rows: 10 oxide rows
-    stored_composition_columns: [1, 2]
-    stored_numeric_cells: 20
-    excluded_columns: '3-6: selected microprobe analyses of run products, outside the requested starting-bulk-composition scope'
-    source_evidence: 'MinerU cell draft corroborated by the page render; pdftotext-layout has no article text.'
-    layout_check: 'Render confirms column 1 is Mixture A, column 2 is Mixture B; footnote (1) identifies A and footnote (2) identifies B.'
+- published_table: '3'
+  page: 10
+  published_page: 490
+  pdf_page_index: 9
+  printed_body_rows: 10 oxide rows
+  stored_composition_columns:
+  - 1
+  - 2
+  stored_numeric_cells: 20
+  excluded_columns: '3-6: selected microprobe analyses of run products, outside the requested starting-bulk-composition scope'
+  source_evidence: MinerU cell draft corroborated by the page render; pdftotext-layout has no article text.
+  layout_check: Render confirms column 1 is Mixture A, column 2 is Mixture B; footnote (1) identifies A and footnote (2) identifies B.
+- published_table: '4'
+  page: 11
+  published_page: 491
+  pdf_page_index: 10
+  printed_body_rows: 35
+  row_groups:
+  - starting_material: Mixture A
+    pressure_as_printed: 1 atm
+    run_rows: 1-6
+    MinerU_pressure_origin_row: 3
+  - starting_material: Mixture B
+    pressure_as_printed: 1 atm
+    run_rows: 7-19
+    MinerU_pressure_origin_row: 10
+  - starting_material: Mixture B
+    pressure_as_printed: 10 kb
+    run_rows: 20-25
+    MinerU_pressure_origin_row: 24
+  - starting_material: Mixture B
+    pressure_as_printed: 16 kb
+    run_rows: '26'
+    MinerU_pressure_origin_row: 30
+  - starting_material: Mixture B
+    pressure_as_printed: 20 kb
+    run_rows: 27-31
+    MinerU_pressure_origin_row: 31
+  - starting_material: Mixture B
+    pressure_as_printed: 30 kb
+    run_rows: 32-35
+    MinerU_pressure_origin_row: 36
+  source_evidence: MinerU cell draft corroborated by the page render; the pdftotext-layout page has no article text.
+  layout_check: The render confirms the two mixture section labels, six merged pressure cells, 35 temperature/time/results rows, and the 1 atm and high-pressure run group boundaries.
+  stored_numeric_cells: 35 pressure values (expanded from the six merged pressure cells to the associated run records), 19 oxygen-condition references to the printed 10^-13 atm PO2 caption for the 1-atm runs, 35 temperature cells, 35 duration cells, and 7 numeric-bearing results cells; each source cell was visually checked against the render.
+mineru_compare: The required compare command was run. It reports zero candidates because the retained table cells are experiment registry data and context records, while compare matches numeric observation rows; the table and prose audit CSVs record the full printed-cell checks.
+prose_records:
+  page: 12
+  published_page: 492
+  pdf_page_index: 11
+  render_check: MinerU prose and page render agree for the six Mixture B transition temperatures, the Mixture A chromite interval and near-1170°C pigeonite onset, the Figure 6 caption's 10^-13 atm PO2, and four rock 12065,45 run temperatures.
+  whole_rock_bulk_compositions: Not printed in this paper; page 8/printed page 488 says the major-element abundances of nine rocks were published separately by Kushiro and Haramura (1971).
