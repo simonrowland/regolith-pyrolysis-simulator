@@ -1994,3 +1994,25 @@ def test_validated_row_rejects_junk_anchor_refs(anchor_refs) -> None:
         match=r"validation\.anchor_refs",
     ):
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+@pytest.mark.parametrize(('species_id', 'temperature_K'), [
+    ('CrO', 199.), ('SiO2_gas', 199.), ('MnO_gas', 900.),
+])
+def test_composite_constituent_domain_uses_flagged_existing_tangent(species_id, temperature_K):
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    evaluator = catalog.species[species_id].evaluator
+    result = evaluator.evaluate(temperature_K, source_activity=1., pO2_bar=1.)
+    assert result.pressure_pa > 0.
+    assert math.log10(result.pressure_pa) == pytest.approx(evaluator._reciprocal_T_tangent_log10(temperature_K))
+    assert result.out_of_range
+    notice = result.extrapolation_notice
+    assert 'outside domain' in notice['reason']
+    assert notice['authority_level'] == 'extrapolated'
+    assert notice['certified_band']['temperature_K'] == evaluator.valid_temperature_K
+
+
+def test_composite_continuation_still_refuses_missing_activity():
+    catalog = compile_vapour_rail_catalog(yaml.safe_load((DATA_DIR / 'vapor_pressures.yaml').read_text()))
+    with pytest.raises(CatalogCompileError, match='explicit source_activity'):
+        catalog.species['CrO'].evaluator.evaluate(199., pO2_bar=1.)

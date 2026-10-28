@@ -970,6 +970,7 @@ class CompiledPressureEvaluator:
         low, high = self.valid_temperature_K
         out_of_range = temperature_K < low or temperature_K > high
 
+        temperature_notice = None
         if out_of_range:
             if self.extrapolation_policy != DEFAULT_EXTRAPOLATION_POLICY:
                 raise CatalogCompileError(
@@ -982,9 +983,16 @@ class CompiledPressureEvaluator:
             # value is physical (family-keyed van 't Hoff / 1/T tangent /
             # composite thermo) — never attenuated linear-T slope invention
             # (b-145 composites; t-538 all non-composite families).
-            log10_reference = self._out_of_domain_log10_continuation(
-                temperature_K
-            )
+            try:
+                log10_reference = self._out_of_domain_log10_continuation(temperature_K)
+            except (NasaCeaDomainError, ShomateDomainError) as exc:
+                log10_reference = self._reciprocal_T_tangent_log10(temperature_K)
+                temperature_notice = {
+                    "reason": str(exc),
+                    "authority_level": "extrapolated",
+                    "certified_band": {"temperature_K": (low, high)},
+                    "continuation": "reciprocal_T_tangent",
+                }
         else:
             log10_reference = self.reference_model.log10_pressure(temperature_K)
 
@@ -1158,7 +1166,7 @@ class CompiledPressureEvaluator:
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            o2_notice or _pO2_floor_inversion_notice(
+            o2_notice or temperature_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1361,26 +1369,9 @@ class CompiledPressureEvaluator:
            attenuated linear-T slope that invented multi-dex low-T pressure.
         """
         if self.reference_model.physical_composite_ood:
-            # Premise: for composite carrier V, log10 P_V°(T) =
-            #   (1/ν) log10 K_ex(T) + (m/ν) log10 P_base°(T) + O2 term
-            # (see _log10_from_composite). Algebra: K_ex(T)=exp(-ΔG_ex°/RT)
-            # from whatever gas polynomials this row compiled — NASA CEA
-            # segments for some carriers (TiO2_gas), IVTAN-derived Shomate
-            # for others (MnO_gas / CoO_gas target gas). This branch does
-            # not first intersect those constituent domains, so "CEA
-            # 300–6000 K at any campaign T" is not a property of the
-            # branch. P_base° is the liquid-reservoir Antoine
-            #   log10 P_base = A − B/(T+C)
-            # which is van't Hoff / Clausius–Clapeyron in 1/(T+C) with the
-            # fitted reaction dH (B ∝ ΔH/R ln10). Composing at the requested
-            # T therefore evaluates each compiled factor at that T.
-            # Unit check: K_ex and every p/P° ratio are dimensionless;
-            # log10 P is log10(Pa). Sanity: at T=T_low the composite
-            # reproduces the in-domain edge value when every constituent
-            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
-            # Shomate cover [1000, 3000] K; T below that floor raises
-            # ShomateDomainError from the polynomial module rather than a
-            # typed catalog continuation.
+            # Compose the landed exchange and base-pressure models while their
+            # constituents accept T. evaluate() routes constituent-domain misses
+            # through the existing 1/T tangent and preserves the original reason.
             return float(self.reference_model.log10_pressure(temperature_K))
 
         mode = self._physical_oor_continuation_mode()
