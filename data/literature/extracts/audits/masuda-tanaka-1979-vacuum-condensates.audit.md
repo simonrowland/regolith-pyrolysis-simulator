@@ -4,7 +4,7 @@
 
 - Table 1, PDF page 5 / printed page 17: 22 printed body rows, 178 numeric cells. All numeric cells and the row/column assignment were checked against the full-page render. The rendered table labels seven condensates, one interrupted residue, and the JB-1 reference. Table 1 states trace-element ppm and selected major oxide percent, on a Ta-free basis.
 - Table 2, PDF page 6 / printed page 18: 21 printed body rows, 149 numeric cells. All numeric cells and the row/column assignment were checked against the full-page render. The average REE row excludes Eu and Yb.
-- `masuda-tanaka-1979-vacuum-condensates.cells.csv` records all 327 numeric cells by printed table, PDF page, row, column, exact printed text, and verification method (b), the render. The pdftotext layer has only ADS bibliographic watermarks, so it could not serve as the independent second read. MinerU QA reported no malformed table, but classified both pages as scanned and skipped digit-agreement checks.
+- `masuda-tanaka-1979-vacuum-condensates.cells.csv` records all 327 numeric cells by printed table, PDF page, printed body-row index, column, exact printed text, and verification method (b), the render. The pdftotext layer has only ADS bibliographic watermarks, so it could not serve as the independent second read. MinerU QA reported no malformed table, but classified both pages as scanned and skipped digit-agreement checks.
 - The 13 numeric residue ppm cells (La through Sr, excluding absent dashes) match the draft compare tool with row and column coordinates: 13 matched, 0 mismatch, 0 no-match, 0 locator error. All other cells remain in the Table 1/2 context transcripts.
 
 ## Data disposition and conditions
