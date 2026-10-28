@@ -9596,6 +9596,304 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     assert _compile_redox(calibration)[0].source_relation is SourceRelation.TRAINING
 
 
+def _count_work_input_lookups(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[list[int], list[tuple[int, bool]]]:
+    """Track work expansions and bound lookups without measuring wall time."""
+
+    import simulator.battery.validate as validate
+
+    original_inputs_for_work = validate._inputs_for_work
+    original_registered_inputs = validate._inputs_registered_under_work
+    work_expansions = [0]
+    registered_lookup_walks: list[tuple[int, bool]] = []
+
+    def count_work_expansions(*args, **kwargs):
+        work_expansions[0] += 1
+        return original_inputs_for_work(*args, **kwargs)
+
+    def count_registered_lookup(*args, **kwargs):
+        before = work_expansions[0]
+        result = original_registered_inputs(*args, **kwargs)
+        registered_lookup_walks.append(
+            (work_expansions[0] - before, result.complete)
+        )
+        return result
+
+    monkeypatch.setattr(validate, "_inputs_for_work", count_work_expansions)
+    monkeypatch.setattr(
+        validate, "_inputs_registered_under_work", count_registered_lookup
+    )
+    return work_expansions, registered_lookup_walks
+
+
+def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A scoring snapshot reuses a shared parent without changing decisions."""
+
+    from simulator.battery.records import Derivation
+    from simulator.battery.validate import (
+        _resolve_coefficient_sources,
+        bound_work_inputs,
+    )
+
+    work = F.work("lineage-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="lineage-cache-exp", work_id=work.work_id
+    )
+    rows = [
+        F.observation(
+            "lineage-cache-0",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="janaf-4th",
+        )
+    ]
+    for index in range(1, 4):
+        parent = rows[-1]
+        rows.append(
+            F.observation(
+                f"lineage-cache-{index}",
+                experiment.experiment_id,
+                F.o2_identity(),
+                Decimal("0"),
+                evidence=EvidenceClass.MEASURED_REDUCED,
+                source_id="janaf-4th",
+                derived_from=(parent.observation_id,),
+                derivation=Derivation(
+                    relation="reduced from the preceding printed row",
+                    inputs=(parent.observation_id,),
+                    parameters=(),
+                    output_unit="kJ/mol",
+                ),
+            )
+        )
+
+    class CountingObservations(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lineage_lookups = 0
+
+        def get(self, key, default=None):
+            self.lineage_lookups += 1
+            return super().get(key, default)
+
+    observations = CountingObservations(
+        {row.observation_id: row for row in rows}
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    baseline = _resolve_coefficient_sources(
+        (work.work_id,), observations, works, experiments
+    )
+    assert baseline.complete and baseline.ids is not None
+    for _ in range(3):
+        assert (
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            == baseline
+        )
+    uncached_lookups = observations.lineage_lookups
+
+    observations.lineage_lookups = 0
+    context = replace(
+        _context(work, experiment, *rows),
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    reference = rows[-1]
+    prediction = _predict(
+        Decimal("0"), reference.identity, coefficient_sources=(work.work_id,)
+    )
+    residual_without_cache, candidate_without_cache = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    residual_line_without_cache = dumps_residual_line(
+        residual_without_cache, candidate_without_cache
+    )
+
+    work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
+    observations.lineage_lookups = 0
+    with bound_work_inputs(works, observations, experiments):
+        cached_results = [
+            _resolve_coefficient_sources(
+                (work.work_id,), observations, works, experiments
+            )
+            for _ in range(4)
+        ]
+        index_lookups = observations.lineage_lookups
+        assert work_expansions[0] == 1
+        registered_lookup_walks.clear()
+        residual_with_cache, candidate_with_cache = compile_residual(
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            context=context,
+            prediction=prediction,
+            comparison_ids={reference.observation_id},
+        )
+        work_expansions_after_compile = work_expansions[0]
+        cached_lookups = observations.lineage_lookups
+
+    assert cached_results == [baseline] * 4
+    assert uncached_lookups == 40
+    assert index_lookups == 10
+    assert index_lookups < uncached_lookups
+    assert work_expansions_after_compile == 1
+    assert len(registered_lookup_walks) == 2
+    assert all(
+        walks == 0 and complete for walks, complete in registered_lookup_walks
+    )
+    assert cached_lookups >= index_lookups
+    assert dumps_residual_line(
+        residual_with_cache, candidate_with_cache
+    ) == residual_line_without_cache
+
+
+def test_nasa9_comparisons_reuse_one_work_lineage_index(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The production NASA-9 helper binds the same maps passed to residuals."""
+
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _nasa9_fit_comparisons,
+    )
+    from simulator.battery.generators import compilation_thermo_fits
+    from simulator.battery.records import Locator
+
+    work = F.work("nasa9-cache-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="nasa9-cache-exp", work_id=work.work_id
+    )
+
+    def cp_identity(temperature: Decimal) -> Identity:
+        identity = F.oxide_identity(
+            "MgO",
+            Phase.CR,
+            T_K=temperature,
+            per=PerBasis.MOL_SPECIES,
+            polymorph=Polymorph.PERICLASE.value,
+            metal_formula="Mg",
+        )
+        return replace(
+            identity,
+            quantity=Quantity.CP,
+            reaction=State.not_applicable("not a formation quantity"),
+            formation_elements=State.not_applicable("not a formation quantity"),
+        )
+
+    rows = tuple(
+        replace(
+            F.observation(
+                f"nasa9-cache-{index}",
+                experiment.experiment_id,
+                cp_identity(temperature),
+                Decimal("1.25"),
+                source_id="janaf-4th",
+            ),
+            locator=Locator(table="fixture-table", record="fixture-table"),
+        )
+        for index, temperature in enumerate((Decimal("1000"), Decimal("1100")))
+    )
+
+    class CountingObservations(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.lineage_lookups = 0
+
+        def get(self, key, default=None):
+            self.lineage_lookups += 1
+            return super().get(key, default)
+
+    observations = CountingObservations(
+        {row.observation_id: row for row in rows}
+    )
+    works = {work.work_id: work}
+    experiments = {experiment.experiment_id: experiment}
+    context = replace(
+        _context(work, experiment, *rows),
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    assert context.works is works
+    assert context.observations is observations
+    assert context.experiments is experiments
+
+    record = {
+        "status": "accepted",
+        "record_id": "nasa9-cache-fit",
+        "source_record_id": "fixture-table",
+        "formula": "MgO",
+        "phase": "cr:periclase",
+        "validity": {"T_min_K": 900.0, "T_max_K": 1200.0},
+        "residual_summary": {
+            Quantity.CP.value: {
+                "n": 2,
+                "max_abs": 0.0,
+                "gate_tolerance": 1.0,
+            }
+        },
+        "formation_capable": False,
+    }
+    monkeypatch.setattr(
+        compilation_thermo_fits,
+        "sidecar_element_reference_curves",
+        lambda _records: {},
+    )
+    monkeypatch.setattr(
+        compilation_thermo_fits,
+        "evaluate_sidecar_fit",
+        lambda *_args, **_kwargs: (1.25, None),
+    )
+    monkeypatch.setattr(
+        compilation_tier,
+        "predict_thermo_attempt",
+        lambda _engine, _observation, **_kwargs: ThermoAttempt(
+            value=Decimal("1.25"),
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="nasa9-cache-test",
+            coefficient_sources=(work.work_id,),
+        ),
+    )
+
+    work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
+    comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+
+    assert len(comparisons) == 2
+    assert all(
+        item.residual.source_relation is SourceRelation.SAME_INPUT
+        for item in comparisons
+    )
+    assert work_expansions[0] == 1
+    assert len(registered_lookup_walks) == 4
+    assert all(
+        walks == 0 and complete for walks, complete in registered_lookup_walks
+    )
+    # Two source-root walks build the index; the two remaining walks are the
+    # per-comparison reference ancestry checks. Work aliases are cache hits.
+    assert observations.lineage_lookups == 4
+
+
 def _alias_fixture(prefix: str):
     work = replace(
         F.work(f"{prefix}-work"),

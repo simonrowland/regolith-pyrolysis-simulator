@@ -105,6 +105,7 @@
         }
       }
     },
+    "liquid_fraction_provider": "magemin",
     "kernel_commit_sha": "goal-18-fixture",
     "campaigns_elapsed": 0.4,
     "backend_status": "unavailable",
@@ -5263,11 +5264,11 @@
           "species_id": "Na",
           "pressure": {
             "kind": "value",
-            "pa": 1.179016420432431e-20
+            "pa": 1.5386541498521582e-22
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 1.179016420432431e-20
+            "pa": 1.5386541498521582e-22
           },
           "flux": {
             "kind": "eligible",
@@ -5344,11 +5345,11 @@
           "species_id": "Na2",
           "pressure": {
             "kind": "value",
-            "pa": 9.039560475264586e-51
+            "pa": 3.327428181583462e-60
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 9.039560475264586e-51
+            "pa": 3.327428181583462e-60
           },
           "flux": {
             "kind": "eligible",
@@ -5434,12 +5435,12 @@
               "limiting_case": "pure endmember in its standard state has a=1",
               "reported_activity_provenance": {
                 "pressure_kind": "effective_equilibrium",
-                "P_reference_Antoine_Pa": 6.148104693201901e-47,
-                "P_eq_Pa": 9.039560475264586e-51,
+                "P_reference_Antoine_Pa": 2.263094193071015e-56,
+                "P_eq_Pa": 3.327428181583462e-60,
                 "pO2_bar": 1e-09,
                 "activity_factor": 4.649497946949064e-09,
                 "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                "P_reference_model_Pa": 6.148104693201901e-47,
+                "P_reference_model_Pa": 2.263094193071015e-56,
                 "melt_oxide_component": "NaO0.5",
                 "melt_oxide_gamma": 0.001,
                 "melt_oxide_effective_gamma": 0.001,
@@ -5493,11 +5494,11 @@
           "species_id": "Na2O_gas",
           "pressure": {
             "kind": "value",
-            "pa": 4.251575797183709e-41
+            "pa": 1.564989045916325e-50
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 4.251575797183709e-41
+            "pa": 1.564989045916325e-50
           },
           "flux": {
             "kind": "eligible",
@@ -5583,12 +5584,12 @@
               "limiting_case": "pure endmember in its standard state has a=1",
               "reported_activity_provenance": {
                 "pressure_kind": "effective_equilibrium",
-                "P_reference_Antoine_Pa": 9.144161037803055e-33,
-                "P_eq_Pa": 4.251575797183709e-41,
+                "P_reference_Antoine_Pa": 3.3659312548857944e-42,
+                "P_eq_Pa": 1.564989045916325e-50,
                 "pO2_bar": 1e-09,
                 "activity_factor": 4.649497946949064e-09,
                 "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                "P_reference_model_Pa": 9.144161037803055e-33,
+                "P_reference_model_Pa": 3.3659312548857944e-42,
                 "melt_oxide_component": "NaO0.5",
                 "melt_oxide_gamma": 0.001,
                 "melt_oxide_effective_gamma": 0.001,
@@ -7539,9 +7540,9 @@
         "K2O_gas": 1.663568966719162e-33,
         "Mg2": 4.796730887747825e-129,
         "MgO_gas": 3.1172514824356117e-55,
-        "Na": 1.179016420432431e-20,
-        "Na2": 9.039560475264586e-51,
-        "Na2O_gas": 4.251575797183709e-41,
+        "Na": 1.5386541498521582e-22,
+        "Na2": 3.327428181583462e-60,
+        "Na2O_gas": 1.564989045916325e-50,
         "Si": 2.753889705438849e-121,
         "Si2": 4.596648430029603e-217,
         "Si3": 2.5310745316539087e-305,
@@ -7564,8 +7565,8 @@
         "K2O_gas": 1.663568966719162e-33,
         "Mg2": 4.796730887747825e-129,
         "MgO_gas": 3.1172514824356117e-55,
-        "Na2": 9.039560475264586e-51,
-        "Na2O_gas": 4.251575797183709e-41,
+        "Na2": 3.327428181583462e-60,
+        "Na2O_gas": 1.564989045916325e-50,
         "Si": 2.753889705438853e-121,
         "Si2": 4.596648430029603e-217,
         "Si3": 2.5310745316539087e-305,
@@ -9900,11 +9901,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "flux": {
               "kind": "eligible",
@@ -9993,11 +9994,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "flux": {
               "kind": "eligible",
@@ -10083,12 +10084,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 6.148104693201901e-47,
-                  "P_eq_Pa": 9.039560475264586e-51,
+                  "P_reference_Antoine_Pa": 2.263094193071015e-56,
+                  "P_eq_Pa": 3.327428181583462e-60,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 6.148104693201901e-47,
+                  "P_reference_model_Pa": 2.263094193071015e-56,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -10154,11 +10155,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "flux": {
               "kind": "eligible",
@@ -10244,12 +10245,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 9.144161037803055e-33,
-                  "P_eq_Pa": 4.251575797183709e-41,
+                  "P_reference_Antoine_Pa": 3.3659312548857944e-42,
+                  "P_eq_Pa": 1.564989045916325e-50,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 9.144161037803055e-33,
+                  "P_reference_model_Pa": 3.3659312548857944e-42,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -13692,11 +13693,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "flux": {
               "kind": "eligible",
@@ -13785,11 +13786,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "flux": {
               "kind": "eligible",
@@ -13875,12 +13876,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 6.148104693201901e-47,
-                  "P_eq_Pa": 9.039560475264586e-51,
+                  "P_reference_Antoine_Pa": 2.263094193071015e-56,
+                  "P_eq_Pa": 3.327428181583462e-60,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 6.148104693201901e-47,
+                  "P_reference_model_Pa": 2.263094193071015e-56,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -13946,11 +13947,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "flux": {
               "kind": "eligible",
@@ -14036,12 +14037,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 9.144161037803055e-33,
-                  "P_eq_Pa": 4.251575797183709e-41,
+                  "P_reference_Antoine_Pa": 3.3659312548857944e-42,
+                  "P_eq_Pa": 1.564989045916325e-50,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 9.144161037803055e-33,
+                  "P_reference_model_Pa": 3.3659312548857944e-42,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -15753,7 +15754,7 @@
           "doctrine_category": 3,
           "species": "Na",
           "field": "P_effective_Pa",
-          "detail": "P_effective_Pa=3.425662586787332e-25 <= 1e-15 Pa; key omitted from vapor_pressures_Pa while status=ok (distinguishable proven-small zero)"
+          "detail": "P_effective_Pa=6.572419455426461e-30 <= 1e-15 Pa; key omitted from vapor_pressures_Pa while status=ok (distinguishable proven-small zero)"
         },
         {
           "zero_because": "proven_below_threshold",
@@ -18393,11 +18394,11 @@
           "species_id": "Na",
           "pressure": {
             "kind": "value",
-            "pa": 1.179016420432431e-20
+            "pa": 1.5386541498521582e-22
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 1.179016420432431e-20
+            "pa": 1.5386541498521582e-22
           },
           "flux": {
             "kind": "eligible",
@@ -18486,11 +18487,11 @@
           "species_id": "Na2",
           "pressure": {
             "kind": "value",
-            "pa": 9.039560475264586e-51
+            "pa": 3.327428181583462e-60
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 9.039560475264586e-51
+            "pa": 3.327428181583462e-60
           },
           "flux": {
             "kind": "eligible",
@@ -18576,12 +18577,12 @@
               "limiting_case": "pure endmember in its standard state has a=1",
               "reported_activity_provenance": {
                 "pressure_kind": "effective_equilibrium",
-                "P_reference_Antoine_Pa": 6.148104693201901e-47,
-                "P_eq_Pa": 9.039560475264586e-51,
+                "P_reference_Antoine_Pa": 2.263094193071015e-56,
+                "P_eq_Pa": 3.327428181583462e-60,
                 "pO2_bar": 1e-09,
                 "activity_factor": 4.649497946949064e-09,
                 "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                "P_reference_model_Pa": 6.148104693201901e-47,
+                "P_reference_model_Pa": 2.263094193071015e-56,
                 "melt_oxide_component": "NaO0.5",
                 "melt_oxide_gamma": 0.001,
                 "melt_oxide_effective_gamma": 0.001,
@@ -18647,11 +18648,11 @@
           "species_id": "Na2O_gas",
           "pressure": {
             "kind": "value",
-            "pa": 4.251575797183709e-41
+            "pa": 1.564989045916325e-50
           },
           "selected_runtime_pressure": {
             "kind": "value",
-            "pa": 4.251575797183709e-41
+            "pa": 1.564989045916325e-50
           },
           "flux": {
             "kind": "eligible",
@@ -18737,12 +18738,12 @@
               "limiting_case": "pure endmember in its standard state has a=1",
               "reported_activity_provenance": {
                 "pressure_kind": "effective_equilibrium",
-                "P_reference_Antoine_Pa": 9.144161037803055e-33,
-                "P_eq_Pa": 4.251575797183709e-41,
+                "P_reference_Antoine_Pa": 3.3659312548857944e-42,
+                "P_eq_Pa": 1.564989045916325e-50,
                 "pO2_bar": 1e-09,
                 "activity_factor": 4.649497946949064e-09,
                 "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                "P_reference_model_Pa": 9.144161037803055e-33,
+                "P_reference_model_Pa": 3.3659312548857944e-42,
                 "melt_oxide_component": "NaO0.5",
                 "melt_oxide_gamma": 0.001,
                 "melt_oxide_effective_gamma": 0.001,
@@ -20210,6 +20211,85 @@
         "source_hour": 1,
         "source_campaign_hour": 1
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -20559,6 +20639,85 @@
         "source_campaign": "C2A",
         "source_hour": 2,
         "source_campaign_hour": 2
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -20910,6 +21069,85 @@
         "source_hour": 3,
         "source_campaign_hour": 3
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -21259,6 +21497,85 @@
         "source_campaign": "C2A",
         "source_hour": 4,
         "source_campaign_hour": 4
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -21610,6 +21927,85 @@
         "source_hour": 5,
         "source_campaign_hour": 5
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -21960,6 +22356,85 @@
         "source_hour": 6,
         "source_campaign_hour": 6
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -22309,6 +22784,85 @@
         "source_campaign": "C2A",
         "source_hour": 7,
         "source_campaign_hour": 7
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -24590,11 +25144,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 3.824414222205331e-26
+              "pa": 1.3667195434622394e-28
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 3.824414222205331e-26
+              "pa": 1.3667195434622394e-28
             },
             "flux": {
               "kind": "eligible",
@@ -24683,11 +25237,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 3.6298572119854376e-67
+              "pa": 6.663060494795979e-83
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 3.6298572119854376e-67
+              "pa": 6.663060494795979e-83
             },
             "flux": {
               "kind": "eligible",
@@ -24773,12 +25327,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 2.468786200582125e-63,
-                  "P_eq_Pa": 3.6298572119854376e-67,
+                  "P_reference_Antoine_Pa": 4.5317682879869185e-79,
+                  "P_eq_Pa": 6.663060494795979e-83,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 2.468786200582125e-63,
+                  "P_reference_model_Pa": 4.5317682879869185e-79,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -24844,11 +25398,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 2.792390255930879e-54
+              "pa": 5.125784325320345e-70
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 2.792390255930879e-54
+              "pa": 5.125784325320345e-70
             },
             "flux": {
               "kind": "eligible",
@@ -24934,12 +25488,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 6.005788770727806e-46,
-                  "P_eq_Pa": 2.792390255930879e-54,
+                  "P_reference_Antoine_Pa": 1.1024382382368569e-61,
+                  "P_eq_Pa": 5.125784325320345e-70,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 6.005788770727806e-46,
+                  "P_reference_model_Pa": 1.1024382382368569e-61,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -26564,9 +27118,9 @@
           "K2O_gas": 2.1061669095418896e-43,
           "Mg2": 1.4222658845277662e-158,
           "MgO_gas": 9.230317552037713e-68,
-          "Na": 3.824414222205331e-26,
-          "Na2": 3.6298572119854376e-67,
-          "Na2O_gas": 2.792390255930879e-54,
+          "Na": 1.3667195434622394e-28,
+          "Na2": 6.663060494795979e-83,
+          "Na2O_gas": 5.125784325320345e-70,
           "Si": 2.1732105666100978e-151,
           "Si2": 9.46308398388967e-271,
           "Si3": 5e-324,
@@ -26589,8 +27143,8 @@
           "K2O_gas": 2.1061669095418896e-43,
           "Mg2": 1.4222658845277662e-158,
           "MgO_gas": 9.230317552037713e-68,
-          "Na2": 3.6298572119854376e-67,
-          "Na2O_gas": 2.792390255930879e-54,
+          "Na2": 6.663060494795979e-83,
+          "Na2O_gas": 5.125784325320345e-70,
           "Si": 2.17321056661003e-151,
           "Si2": 9.46308398388967e-271,
           "Si3": 5e-324,
@@ -26835,6 +27389,85 @@
         "source_campaign": "C2A",
         "source_hour": 8,
         "source_campaign_hour": 8
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -29116,11 +29749,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 6.88457344130429e-25
+              "pa": 3.308533811259192e-27
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 6.88457344130429e-25
+              "pa": 3.308533811259192e-27
             },
             "flux": {
               "kind": "eligible",
@@ -29209,11 +29842,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 3.383859814870513e-63
+              "pa": 2.8956497544159484e-77
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 3.383859814870513e-63
+              "pa": 2.8956497544159484e-77
             },
             "flux": {
               "kind": "eligible",
@@ -29299,12 +29932,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 2.301475217281968e-59,
-                  "P_eq_Pa": 3.383859814870513e-63,
+                  "P_reference_Antoine_Pa": 1.9694273735662832e-73,
+                  "P_eq_Pa": 2.8956497544159484e-77,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 2.301475217281968e-59,
+                  "P_reference_model_Pa": 1.9694273735662832e-73,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -29370,11 +30003,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 4.783674361706072e-51
+              "pa": 4.093504532843624e-65
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 4.783674361706072e-51
+              "pa": 4.093504532843624e-65
             },
             "flux": {
               "kind": "eligible",
@@ -29460,12 +30093,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 1.0288582587384589e-42,
-                  "P_eq_Pa": 4.783674361706072e-51,
+                  "P_reference_Antoine_Pa": 8.804186128374948e-57,
+                  "P_eq_Pa": 4.093504532843624e-65,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 1.0288582587384589e-42,
+                  "P_reference_model_Pa": 8.804186128374948e-57,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -31090,9 +31723,9 @@
           "K2O_gas": 5.845429351794685e-41,
           "Mg2": 8.09955438750859e-152,
           "MgO_gas": 6.770336358007929e-65,
-          "Na": 6.88457344130429e-25,
-          "Na2": 3.383859814870513e-63,
-          "Na2O_gas": 4.783674361706072e-51,
+          "Na": 3.308533811259192e-27,
+          "Na2": 2.8956497544159484e-77,
+          "Na2O_gas": 4.093504532843624e-65,
           "Si": 1.9662114839612515e-144,
           "Si2": 2.5058328821311477e-258,
           "Si3": 5e-324,
@@ -31115,8 +31748,8 @@
           "K2O_gas": 5.845429351794685e-41,
           "Mg2": 8.09955438750859e-152,
           "MgO_gas": 6.770336358007929e-65,
-          "Na2": 3.383859814870513e-63,
-          "Na2O_gas": 4.783674361706072e-51,
+          "Na2": 2.8956497544159484e-77,
+          "Na2O_gas": 4.093504532843624e-65,
           "Si": 1.9662114839611903e-144,
           "Si2": 2.5058328821311477e-258,
           "Si3": 5e-324,
@@ -31361,6 +31994,85 @@
         "source_campaign": "C2A",
         "source_hour": 9,
         "source_campaign_hour": 9
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -33642,11 +34354,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.0144861981726767e-23
+              "pa": 6.423013668787494e-26
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.0144861981726767e-23
+              "pa": 6.423013668787494e-26
             },
             "flux": {
               "kind": "eligible",
@@ -33735,11 +34447,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 1.2660968237555993e-59
+              "pa": 2.8678927844814225e-72
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.2660968237555993e-59
+              "pa": 2.8678927844814225e-72
             },
             "flux": {
               "kind": "eligible",
@@ -33825,12 +34537,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 8.611144142992174e-56,
-                  "P_eq_Pa": 1.2660968237555993e-59,
+                  "P_reference_Antoine_Pa": 1.9505489383159755e-68,
+                  "P_eq_Pa": 2.8678927844814225e-72,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 8.611144142992174e-56,
+                  "P_reference_model_Pa": 1.9505489383159755e-68,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -33896,11 +34608,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 3.701853814480876e-48
+              "pa": 8.385235350534506e-61
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 3.701853814480876e-48
+              "pa": 8.385235350534506e-61
             },
             "flux": {
               "kind": "eligible",
@@ -33986,12 +34698,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 7.961835571752357e-40,
-                  "P_eq_Pa": 3.701853814480876e-48,
+                  "P_reference_Antoine_Pa": 1.8034711373594108e-52,
+                  "P_eq_Pa": 8.385235350534506e-61,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 7.961835571752357e-40,
+                  "P_reference_model_Pa": 1.8034711373594108e-52,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -35616,9 +36328,9 @@
           "K2O_gas": 8.740798273696684e-39,
           "Mg2": 1.566086243534777e-145,
           "MgO_gas": 3.143822918165366e-62,
-          "Na": 1.0144861981726767e-23,
-          "Na2": 1.2660968237555993e-59,
-          "Na2O_gas": 3.701853814480876e-48,
+          "Na": 6.423013668787494e-26,
+          "Na2": 2.8678927844814225e-72,
+          "Na2O_gas": 8.385235350534506e-61,
           "Si": 5.36370585722782e-138,
           "Si2": 7.64325789428439e-247,
           "Si3": 5e-324,
@@ -35641,8 +36353,8 @@
           "K2O_gas": 8.740798273696684e-39,
           "Mg2": 1.566086243534777e-145,
           "MgO_gas": 3.143822918165366e-62,
-          "Na2": 1.2660968237555993e-59,
-          "Na2O_gas": 3.701853814480876e-48,
+          "Na2": 2.8678927844814225e-72,
+          "Na2O_gas": 8.385235350534506e-61,
           "Si": 5.363705857227652e-138,
           "Si2": 7.64325789428439e-247,
           "Si3": 5e-324,
@@ -35887,6 +36599,85 @@
         "source_campaign": "C2A",
         "source_hour": 10,
         "source_campaign_hour": 10
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -38168,11 +38959,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.2485399220029562e-22
+              "pa": 1.0223840626368452e-24
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.2485399220029562e-22
+              "pa": 1.0223840626368452e-24
             },
             "flux": {
               "kind": "eligible",
@@ -38261,11 +39052,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 2.1637694728256425e-56
+              "pa": 8.205152533828744e-68
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 2.1637694728256425e-56
+              "pa": 8.205152533828744e-68
             },
             "flux": {
               "kind": "eligible",
@@ -38351,12 +39142,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 1.471651336067527e-52,
-                  "P_eq_Pa": 2.1637694728256425e-56,
+                  "P_reference_Antoine_Pa": 5.5805961959886394e-64,
+                  "P_eq_Pa": 8.205152533828744e-68,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 1.471651336067527e-52,
+                  "P_reference_model_Pa": 5.5805961959886394e-64,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -38422,11 +39213,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 1.4552676379923928e-45
+              "pa": 5.518468162728644e-57
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.4552676379923928e-45
+              "pa": 5.518468162728644e-57
             },
             "flux": {
               "kind": "eligible",
@@ -38512,12 +39303,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 3.129945758869113e-37,
-                  "P_eq_Pa": 1.4552676379923928e-45,
+                  "P_reference_Antoine_Pa": 1.1868954940285036e-48,
+                  "P_eq_Pa": 5.518468162728644e-57,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 3.129945758869113e-37,
+                  "P_reference_model_Pa": 1.1868954940285036e-48,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -40142,9 +40933,9 @@
           "K2O_gas": 7.726042126447978e-37,
           "Mg2": 1.1460007924531808e-139,
           "MgO_gas": 9.676466744337032e-60,
-          "Na": 1.2485399220029562e-22,
-          "Na2": 2.1637694728256425e-56,
-          "Na2O_gas": 1.4552676379923928e-45,
+          "Na": 1.0223840626368452e-24,
+          "Na2": 8.205152533828744e-68,
+          "Na2O_gas": 5.518468162728644e-57,
           "Si": 5.02512763764867e-132,
           "Si2": 3.4024773512490426e-236,
           "Si3": 5e-324,
@@ -40167,8 +40958,8 @@
           "K2O_gas": 7.726042126447978e-37,
           "Mg2": 1.1460007924531808e-139,
           "MgO_gas": 9.676466744337032e-60,
-          "Na2": 2.1637694728256425e-56,
-          "Na2O_gas": 1.4552676379923928e-45,
+          "Na2": 8.205152533828744e-68,
+          "Na2O_gas": 5.518468162728644e-57,
           "Si": 5.025127637648513e-132,
           "Si2": 3.4024773512490426e-236,
           "Si3": 5e-324,
@@ -40413,6 +41204,85 @@
         "source_campaign": "C2A",
         "source_hour": 11,
         "source_campaign_hour": 11
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -42694,11 +43564,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.3060058558728379e-21
+              "pa": 1.3603142026524505e-23
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.3060058558728379e-21
+              "pa": 1.3603142026524505e-23
             },
             "flux": {
               "kind": "eligible",
@@ -42787,11 +43657,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 1.8781066132342695e-53
+              "pa": 8.193766107658523e-64
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.8781066132342695e-53
+              "pa": 8.193766107658523e-64
             },
             "flux": {
               "kind": "eligible",
@@ -42877,12 +43747,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 1.277362557035293e-49,
-                  "P_eq_Pa": 1.8781066132342695e-53,
+                  "P_reference_Antoine_Pa": 5.572851910150019e-60,
+                  "P_eq_Pa": 8.193766107658523e-64,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 1.277362557035293e-49,
+                  "P_reference_model_Pa": 5.572851910150019e-60,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -42948,11 +43818,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 3.1982522869185734e-43
+              "pa": 1.3953271346596766e-53
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 3.1982522869185734e-43
+              "pa": 1.3953271346596766e-53
             },
             "flux": {
               "kind": "eligible",
@@ -43038,12 +43908,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 6.878704590066997e-35,
-                  "P_eq_Pa": 3.1982522869185734e-43,
+                  "P_reference_Antoine_Pa": 3.001027531532228e-45,
+                  "P_eq_Pa": 1.3953271346596766e-53,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 6.878704590066997e-35,
+                  "P_reference_model_Pa": 3.001027531532228e-45,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -44668,9 +45538,9 @@
           "K2O_gas": 4.353217654243002e-35,
           "Mg2": 3.488196051586963e-134,
           "MgO_gas": 2.0547435077069228e-57,
-          "Na": 1.3060058558728379e-21,
-          "Na2": 1.8781066132342695e-53,
-          "Na2O_gas": 3.1982522869185734e-43,
+          "Na": 1.3603142026524505e-23,
+          "Na2": 8.193766107658523e-64,
+          "Na2O_gas": 1.3953271346596766e-53,
           "Si": 1.8084004348683476e-126,
           "Si2": 2.7087647712235833e-226,
           "Si3": 2.61171e-318,
@@ -44693,8 +45563,8 @@
           "K2O_gas": 4.353217654243002e-35,
           "Mg2": 3.488196051586963e-134,
           "MgO_gas": 2.0547435077069228e-57,
-          "Na2": 1.8781066132342695e-53,
-          "Na2O_gas": 3.1982522869185734e-43,
+          "Na2": 8.193766107658523e-64,
+          "Na2O_gas": 1.3953271346596766e-53,
           "Si": 1.8084004348683502e-126,
           "Si2": 2.7087647712235833e-226,
           "Si3": 2.61171e-318,
@@ -44939,6 +45809,85 @@
         "source_campaign": "C2A",
         "source_hour": 12,
         "source_campaign_hour": 12
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1018.75,
+            "liquidus_T_C": 1320.3125,
+            "composition_projected_notice": {
+              "kind": "composition_projected",
+              "reason": "composition_projected",
+              "authority": "extrapolated",
+              "certified_band": {
+                "engine": "magemin",
+                "database": "ig",
+                "bulk_components": [
+                  "SiO2",
+                  "Al2O3",
+                  "CaO",
+                  "MgO",
+                  "FeOt",
+                  "K2O",
+                  "Na2O",
+                  "TiO2",
+                  "O",
+                  "Cr2O3",
+                  "H2O"
+                ]
+              },
+              "dropped_components": [
+                {
+                  "component": "P2O5",
+                  "mass_fraction": 0.008809612614480485
+                }
+              ]
+            }
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -47220,11 +48169,11 @@
             "species_id": "Na",
             "pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 1.179016420432431e-20
+              "pa": 1.5386541498521582e-22
             },
             "flux": {
               "kind": "eligible",
@@ -47313,11 +48262,11 @@
             "species_id": "Na2",
             "pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 9.039560475264586e-51
+              "pa": 3.327428181583462e-60
             },
             "flux": {
               "kind": "eligible",
@@ -47403,12 +48352,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 6.148104693201901e-47,
-                  "P_eq_Pa": 9.039560475264586e-51,
+                  "P_reference_Antoine_Pa": 2.263094193071015e-56,
+                  "P_eq_Pa": 3.327428181583462e-60,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 6.148104693201901e-47,
+                  "P_reference_model_Pa": 2.263094193071015e-56,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -47474,11 +48423,11 @@
             "species_id": "Na2O_gas",
             "pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "selected_runtime_pressure": {
               "kind": "value",
-              "pa": 4.251575797183709e-41
+              "pa": 1.564989045916325e-50
             },
             "flux": {
               "kind": "eligible",
@@ -47564,12 +48513,12 @@
                 "limiting_case": "pure endmember in its standard state has a=1",
                 "reported_activity_provenance": {
                   "pressure_kind": "effective_equilibrium",
-                  "P_reference_Antoine_Pa": 9.144161037803055e-33,
-                  "P_eq_Pa": 4.251575797183709e-41,
+                  "P_reference_Antoine_Pa": 3.3659312548857944e-42,
+                  "P_eq_Pa": 1.564989045916325e-50,
                   "pO2_bar": 1e-09,
                   "activity_factor": 4.649497946949064e-09,
                   "source_label": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
-                  "P_reference_model_Pa": 9.144161037803055e-33,
+                  "P_reference_model_Pa": 3.3659312548857944e-42,
                   "melt_oxide_component": "NaO0.5",
                   "melt_oxide_gamma": 0.001,
                   "melt_oxide_effective_gamma": 0.001,
@@ -49194,9 +50143,9 @@
           "K2O_gas": 1.663568966719162e-33,
           "Mg2": 4.796730887747825e-129,
           "MgO_gas": 3.1172514824356117e-55,
-          "Na": 1.179016420432431e-20,
-          "Na2": 9.039560475264586e-51,
-          "Na2O_gas": 4.251575797183709e-41,
+          "Na": 1.5386541498521582e-22,
+          "Na2": 3.327428181583462e-60,
+          "Na2O_gas": 1.564989045916325e-50,
           "Si": 2.753889705438849e-121,
           "Si2": 4.596648430029603e-217,
           "Si3": 2.5310745316539087e-305,
@@ -49219,8 +50168,8 @@
           "K2O_gas": 1.663568966719162e-33,
           "Mg2": 4.796730887747825e-129,
           "MgO_gas": 3.1172514824356117e-55,
-          "Na2": 9.039560475264586e-51,
-          "Na2O_gas": 4.251575797183709e-41,
+          "Na2": 3.327428181583462e-60,
+          "Na2O_gas": 1.564989045916325e-50,
           "Si": 2.753889705438853e-121,
           "Si2": 4.596648430029603e-217,
           "Si3": 2.5310745316539087e-305,

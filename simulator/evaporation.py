@@ -26,8 +26,11 @@ from simulator.fe_redox import (
     kress91_temperature_band_case,
     normalize_redox_state,
 )
-from simulator.melt_backend.base import MeltCompositionError
-from simulator.melt_backend.liquidus import LIQUIDUS_LIQUID_EPSILON
+from simulator.melt_backend.liquidus import (
+    LIQUIDUS_LIQUID_EPSILON,
+    LiquidusSampleError,
+)
+from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -1744,6 +1747,8 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
     ) -> float:
+        from simulator.reduced_real_determinism import GATE_CURVE_NOTICE_KEYS
+
         if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
             curve = self._resolved_melt_redox_gate_authority()
         else:
@@ -1774,11 +1779,10 @@ class EvaporationMixin:
             'liquidus_T_C': curve['liquidus_T_C'],
             'liquid_fraction': factor,
         }
-        notice = curve.get('composition_projected_notice')
-        if isinstance(notice, Mapping):
-            self._last_freeze_gate_diagnostic[
-                'composition_projected_notice'
-            ] = dict(notice)
+        for notice_key in GATE_CURVE_NOTICE_KEYS:
+            notice = curve.get(notice_key)
+            if isinstance(notice, Mapping):
+                self._last_freeze_gate_diagnostic[notice_key] = dict(notice)
         self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 
@@ -1897,8 +1901,8 @@ class EvaporationMixin:
 
         Invalid or missing projected bounds are not a curve and do not arm
         the Kress floor by themselves. The caller keeps the drop notice and
-        continues the ladder. A missing per-component fraction stays a typed
-        refusal from ``composition_projected_liquidus_notice``.
+        retains the declared provider. A missing per-component fraction stays
+        a typed refusal from ``composition_projected_liquidus_notice``.
         """
         from simulator.melt_backend.magemin import (
             composition_projected_liquidus_notice,
@@ -2053,7 +2057,7 @@ class EvaporationMixin:
 
     def _freeze_gate_kress_floor_curve(
         self,
-        notice: Mapping[str, Any],
+        notice: Mapping[str, Any] | None,
         reasons: list[str],
     ) -> dict[str, Any] | None:
         """Kress91 calibration step, named as its own authority.
@@ -2073,7 +2077,7 @@ class EvaporationMixin:
         solidus_T_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
         liquidus_T_C = solidus_T_C + _KRESS91_FLOOR_OPEN_SIDE_C
         source = _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
-        return {
+        curve = {
             'source': source,
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
@@ -2081,20 +2085,21 @@ class EvaporationMixin:
                 (solidus_T_C, 0.0),
                 (liquidus_T_C, 1.0),
             ),
-            'composition_projected_notice': (
-                self._invalid_projection_bounds_notice(
-                    notice,
-                    bounds_source=source,
-                )
-            ),
         }
+        if notice is not None:
+            curve['composition_projected_notice'] = (
+                self._invalid_projection_bounds_notice(
+                    notice, bounds_source=source,
+                )
+            )
+        return curve
 
     def _refuse_freeze_gate_without_liquidus_authority(
         self,
         notice: Mapping[str, Any],
         reasons: list[str],
     ) -> None:
-        """No projected, ladder, or Kress bound. Typed run refusal, not abort."""
+        """No projected or Kress bound. Typed run refusal, not abort."""
         annotated = self._invalid_projection_bounds_notice(
             notice,
             bounds_source='refused',
@@ -2124,17 +2129,77 @@ class EvaporationMixin:
             return self._freeze_gate_curve_record()['curve']
         return self._freeze_gate_curve_record(redox_state=redox_state)['curve']
 
+    def _remember_freeze_gate_provider_curve(
+        self, curve: dict[str, Any],
+    ) -> dict[str, Any]:
+        self._freeze_gate_last_good_curve = {
+            'provider': self._liquid_fraction_provider,
+            'curve': copy.deepcopy(curve),
+            'computed_hour': int(self.melt.hour),
+            'composition_wt_pct': self.melt.composition_wt_pct(),
+        }
+        self._freeze_gate_held_curve_record = None
+        return curve
+
+    def _hold_freeze_gate_provider_curve(
+        self, failure: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        previous = self._freeze_gate_last_good_curve
+        if previous is None or previous['provider'] != self._liquid_fraction_provider:
+            return None
+        composition = self.melt.composition_wt_pct()
+        previous_composition = previous['composition_wt_pct']
+        # d-298 applies d-019's best available extension: retain the SAME
+        # provider's F(T; w_solved). Composition drift is the approximation.
+        # D_1 = sum_i |w_i(now) - w_i(solved)| over oxides, in wt% points;
+        # absent oxides contribute zero, identical compositions give D_1=0.
+        # This is a diagnostic distance, never an acceptance threshold.
+        distance = sum(
+            abs(composition.get(oxide, 0.0) - previous_composition.get(oxide, 0.0))
+            for oxide in sorted(composition.keys() | previous_composition.keys())
+        )
+        curve = copy.deepcopy(previous['curve'])
+        diagnostic = failure['provider_diagnostic']
+        curve['gate_provider_refusal'] = {
+            **failure,
+            'reason': diagnostic.get('backend_status_reason') or diagnostic.get('reason'),
+            'qualification': 'held_last_good_curve',
+            'authority': 'extrapolated (held)',
+            'failure_hour': int(self.melt.hour),
+            'failure_temperature_C': float(self.melt.temperature_C),
+            'computed_hour': previous['computed_hour'],
+            'composition_distance_wt_pct': distance,
+        }
+        return curve
+
     def _freeze_gate_curve_record(
         self,
         *,
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
-            uncacheable_replay_disposition,
         )
+
+        if self._liquid_fraction_provider == 'analytical':
+            curve = self._freeze_gate_kress_floor_curve(None, [])
+            if curve is None:
+                raise EvaporationFluxRefusal(
+                    'analytical_gate_no_cleaned_melt',
+                    {'provider': 'analytical', 'reason': 'no_cleaned_melt'},
+                )
+            return gate_curve_memo_record(curve, None, (), 'live')
+
+        held = self._freeze_gate_held_curve_record
+        if (
+            held is not None
+            and held['hour'] == int(self.melt.hour)
+            and held['provider'] == self._liquid_fraction_provider
+        ):
+            return copy.deepcopy(held['record'])
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -2316,43 +2381,34 @@ class EvaporationMixin:
         try:
             reasons: list[str] = []
             repair_notices: list[dict[str, Any]] = []
-            failed_curve_source: str | None = None
             curve = self._freeze_gate_curve_from_gate_dispatch(
                 reasons,
                 fO2_log=fO2_log,
                 repair_notices=repair_notices,
                 redox_state=redox_state,
             )
-            if curve is None:
-                if not uncacheable_replay_disposition(self):
-                    failed_curve_source = 'gate_liquid_fraction'
-                backend_finder = getattr(
-                    self.backend,
-                    'find_liquidus_solidus',
-                    None,
+            if (
+                isinstance(curve, Mapping)
+                and curve.get('gate_provider_refusal', {}).get('outcome') in {
+                    GateCurveProviderOutcome.NUMERICAL_FAILURE,
+                    GateCurveProviderOutcome.FAILED,
+                }
+            ):
+                record = gate_curve_memo_record(
+                    curve, (self._freeze_gate_last_good_curve or {}).get('origin'),
+                    repair_notices, 'live',
+                    provider_outcome=self._freeze_gate_provider_outcome,
                 )
-                curve = self._freeze_gate_curve_from_backend_liquidus(
-                    reasons,
-                    pressure_bar=pressure_bar,
-                    fO2_log=fO2_log,
-                    repair_notices=repair_notices,
-                    redox_state=redox_state,
-                )
-                if (
-                    curve is None
-                    and callable(backend_finder)
-                    and not uncacheable_replay_disposition(self)
-                ):
-                    failed_curve_source = 'liquidus_solidus:backend'
-            if curve is None:
-                curve = self._freeze_gate_curve_from_kernel_liquidus(
-                    reasons,
-                    fO2_log=fO2_log,
-                    repair_notices=repair_notices,
-                    redox_state=redox_state,
-                )
-            # Invalid projected bounds are not a liquidus. A later ladder
-            # bound wins; otherwise the Kress floor is the prediction and
+                # Holds and first-call floors are tick-local, never solved memos.
+                self._freeze_gate_held_curve_record = {
+                    'hour': int(self.melt.hour),
+                    'provider': self._liquid_fraction_provider,
+                    'record': copy.deepcopy(record),
+                }
+                return record
+
+            # Invalid projected bounds are not a liquidus. The Kress floor
+            # remains the qualified out-of-domain prediction and
             # the notice names that source plus the dropped components.
             # The projection itself is never the curve source. No bound at
             # all is a typed refusal, not a run-killing RuntimeError.
@@ -2396,8 +2452,8 @@ class EvaporationMixin:
                 # gate must not read this refusal as a missing liquidus.
                 if any('composition_projected' in reason for reason in reasons):
                     # Named projection, no parseable drop notice, and no
-                    # ladder bound. Typed refusal. A RuntimeError here is
-                    # re-raised and the runner records status=failed.
+                    # usable declared-provider bound. Typed refusal; a
+                    # RuntimeError would be re-raised as status=failed.
                     detail = f'composition_projected; {detail}'
                     raise EvaporationFluxRefusal(
                         detail,
@@ -2412,20 +2468,14 @@ class EvaporationMixin:
                             'detail': detail,
                         },
                     )
-                raise ProviderUnavailableError(
-                    'freeze_gate.enabled requires a liquid_fraction(T) source; '
-                    'no liquidus engine produced usable solidus/liquidus bounds. '
-                    f'{detail}'
-                )
-
-            if (
-                failed_curve_source is not None
-                and not uncacheable_replay_disposition(self)
-            ):
-                self._record_freeze_gate_curve_source_repair(
-                    repair_notices,
-                    failed_source=failed_curve_source,
-                    replacement_source=str(curve.get('source') or ''),
+                raise EvaporationFluxRefusal(
+                    'liquid_fraction_provider_failed',
+                    {
+                        'provider': self._liquid_fraction_provider,
+                        'reason': 'liquid_fraction_provider_failed',
+                        'detail': detail,
+                        'outcome': self._freeze_gate_provider_outcome,
+                    },
                 )
 
             self._record_composition_projected_liquidus_notice_from_curve(curve)
@@ -2453,6 +2503,9 @@ class EvaporationMixin:
                 **redox_state_kwargs,
             )
             origin = record['origin']
+            last_good = self._freeze_gate_last_good_curve
+            if last_good is not None and last_good['curve'] == curve:
+                last_good['origin'] = origin
             if cache_eligible:
                 self._freeze_gate_liquid_fraction_cache = {
                     **record,
@@ -2661,6 +2714,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
+            gate_curve_provider_timed_out,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
         )
@@ -2687,32 +2741,36 @@ class EvaporationMixin:
                     f'gate provider registration failed: {type(exc).__name__}',
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
-        try:
-            result = self._dispatch_only(
-                ChemistryIntent.GATE_LIQUID_FRACTION,
-                control_inputs={},
-                fO2_log=fO2_log,
-                redox_state=redox_state,
-                fe_redox_policy='intrinsic',
-            )
-        except ProviderUnavailableError as exc:
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.FAILED,
-            )
-            mark_uncacheable_replay_disposition(
-                self,
-                f'gate liquid fraction provider unavailable: {type(exc).__name__}',
-            )
-            reasons.append(f'gate liquid fraction unavailable: {exc}')
-            return None
+        for attempt in range(2):
+            try:
+                result = self._dispatch_only(
+                    ChemistryIntent.GATE_LIQUID_FRACTION,
+                    control_inputs={},
+                    fO2_log=fO2_log,
+                    redox_state=redox_state,
+                    fe_redox_policy='intrinsic',
+                )
+            except (
+                ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
+            ) as exc:
+                diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
+                if isinstance(exc, EngineWorkerTimeout):
+                    diagnostic['reason'] = 'engine_worker_timeout'
+                diagnostic['exception_class'] = type(exc).__name__
+                diagnostic['exception_message'] = str(exc)
+                status = str(getattr(exc, 'status', 'unavailable'))
+                warnings = list(getattr(exc, 'warnings', ()) or ())
+            else:
+                diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+                status = str(
+                    getattr(result, 'status', None)
+                    or diagnostic.get('backend_status')
+                    or 'unavailable'
+                )
+                warnings = list(getattr(result, 'warnings', ()) or ())
+            if not gate_curve_provider_timed_out(diagnostic) or attempt == 1:
+                break
 
-        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-        status = str(
-            getattr(result, 'status', None)
-            or diagnostic.get('backend_status')
-            or 'unavailable'
-        )
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
@@ -2724,9 +2782,53 @@ class EvaporationMixin:
         )
         record_gate_curve_provider_outcome(self, status_outcome)
         if (
-            status_outcome is GateCurveProviderOutcome.FAILED
-            or status != 'ok'
+            status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
+            or status_outcome is GateCurveProviderOutcome.FAILED
         ):
+            failure = {
+                'provider': self._liquid_fraction_provider,
+                'reason': 'liquid_fraction_provider_failed',
+                'outcome': status_outcome,
+                'provider_diagnostic': diagnostic,
+                'status': status,
+                'warnings': warnings,
+                **({'backend_failure_disposition': 'environment'}
+                   if gate_curve_provider_timed_out(diagnostic) else {}),
+                **({'detail': diagnostic['exception_message']}
+                   if diagnostic.get('exception_message') else {}),
+            }
+            if (
+                status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
+                or gate_curve_provider_timed_out(diagnostic)
+            ):
+                held = self._hold_freeze_gate_provider_curve(failure)
+                if held is not None:
+                    return held
+                curve = self._freeze_gate_kress_floor_curve(None, reasons)
+                if curve is not None:
+                    curve['gate_provider_refusal'] = {
+                        **failure,
+                        'reason': (diagnostic.get('backend_status_reason')
+                                   or diagnostic.get('reason') or failure['reason']),
+                        'qualification': 'first_call_kress91_floor_prediction',
+                        'authority': 'extrapolated (lower-rung)',
+                        'failure_hour': int(self.melt.hour),
+                        'failure_temperature_C': float(self.melt.temperature_C),
+                        'detail': (
+                            'Kress91 calibration-floor step; '
+                            'not a fresh solve or a melting measurement'
+                        ),
+                    }
+                    return curve
+            if diagnostic.get('exception_class'):
+                mark_uncacheable_replay_disposition(
+                    self,
+                    'gate liquid fraction provider unavailable: '
+                    f"{diagnostic['exception_class']}",
+                )
+            raise EvaporationFluxRefusal('liquid_fraction_provider_failed', failure)
+        if status_outcome is GateCurveProviderOutcome.STABLE_REFUSAL:
+            self._freeze_gate_held_curve_record = None
             projected = self._composition_projected_freeze_gate_curve(
                 diagnostic,
                 source=source,
@@ -2734,7 +2836,7 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
             )
             if projected is not None:
-                return projected
+                return self._remember_freeze_gate_provider_curve(projected)
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(
                     'composition_projected' in reason for reason in reasons
@@ -2743,6 +2845,29 @@ class EvaporationMixin:
                         f'{source} composition_projected status={status}'
                     )
                 return None
+            curve = self._freeze_gate_kress_floor_curve(None, reasons)
+            if curve is not None:
+                from engines.magemin.domain import (
+                    _SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT,
+                )
+
+                curve['gate_provider_refusal'] = {
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'reason': diagnostic.get('backend_status_reason'),
+                    'qualification': 'out_of_domain_kress91_floor_prediction',
+                    'authority': 'extrapolated',
+                    'certified_band': {
+                        'sio2_wt_pct': [_SIO2_MIN_WT_PCT, _SIO2_MAX_WT_PCT],
+                        'min_T_C': float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+                        'max_T_C': float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+                        'source': kress91_temperature_band_case(
+                            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                        )['source'],
+                    },
+                    'warnings': warnings,
+                }
+                return curve
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'
@@ -2763,7 +2888,7 @@ class EvaporationMixin:
                     self,
                     GateCurveProviderOutcome.PRODUCED,
                 )
-                return curve
+                return self._remember_freeze_gate_provider_curve(curve)
             if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
                 return None
             reasons.append('gate liquid fraction table invalid')
@@ -2778,99 +2903,12 @@ class EvaporationMixin:
                 self,
                 GateCurveProviderOutcome.PRODUCED,
             )
-            return curve
+            return self._remember_freeze_gate_provider_curve(curve)
         record_gate_curve_provider_outcome(
             self,
             GateCurveProviderOutcome.FAILED,
         )
         return None
-
-    def _freeze_gate_curve_from_backend_liquidus(
-        self,
-        reasons: list[str],
-        *,
-        pressure_bar: float,
-        fO2_log: float,
-        repair_notices: list[dict[str, Any]] | None = None,
-        redox_state: RedoxState | None = None,
-    ) -> dict[str, Any] | None:
-        from simulator.reduced_real_determinism import (
-            GateCurveProviderOutcome,
-            gate_curve_provider_outcome_for_status,
-            mark_uncacheable_replay_disposition,
-            record_gate_curve_provider_outcome,
-        )
-
-        fO2_log, redox_state = normalize_redox_state(
-            fO2_log,
-            redox_state,
-        )
-        finder = getattr(self.backend, 'find_liquidus_solidus', None)
-        if not callable(finder):
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.NO_PROVIDER,
-            )
-            reasons.append('backend liquidus finder unavailable')
-            return None
-        composition_mol = self.atom_ledger.project_account_mol(
-            _FREEZE_GATE_ACCOUNT
-        )
-        try:
-            result = finder(
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                redox_state=redox_state,
-                composition_mol_by_account={
-                    _FREEZE_GATE_ACCOUNT: composition_mol
-                },
-                species_formula_registry=dict(
-                    getattr(self, 'species_formula_registry', {}) or {}
-                ),
-            )
-        except MeltCompositionError:
-            raise
-        except ProviderUnavailableError as exc:
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.FAILED,
-            )
-            mark_uncacheable_replay_disposition(
-                self,
-                f'backend liquidus provider unavailable: {type(exc).__name__}',
-            )
-            reasons.append(f'backend liquidus provider unavailable: {exc}')
-            return None
-        except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.FAILED,
-            )
-            mark_uncacheable_replay_disposition(
-                self,
-                f'backend liquidus finder failed: {type(exc).__name__}',
-            )
-            reasons.append(f'backend liquidus finder failed: {exc}')
-            return None
-        status = str(getattr(result, 'status', 'unavailable'))
-        diagnostics = getattr(result, 'diagnostics', None)
-        status_outcome = gate_curve_provider_outcome_for_status(
-            status,
-            diagnostics if isinstance(diagnostics, Mapping) else None,
-        )
-        record_gate_curve_provider_outcome(self, status_outcome)
-        curve = self._freeze_gate_curve_from_liquidus_result(
-            result,
-            source='liquidus_solidus:backend',
-            reasons=reasons,
-            repair_notices=repair_notices,
-        )
-        if curve is None and status_outcome is GateCurveProviderOutcome.PRODUCED:
-            record_gate_curve_provider_outcome(
-                self,
-                GateCurveProviderOutcome.FAILED,
-            )
-        return curve
 
     def _freeze_gate_curve_from_kernel_liquidus(
         self,
@@ -2986,98 +3024,6 @@ class EvaporationMixin:
                 GateCurveProviderOutcome.PRODUCED,
             )
         return curve
-
-    def _freeze_gate_curve_from_liquidus_result(
-        self,
-        result: Any,
-        *,
-        source: str,
-        reasons: list[str],
-        repair_notices: list[dict[str, Any]] | None = None,
-    ) -> dict[str, Any] | None:
-        status = str(getattr(result, 'status', 'unavailable'))
-        if status != 'ok':
-            diagnostics = getattr(result, 'diagnostics', None)
-            if isinstance(diagnostics, Mapping) and diagnostics:
-                self._last_backend_diagnostics = dict(diagnostics)
-                if status == 'out_of_domain':
-                    self._last_out_of_domain_diagnostics = dict(diagnostics)
-                note = getattr(
-                    self,
-                    '_note_engine_commissioning_from_last_diagnostics',
-                    None,
-                )
-                if callable(note):
-                    note()
-            sample_points = []
-            for sample in tuple(getattr(result, 'samples', ()) or ()):
-                sample_points.append({
-                    'temperature_C': getattr(sample, 'temperature_C', None),
-                    'liquid_fraction': getattr(sample, 'frac_M', None),
-                })
-            projected_diagnostic = (
-                dict(diagnostics) if isinstance(diagnostics, Mapping) else {}
-            )
-            projected_diagnostic.setdefault(
-                'solidus_T_C',
-                getattr(result, 'solidus_T_C', None),
-            )
-            projected_diagnostic.setdefault(
-                'liquidus_T_C',
-                getattr(result, 'liquidus_T_C', None),
-            )
-            projected = self._composition_projected_freeze_gate_curve(
-                projected_diagnostic,
-                source=source,
-                reasons=reasons,
-                path=tuple(sample_points),
-                repair_notices=repair_notices,
-            )
-            if projected is not None:
-                return projected
-            if _diagnostic_names_composition_projected(projected_diagnostic):
-                if not any(
-                    'composition_projected' in reason for reason in reasons
-                ):
-                    reasons.append(
-                        f'{source} composition_projected status={status}'
-                    )
-                return None
-            warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
-            reasons.append(
-                f'{source} unavailable: status={status}'
-                + (f', warnings={warnings}' if warnings else '')
-            )
-            return None
-
-        solidus_T_C = self._optional_float(getattr(result, 'solidus_T_C', None))
-        liquidus_T_C = self._optional_float(getattr(result, 'liquidus_T_C', None))
-        samples = []
-        for sample in tuple(getattr(result, 'samples', ()) or ()):
-            samples.append({
-                'temperature_C': getattr(sample, 'temperature_C', None),
-                'liquid_fraction': getattr(sample, 'frac_M', None),
-            })
-        if samples:
-            reason_mark = len(reasons)
-            curve = self._freeze_gate_curve_from_path(
-                samples,
-                solidus_T_C=solidus_T_C,
-                liquidus_T_C=liquidus_T_C,
-                source=source,
-                repair_notices=repair_notices,
-                reasons=reasons,
-            )
-            if curve is not None:
-                return curve
-            if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
-                return None
-        return self._freeze_gate_curve_from_bounds(
-            solidus_T_C=solidus_T_C,
-            liquidus_T_C=liquidus_T_C,
-            source=source,
-            reasons=reasons,
-        )
 
     def _freeze_gate_curve_from_bounds(
         self,

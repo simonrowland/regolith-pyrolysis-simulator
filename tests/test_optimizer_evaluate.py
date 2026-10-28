@@ -3938,6 +3938,38 @@ def test_real_backend_refused_is_physics_refused_not_unavailable() -> None:
     assert "fo2_requires_iron" in result.notes
 
 
+def test_environment_disposition_refusal_aborts_optimizer_evaluation() -> None:
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    status="refused",
+                    reason="liquid_fraction_provider_failed",
+                    error_message="MAGEMin worker could not be restarted",
+                    backend_status="refused",
+                    backend_authoritative=False,
+                    refusal_diagnostic={
+                        "reason": "liquid_fraction_provider_failed",
+                        "provider_diagnostic": {
+                            "backend_diagnostics": {
+                                "projected_liquidus_diagnostics": {
+                                    "backend_failure_disposition": "environment",
+                                },
+                            },
+                        },
+                    },
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert "environment" in str(raised.value)
+
+
 def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
     """Red-by-revert: unfinished computation must not be backend-unavailable.
 
