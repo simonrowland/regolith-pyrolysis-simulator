@@ -4322,19 +4322,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     raise VaporPressureComputationError(
                         f"{name}: {exc}"
                     ) from exc
-                if domain_transition.refuses:
+                if domain_transition.detail:
                     oxide_vapor_extrapolations[name] = {
-                        "temperature_K": T_K,
-                        "valid_range_K": compiled_evaluator.valid_temperature_K,
-                        "status": domain_transition.disposition,
-                        "refusal_code": domain_transition.refusal_code,
-                        "detail": domain_transition.detail,
+                        "reason": "outside_declared_evaluator_domain",
+                        "notice": domain_transition.detail,
                     }
-                    warnings.append(
-                        f"{name}: {domain_transition.refusal_code}: "
-                        f"{domain_transition.detail}"
-                    )
-                    continue
+                    warnings.append(domain_transition.detail)
                 # Explicit unit/reference inputs here are the declared standard
                 # reaction reference, not evaluator defaults. The live point
                 # below uses the physical activity and the evaluator's named

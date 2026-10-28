@@ -1118,17 +1118,14 @@ def test_t622_real_rows_share_diagnostic_only_typed_ood_policy(
     assert answer.verdict_status == "status_bearing_non_authoritative"
     assert answer.certification_ceiling == "never"
     assert not answer.is_flux_active
+    assert isinstance(answer.pressure, PressureUpperBound)
+    assert isinstance(answer.flux, FluxDiagnosticUpperBound)
+    assert answer.pressure.pa > 0
+    assert answer.extra["out_of_range"] is expected_refusal
     if expected_refusal:
-        assert isinstance(answer.pressure, PressureRefusal)
-        assert answer.pressure.code == REFUSAL_OUTSIDE_DECLARED_DOMAIN
-        assert isinstance(answer.flux, FluxRefusal)
-    else:
-        assert isinstance(answer.pressure, PressureUpperBound)
-        assert isinstance(answer.flux, FluxDiagnosticUpperBound)
-        assert answer.extra["alpha_inventory_policy"] == (
-            "diagnostic_only_no_inventory_debit"
-        )
-        assert answer.extra["alpha_authority_status"] == "diagnostic_upper_bound"
+        assert "reason=outside_declared_evaluator_domain" in answer.extra["domain_notice"]
+        assert "authority_level=extrapolated" in answer.extra["domain_notice"]
+        assert "certified_band=" in answer.extra["domain_notice"]
 
 
 def test_t568_shadow_is_golden_neutral_and_fail_isolated(monkeypatch) -> None:
@@ -4354,3 +4351,11 @@ def test_legacy_view_production_warm_hit_budget() -> None:
     assert proj_loop < 0.005, (
         f"projected re-entry loop too slow: {proj_loop*1000:.2f} ms"
     )
+
+
+@pytest.mark.parametrize("temperature", [0., -1., float("nan")])
+def test_declared_domain_continuation_rejects_invalid_temperature(temperature):
+    from simulator.vapour_rail.domain_policy import declared_domain_transition, DomainPolicyError
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    with pytest.raises(DomainPolicyError, match="finite and positive"):
+        declared_domain_transition(catalog.species["MnO_gas"], temperature)

@@ -592,7 +592,7 @@ def test_builtin_provider_deduplicates_repeated_antoine_skip_in_one_result(
         ("CoO_gas", _co_vapor_request_at_T_K, 2100.0, 1800.0),
     ),
 )
-def test_t622_builtin_provider_applies_typed_ood_before_evaluation(
+def test_t622_builtin_provider_retains_flagged_ood_evaluation(
     vapor_pressure_data,
     species_id,
     request_factory,
@@ -605,9 +605,10 @@ def test_t622_builtin_provider_applies_typed_ood_before_evaluation(
     transition = refused.diagnostic["extrapolated_beyond_valid_range_K"][
         species_id
     ]
-    assert transition["status"] == "typed_refusal"
-    assert transition["refusal_code"] == "outside_declared_evaluator_domain"
-    assert species_id not in refused.diagnostic["vapor_pressures_Pa"]
+    assert transition["reason"] == "outside_declared_evaluator_domain"
+    assert transition["authority_level"] == "extrapolated"
+    assert transition["certified_band"]["temperature_K"]
+    assert refused.diagnostic["vapor_pressures_Pa"][species_id] > 0
 
     accepted = provider.dispatch(request_factory(in_domain_K))
     assert species_id in accepted.diagnostic["vapor_pressures_Pa"]
