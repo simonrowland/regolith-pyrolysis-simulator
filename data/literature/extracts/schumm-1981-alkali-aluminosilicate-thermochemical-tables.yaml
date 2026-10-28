@@ -1,0 +1,266 @@
+schema_version: literature_extract.v1
+source_id: schumm-1981-alkali-aluminosilicate-thermochemical-tables
+source:
+  citation: Schumm, R. H. (1981). Thermodynamic Properties of Solid Alkali Aluminosilicates at Elevated Temperatures. NBSIR 81-2343. National Bureau of Standards.
+  doi: 10.6028/NBS.IR.81-2343
+  year: 1981
+extraction:
+  method: Machine transcription from MinerU table block and pdftotext layout; page render verified the full table layout and every numeric cell.
+  worker: codex-resume-30388-1793182511
+  date: '2026-10-28'
+review_status: draft
+classification:
+  primary: compilation_assessed
+  note: Schumm assesses thermochemical values from cited calorimetric and thermochemical compilations.
+species:
+  NaAlSiO4:
+    observations:
+    - observation_id: schumm81_nepheline_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: cp
+      phase: cr
+      standard_state: solid nepheline as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: "Schumm prints source annotations for S298 (53KEL/TOD), H298 (53KEL/TOD), and delta_fH298 (53KRA/NEU); no separate Cp annotation is printed."
+        series:
+        - T_K: 298
+          cp: 26.21
+        - T_K: 300
+          cp: 26.37
+        - T_K: 400
+          cp: 34.8
+        - T_K: 467
+          cp: 40.45
+        - T_K: 467
+          cp: 34.11
+        - T_K: 500
+          cp: 34.63
+        - T_K: 600
+          cp: 36.22
+        - T_K: 700
+          cp: 37.81
+        - T_K: 800
+          cp: 39.4
+        - T_K: 900
+          cp: 40.98
+        - T_K: 1000
+          cp: 42.57
+        - T_K: 1100
+          cp: 44.16
+        - T_K: 1180
+          cp: 45.43
+        - T_K: 1180
+          cp: 42.67
+        - T_K: 1200
+          cp: 42.69
+        - T_K: 1300
+          cp: 42.83
+        - T_K: 1400
+          cp: 42.96
+        - T_K: 1500
+          cp: 43.09
+    - observation_id: schumm81_nepheline_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: "Schumm prints source annotations for H298 (53KEL/TOD) and delta_fH298 (53KRA/NEU)."
+        series:
+        - T_K: 298
+          enthalpy_increment: 0.0
+        - T_K: 300
+          enthalpy_increment: 0.05
+        - T_K: 400
+          enthalpy_increment: 3.11
+        - T_K: 467
+          enthalpy_increment: 5.63
+        - T_K: 467
+          enthalpy_increment: 5.72
+        - T_K: 500
+          enthalpy_increment: 6.85
+        - T_K: 600
+          enthalpy_increment: 10.39
+        - T_K: 700
+          enthalpy_increment: 14.09
+        - T_K: 800
+          enthalpy_increment: 17.95
+        - T_K: 900
+          enthalpy_increment: 21.97
+        - T_K: 1000
+          enthalpy_increment: 26.15
+        - T_K: 1100
+          enthalpy_increment: 30.49
+        - T_K: 1180
+          enthalpy_increment: 34.07
+        - T_K: 1180
+          enthalpy_increment: 34.2
+        - T_K: 1200
+          enthalpy_increment: 35.05
+        - T_K: 1300
+          enthalpy_increment: 39.33
+        - T_K: 1400
+          enthalpy_increment: 43.62
+        - T_K: 1500
+          enthalpy_increment: 47.92
+    - observation_id: schumm81_nepheline_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: "Schumm prints delta_fH298 source as 53KRA/NEU."
+        series:
+        - T_K: 298
+          delta_fH: -501.0
+        - T_K: 300
+          delta_fH: -501.01
+        - T_K: 400
+          delta_fH: -501.82
+        - T_K: 467
+          delta_fH: -501.56
+        - T_K: 467
+          delta_fH: -501.48
+        - T_K: 500
+          delta_fH: -501.46
+        - T_K: 600
+          delta_fH: -501.37
+        - T_K: 700
+          delta_fH: -501.2
+        - T_K: 800
+          delta_fH: -500.95
+        - T_K: 900
+          delta_fH: -500.62
+        - T_K: 1000
+          delta_fH: -502.75
+        - T_K: 1100
+          delta_fH: -502.18
+        - T_K: 1180
+          delta_fH: -501.63
+        - T_K: 1180
+          delta_fH: -501.51
+        - T_K: 1200
+          delta_fH: -501.42
+        - T_K: 1300
+          delta_fH: -500.99
+        - T_K: 1400
+          delta_fH: -500.59
+        - T_K: 1500
+          delta_fH: -500.22
+    - observation_id: schumm81_nepheline_delta_fG
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      standard_state: solid nepheline as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: "Schumm prints delta_fH298 source as 53KRA/NEU; no separate delta_fG source annotation is printed."
+        series:
+        - T_K: 298
+          delta_fG: -473.61
+        - T_K: 300
+          delta_fG: -473.44
+        - T_K: 400
+          delta_fG: -464.15
+        - T_K: 467
+          phase_context_as_printed: alpha
+          delta_fG: -457.86
+        - T_K: 467
+          phase_context_as_printed: beta
+          delta_fG: -457.86
+        - T_K: 500
+          delta_fG: -454.78
+        - T_K: 600
+          delta_fG: -445.45
+        - T_K: 700
+          delta_fG: -436.14
+        - T_K: 800
+          delta_fG: -426.86
+        - T_K: 900
+          delta_fG: -417.62
+        - T_K: 1000
+          delta_fG: -408.23
+        - T_K: 1100
+          delta_fG: -398.81
+        - T_K: 1180
+          delta_fG: -391.32
+        - T_K: 1180
+          delta_fG: -391.31
+        - T_K: 1200
+          delta_fG: -389.45
+        - T_K: 1300
+          delta_fG: -380.13
+        - T_K: 1400
+          delta_fG: -370.85
+        - T_K: 1500
+          delta_fG: -361.6
+    - observation_id: schumm81_nepheline_S298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 19
+        published_page: 13
+        pdf_page_index: 18
+        note: Printed heading NaAlSiO4 nepheline; no numbered table caption.
+        column: S298
+      phase: cr
+      standard_state: solid nepheline as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      uncertainty:
+        confidence_level: not_stated
+        S298: "+/- 0.3 cal/mol"
+        note: Confidence level not stated.
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: "S298 source: 53KEL/TOD."
+        series:
+        - T_K: 298
+          entropy: 29.7
+fidelity_samples:
+- path: species.NaAlSiO4.observations[schumm81_nepheline_cp].values.series[0]
+  value:
+    T_K: 298
+    cp: 26.21
+  locator:
+    page: 19
+    published_page: 13
+    note: Printed heading NaAlSiO4 nepheline.
+  note: Cp cell is 26.21 cal/deg,mol at 298 K.
