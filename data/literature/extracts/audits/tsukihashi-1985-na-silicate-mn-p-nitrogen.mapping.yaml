@@ -22,10 +22,10 @@ tables:
     observation_mapping:
       phase: liquid slag against carbon-saturated iron
       units: dimensionless distribution ratio; numerator and denominator are both printed as wt% concentrations
-      temperature: 1200 °C, identified by the Table 1 points in Figures 1 and 6
-      atmosphere_and_pressure: CO at 1 atm in a graphite crucible, as stated for the practical-slag equilibration
-      oxygen_pressure: practical-slag interface estimate 6.00e-18 atm at 1200 °C; kept distinct from total pressure
-      evidence_class: quoted_attributed because the final equilibrium metal concentration is not tabulated
+      temperature: printed T_C=1200 °C; Figures 1 and 6 identify the practical-slag point
+      atmosphere_and_pressure: printed CO at 1 atm in a graphite crucible; source locator PDF page 3
+      oxygen_pressure: identity fO2 unknown; context retains prose 6.00e-18 atm and figure annotation 8.42e-18 atm
+      evidence_class: measured_direct; authors' own chemical assays and Table 1 ratios
     column_map:
       FeO: composition_wt_pct.FeO
       Fe2O3: composition_wt_pct.Fe2O3
@@ -63,8 +63,8 @@ mineru_table_qa:
   pdf_page_2:
     numeric_agreement: 0.000
     flags: em_dash_minus=4; non_numeric_in_numeric_column=4
-    resolution: 18 numeric and 4 dash body cells (22 total) and row/column assignments confirmed from render.
+    resolution: 18 numeric and 4 dash body cells (22 total); pdftotext has no table-cell readings, so the render confirms every cell and row/column assignment.
   pdf_page_8:
     numeric_agreement: 0.605
     flags: latex=13; numeric_mismatch=15
-    resolution: all 21 numeric body cells and row/column assignments confirmed from render.
+    resolution: all 21 numeric body cells and row/column assignments confirmed from render; the render resolves pdftotext's prose 0.524 as table gamma_Mn=0.514 at 1200 °C.

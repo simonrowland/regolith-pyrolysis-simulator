@@ -3,7 +3,7 @@ source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
 page_offset: 822
 source:
   citation: Tsukihashi F, Matsumoto F, Hyodo T, Yukinobu M, Sano N (1985). Phosphorus and Manganese Distribution
-    between Carbon-saturated Iron and Sodium Silicate Melts and Nitrogen Solubility in the Melts. Tetsu-to-Hagane
+    between Carbon-saturated Iron and Na2O-SiO2 Melts and Nitrogen Solubility in the Melts. Tetsu-to-Hagane
     71(7):823-830.
   doi: 10.2355/tetsutohagane1955.71.7_823
   year: 1985
@@ -47,7 +47,7 @@ species:
         quantity: distribution_ratio
         basis: wt_percent
         distribution_ratio: '105'
-        total_pressure_Pa: '101325'
+        total_pressure_atm: '1'
         phase_label: slag
         counter_phase_label: metal
         subtype_as_printed: (wt% P in slag)/[wt% P in carbon-saturated iron]
@@ -61,14 +61,11 @@ species:
           SiO2: '19.00'
           P2O5: '13.05'
           MnO: '1.66'
-        oxygen_partial_pressure:
-          value: '6.00e-18'
-          units: atm
         point_conditions:
-          temperature_K:
+          temperature_C:
             state:
               tag: value
-              value: '1473.15'
+              value: '1200'
             locator:
               page: 2
               figure: '1'
@@ -90,39 +87,26 @@ species:
               page: 2
               table: '1'
               row: After equilibration
-          total_pressure_Pa:
+          total_pressure_atm:
             state:
               tag: value
-              value:
-                kind: point
-                point: '101325'
+              value: '1'
             locator:
-              page: 4
+              page: 3
               section: '3.1'
-              note: CO atmosphere printed as 1 atm; Pa value is unit conversion.
+              note: The CO-at-1-atm graphite-crucible run is stated on this page.
           atmosphere:
             state:
               tag: value
               value: CO
             locator:
-              page: 4
+              page: 3
               section: '3.1'
-              note: The phosphorus experiment is stated to use CO at 1 atm in a graphite crucible.
-          pO2_Pa:
-            state:
-              tag: value
-              value:
-                kind: point
-                point: '6.0795e-13'
-            locator:
-              page: 4
-              section: '3.1'
-              note: Printed oxygen partial pressure 6.00 × 10^-18 atm for the Table 1 practical-slag result.
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: authors' ratio from chemical analyses; the individual final metal concentration is not tabulated
-        note: Slag-side concentration divided by carbon-saturated-iron concentration, both as mass percent. No final
-          metal concentration is printed. The initial Fe-2%P alloy is not the final equilibrium composition.
+              note: The CO-at-1-atm graphite-crucible run is stated on this page.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        note: Authors' own Table 1 chemical assays; the ratio is the slag wt% divided by carbon-saturated-iron wt%.
+          Na2O is marked '* balance'. The initial Fe-2%P alloy is not the final equilibrium composition.
     context:
     - observation_id: tsukihashi_1985_table1_complete
       type: table_record
@@ -161,6 +145,22 @@ species:
           P_distribution_ratio: '105'
           Mn_distribution_ratio: '7.62'
           V_distribution_ratio: '32.6'
+    - observation_id: tsukihashi_1985_phosphorus_distribution_temperature_relations
+      type: thermodynamic_relation
+      locator:
+        page: 2
+        published_page: 824
+        pdf_page_index: 1
+        equation: '1'
+      units: as printed
+      values:
+        phosphorus_log_distribution_relation_as_printed: log((%P)/[%P]) = 20200/T - 10.9
+        temperature_range_as_printed: 1200-1350 °C
+        figure_2_fit_label_as_printed: log((%P)/[%P]) = 20180/T - 10.87
+        figure_2_locator: PDF page 3, Figure 2
+        metal_phosphorus_activity_coefficient_as_printed: f_P = 9.86 at 1200 °C
+        metal_phosphorus_activity_coefficient_method: estimated from equation (9), with [P] in iron approximated as zero and a regular-solution model assumed
+        note: The figure fit label and the rounded equation in the synopsis/body differ slightly; both are retained in their printed forms. Fit inputs are not stored, so no derived observation is created.
     - observation_id: tsukihashi_1985_capacity_and_relations
       type: thermodynamic_relation
       locator:
@@ -219,10 +219,38 @@ species:
         section: '3.1'
       units: atm
       values:
-        oxygen_partial_pressure_at_1200C: '6.00e-18'
-        oxygen_partial_pressure_at_1300C: '9.00e-17'
+        oxygen_partial_pressure_at_1200C_as_printed_atm: '6.00e-18'
+        oxygen_partial_pressure_at_1300C_as_printed_atm: '9.00e-17'
         basis: author estimate from the practical-slag FeO activity coefficient and FeO content using equation (15)
-        notes: The 1200 °C value applies to the Table 1 practical-slag point; the 1300 °C estimate has no accompanying Table 1 P/Mn result.
+        notes: These are author-estimated interface values, not the imposed oxygen pressure. Figure 5 and Figure 6 print 8.42e-18 atm for the practical-slag point at 1200 °C; identity fO2 remains unknown because this conflicts with the prose estimate.
+    - observation_id: tsukihashi_1985_practical_slag_iron_oxide_activities
+      type: thermodynamic_relation
+      locator:
+        page: 5
+        published_page: 827
+        pdf_page_index: 4
+        figure: '5'
+      units: as printed
+      values:
+        practical_slag_gamma_FeO_as_printed: '0.55'
+        practical_slag_a_Fe_as_printed: '0.684'
+        practical_slag_a_FeO_as_printed: '0.00375'
+        practical_slag_gamma_FeO_reference_state: not stated beside the printed annotation
+        practical_slag_a_FeO_reference_state: not stated beside the printed annotation
+        pO2_figure_annotation_as_printed_atm: '8.42e-18'
+        pO2_figure_annotation_locator: PDF page 5, Figures 5 and 6
+        note: The figure-printed pO2 conflicts with the 6.00e-18 atm prose estimate. Identity fO2 is left unknown; neither value is assigned as a reconciled run condition.
+    - observation_id: tsukihashi_1985_phosphate_capacity_abstract_range
+      type: thermodynamic_relation
+      locator:
+        page: 1
+        published_page: 823
+        pdf_page_index: 0
+        section: Synopsis
+      units: as printed
+      values:
+        phosphate_capacity_range_as_printed: 10^26.7 to 10^29 at 1200 °C
+        schema_gap: Phosphate capacity has no matching Quantity token; retain its printed range as context.
     - observation_id: tsukihashi_1985_figure_read_candidates
       type: figure_read_candidates
       locator:
@@ -280,7 +308,7 @@ species:
         quantity: distribution_ratio
         basis: wt_percent
         distribution_ratio: '7.62'
-        total_pressure_Pa: '101325'
+        total_pressure_atm: '1'
         phase_label: slag
         counter_phase_label: metal
         subtype_as_printed: (wt% Mn in slag)/[wt% Mn in carbon-saturated iron]
@@ -294,14 +322,11 @@ species:
           SiO2: '19.00'
           P2O5: '13.05'
           MnO: '1.66'
-        oxygen_partial_pressure:
-          value: '6.00e-18'
-          units: atm
         point_conditions:
-          temperature_K:
+          temperature_C:
             state:
               tag: value
-              value: '1473.15'
+              value: '1200'
             locator:
               page: 5
               figure: '6'
@@ -323,40 +348,40 @@ species:
               page: 2
               table: '1'
               row: After equilibration
-          total_pressure_Pa:
+          total_pressure_atm:
             state:
               tag: value
-              value:
-                kind: point
-                point: '101325'
+              value: '1'
             locator:
-              page: 4
+              page: 3
               section: '3.1'
-              note: The Table 1 practical-slag equilibration is described under CO at 1 atm in a graphite crucible.
+              note: The CO-at-1-atm graphite-crucible run is stated on this page.
           atmosphere:
             state:
               tag: value
               value: CO
             locator:
-              page: 4
+              page: 3
               section: '3.1'
-              note: The Table 1 practical-slag equilibration is described under CO at 1 atm in a graphite crucible.
-          pO2_Pa:
-            state:
-              tag: value
-              value:
-                kind: point
-                point: '6.0795e-13'
-            locator:
-              page: 4
-              section: '3.1'
-              note: The practical-slag Table 1 results give pO2=6.00e-18 atm at 1200 °C.
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: authors' ratio from chemical analyses; the individual final metal concentration is not tabulated
-        note: Slag-side concentration divided by carbon-saturated-iron concentration, both as mass percent. No final
-          metal concentration is printed.
+              note: The CO-at-1-atm graphite-crucible run is stated on this page.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        note: Authors' own Table 1 chemical assays; the ratio is the slag wt% divided by carbon-saturated-iron wt%.
+          Na2O is marked '* balance'.
     context:
+    - observation_id: tsukihashi_1985_manganese_distribution_temperature_relation
+      type: thermodynamic_relation
+      locator:
+        page: 6
+        published_page: 828
+        pdf_page_index: 5
+        section: '3.2'
+        equation: '17'
+      units: as printed
+      values:
+        manganese_log_distribution_relation_as_printed: log((%Mn)/[%Mn]) = 6070/T - 2.74
+        temperature_range_as_printed: 1200-1350 °C
+        note: The authors' temperature fit is retained as a printed relation; its fitted Figure 7 inputs are not stored, so no derived observation is created.
     - observation_id: tsukihashi_1985_appendix_interaction_parameters_table
       type: table_record
       locator:
@@ -396,6 +421,7 @@ species:
           iron, not Na2O, MnO, P2O5 slag activities. Values that the authors calculate from cited inputs are retained
           as printed context; they are not used as measured slag-metal runs.
   CN:
+    observations: []
     context:
     - observation_id: tsukihashi_1985_practical_slag_cn_solubility_typed_refusal
       type: thermodynamic_example

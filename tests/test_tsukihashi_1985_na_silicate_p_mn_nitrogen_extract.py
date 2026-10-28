@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 import yaml
 
-from simulator.battery.enums import PhaseRole, Quantity
+from simulator.battery.enums import EvidenceClass, PhaseRole, Quantity
 from simulator.battery.migrate import Migrator, REPO_ROOT
 
 
@@ -135,7 +135,8 @@ def test_isolated_migration_preserves_table1_identity_axes_and_values() -> None:
     result = migrator.result
     assert result.validation is not None
     assert result.validation.hard_issues == ()
-    assert result.validation.issues == ()
+    assert len(result.validation.issues) == 2
+    assert all("required axis fO2_Pa is unknown" in issue.detail for issue in result.validation.issues)
     assert len(result.observations) == 2
     expected = {
         "tsukihashi_1985_table1_p_distribution": ("P", Decimal("105")),
@@ -146,29 +147,39 @@ def test_isolated_migration_preserves_table1_identity_axes_and_values() -> None:
         assert row.identity.quantity.value is Quantity.DISTRIBUTION_RATIO
         assert row.identity.species.formula == formula
         assert row.value.point == ratio
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        assert row.evidence.original_method_class == "measured_direct"
         assert row.identity.temperature_K.value == Decimal("1473.15")
         assert row.identity.phase_role.value is PhaseRole.SLAG
         assert row.identity.counter_phase_role.value is PhaseRole.METAL
         assert row.identity.total_pressure_Pa.value == Decimal("101325")
-        assert row.identity.fO2_Pa.value == Decimal("6.0795e-13")
+        assert not row.identity.fO2_Pa.is_value
         assert row.identity.composition.is_value
         assert row.locator.page == 2
         assert row.locator.table == "1"
 
     p_row = result.observations[f"{SOURCE_ID}::tsukihashi_1985_table1_p_distribution"]
     mn_row = result.observations[f"{SOURCE_ID}::tsukihashi_1985_table1_mn_distribution"]
+    source_p = document["species"]["P"]["observations"][0]
+    assert "temperature_K" not in source_p["values"]["point_conditions"]
+    assert "total_pressure_Pa" not in source_p["values"]
+    assert "oxygen_partial_pressure" not in source_p["values"]
     assert p_row.point_conditions["composition"].locator.page == 2
     assert p_row.point_conditions["composition"].locator.table == "1"
-    assert mn_row.point_conditions["temperature_K"].locator.page == 5
-    assert mn_row.point_conditions["temperature_K"].locator.figure == "6"
-    assert p_row.point_conditions["total_pressure_Pa"].locator.page == 4
-    assert p_row.point_conditions["pO2_Pa"].locator.page == 4
-    assert mn_row.point_conditions["total_pressure_Pa"].locator.page == 4
-    assert mn_row.point_conditions["pO2_Pa"].locator.page == 4
+    assert p_row.point_conditions["temperature_C"].state.value == Decimal("1200")
+    assert p_row.point_conditions["temperature_C"].locator.page == 2
+    assert p_row.point_conditions["total_pressure_atm"].state.value == Decimal("1")
+    assert p_row.point_conditions["total_pressure_atm"].locator.page == 3
+    assert mn_row.point_conditions["temperature_C"].locator.page == 5
+    assert mn_row.point_conditions["temperature_C"].locator.figure == "6"
+    assert mn_row.point_conditions["total_pressure_atm"].locator.page == 3
+    assert "pO2_Pa" not in p_row.point_conditions
+    assert "pO2_Pa" not in mn_row.point_conditions
 
     # The independently printed nitrogen assay remains context because its
     # complete run composition is absent; Table 1 composition is not reused.
     cn_context = document["species"]["CN"]["context"][0]
+    assert document["species"]["CN"]["observations"] == []
     assert cn_context["values"]["component_amount_as_published"] == "2.1"
     assert cn_context["values"]["admission_status"] == "typed_refusal"
     assert "complete slag composition" in cn_context["values"]["reason"]
