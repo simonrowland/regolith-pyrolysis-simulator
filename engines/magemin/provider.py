@@ -319,6 +319,11 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             engine_version=self._engine_version(),
         )
 
+        diagnostics = replace(
+            diagnostics,
+            backend_warnings=tuple(gate_warnings) + diagnostics.backend_warnings,
+        )
+
         # Hand the adapter's status to the vocabulary owner unchanged.
         #
         # This provider used to keep a private four-token allowlist and map
