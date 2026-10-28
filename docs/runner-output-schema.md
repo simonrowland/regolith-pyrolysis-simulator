@@ -282,6 +282,10 @@ When C3 alkali-credit metadata is present, the optional
 `c3_alkali_credit_unused_by_design_kg_by_species` map identifies a requested
 credit dose that the selected campaign path does not draw. In the V1c staged
 Na-only path, a configured K dose is reported here as unused by design.
+When Na credit is drawn, the optional `c3_alkali_recovery_diagnostic` compares
+recycled Na with gross Na credit draw and the configured recovery band. It
+includes a typed `c3_alkali_recovery_outside_setpoint_band` notice when the
+measured fraction falls outside that band; it does not change simulator values.
 
 ```jsonc
 "run_metadata": {

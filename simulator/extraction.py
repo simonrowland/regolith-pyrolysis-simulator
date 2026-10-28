@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Any, Dict, Mapping
+from typing import Any, Dict, Literal, Mapping, TypedDict
 
 from engines.antoine import (
     _AntoineCoefficientRefusal,
@@ -40,6 +40,15 @@ from simulator.state import (
     CampaignPhase,
     EvaporationFlux,
 )
+
+
+class C3AlkaliRecoveryBandNotice(TypedDict):
+    type: Literal['c3_alkali_recovery_outside_setpoint_band']
+    reason: Literal['c3_alkali_recovery_outside_setpoint_band']
+    species: Literal['Na']
+    recovered_fraction: float
+    recovery_band_pct: list[float]
+
 
 class ExtractionMixin:
     _LEDGER_KG_TOL = 1e-9
@@ -2698,6 +2707,78 @@ class ExtractionMixin:
                     self._pending_shuttle_bakeout_cycle_increment = campaign.name
                 elif campaign == CampaignPhase.C3_NA:
                     self._pending_shuttle_bakeout_cycle_increment = campaign.name
+
+    def _c3_alkali_recovery_diagnostic(self) -> dict[str, Any]:
+        """Compare recycled Na with gross C3 credit draw and its setpoint band."""
+        setpoint_path = 'campaigns.C3.Na_phase.Na_recovery_per_cycle_pct'
+        campaigns = getattr(self, 'setpoints', {}).get('campaigns', {})
+        c3_config = campaigns.get('C3') if isinstance(campaigns, Mapping) else None
+        na_phase = c3_config.get('Na_phase') if isinstance(c3_config, Mapping) else None
+        band_raw = (
+            na_phase.get('Na_recovery_per_cycle_pct')
+            if isinstance(na_phase, Mapping)
+            else None
+        )
+        try:
+            band_pct = [float(value) for value in band_raw]
+        except (TypeError, ValueError):
+            band_pct = []
+        if (
+            len(band_pct) != 2
+            or not all(math.isfinite(value) for value in band_pct)
+            or band_pct[0] < 0.0
+            or band_pct[0] > band_pct[1]
+            or band_pct[1] > 100.0
+        ):
+            return {
+                'status': 'unavailable',
+                'reason': 'campaign_setpoint_missing',
+                'setpoint_path': setpoint_path,
+            }
+
+        gross_draw_kg = float(
+            getattr(self, '_c3_alkali_credit_drawn_kg_by_species', {}).get(
+                'Na', 0.0
+            )
+        )
+        recycled_kg = float(
+            AccountingQueries(self)
+            .recycled_to_reagent_kg_cumulative()
+            .get('Na', 0.0)
+        )
+        diagnostic: dict[str, Any] = {
+            'species': 'Na',
+            'recycled_kg': recycled_kg,
+            'gross_draw_kg': gross_draw_kg,
+            'recovery_band_pct': band_pct,
+        }
+        if gross_draw_kg <= 0.0:
+            diagnostic.update({
+                'status': 'not_evaluated',
+                'reason': 'zero_gross_na_draw',
+                'recovered_fraction': None,
+            })
+            return diagnostic
+
+        recovered_fraction = recycled_kg / gross_draw_kg
+        in_band = (
+            band_pct[0] / 100.0
+            <= recovered_fraction
+            <= band_pct[1] / 100.0
+        )
+        diagnostic.update({
+            'status': 'within_setpoint_band' if in_band else 'outside_setpoint_band',
+            'recovered_fraction': recovered_fraction,
+        })
+        if not in_band:
+            diagnostic['notice'] = C3AlkaliRecoveryBandNotice(
+                type='c3_alkali_recovery_outside_setpoint_band',
+                reason='c3_alkali_recovery_outside_setpoint_band',
+                species='Na',
+                recovered_fraction=recovered_fraction,
+                recovery_band_pct=band_pct,
+            )
+        return diagnostic
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """

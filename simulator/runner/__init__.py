@@ -1458,6 +1458,11 @@ class PyrolysisRun:
             run_metadata[
                 "c3_alkali_credit_unused_by_design_kg_by_species"
             ] = c3_credit_unused_by_design
+        if c3_credit_drawn_kg.get("Na", 0.0) > 0.0:
+            run_metadata["c3_alkali_recovery_diagnostic"] = _safe_failure_value(
+                lambda: _json_safe(sim._c3_alkali_recovery_diagnostic()),
+                section="run_metadata.c3_alkali_recovery_diagnostic",
+            )
         if execution.reduced_real_cache:
             run_metadata["reduced_real_cache"] = _safe_failure_value(
                 lambda: _json_safe(execution.reduced_real_cache),

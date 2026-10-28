@@ -1170,6 +1170,20 @@ def test_staged_c3_current_k_and_bakeout_behavior_is_pinned():
         0.011085595572037659,
         abs=1e-10,
     )
+    recovery = metadata["c3_alkali_recovery_diagnostic"]
+    assert recovery["status"] == "outside_setpoint_band"
+    assert recovery["recovered_fraction"] == pytest.approx(
+        recycled_na_kg / gross_na_draw_kg
+    )
+    assert recovery["recovery_band_pct"] == sim.setpoints["campaigns"]["C3"][
+        "Na_phase"
+    ]["Na_recovery_per_cycle_pct"]
+    assert recovery["notice"]["type"] == (
+        "c3_alkali_recovery_outside_setpoint_band"
+    )
+    assert recovery["notice"]["reason"] == (
+        "c3_alkali_recovery_outside_setpoint_band"
+    )
 
 
 def test_c3_missing_schedule_row_is_a_typed_campaign_refusal():
