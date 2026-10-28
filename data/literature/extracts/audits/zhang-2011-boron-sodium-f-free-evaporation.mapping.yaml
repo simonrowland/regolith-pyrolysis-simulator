@@ -12,7 +12,8 @@ tables:
     caption: Chemical compositions of the designed slag specimens (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
     mapping: species.slag.context[zhang_2011_designed_slag_compositions_table1].values.table_1_rows[].composition_wt_pct
-    printed_body_rows: 5
+    printed_body_rows: 6
+    printed_layout: 6 oxide rows by 5 slag columns; extract stores 5 specimen records with 6 oxide components each.
     printed_numeric_cells: 30
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
@@ -21,7 +22,8 @@ tables:
     caption: Chemical compositions of post-measured slag (mass%).
     required_columns: [Brand, CaO, SiO2, Al2O3, Na2O, B2O3, TiO2]
     mapping: species.slag.context[zhang_2011_analyzed_slag_compositions_table2].values.table_2_rows[].composition_wt_pct and per-row identity composition for Table 6
-    printed_body_rows: 5
+    printed_body_rows: 6
+    printed_layout: 6 oxide rows by 5 slag columns; extract stores 5 specimen records with 6 oxide components each.
     printed_numeric_cells: 30
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
@@ -62,8 +64,8 @@ tables:
     render_verified: true
     render_reason: Table cells absent from pdftotext; hand-transcribed and every numeric cell checked against page render.
 expected_table_counts:
-  table_1_body_rows: 5
-  table_2_body_rows: 5
+  table_1_body_rows: 6
+  table_2_body_rows: 6
   table_3_body_rows: 4
   table_4_body_rows: 2
   table_5_body_rows: 2

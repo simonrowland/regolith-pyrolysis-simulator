@@ -82,10 +82,21 @@ def _assert_table2_render_pins(document: dict) -> dict[str, dict[str, Decimal]]:
     return rows
 
 
+def _assert_xrf_aliquot_role(document: dict) -> None:
+    geometry = next(
+        item
+        for item in document["species"]["slag"]["context"]
+        if item["observation_id"] == "zhang_2011_geometry_and_run_conditions"
+    )
+    assert geometry["values"]["xrf_analysis_aliquot_mass_g"] == 50
+    assert "premelt_charge_mass_g" not in geometry["values"]
+
+
 def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
     document = yaml.safe_load(EXTRACT.read_text())
     _assert_table6_render_pins(document)
     table2 = _assert_table2_render_pins(document)
+    _assert_xrf_aliquot_role(document)
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -105,6 +116,7 @@ def test_zhang_2011_table6_values_and_conditions_migrate() -> None:
         assert "no composition field" in observation.identity.composition.reason
         assert observation.identity.total_pressure_Pa.tag is StateTag.UNKNOWN
         assert observation.identity.fO2_Pa.tag is StateTag.UNKNOWN
+        assert observation.identity.sample_mass_kg.tag is StateTag.UNKNOWN
         assert observation.point_conditions["T_C"].state.value == Decimal(temperature_c)
         assert observation.point_conditions["T_C"].locator.page == 8
         assert observation.point_conditions["T_C"].locator.table == "6"
@@ -155,3 +167,16 @@ def test_zhang_2011_table2_render_pin_detects_composition_mutation() -> None:
     cs3["composition_wt_pct"]["CaO"] = 1.0
     with pytest.raises(AssertionError):
         _assert_table2_render_pins(document)
+
+
+def test_zhang_2011_xrf_aliquot_role_pin_detects_premelt_mislabel() -> None:
+    document = yaml.safe_load(EXTRACT.read_text())
+    _assert_xrf_aliquot_role(document)
+    geometry = next(
+        item
+        for item in document["species"]["slag"]["context"]
+        if item["observation_id"] == "zhang_2011_geometry_and_run_conditions"
+    )
+    geometry["values"]["premelt_charge_mass_g"] = 50
+    with pytest.raises(AssertionError):
+        _assert_xrf_aliquot_role(document)
