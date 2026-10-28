@@ -178,7 +178,23 @@ def mre_decomposition_voltage_reference(
                     and f"{oxide}(l)" not in segment.phase_basis
                 ):
                     fusion_key = "SiO2(II)" if oxide == "SiO2" else oxide
-                    fusion = janaf_fusion_energy(fusion_key, T_K)
+                    try:
+                        fusion = janaf_fusion_energy(fusion_key, T_K)
+                    except ValueError as exc:
+                        # Evaluation-time import: electrolysis consumes this
+                        # owner, so importing its refusal class eagerly cycles.
+                        from simulator.electrolysis import MREElectrolysisRefusal
+
+                        raise MREElectrolysisRefusal(
+                            "mre_liquid_standard_missing_input",
+                            {
+                                "oxide": oxide,
+                                "temperature_K": T_K,
+                                "source": "NIST-JANAF",
+                                "fusion_key": fusion_key,
+                                "missing_input": str(exc),
+                            },
+                        ) from exc
                     # Premise: mu_l = mu_cr + dG_fus on the pure-liquid
                     # activity standard. For n_ox mol oxide per mol O2,
                     # dG_liq = dG_cr + n_ox*dG_fus, hence E_liq = E_cr

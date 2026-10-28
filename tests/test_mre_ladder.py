@@ -283,12 +283,66 @@ def test_already_liquid_mre_segments_need_no_fusion_correction(oxide):
 
 
 def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
+    from simulator.electrolysis import MREElectrolysisRefusal
+
     def missing(*_args):
         raise ValueError("Cr-015: JANAF table values are missing")
 
     monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
-    with pytest.raises(ValueError, match="Cr-015"):
+    with pytest.raises(MREElectrolysisRefusal) as caught:
         mre_ladder.mre_decomposition_voltage_reference("Cr2O3", temperature_K=1773.15)
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert caught.value.diagnostic["missing_input"] == "Cr-015: JANAF table values are missing"
+    assert caught.value.diagnostic["oxide"] == "Cr2O3"
+    assert caught.value.diagnostic["source"] == "NIST-JANAF"
+
+
+def test_missing_fusion_input_import_is_safe_and_provider_refuses(monkeypatch):
+    import subprocess
+    import sys
+    from simulator.electrolysis import MREElectrolysisRefusal
+    import engines.builtin.electrolysis_step as provider_module
+
+    def missing(*_args):
+        raise ValueError("Cr-015: JANAF table values are missing")
+
+    proc = subprocess.run(
+        [sys.executable, "-c", """
+import importlib
+from unittest.mock import patch
+import simulator.mre_ladder as ladder
+import engines.builtin.electrolysis_step as provider
+with patch('simulator.reference_data.janaf.janaf_fusion_energy',
+           side_effect=ValueError('Cr-015: JANAF table values are missing')):
+    importlib.reload(ladder)
+    importlib.reload(provider)
+    try:
+        ladder.mre_decomposition_voltage_reference('Cr2O3', temperature_K=1773.15)
+    except Exception as exc:
+        assert exc.terminal_refusal
+        assert exc.reason == 'mre_liquid_standard_missing_input'
+    else:
+        raise AssertionError('missing input was accepted')
+"""], capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    monkeypatch.setattr(mre_ladder, "janaf_fusion_energy", missing)
+    request = IntentRequest(
+        intent=ChemistryIntent.ELECTROLYSIS_STEP,
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        control_inputs={"voltage_V": 3.0, "current_A": 100.0,
+                        "dt_hr": 1.0, "pO2_bar": 1.0, "allowed_oxides": ["Cr2O3"]},
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Cr2O3": 1.0}},
+            species_formula_registry={},
+        ),
+    )
+    with pytest.raises(MREElectrolysisRefusal) as caught:
+        provider_module.BuiltinElectrolysisStepProvider().dispatch(request)
+    assert caught.value.reason == "mre_liquid_standard_missing_input"
+    assert "Cr-015" in caught.value.diagnostic["missing_input"]
 
 
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
