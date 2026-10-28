@@ -188,7 +188,7 @@
       ? silicaExcluded.map((item) => {
         const bound = typeof item.upper_bound_kg === "number"
           && Number.isFinite(item.upper_bound_kg)
-          ? `up to ${fmtNum(item.upper_bound_kg, "kg")}`
+          ? `up to ${fmtNum(item.upper_bound_kg, "kg")} (conservative upper bound)`
           : scalarText(item.upper_bound_kg || "unbounded");
         return `${item.species || "unknown"} via ${item.account || "unknown"} (${bound}; ${item.reason || "refused quantity"})`;
       })

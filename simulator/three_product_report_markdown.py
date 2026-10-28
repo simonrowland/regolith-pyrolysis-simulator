@@ -141,7 +141,7 @@ def format_three_product_markdown(
             for excluded in bucket.get('excluded', ()):
                 bound = excluded.get('upper_bound_kg', 'unbounded')
                 bound_text = (
-                    f"up to {float(bound):.3f} kg"
+                    f"up to {float(bound):.3f} kg (conservative upper bound)"
                     if isinstance(bound, (int, float))
                     else str(bound)
                 )

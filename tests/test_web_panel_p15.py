@@ -1053,6 +1053,7 @@ def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
             "account": "process.cleaned_melt",
             "reason": "missing LJ row",
             "upper_bound_kg": 0.5,
+            "upper_bound_basis": "conservative_ledger_bound",
         }],
     })
     artifact = {
@@ -1067,7 +1068,10 @@ def test_p15_silica_stage_renders_partial_class_exclusion() -> None:
 
     assert "sec-p15-stage--product" in stage
     assert "PARTIAL silica product; computed total is a lower bound" in stage
-    assert "Si via process.cleaned_melt (up to 0.5 kg; missing LJ row)" in stage
+    assert (
+        "Si via process.cleaned_melt (up to 0.5 kg "
+        "(conservative upper bound); missing LJ row)"
+    ) in stage
 
 
 def test_empty_stage_indeterminate_renders_as_no_material() -> None:

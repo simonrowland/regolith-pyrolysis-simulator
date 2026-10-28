@@ -281,7 +281,8 @@ def test_p11_renders_partial_product_flag_and_excluded_quantity() -> None:
             "species": "Si",
             "account": "process.cleaned_melt",
             "reason": "missing LJ row",
-            "upper_bound_kg": "unbounded",
+            "upper_bound_kg": 0.5617,
+            "upper_bound_basis": "conservative_ledger_bound",
         }],
         "flag": {
             "status": "partial",
@@ -293,7 +294,7 @@ def test_p11_renders_partial_product_flag_and_excluded_quantity() -> None:
     visible = _visible(card)
     assert "partial" in visible
     assert "Si via process.cleaned_melt" in visible
-    assert "unbounded kg bound" in visible
+    assert "up to 0.562 kg (conservative upper bound)" in visible
 
 
 def test_p11_renders_availability_flag_without_other_flag() -> None:
@@ -314,6 +315,7 @@ def test_p11_renders_availability_flag_without_other_flag() -> None:
 
     assert "partial" in visible
     assert "Si via process.cleaned_melt" in visible
+    assert "unbounded kg bound" in visible
 
 
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:

@@ -418,19 +418,26 @@ function advisoryNestedValue(value, unit, strictNumeric = false) {
     }
     const payload = advisoryObject(value);
     if (!payload) return advisoryFormatValue(value, unit, strictNumeric);
-    const parts = advisoryEntries(payload).map(([key, nested]) => {
-        const metadata = advisoryIsProductMetadata(key);
-        const valueUnit = metadata
-            ? undefined
-            : ['upper_bound_kg', 'lower_bound_kg'].includes(key)
-                ? 'kg'
-                : strictNumeric && (key === 'account' || key === 'disposition')
-                    ? undefined
-                    : unit;
-        return `${advisoryPrettyKey(key)} ${advisoryNestedValue(
-            nested, valueUnit, metadata ? false : strictNumeric,
-        )}`;
-    });
+    const hasNumericUpperBound = typeof payload.upper_bound_kg === 'number'
+        && Number.isFinite(payload.upper_bound_kg);
+    const parts = advisoryEntries(payload)
+        .filter(([key]) => !(key === 'upper_bound_basis' && hasNumericUpperBound))
+        .map(([key, nested]) => {
+            if (key === 'upper_bound_kg' && hasNumericUpperBound) {
+                return `up to ${advisoryFormatValue(nested, 'kg')} (conservative upper bound)`;
+            }
+            const metadata = advisoryIsProductMetadata(key);
+            const valueUnit = metadata
+                ? undefined
+                : ['upper_bound_kg', 'lower_bound_kg'].includes(key)
+                    ? 'kg'
+                    : strictNumeric && (key === 'account' || key === 'disposition')
+                        ? undefined
+                        : unit;
+            return `${advisoryPrettyKey(key)} ${advisoryNestedValue(
+                nested, valueUnit, metadata ? false : strictNumeric,
+            )}`;
+        });
     return parts.length ? parts.join('; ') : unit ? 'unavailable' : 'n/a';
 }
 

@@ -238,6 +238,7 @@ def test_product_class_availability_reports_unbounded_without_full_window_ledger
     assert result["status"] == "partial"
     assert result["class_total_kg"] == 3.0
     assert result["excluded"][0]["upper_bound_kg"] == "unbounded"
+    assert "upper_bound_basis" not in result["excluded"][0]
 
 
 def test_product_class_availability_bounds_from_ledger_gross_flows():
@@ -290,6 +291,9 @@ def test_product_class_availability_bounds_from_ledger_gross_flows():
 
     # 20 mol Si at 28.085 g/mol, converted independently to kilograms.
     assert result["excluded"][0]["upper_bound_kg"] == pytest.approx(0.5617)
+    assert result["excluded"][0]["upper_bound_basis"] == (
+        "conservative_ledger_bound"
+    )
 
 
 def test_cost_refusal_matches_declared_targets_without_si_product(two_hour_run):

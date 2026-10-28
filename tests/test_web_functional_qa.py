@@ -253,7 +253,8 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
                     "species": "Si",
                     "account": "process.cleaned_melt",
                     "reason": "missing LJ row",
-                    "upper_bound_kg": "unbounded",
+                    "upper_bound_kg": 0.5617,
+                    "upper_bound_basis": "conservative_ledger_bound",
                 }],
             },
         },
@@ -272,7 +273,7 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
     assert "species Si" in text
     assert "account process.cleaned_melt" in text
     assert "reason missing LJ row" in text
-    assert "upper bound kg unbounded" in text
+    assert "up to 0.562 kg (conservative upper bound)" in text
 
 
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.

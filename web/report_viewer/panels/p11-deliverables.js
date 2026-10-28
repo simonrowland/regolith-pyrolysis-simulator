@@ -327,7 +327,12 @@
       ];
       const excluded = Array.isArray(record.excluded) ? record.excluded : flag.excluded;
       if (Array.isArray(excluded) && excluded.length) {
-        parts.push(`excluded: ${excluded.map(item => `${item.species} via ${item.account} (${item.upper_bound_kg} kg bound)`).join(", ")}`);
+        parts.push(`excluded: ${excluded.map(item => {
+          const bound = typeof item.upper_bound_kg === "number" && Number.isFinite(item.upper_bound_kg)
+            ? `up to ${fmtNum(item.upper_bound_kg, "kg")} (conservative upper bound)`
+            : `${item.upper_bound_kg} kg bound`;
+          return `${item.species} via ${item.account} (${bound})`;
+        }).join(", ")}`);
       }
       return `<p class="sec-p11-flag">${esc(parts.join(" · "))}</p>`;
     }

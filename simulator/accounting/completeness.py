@@ -56,6 +56,10 @@ _EVAPORATION_SOURCE_ACCOUNTS = (
     "process.cleaned_melt",
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+# The bound sums cumulative withdrawals and current balances over the source
+# accounts. Transfers between them may be counted twice, so it is a
+# conservative upper bound, not an estimate.
+_CONSERVATIVE_LEDGER_UPPER_BOUND_BASIS = "conservative_ledger_bound"
 TARGET_YIELD_PRODUCT_ACCOUNTS = (
     _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.stage0_salt_phase",
@@ -406,7 +410,7 @@ def product_class_availability(
             upper_bound_kg = _refused_parent_element_upper_bound_kg(
                 sim, refusal
             )
-            excluded.append({
+            excluded_item = {
                 "species": str(refusal.get("species") or "unknown"),
                 "account": str(refusal.get("account") or "unknown"),
                 "reason": str(refusal.get("reason") or "transport refusal"),
@@ -415,7 +419,12 @@ def product_class_availability(
                     if upper_bound_kg is not None
                     else "unbounded"
                 ),
-            })
+            }
+            if upper_bound_kg is not None:
+                excluded_item["upper_bound_basis"] = (
+                    _CONSERVATIVE_LEDGER_UPPER_BOUND_BASIS
+                )
+            excluded.append(excluded_item)
     status = (
         "available" if not refusals
         else "partial" if has_computed_part
@@ -521,7 +530,8 @@ def _refused_parent_element_upper_bound_kg(
     # parent-element balance equals its initial balance plus every credited
     # atom. That covers every possible inventory during the run, including
     # later cleaned-melt additions and spent reductant; transfers between the
-    # two accounts can be counted twice, making this conservative, not low.
+    # two accounts can be counted twice, so this is an upper bound, not an
+    # estimate.
     upper_bound_kg = total_atom_mol * float(atomic_weight) / 1000.0
     if not math.isfinite(upper_bound_kg) or upper_bound_kg <= 0.0:
         return None

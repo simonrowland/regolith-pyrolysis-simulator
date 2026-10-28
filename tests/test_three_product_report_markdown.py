@@ -123,6 +123,26 @@ def test_partial_product_class_renders_excluded_refusal():
     assert "Si via process.cleaned_melt (unbounded" in report
 
 
+def test_partial_product_class_labels_numeric_ledger_bound_as_conservative():
+    classification = _empty_classification()
+    classification["metals_plus_O2"].update({
+        "class_total_kg": 8.5,
+        "status": "partial",
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": 0.5617,
+            "upper_bound_basis": "conservative_ledger_bound",
+        }],
+    })
+    report = format_three_product_markdown(classification)
+    assert (
+        "Si via process.cleaned_melt (up to 0.562 kg "
+        "(conservative upper bound); missing LJ row)"
+    ) in report
+
+
 def test_silica_glass_class_shows_stage_3_capture():
     classification = _empty_classification()
     classification['pure_silica_glass'] = {
