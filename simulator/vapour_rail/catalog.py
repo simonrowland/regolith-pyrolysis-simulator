@@ -1442,7 +1442,7 @@ class CompiledPressureEvaluator:
         return "reciprocal_T_tangent"
 
     def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
-        """Continue log10 P as linear in 1/T from the fit-domain edge.
+        """Continue log10 P as linear in 1/T from the supported domain edge.
 
         Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
         where reaction ΔH is slowly varying,
@@ -1483,6 +1483,24 @@ class CompiledPressureEvaluator:
             )
 
         ref = self.reference_model
+
+        if ref.physical_composite_ood:
+            # The fit edge is inside every constituent's contiguous cover
+            # (checked at compile time). Bracket the actual support edge
+            # between that accepted T and the rejected request. Stop at
+            # adjacent floats so the join is the last supported temperature,
+            # not an arbitrary tolerance or the unrelated catalog fit edge.
+            rejected = temperature_K
+            while True:
+                probe = boundary + (rejected - boundary) * 0.5
+                if probe == boundary or probe == rejected:
+                    break
+                try:
+                    ref.log10_pressure(probe)
+                except (NasaCeaDomainError, ShomateDomainError):
+                    rejected = probe
+                else:
+                    boundary = probe
 
         if ref.evaluator_family == "antoine":
             try:
@@ -1541,7 +1559,7 @@ class CompiledPressureEvaluator:
         # reference surface is smooth.
         span = max(high - low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
-        inside = boundary + step if boundary == low else boundary - step
+        inside = boundary + step if temperature_K < low else boundary - step
         if inside <= 0.0:
             inside = boundary + step  # force positive probe
         boundary_log = float(ref.log10_pressure(boundary))
