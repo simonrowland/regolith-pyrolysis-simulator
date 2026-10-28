@@ -76,7 +76,7 @@ from simulator.alphamelts_reference_pressure import (
     alphamelts_reference_pressure_diagnostics,
     annotate_alphamelts_reference_pressure,
 )
-from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.melt_backend.base import LiquidFractionInvalidError, MeltBackendError
 from simulator.melt_backend.liquidus import (
     EquilibriumCrystallizationPathResult,
     LiquidusSampleError,
@@ -779,13 +779,30 @@ class AlphaMELTSProvider(ChemistryProvider):
             evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
                 request.pressure_bar, transport='subprocess',
             )
-            path = self._backend.gate_cooling_path(
-                pressure_bar=evaluation_pressure_bar,
-                fO2_log=fO2_log if fO2_log is not None else -9.0,
-                redox_state=redox_state,
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=dict(request.account_view.species_formula_registry or {}),
-            )
+            try:
+                path = self._backend.gate_cooling_path(
+                    pressure_bar=evaluation_pressure_bar,
+                    fO2_log=fO2_log if fO2_log is not None else -9.0,
+                    redox_state=redox_state,
+                    composition_mol_by_account=composition_mol_by_account,
+                    species_formula_registry=dict(request.account_view.species_formula_registry or {}),
+                )
+            except MeltBackendError as exc:
+                failure = liquidus_sample_error_from_exception(exc)
+                if failure is None:
+                    from simulator.melt_backend.alphamelts import AlphaMELTSSubprocessContractError
+
+                    if not isinstance(exc, AlphaMELTSSubprocessContractError):
+                        raise
+                    reason = getattr(exc, 'backend_failure_reason_code', None) or str(exc)
+                    failure = LiquidusSampleError('unavailable', (str(exc),), {
+                        'backend_status': 'unavailable', 'backend_status_reason': reason,
+                        'backend_failure_reason_code': reason,
+                        'backend_failure_category': getattr(exc, 'backend_failure_category', None),
+                    })
+                path = EquilibriumCrystallizationPathResult(
+                    status=failure.status, warnings=failure.warnings, diagnostics=failure.diagnostics,
+                )
             pressure_diagnostics = alphamelts_reference_pressure_diagnostics(
                 physical_pressure_bar=request.pressure_bar,
                 evaluation_pressure_bar=evaluation_pressure_bar,

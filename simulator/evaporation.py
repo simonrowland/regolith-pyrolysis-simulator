@@ -2835,7 +2835,8 @@ class EvaporationMixin:
             ):
                 held = self._hold_freeze_gate_provider_curve(failure)
                 if held is not None:
-                    held.update(notices)
+                    if 'gate_provider_step_down' in notices:
+                        held['gate_provider_step_down'] = notices['gate_provider_step_down']
                     if 'gate_provider_step_down' in held:
                         held['gate_provider_step_down'] = {
                             **held['gate_provider_step_down'],

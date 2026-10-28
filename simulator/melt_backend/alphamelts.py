@@ -117,6 +117,7 @@ from simulator.physical_constants import (
     PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -2128,9 +2129,10 @@ class _MELTSBackendSupport(MeltBackend):
             if not math.isfinite(float(row[field])):
                 raise ValueError(f'cooling path non-finite {field}')
         # Native tables print T/P to 0.01 and log10 fO2 to 0.001.
-        if (abs(float(row['Temperature']) - temperature_C) > .01
+        if (abs(float(row['Temperature']) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C
                 or abs(float(row['Pressure']) - pressure_bar) > .01
-                or abs(float(row['fO2(absolute)']) - fO2_log) > .001):
+                or not math.isclose(float(row['fO2(absolute)']), fO2_log, rel_tol=0,
+                                    abs_tol=ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10)):
             raise ValueError('cooling path did not apply requested T/P/fO2')
         phase_lines = phase_output.splitlines()
         indices = [i for i, line in enumerate(phase_lines) if line.startswith('index ')]
@@ -2139,7 +2141,7 @@ class _MELTSBackendSupport(MeltBackend):
         phase_block = '\n'.join(phase_lines[indices[-1]:])
         phase_header = phase_lines[indices[-1]].split()
         if (phase_header[1] != row['index']
-                or abs(float(phase_header[5]) - temperature_C) > .01):
+                or abs(float(phase_header[5]) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C):
             raise ValueError('cooling path system/phase rows disagree')
         phases = self._parse_phase_main_output(phase_block)
         instances = phases['phase_instances']
@@ -2156,7 +2158,8 @@ class _MELTSBackendSupport(MeltBackend):
         if (total_mass <= 0 or not 0 <= fraction <= 1
                 or abs(total_mass * 1000 - float(row['mass'])) > .001
                 or abs(liquid_mass / total_mass - fraction) > 1.e-6
-                or (fraction == 0 and any(p['phase'] == 'liquid' for p in instances))):
+                or (melt_regime(liquid_fraction=fraction, epsilon=0) is MeltRegime.FROZEN
+                    and any(p['phase'] == 'liquid' for p in instances))):
             raise ValueError('cooling path liquid fraction disagrees with phases')
         return LiquidFractionPathPoint(
             temperature_C, fraction, phases['phase_compositions'].get('liquid', {}),
@@ -2271,10 +2274,10 @@ class _MELTSBackendSupport(MeltBackend):
                                 header + '\n' + row, blocks[row.split()[0]],
                                 temperature_C=expected_T, pressure_bar=pressure_bar, fO2_log=fO2_log,
                             )
-                        if not points and point.liquid_fraction != 1:
+                        if not points and melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is not MeltRegime.MOLTEN:
                             raise ValueError('cooling start is not superliquidus')
                         points.append(point)
-                        if point.liquid_fraction == 0:
+                        if melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is MeltRegime.FROZEN:
                             break
                     process.stdin.write('x\n')
                     process.stdin.flush()
@@ -2287,7 +2290,8 @@ class _MELTSBackendSupport(MeltBackend):
                     input='', env=env, timeout=DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
                     interact=interact,
                 )
-                if result.returncode != 0 or not points or points[-1].liquid_fraction != 0:
+                if (result.returncode != 0 or not points
+                        or melt_regime(liquid_fraction=points[-1].liquid_fraction, epsilon=0) is not MeltRegime.FROZEN):
                     raise ValueError('incomplete cooling path: no checked solidus')
             except (ValueError, OSError, IndexError, KeyError, subprocess.TimeoutExpired) as exc:
                 return EquilibriumCrystallizationPathResult(
