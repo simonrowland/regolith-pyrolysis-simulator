@@ -51,7 +51,7 @@ tables:
     observation_ids: [kroger_kreitlow_1956_table5_crystalline_solution_and_devitrification_heats, kroger_kreitlow_1956_table5_glass_solution_heats]
     columns: [composition_formula, form, solution_heat_cal_g, uncertainty_cal_g, solution_heat_kcal_mol, uncertainty_kcal_mol, devitrification_heat_cal_g, devitrification_heat_kcal_mol]
   - page: 6
-    table: '6'
+    section: '5'
     species: Na2O-CaO-SiO2
     phase: glass
     quantity: heat_of_solution
@@ -59,7 +59,26 @@ tables:
     conditions: {T_C: 22, solution: '20.6% HF-HCl'}
     method_class: measured_direct
     observation_ids: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6, kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8, kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85]
-    columns: [composition_mol_ratio_as_printed, composition_wt_pct, heat_cal_g, uncertainty_cal_g, heat_kcal_mol]
+    columns: [composition_mol_ratio_as_printed, heat_cal_g, uncertainty_cal_g, heat_kcal_mol]
+  - page: 7
+    table: '7'
+    species: Na2O-CaO-SiO2
+    phase: glass
+    quantity: batch_to_glass_reaction_heat
+    units: kcal/mol glass; kcal/100 kg glass
+    method_class: measured_reduced
+    observation_ids: [kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_6, kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_4_8, kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_0_71_4_85]
+    columns: [composition_mol_ratio_as_printed, solution_heat_kcal_mol_glass, solution_heat_kcal_100kg]
+  - page: 7
+    table: '7'
+    species: Na2O-CaO-SiO2
+    phase: glass
+    quantity: batch_to_glass_reaction_heat
+    units: kcal/100 kg glass
+    method_class: quoted_attributed
+    attribution: reference [23]
+    observation_ids: [kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_6, kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_4_8, kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_0_71_4_85]
+    columns: [composition_mol_ratio_as_printed, prior_calculation_kcal_100kg]
   - page: 7
     table: '7'
     species: Na2O-CaO-SiO2
@@ -69,7 +88,7 @@ tables:
     conditions: {T_range_C: [1300, 1350]}
     method_class: measured_direct
     observation_ids: [kroger_kreitlow_1956_table7_glass_formation_heat_1_1_6, kroger_kreitlow_1956_table7_glass_formation_heat_1_1_4_8, kroger_kreitlow_1956_table7_glass_formation_heat_1_0_71_4_85]
-    columns: [composition_mol_ratio_as_printed, composition_wt_pct, solution_heat_kcal_mol_glass, solution_heat_kcal_100kg, prior_calculation_kcal_100kg, direct_heat_kcal_mol_glass, direct_uncertainty_kcal_mol_glass, direct_heat_kcal_100kg, direct_uncertainty_kcal_100kg]
+    columns: [composition_mol_ratio_as_printed, composition_wt_pct, direct_heat_kcal_mol_glass, direct_uncertainty_kcal_mol_glass, direct_heat_kcal_100kg, direct_uncertainty_kcal_100kg]
   - page: 7
     table: '8'
     species: Na2O-CaO-SiO2
