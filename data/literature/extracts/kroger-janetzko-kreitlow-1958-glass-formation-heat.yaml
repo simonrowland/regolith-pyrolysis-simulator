@@ -1,0 +1,2734 @@
+schema_version: literature_extract.v1
+source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+source:
+  citation: Carl Kröger, Wilhelm Janetzko and Gerhard Kreitlow (1958), “Der Wärmebedarf der Silikatglasbildung”,
+    Glastechnische Berichte 31(6), 221–228. DOI 10.34657/16750 is the modern TIB repository deposit, not
+    a historical journal DOI.
+  doi: 10.34657/16750
+  doi_note: Modern TIB repository deposit DOI; no historical journal DOI is asserted.
+  url: https://doi.org/10.34657/16750
+  year: 1958
+extraction:
+  method: MinerU and Tesseract machine transcription; rendered pages used for all distinct heat-table
+    locators and flagged disagreements.
+  date: '2026-10-28'
+  worker: w1028naE2-kroger58-glass
+  provenance_path: data/literature/extracts/audits/kroger-janetzko-kreitlow-1958-glass-formation-heat.md
+  source_note: German headers translated in the audit; numeric values and units remain as printed. The
+    paper reports the heat of batch → glass + gas at 20°C. No unprinted pressure or ambient condition
+    is added.
+review_status: draft
+fidelity_samples:
+- species: silicate_glass
+  observation_id: kroger_1958_direct_fourcault_detag
+  field: value_as_printed
+  value:
+    value: '123.6'
+    unit: cal/g
+  locator:
+    page: 222
+    pdf_page_index: 1
+    note: Fourcaultglas (Detag) direct-calorimetry prose
+- species: silicate_glass
+  observation_id: kroger_1958_direct_sulfatglas_I
+  field: value_as_printed
+  value:
+    value: '209.5'
+    unit: cal/g
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: 12a
+    note: Sulfatglas I direct heat
+- species: silicate_glass
+  observation_id: kroger_1958_direct_green_bottle_table8a
+  field: value_as_printed
+  value:
+    value: '113.80'
+    unit: cal/g
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: 8a
+    note: green bottle glass direct heat
+species:
+  silicate_glass:
+    observations:
+    - observation_id: kroger_1958_direct_fourcault_detag
+      type: gibbs_table
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Detag)
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '123.6'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12360'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Detag)
+        table7_as_printed:
+          value_as_printed: '12360'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: direct_fourcault_detag
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.5'
+              - - Na2O
+                - '15.3'
+              - - CaO
+                - '7.9'
+              - - MgO
+                - '4.2'
+              - - SO3
+                - '0.4'
+              - - K2O
+                - '0.1'
+              - - R2O3
+                - '0.44'
+          locator: &id003
+            page: 222
+            pdf_page_index: 1
+            table: '3'
+            note: analyzed Fourcault Detag glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 222
+            pdf_page_index: 1
+            note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 0.8
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_fourcault_delog_oxidising
+      type: gibbs_table
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Delog), oxydierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '125.6'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12560'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Delog), oxydierend
+        table7_as_printed:
+          value_as_printed: '12560'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: direct_fourcault_delog_oxidising
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.11'
+              - - Na2O
+                - '14.34'
+              - - CaO
+                - '7.97'
+              - - MgO
+                - '4.43'
+              - - SO3
+                - '0.47'
+              - - K2O
+                - '0.91'
+              - - R2O3
+                - '0.77'
+          locator: &id001
+            page: 222
+            pdf_page_index: 1
+            table: '3'
+            note: analyzed Fourcault Delog glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 222
+            pdf_page_index: 1
+            note: Fourcaultglas (Delog), oxydierend; the paper gives no quench/preservation statement
+              for this glass
+      uncertainty:
+        as_printed: ± 1.8
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_libbey_owens_oxidising
+      type: gibbs_table
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Libbey-Owens-Glas (Delog), oxydierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '111.8'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '11180'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Libbey-Owens-Glas (Delog), oxydierend
+        table7_as_printed:
+          value_as_printed: '11180'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: direct_libbey_owens_oxidising
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.21'
+              - - Na2O
+                - '12.93'
+              - - CaO
+                - '9.12'
+              - - MgO
+                - '3.05'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '0.85'
+          locator: &id002
+            page: 222
+            pdf_page_index: 1
+            table: '3'
+            note: analyzed Libbey-Owens glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 222
+            pdf_page_index: 1
+            note: Libbey-Owens-Glas (Delog), oxydierend; the paper gives no quench/preservation statement
+              for this glass
+      uncertainty:
+        as_printed: ± 1.4
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_brown_bottle
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Braunes Flaschenglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '126.60'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12660'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Braunes Flaschenglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.9'
+              - - Na2O
+                - '14.6'
+              - - K2O
+                - '0.62'
+              - - CaO
+                - '9.86'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '2.51'
+          locator: &id004
+            page: 224
+            pdf_page_index: 3
+            table: 8b
+            note: analysed brown glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8a
+            note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 1.6
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_chromgreen_bottle
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Chromgrünes Flaschenglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '124.40'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12440'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Chromgrünes Flaschenglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '72.2'
+              - - Na2O
+                - '15.2'
+              - - K2O
+                - '0.62'
+              - - CaO
+                - '9.75'
+              - - SO3
+                - '0.3'
+              - - Cr2O3
+                - '0.29'
+              - - R2O3
+                - '1.84'
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8b
+            note: analysed chrom-green glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8a
+            note: Chromgrünes Flaschenglas; the paper gives no quench/preservation statement for this
+              glass
+      uncertainty:
+        as_printed: ± 1.2
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_green_bottle_table8a
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Grünes Flaschenglas, Table 8a
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '113.80'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 8a render reads 113.80 ± 0.9 cal/g; Table 16 independently prints 10700 kcal/100
+          kg. Both are preserved; no correction inferred.
+        table16_summary_as_printed:
+          value_as_printed: '10700'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Grünes Flaschenglas, Table 8a
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '68.90'
+              - - Na2O
+                - '13.80'
+              - - K2O
+                - '1.2'
+              - - CaO
+                - '8.78'
+              - - MgO
+                - '3.3'
+              - - SO3
+                - '0.3'
+              - - Mn2O3
+                - '0.45'
+              - - R2O3
+                - '6.57'
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8b
+            note: analysed green glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8a
+            note: Grünes Flaschenglas, Table 8a; the paper gives no quench/preservation statement for
+              this glass
+      uncertainty:
+        as_printed: ± 0.9
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_white_bottle
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Weißes Flaschenglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '126.8'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12680'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Weißes Flaschenglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '72.5'
+              - - Na2O
+                - '15.5'
+              - - K2O
+                - '0.4'
+              - - CaO
+                - '6.3'
+              - - BaO
+                - '0.5'
+              - - R2O3
+                - '1.2'
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8b
+            note: analysed white glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: 8a
+            note: Weißes Flaschenglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 1.5
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_rohrenglas_I
+      type: gibbs_table
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '130.2'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '13020'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Röhrenglas I
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '69.3'
+              - - Na2O
+                - '16.6'
+              - - K2O
+                - '2.39'
+              - - CaO
+                - '6.9'
+              - - R2O3
+                - '4.6'
+          locator: &id005
+            page: 225
+            pdf_page_index: 4
+            table: '9'
+            note: analysed tube glass I
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '9'
+            note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 1.7
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_rohrenglas_II
+      type: gibbs_table
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas II
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '121.1'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12110'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Röhrenglas II
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '70.2'
+              - - Na2O
+                - '12.5'
+              - - K2O
+                - '1.76'
+              - - CaO
+                - '5.78'
+              - - MgO
+                - '3.42'
+              - - BaO
+                - '1.55'
+              - - ZnO
+                - '1.31'
+              - - Na2SO4
+                - '0.14'
+              - - Sb2O3
+                - '0.05'
+              - - R2O3
+                - '3.38'
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '9'
+            note: analysed tube glass II
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '9'
+            note: Röhrenglas II; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 3.1
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_speiser_wirtschaftsglas
+      type: gibbs_table
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '10'
+        note: Speiser-Wirtschaftsglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '109.6'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '10960'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Speiser-Wirtschaftsglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.4'
+              - - Na2O
+                - '14.06'
+              - - K2O
+                - '1.73'
+              - - CaO
+                - '8.04'
+              - - R2O3
+                - '2.77'
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '10'
+            note: analysed Speiser glass
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '10'
+            note: Speiser-Wirtschaftsglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 2.8
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_geraeteglas
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Geräteglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '107.0'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '10700'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Geräteglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '79.26'
+              - - Na2O
+                - '5.91'
+              - - B2O3
+                - '8.41'
+              - - CaO
+                - '0.89'
+              - - Al2O3
+                - '5.53'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: printed Geräteglas composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: Geräteglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 2.4
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_kristallglas
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Kristallglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '123.7'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '12370'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Kristallglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '75.0'
+              - - Na2O
+                - '9.06'
+              - - K2O
+                - '7.19'
+              - - CaO
+                - '5.04'
+              - - BaO
+                - '3.89'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: printed Kristallglas composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: Kristallglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 1.8
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_bleikristallglas
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Bleikristallglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '90.3'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '9030'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Bleikristallglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '62.0'
+              - - Na2O
+                - '1.17'
+              - - K2O
+                - '12.99'
+              - - BaO
+                - '3.89'
+              - - PbO
+                - '19.05'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: printed Bleikristallglas composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: '11'
+            note: Bleikristallglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 2.9
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_sulfatglas_I
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas I
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '209.5'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '20950'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Sulfatglas I
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '67.85'
+              - - Na2O
+                - '11.56'
+              - - Na2SO4
+                - '2.60'
+              - - CaO
+                - '15.20'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: printed Sulfatglas I glass composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: Sulfatglas I; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 3.8
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_sulfatglas_II
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas II
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '175.8'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '17580'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Sulfatglas II
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '74.15'
+              - - Na2O
+                - '12.43'
+              - - Na2SO4
+                - '3.00'
+              - - CaO
+                - '11.22'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: printed Sulfatglas II glass composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: Sulfatglas II; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 4.3
+        confidence_level: not_stated
+    - observation_id: kroger_1958_direct_sulfatglas_III
+      type: gibbs_table
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas III
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_direct
+        value_as_printed:
+          value: '203.5'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary conversion is retained beside the detailed mean.
+        table16_summary_as_printed:
+          value_as_printed: '20350'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Sulfatglas III
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '68.34'
+              - - Na2O
+                - '13.40'
+              - - Na2SO4
+                - '3.50'
+              - - CaO
+                - '13.76'
+              - - Al2O3·2SiO2
+                - '3.56'
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: printed Sulfatglas III glass composition
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 226
+            pdf_page_index: 5
+            table: 12a
+            note: Sulfatglas III; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 3.3
+        confidence_level: not_stated
+    - observation_id: kroger_1958_reduced_fourcault_delog
+      type: gibbs_table
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Fourcaultglas (Delog), reduzierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_reduced
+        value_as_printed:
+          value: '137.86'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 16 summary agrees with 137.86 cal/g.
+        table16_summary_as_printed:
+          value_as_printed: '13786'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Delog), reduzierend
+        table7_as_printed:
+          value_as_printed: '13786'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Fourcaultglas (Delog), reduzierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.11'
+              - - Na2O
+                - '14.34'
+              - - CaO
+                - '7.97'
+              - - MgO
+                - '4.43'
+              - - SO3
+                - '0.47'
+              - - K2O
+                - '0.91'
+              - - R2O3
+                - '0.77'
+          locator: *id001
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 222
+            pdf_page_index: 1
+            note: Fourcaultglas (Delog), reduzierend; the paper gives no quench/preservation statement
+              for this glass
+        atmosphere:
+          state:
+            tag: value
+            value: reducing; corrected from direct calorimetry
+          locator:
+            page: 222
+            pdf_page_index: 1
+            equation: '3'
+            note: reducing-furnace correction
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from:
+      - kroger_1958_direct_fourcault_delog_oxidising
+      derivation:
+        relation: author correction from oxidising bomb calorimetry to reducing furnace reaction using
+          printed carbon reaction (3)
+        inputs:
+        - kroger_1958_direct_fourcault_delog_oxidising
+        output_unit: cal/g
+    - observation_id: kroger_1958_reduced_libbey_owens
+      type: gibbs_table
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Libbey-Owens-Glas (Delog), reduzierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_reduced
+        value_as_printed:
+          value: '124.28'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 7 prints 12428 and Table 16 prints 12420 kcal/100 kg; prose result 124.28 cal/g is
+          preserved, conflict unresolved.
+        table16_summary_as_printed:
+          value_as_printed: '12420'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Libbey-Owens-Glas (Delog), reduzierend
+        table7_as_printed:
+          value_as_printed: '12428'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Libbey-Owens-Glas (Delog), reduzierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.21'
+              - - Na2O
+                - '12.93'
+              - - CaO
+                - '9.12'
+              - - MgO
+                - '3.05'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '0.85'
+          locator: *id002
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 222
+            pdf_page_index: 1
+            note: Libbey-Owens-Glas (Delog), reduzierend; the paper gives no quench/preservation statement
+              for this glass
+        atmosphere:
+          state:
+            tag: value
+            value: reducing; corrected from direct calorimetry
+          locator:
+            page: 222
+            pdf_page_index: 1
+            equation: '3'
+            note: reducing-furnace correction
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from:
+      - kroger_1958_direct_libbey_owens_oxidising
+      derivation:
+        relation: author correction from oxidising bomb calorimetry to reducing furnace reaction using
+          printed carbon reaction (3)
+        inputs:
+        - kroger_1958_direct_libbey_owens_oxidising
+        output_unit: cal/g
+    - observation_id: kroger_1958_solution_glass_detag
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Detag)
+      phase: glass
+      standard_state: Glass dissolution in the printed 20% HF–HCl mixture; near 20°C. Not a glass-formation
+        heat.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          value: '-583.7'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.5'
+              - - Na2O
+                - '15.3'
+              - - CaO
+                - '7.9'
+              - - MgO
+                - '4.2'
+              - - SO3
+                - '0.4'
+              - - K2O
+                - '0.1'
+              - - R2O3
+                - '0.44'
+          locator: *id003
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: '5'
+            note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 0.4
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_glass_delog
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Delog)
+      phase: glass
+      standard_state: Glass dissolution in the printed 20% HF–HCl mixture; near 20°C. Not a glass-formation
+        heat.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          value: '-586.8'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.11'
+              - - Na2O
+                - '14.34'
+              - - CaO
+                - '7.97'
+              - - MgO
+                - '4.43'
+              - - SO3
+                - '0.47'
+              - - K2O
+                - '0.91'
+              - - R2O3
+                - '0.77'
+          locator: *id001
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: '5'
+            note: Fourcaultglas (Delog); the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 0.4
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_glass_libbey
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Libbey-Owens-Glas (Delog)
+      phase: glass
+      standard_state: Glass dissolution in the printed 20% HF–HCl mixture; near 20°C. Not a glass-formation
+        heat.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          value: '-581.2'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.21'
+              - - Na2O
+                - '12.93'
+              - - CaO
+                - '9.12'
+              - - MgO
+                - '3.05'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '0.85'
+          locator: *id002
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: '5'
+            note: Libbey-Owens-Glas (Delog); the paper gives no quench/preservation statement for this
+              glass
+      uncertainty:
+        as_printed: ± 0.9
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_glass_brown
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        note: Braunes Flaschenglas
+      phase: glass
+      standard_state: Glass dissolution in the printed 20% HF–HCl mixture; near 20°C. Not a glass-formation
+        heat.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          value: '-584.2'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.9'
+              - - Na2O
+                - '14.6'
+              - - K2O
+                - '0.62'
+              - - CaO
+                - '9.86'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '2.51'
+          locator: *id004
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 0.9
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_glass_rohr1
+      type: gibbs_table
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+      phase: glass
+      standard_state: Glass dissolution in the printed 20% HF–HCl mixture; near 20°C. Not a glass-formation
+        heat.
+      units: cal/g
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          value: '-566.6'
+          unit: cal/g
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '69.3'
+              - - Na2O
+                - '16.6'
+              - - K2O
+                - '2.39'
+              - - CaO
+                - '6.9'
+              - - R2O3
+                - '4.6'
+          locator: *id005
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 225
+            pdf_page_index: 4
+            table: '9'
+            note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        as_printed: ± 1.0
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_formation_detag
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Detag)
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_tabulated
+        value_as_printed:
+          value_as_printed: '12030'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '12030'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Detag)
+        table6b_as_printed:
+          formation_kcal_per_kg:
+            raw: '120.30'
+            corrected: '120.30'
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: 6b
+            note: Fourcaultglas (Detag)
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.5'
+              - - Na2O
+                - '15.3'
+              - - CaO
+                - '7.9'
+              - - MgO
+                - '4.2'
+              - - SO3
+                - '0.4'
+              - - K2O
+                - '0.1'
+              - - R2O3
+                - '0.44'
+          locator: *id003
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from: &id006
+      - kroger_1958_solution_glass_detag
+      - kroger_1958_solution_feldspar
+      - kroger_1958_solution_dolomite
+      - kroger_1958_solution_sulfate
+      derivation:
+        relation: Authors’ solution-calorimetry tabulation from measured dissolution heats and printed
+          auxiliary reactions; prior 1956 component values are cross-referenced as [2] and not duplicated.
+        inputs: *id006
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_delog_oxidising
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), oxydierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_tabulated
+        value_as_printed:
+          value_as_printed: '12325'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '12325'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Delog), oxydierend
+        table6b_as_printed:
+          formation_kcal_per_kg:
+            raw: '172.18'
+            corrected: '132.60'
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: 6b
+            note: Fourcaultglas (Delog), oxydierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.11'
+              - - Na2O
+                - '14.34'
+              - - CaO
+                - '7.97'
+              - - MgO
+                - '4.43'
+              - - SO3
+                - '0.47'
+              - - K2O
+                - '0.91'
+              - - R2O3
+                - '0.77'
+          locator: *id001
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Fourcaultglas (Delog), oxydierend; the paper gives no quench/preservation statement
+              for this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from: &id007
+      - kroger_1958_solution_glass_delog
+      - kroger_1958_solution_feldspar
+      - kroger_1958_solution_dolomite
+      - kroger_1958_solution_sulfate
+      derivation:
+        relation: Authors’ solution-calorimetry tabulation from measured dissolution heats and printed
+          auxiliary reactions; prior 1956 component values are cross-referenced as [2] and not duplicated.
+        inputs: *id007
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_delog_reducing
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), reduzierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_reduced
+        value_as_printed:
+          value_as_printed: '13663'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '13663'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Fourcaultglas (Delog), reduzierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.11'
+              - - Na2O
+                - '14.34'
+              - - CaO
+                - '7.97'
+              - - MgO
+                - '4.43'
+              - - SO3
+                - '0.47'
+              - - K2O
+                - '0.91'
+              - - R2O3
+                - '0.77'
+          locator: *id001
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Fourcaultglas (Delog), reduzierend; the paper gives no quench/preservation statement
+              for this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from:
+      - kroger_1958_solution_formation_delog_oxidising
+      derivation:
+        relation: Reducing-furnace correction from the oxidising solution-calorimetry row using printed
+          carbon reaction (3).
+        inputs:
+        - kroger_1958_solution_formation_delog_oxidising
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_libbey_oxidising
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, oxydierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_tabulated
+        value_as_printed:
+          value_as_printed: '10811'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '10811'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Libbey-Owens-Glas, oxydierend
+        table6b_as_printed:
+          formation_kcal_per_kg:
+            raw: '148.03'
+            corrected: '116.70'
+          locator:
+            page: 223
+            pdf_page_index: 2
+            table: 6b
+            note: Libbey-Owens-Glas, oxydierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.21'
+              - - Na2O
+                - '12.93'
+              - - CaO
+                - '9.12'
+              - - MgO
+                - '3.05'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '0.85'
+          locator: *id002
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Libbey-Owens-Glas, oxydierend; the paper gives no quench/preservation statement for
+              this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from: &id008
+      - kroger_1958_solution_glass_libbey
+      - kroger_1958_solution_feldspar
+      - kroger_1958_solution_dolomite
+      - kroger_1958_solution_sulfate
+      derivation:
+        relation: Authors’ solution-calorimetry tabulation from measured dissolution heats and printed
+          auxiliary reactions; prior 1956 component values are cross-referenced as [2] and not duplicated.
+        inputs: *id008
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_libbey_reducing
+      type: gibbs_table
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, reduzierend
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_reduced
+        value_as_printed:
+          value_as_printed: '12041'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '12041'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Libbey-Owens-Glas, reduzierend
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '73.21'
+              - - Na2O
+                - '12.93'
+              - - CaO
+                - '9.12'
+              - - MgO
+                - '3.05'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '0.85'
+          locator: *id002
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 224
+            pdf_page_index: 3
+            table: '7'
+            note: Libbey-Owens-Glas, reduzierend; the paper gives no quench/preservation statement for
+              this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from:
+      - kroger_1958_solution_formation_libbey_oxidising
+      derivation:
+        relation: Reducing-furnace correction from the oxidising solution-calorimetry row using printed
+          carbon reaction (3).
+        inputs:
+        - kroger_1958_solution_formation_libbey_oxidising
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_rohrenglas_I
+      type: gibbs_table
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Röhrenglas I
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_tabulated
+        value_as_printed:
+          value_as_printed: '12760'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '12760'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Röhrenglas I
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '69.3'
+              - - Na2O
+                - '16.6'
+              - - K2O
+                - '2.39'
+              - - CaO
+                - '6.9'
+              - - R2O3
+                - '4.6'
+          locator: *id005
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from: &id009
+      - kroger_1958_solution_glass_rohr1
+      derivation:
+        relation: Authors’ solution-calorimetry tabulation from measured dissolution heats and printed
+          auxiliary reactions; prior 1956 component values are cross-referenced as [2] and not duplicated.
+        inputs: *id009
+        output_unit: kcal/100 kg glass
+    - observation_id: kroger_1958_solution_formation_brown_bottle
+      type: gibbs_table
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Braunes Flaschenglas
+      phase: glass
+      standard_state: Gemenge → Glas + Gas; reaction heat referred to 20°C; no total pressure stated.
+      units: kcal/100 kg glass
+      T_C: '20'
+      values:
+        quantity: heat_of_glass_formation_from_batch
+        method_class: measured_tabulated
+        value_as_printed:
+          value_as_printed: '12810'
+          unit: kcal/100 kg glass
+        schema_gap: No exact battery quantity token represents the measured reaction heat for batch →
+          glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the measured reaction heat for batch
+          → glass + gas. Quantity.DELTA_FH is formation from elements, not this batch reaction; retained
+          as typed-refused data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        table16_summary_as_printed:
+          value_as_printed: '12810'
+          units_as_printed: kcal/100 kg glass
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Braunes Flaschenglas
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: as printed
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '71.9'
+              - - Na2O
+                - '14.6'
+              - - K2O
+                - '0.62'
+              - - CaO
+                - '9.86'
+              - - SO3
+                - '0.47'
+              - - R2O3
+                - '2.51'
+          locator: *id004
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 228
+            pdf_page_index: 7
+            table: '16'
+            note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+      derived_from: &id010
+      - kroger_1958_solution_glass_brown
+      derivation:
+        relation: Authors’ solution-calorimetry tabulation from measured dissolution heats and printed
+          auxiliary reactions; prior 1956 component values are cross-referenced as [2] and not duplicated.
+        inputs: *id010
+        output_unit: kcal/100 kg glass
+  solution_component:
+    observations:
+    - observation_id: kroger_1958_solution_feldspar
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Feldspat
+      phase: cr
+      standard_state: Dissolution in the printed 20% HF–HCl mixture; reference near 20°C as in the solution-calorimetry
+        section.
+      units: cal/g; kcal/mol
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          heat_cal_g: '-425.1'
+          corrected_cal_g: '-455.4'
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 4 measured means and any separately printed corrected or molar form are retained
+          literally.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+      uncertainty:
+        as_printed: ± 0.9
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_dolomite
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Dolomit
+      phase: cr
+      standard_state: Dissolution in the printed 20% HF–HCl mixture; reference near 20°C as in the solution-calorimetry
+        section.
+      units: cal/g; kcal/mol
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          heat_cal_g: '-98.0'
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 4 measured means and any separately printed corrected or molar form are retained
+          literally.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+      uncertainty:
+        as_printed: ± 0.1
+        confidence_level: not_stated
+    - observation_id: kroger_1958_solution_sulfate
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfat
+      phase: cr
+      standard_state: Dissolution in the printed 20% HF–HCl mixture; reference near 20°C as in the solution-calorimetry
+        section.
+      units: cal/g; kcal/mol
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          heat_cal_g: '+24.68'
+          heat_kcal_mol: '+3.5'
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 4 measured means and any separately printed corrected or molar form are retained
+          literally.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+    - observation_id: kroger_1958_solution_sulfite
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfit
+      phase: cr
+      standard_state: Dissolution in the printed 20% HF–HCl mixture; reference near 20°C as in the solution-calorimetry
+        section.
+      units: cal/g; kcal/mol
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          heat_cal_g: '-16.08'
+          heat_kcal_mol: '-2.03'
+          corrected_cal_g: '-24.24'
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 4 measured means and any separately printed corrected or molar form are retained
+          literally.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+      uncertainty:
+        note: No uncertainty printed for this reported value.
+    - observation_id: kroger_1958_solution_sulfide
+      type: gibbs_table
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfid
+      phase: cr
+      standard_state: Dissolution in the printed 20% HF–HCl mixture; reference near 20°C as in the solution-calorimetry
+        section.
+      units: cal/g; kcal/mol
+      T_C: '20'
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        value_as_printed:
+          heat_cal_g: '-315.0'
+          heat_kcal_mol: '-24.57'
+        schema_gap: No exact battery quantity token represents the separately measured dissolution heat;
+          the printed value is retained as typed-refused input data.
+        admission_status: typed_refusal
+        refusal_reason: No exact battery quantity token represents the separately measured dissolution
+          heat; the printed value is retained as typed-refused input data.
+        reaction_as_printed: Gemenge → Glas + Gas
+        reference_temperature_as_printed: 20°C
+        notes: Table 4 measured means and any separately printed corrected or molar form are retained
+          literally.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '20'
+          locator:
+            page: 228
+            pdf_page_index: 7
+            section: '8'
+            note: reference temperature stated in section 8
+      uncertainty:
+        as_printed: ± 1.1
+        confidence_level: not_stated
