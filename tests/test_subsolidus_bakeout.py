@@ -807,7 +807,9 @@ def test_c0_same_step_pipe_cap_numeric_pin():
         p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
     )
 
-    assert inlet.total_kg_hr == pytest.approx(0.0009597869579047912)
+    # Prepared inventory and its ledger potential change the incoming
+    # vapour mixture; the capacity owner and capped-rate guards stay fixed.
+    assert inlet.total_kg_hr == pytest.approx(0.0023999447173521636)
     assert transport["pipe_conductance_kg_hr"] == pytest.approx(
         0.0004385903383104627
     )
