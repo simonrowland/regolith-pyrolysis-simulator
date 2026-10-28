@@ -113,7 +113,7 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
     assert composition_condition.locator.page == 12
     assert composition_condition.locator.published_page == 492
     mixture_b_initial = result.experiments[
-        "kushiro-1971-mixture-b"
+        mixture_b_row.experiment_id
     ].sample.initial_composition
     assert mixture_b_initial is not None and mixture_b_initial.state.is_value
     assert mixture_b_initial.locator is not None
