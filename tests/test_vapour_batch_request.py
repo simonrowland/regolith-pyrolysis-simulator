@@ -741,10 +741,12 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
             state=state,
             flux_activation_context=_rg_activation_context(),
         )
-        assert non_p_batch.channel("NaCl").refusal_code == (
-            REFUSAL_INAPPLICABLE_PREDICATE
-        )
-        assert non_p_batch.channel("NaCl").extra["applicability_evidence"]["flux_dormant"] is True
+        non_p = non_p_batch.channel("NaCl")
+        if stage == "c0b_p_cleanup":
+            assert non_p.refusal_code != REFUSAL_INAPPLICABLE_PREDICATE
+        else:
+            assert non_p.refusal_code == REFUSAL_INAPPLICABLE_PREDICATE
+            assert non_p.extra["applicability_evidence"]["flux_dormant"] is True
 
 
 @pytest.mark.parametrize("phase,stage", [(None, None), ("", None), (None, ""), ("", "")])

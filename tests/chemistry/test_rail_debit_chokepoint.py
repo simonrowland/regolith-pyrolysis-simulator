@@ -151,6 +151,47 @@ def test_cleanup_offgas_requires_positive_predicate(
         assert authority["status"] == VAPOUR_CARRIER_AUTHORITY_REFUSED
 
 
+@pytest.mark.parametrize("temperature_C", [1180.0, 1200.0, 1250.0, 1320.0])
+def test_c0b_coevaporation_uses_hot_train_flux_and_debits_ledger(
+    vapor_pressure_data, feedstocks_data, setpoints_data, temperature_C,
+):
+    from simulator.state import Atmosphere, CampaignPhase
+
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._get_turbine_spec()
+    sim.melt.temperature_C = temperature_C
+    sim.melt.p_total_mbar = sim.melt.pO2_mbar = 9.0
+    sim.melt.background_gas_species = "O2"
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    equilibrium = sim._get_equilibrium()
+    sim.melt.campaign = CampaignPhase.C2B
+    hot_flux = sim._calculate_evaporation(equilibrium)
+    sim.melt.campaign = CampaignPhase.C0B
+    cleanup_flux = sim._calculate_evaporation(equilibrium)
+
+    # Same source state and gas cover: the cleanup label adds P carriers,
+    # but must not suppress the ordinary hot-train evaporating species.
+    for species in ("Na", "K", "SiO"):
+        assert hot_flux.species_kg_hr[species] > 0.0
+        assert cleanup_flux.species_kg_hr.get(species, 0.0) == pytest.approx(
+            hot_flux.species_kg_hr[species], rel=1e-12, abs=0.0,
+        )
+        assert cleanup_flux.carrier_authority_by_species[species]["is_flux_active"]
+    assert cleanup_flux.species_kg_hr["PO"] > 0.0
+    assert cleanup_flux.species_kg_hr["PO2"] > 0.0
+
+    before = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    sim._route_to_condensation(cleanup_flux)
+    committed = sim._ledger_committed_evap_flux_this_tick.species_kg_hr
+    after = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    for species, parent in (("Na", "Na2O"), ("K", "K2O"), ("SiO", "SiO2")):
+        assert committed[species] > 0.0
+        assert after[parent] < before[parent]
+        assert sim.condensation_model.last_condensation_authority_by_species[species]["status"] != "refused"
+    sim.atom_ledger.assert_balanced()
+
+
 def test_stage3_extrapolation_flag_reaches_product_ledger(
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
