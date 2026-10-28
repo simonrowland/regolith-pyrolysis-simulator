@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from simulator.chemistry import ellingham_thermo
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ellingham_fit_extrapolation,
@@ -14,7 +15,6 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
 )
-from simulator.chemistry import melt_activity
 from simulator.physical_constants import FARADAY
 from simulator.reference_data.janaf import janaf_fusion_energy, _fusion_table_points
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -184,7 +184,7 @@ def mre_decomposition_voltage_reference(
                         # -dG*1000/(4F) gives J/C = V, matching the graph
                         # rail when the liquid branch is reached.
                         liquid_delta_g = (
-                            melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(T_K)
+                            ellingham_thermo._na_activity_reference_standard_delta_g_kj_per_mol_o2(T_K)
                         )
                         voltage = -liquid_delta_g * 1000.0 / (4.0 * FARADAY)
                         liquid_bands = [

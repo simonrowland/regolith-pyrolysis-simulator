@@ -9,6 +9,7 @@ import yaml
 
 from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator import mre_ladder
+from simulator.chemistry import ellingham_thermo
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -302,28 +303,26 @@ def test_missing_fusion_input_refuses_without_static_fallback(monkeypatch):
 
 @pytest.mark.parametrize("temperature_K", [1100.0, 1200.0, 1300.0, 1400.0, 1405.2, 1473.15])
 def test_na_mre_uses_existing_liquid_activity_standard(temperature_K):
-    from simulator.chemistry import melt_activity
     from simulator.physical_constants import FARADAY
 
     ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=temperature_K)
-    expected_g = melt_activity._na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
+    expected_g = ellingham_thermo._na_activity_reference_standard_delta_g_kj_per_mol_o2(temperature_K)
     assert ref.voltage == -expected_g * 1000.0 / (4.0 * FARADAY)
     if temperature_K < 1405.2:
         assert ref.voltage != ref.raw_graph_voltage_V
         assert ref.authoritative is False
         assert "metastable_liquid_standard" in ref.status
-        assert "certified_band_K=[1405.2,2600.0]" in ref.status
+        assert "certified_band_K=[1405.2,3000.0]" in ref.status
     else:
         assert ref.voltage == ref.raw_graph_voltage_V
         assert ref.status == "ok"
 
 
 def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypatch):
-    from simulator.chemistry import melt_activity
     from simulator.electrolysis import MREElectrolysisRefusal
     from simulator.physical_constants import FARADAY
 
-    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2",
+    monkeypatch.setattr(ellingham_thermo, "_na_activity_reference_standard_delta_g_kj_per_mol_o2",
                         lambda _temperature: -400.0)
     ref = mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
     assert ref.voltage == 400000.0 / (4.0 * FARADAY)
@@ -331,7 +330,7 @@ def test_na_mre_tracks_liquid_standard_owner_and_refuses_missing_input(monkeypat
     def missing(_temperature):
         raise ValueError("Na-015: JANAF liquid rows missing")
 
-    monkeypatch.setattr(melt_activity, "_na_activity_reference_standard_delta_g_kj_per_mol_o2", missing)
+    monkeypatch.setattr(ellingham_thermo, "_na_activity_reference_standard_delta_g_kj_per_mol_o2", missing)
     with pytest.raises(MREElectrolysisRefusal) as caught:
         mre_ladder.mre_decomposition_voltage_reference("Na2O", temperature_K=1200.0)
     assert caught.value.reason == "mre_liquid_standard_missing_input"
