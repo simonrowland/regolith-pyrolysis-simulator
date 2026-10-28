@@ -96,8 +96,9 @@ MASS_BALANCE_MAX_PCT = 5e-12
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
-        "flux_maps_sha256": "6f6b8e6f2137ffb369ec3079cd7305324325713cad87be2e6d609fe9911b6267",
-        "ledger_sha256": "7a9f7563abd01542bcf892aa7c5109faef4a0d9f6eb7b5831248518177e77669",
+        # c3: redox applied once per batch in canonical order (lunar C0 moves).
+        "flux_maps_sha256": "b17dd0a57b6cce6860af54eed8f1ba93a0a7187597f7c30940313825173ad6a4",
+        "ledger_sha256": "b8d78633ec0c91bbc92f34b1e92378ad36987e7209fefc5aedff5cd54ab9b18f",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
