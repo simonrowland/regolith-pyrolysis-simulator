@@ -16,6 +16,10 @@
 
 The alternate pipeline-ocr variant is independently compared but is not treated as clean corroboration: it merges cells and misreads 134.4 as `13404`; the page render resolves these. No decimal, sign, exponent, or row/column uncertainty remains in the listed Table 3 cells.
 
+## Quoted pressure statement
+
+The approximate high-temperature Na partial-pressure range is prose on absolute PDF page 19 (printed page 16), not a row-level Table 3 result. The pdftotext wording was checked against the page render. It states that no experimental checks were made during vaporization, that Na/O was believed to be approximately 2/1 particularly at higher temperatures, and that this value was assumed in all calculations for Na2O. The one quoted observation preserves the printed range (10^-3–10^-4 atm); it is not expanded into per-run measurements.
+
 ## Schema / interpretation question
 
 Table 3 directly reports total sample weight loss, duration, and effusion-hole area. The text says the Na/O ratio was not measured during Na2O vaporization and was assumed to be 2:1 in the authors’ calculations. It reports only an approximate high-temperature Na partial-pressure range (10⁻³–10⁻⁴ atm), not seven row-specific pressures. Existing `mass_loss_rate` is a supported quantity but does not distinguish Na from O2; obtaining a Na-specific pressure or flux from these rows requires adopting the stated but unchecked gas composition assumption and a Knudsen reduction. No row-level total pressure or quantitative starting composition is printed in Table 3. They must remain unknown unless another printed statement supplies them.
