@@ -16,6 +16,7 @@ _RENDER_PINS = {
     "kroger_1958_direct_libbey_owens_oxidising": ("111.8", "cal/g", 222, None),
     "kroger_1958_direct_green_bottle_table8a": ("113.80", "cal/g", 224, "8a"),
     "kroger_1958_direct_sulfatglas_I": ("209.5", "cal/g", 226, "12a"),
+    "kroger_1958_direct_speiser_wirtschaftsglas": ("109.6", "cal/g", 226, "10"),
     "kroger_1958_solution_formation_libbey_reducing": ("12041", "kcal/100 kg glass", 224, "7"),
     "kroger_1958_solution_formation_rohrenglas_I": ("12760", "kcal/100 kg glass", 228, "16"),
 }
@@ -41,6 +42,18 @@ _SULFATGLAS_KG_PINS = {
         "Al2O3·2SiO2": "3.56",
     },
 }
+
+_ROHR_II_ANALYSED = {
+    "SiO2": "70.2",
+    "Na2O": "12.5",
+    "K2O": "1.76",
+    "CaO": "5.78",
+    "MgO": "3.42",
+    "BaO": "1.55",
+    "ZnO": "1.31",
+    "R2O3": "3.38",
+}
+_ROHR_II_CALCULATED = {"Na2SO4": "0.14", "Sb2O3": "0.05"}
 
 
 def _load():
@@ -120,6 +133,55 @@ def test_sulfatglas_compositions_are_pinned_as_printed_kilogram_maps():
             "components": list(_SULFATGLAS_KG_PINS[observation_id].items()),
         }
     assert _sulfatglas_kg_grid(mutated) != _SULFATGLAS_KG_PINS
+
+
+def test_rohrenglas_ii_keeps_analysed_and_calculated_cells_separate():
+    document = _load()
+    observations = _observations(document)
+    row = observations["kroger_1958_direct_rohrenglas_II"]
+    analysed = row["point_conditions"]["printed_composition"]
+    calculated = row["point_conditions"]["calculated_composition"]
+    dashes = row["point_conditions"]["analysed_composition_dashes"]
+    assert analysed["state"]["value"]["components"] == [
+        [key, value] for key, value in _ROHR_II_ANALYSED.items()
+    ]
+    assert analysed["state"]["value"]["amount_basis"] == "mass_percent"
+    assert calculated["state"]["value"] == _ROHR_II_CALCULATED
+    assert "analysed Na2SO4 and Sb2O3 cells are —" in calculated["locator"]["note"]
+    assert dashes["state"]["value"] == {"Na2SO4": "—", "Sb2O3": "—"}
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    migrated = migrator.result.observations[
+        f"{document['source_id']}::kroger_1958_direct_rohrenglas_II"
+    ]
+    migrated_analysed = migrated.point_conditions["printed_composition"]
+    migrated_calculated = migrated.point_conditions["calculated_composition"]
+    migrated_dashes = migrated.point_conditions["analysed_composition_dashes"]
+    assert migrated_analysed.state.is_value
+    assert migrated_analysed.state.value["amount_basis"] == "mass_percent"
+    assert dict(migrated_analysed.state.value["components"]) == _ROHR_II_ANALYSED
+    assert migrated_calculated.state.is_value
+    assert {key: str(value) for key, value in migrated_calculated.state.value.items()} == _ROHR_II_CALCULATED
+    assert "analysed Na2SO4 and Sb2O3 cells are —" in migrated_calculated.locator.note
+    assert migrated_dashes.state.is_value
+    assert {key: str(value) for key, value in migrated_dashes.state.value.items()} == {
+        "Na2SO4": "—",
+        "Sb2O3": "—",
+    }
+
+
+def test_speiser_table_10_locators_use_page_226_pdf_page_5():
+    document = _load()
+    row = _observations(document)["kroger_1958_direct_speiser_wirtschaftsglas"]
+    assert row["locator"]["page"] == 226
+    assert row["locator"]["pdf_page_index"] == 5
+    for key in ("printed_composition", "quench_state"):
+        locator = row["point_conditions"][key]["locator"]
+        assert locator["page"] == 226
+        assert locator["pdf_page_index"] == 5
+        assert locator["table"] == "10"
 
 
 def test_isolated_migration_preserves_unknown_quantity_conditions_and_lineage():
