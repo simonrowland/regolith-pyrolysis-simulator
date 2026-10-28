@@ -24,11 +24,11 @@ After isolated migration, the printed identity axes are:
 
 | Observation | composition | total_pressure_Pa | fO2_Pa | temperature_K | standard_pressure_Pa |
 |---|---|---|---|---:|---:|
-| Na2O(c) ΔfH°, page 41, Table 99 | unknown | unknown | unknown | 298.15 | 101325 |
-| NaO2(g) S°, page 41, Table 99 | unknown | unknown | unknown | 298.15 | unknown |
-| K2SiO3(c) S°, page 88, Table 100 | unknown | unknown | unknown | 298.15 | 101325 |
+| Na2O(c) ΔfH°, page 41, Table 99 | not applicable | not applicable | not applicable | 298.15 | 101325 |
+| NaO2(g) S°, page 41, Table 99 | not applicable | not applicable | not applicable | 298.15 | unknown |
+| K2SiO3(c) S°, page 88, Table 100 | not applicable | not applicable | not applicable | 298.15 | 101325 |
 
-The source's one-atmosphere standard-state definition is bound to `standard_pressure_Pa`; it is not recast as an experiment total pressure. The gas standard-state unit fugacity is not converted to a numeric pressure.
+The source's one-atmosphere standard-state definition is bound to `standard_pressure_Pa`; it is not recast as an experiment total pressure. For these quantity profiles, composition, total pressure, and fO2 axes are not applicable. The gas standard-state unit fugacity is not converted to a numeric pressure; its `standard_pressure_Pa` remains unknown.
 
 ## H°298−H°0 schema gap
 
@@ -38,6 +38,6 @@ The direct observation mapper accepts explicit `QUANTITY_ALIASES` keys or exact 
 
 ## Units, migration, and deferred entries
 
-Formation energies and H°298−H°0 are stored in printed kcal/mol. The printed S° and C°p unit is `cal/deg mol`; the extract stores the migrator token `cal/deg-mole` and retains the printed wording in `units_as_printed`. The isolated real migrator produced 49 observations, 0 hard issues, 42 point values, 7 unavailable typed refusals, and 0 phase-unknown observations. The focused test also checks migrated unit values and asserts that unprinted composition, total pressure, and fO2 remain unknown.
+Formation energies and H°298−H°0 are stored in printed kcal/mol. The printed S° and C°p unit is `cal/deg mol`; the extract stores the migrator token `cal/deg-mole` and retains the printed wording in `units_as_printed`. The isolated real migrator produced 49 observations, 0 hard issues, 42 point values, 7 unavailable typed refusals, and 0 phase-unknown observations. The focused test also checks migrated unit values and asserts that unprinted composition, total pressure, and fO2 do not enter point conditions or applicable identity axes.
 
 Follow-up candidates in Tables 99–100 include Na2SO4, Na2CO3, NaF, NaCl, NaBr, NaI, K2SO4, K2CO3, KF, KCl, KBr, and KI, along with the tables' related mixed salts, hydrates, and derivative sulfate/carbonate/halide entries. They are not extracted in this round.
