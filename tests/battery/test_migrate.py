@@ -1198,6 +1198,125 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             "calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios"
         )
 
+    # Five rows pinned to the 300 dpi render of journal pages 23, 24, 25, 26
+    # and 27. The numbers are the printed cells.
+    rendered = (
+        {
+            "parent": "holzheid_1997_table2_page23_feo",
+            "run": "AD 10",
+            "slug": "ad-10",
+            "T_K": "1677",
+            "log_fO2": "-10.31",
+            "gamma": "1.62",
+            "melt_Fe": ("XFeO_mol_pct", "5.56"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page24_feo",
+            "run": "AD 45",
+            "slug": "ad-45",
+            "T_K": "1872",
+            "log_fO2": "-9.73",
+            "gamma": "2.02",
+            "melt_Fe": ("XFeO_mol_pct", "3.34"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page25_feo",
+            "run": "BK 50 a",
+            "slug": "bk-50-a",
+            "T_K": "1578",
+            "log_fO2": "-12.54",
+            "gamma": "1.39",
+            "melt_Fe": ("XFeO_mol_pct", "0.91"),
+        },
+        {
+            "parent": "holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1",
+            "run": "V 69",
+            "slug": "v-69",
+            "T_K": "1673",
+            "log_fO2": "-9.63",
+            "gamma": "1.72",
+            "melt_Fe": ("FeO_wt_pct", "26.0"),
+            "metal_Fe": ("alloy_Fe_wt_pct", "41.9"),
+        },
+        {
+            "parent": "holzheid_1997_table3_pages27_bk_feo",
+            "run": "V 67",
+            "slug": "v-67",
+            "T_K": "1667",
+            "log_fO2": "-9.79",
+            "gamma": "3.99",
+            "melt_Fe": ("FeO_wt_pct", "0.975"),
+            "metal_Fe": ("metal_Fe_wt_pct", "6.84"),
+        },
+    )
+    source_by_id = {row["observation_id"]: row for row in activity_sources}
+    for pin in rendered:
+        source_row = next(
+            item
+            for item in source_by_id[pin["parent"]]["values"]["series"]
+            if item["run"] == pin["run"]
+            and Decimal(str(item["T_K"])) == Decimal(pin["T_K"])
+            and Decimal(str(item["gamma"])) == Decimal(pin["gamma"])
+        )
+        assert Decimal(str(source_row["log_fO2"])) == Decimal(pin["log_fO2"])
+        melt_key, melt_value = pin["melt_Fe"]
+        assert Decimal(str(source_row[melt_key])) == Decimal(melt_value)
+        if "metal_Fe" in pin:
+            metal_key, metal_value = pin["metal_Fe"]
+            assert Decimal(str(source_row[metal_key])) == Decimal(metal_value)
+        migrated_row = next(
+            observation
+            for observation in all_rows
+            if f"::{pin['parent']}::" in observation.observation_id
+            and f"row={pin['slug']}:" in observation.observation_id
+            and observation.value.point == Decimal(pin["gamma"])
+        )
+        assert migrated_row.identity.temperature_K is not None
+        assert migrated_row.identity.temperature_K.is_value
+        assert migrated_row.identity.temperature_K.value == Decimal(pin["T_K"])
+        assert migrated_row.point_conditions["fO2_log"].state.is_value
+        assert migrated_row.point_conditions["fO2_log"].state.value == Decimal(
+            pin["log_fO2"]
+        )
+
+    # Journal page 26 Table 3(b) MgO s.d. (%) column, 300 dpi render.
+    # Five cells were stored as 5; the page prints 1. The last two rows
+    # print 5 and 7 and were already stored correctly.
+    corrected_mgo_sd = (
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6", "5"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7", "7"),
+    )
+    for parent_id, printed_sd in corrected_mgo_sd:
+        item = source_by_id[parent_id]["values"]["series"][0]
+        assert Decimal(str(item["MgO_sd_pct"])) == Decimal(printed_sd)
+
+    # Temperature and the printed absolute log fO2 reach every FeO activity row.
+    for observation in all_rows:
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        logged = observation.point_conditions["fO2_log"]
+        assert logged.state.is_value
+        assert logged.state.value < 0
+
+    stoichiometry = source_doc["source_tables"]["activity_calculation"][
+        "wustite_stoichiometry"
+    ]
+    assert stoichiometry["state"] == {"tag": "unknown", "reason": "not_published"}
+    assert "Fe0.947O" in stoichiometry["note"]
+    assert "1.94 at 1400" in stoichiometry["note"]
+    for parent_id in (
+        "holzheid_1997_table2_page23_feo",
+        "holzheid_1997_table2_page24_feo",
+        "holzheid_1997_table2_page25_feo",
+    ):
+        metal = source_by_id[parent_id]["values"]["metal_Fe_wt_pct"]
+        assert metal["state"] == {"tag": "unknown", "reason": "not_published"}
+
     # Mutating a persisted run composition must fail the three-run expected-value pin.
     mutated_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
     mutated_doc["species"]["FeO"]["observations"][0]["values"]["series"][0][
