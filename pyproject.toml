@@ -73,7 +73,7 @@ magemin = [
 # Retain the extra name as an installer-owned build marker.
 sulfur = []
 # dev includes the pytest plugins the project-level [tool.pytest.ini_options]
-# addopts depends on (`-n auto` needs pytest-xdist; `--timeout=300` needs
+# addopts depends on (`-n auto` needs pytest-xdist; `--timeout=1800` needs
 # pytest-timeout). Without these declared, a clean checkout doing
 # `pip install -e .[dev]` would let pytest abort during argument parsing
 # before any test runs. Per autoreview 2026-05-27 finding.

@@ -60,7 +60,7 @@ if PLAYWRIGHT_SYNC_API is not None:
     )
 
 
-@pytest.mark.timeout(JOURNEY_TIMEOUT_S)
+@pytest.mark.cpu_budget(JOURNEY_TIMEOUT_S)
 def test_happy_path_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
 

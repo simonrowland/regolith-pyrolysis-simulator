@@ -2326,7 +2326,7 @@ def test_status_with_mass_balance_invariant_refuses_completed_run_without_eviden
 # Nightly (2026-08-02 CI tiering): operator/decision path (~251 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_runner_records_operator_decision_in_shadow_trace():
     """When the simulator pauses for a decision mid-run, the runner
     auto-applies the recommendation and records an ``operator_decision``
