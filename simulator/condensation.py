@@ -698,7 +698,10 @@ def _wall_route_species_order(species_names: Any) -> tuple[str, ...]:
     names = tuple(str(species) for species in species_names)
     present = set(names)
     ordered = [species for species in C4B_WALL_ROUTE_ORDER if species in present]
-    ordered.extend(species for species in names if species not in C4B_WALL_ROUTE_ORDER)
+    ordered.extend(sorted(
+        (species for species in names if species not in C4B_WALL_ROUTE_ORDER),
+        key=str,
+    ))
     return tuple(ordered)
 
 

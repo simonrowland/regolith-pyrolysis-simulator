@@ -12105,7 +12105,7 @@ def load_score_context(
                 **observations,
                 **{
                     observation_id: all_observations[observation_id]
-                    for observation_id in unresolved_reference_ids
+                    for observation_id in sorted(unresolved_reference_ids, key=str)
                     if observation_id in all_observations
                 },
             }

@@ -634,10 +634,12 @@ class AccountingQueries:
         initial_total_kg = sum(initial.values())
         terminal_total_kg = sum(terminal.values())
         initial_ree_kg = sum(
-            float(initial.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(initial.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         terminal_ree_kg = sum(
-            float(terminal.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(terminal.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         initial_wt_pct = (
             initial_ree_kg / initial_total_kg * 100.0

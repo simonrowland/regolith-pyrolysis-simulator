@@ -397,7 +397,7 @@ def _mean_molar_mass_kg_mol(
         return DEFAULT_PIPE_M_AVG_KG_MOL
     total_kg = 0.0  # kg — summed species mass
     total_mol = 0.0  # mol — summed species amount
-    for species, kg in species_kg.items():  # kg — species mass or mass-rate basis
+    for species, kg in sorted(species_kg.items(), key=lambda item: str(item[0])):  # kg — species mass or mass-rate basis
         try:
             mass = float(kg)  # kg — finite species mass contribution
         except (TypeError, ValueError):

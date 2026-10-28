@@ -4539,7 +4539,7 @@ def _apply_tap_coating_product_summary(
         )
     for key in _TAP_COATING_DERIVED_AUTHORITY_FIELDS:
         summary.pop(key, None)
-    for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS:
+    for key in sorted(_TAP_COATING_PRODUCT_SUMMARY_FIELDS, key=str):
         if key in tap_summary:
             summary[key] = tap_summary[key]
 

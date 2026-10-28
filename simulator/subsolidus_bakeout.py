@@ -69,7 +69,7 @@ def throttle_mass_rate_kg_hr(
     evap = evap_species_kg_hr or {}
     bakeout = bakeout_species_kg_hr or {}
     total = 0.0
-    for species in VOLATILE_THROTTLE_SPECIES:
+    for species in sorted(VOLATILE_THROTTLE_SPECIES, key=str):
         total += float(evap.get(species, 0.0) or 0.0)
         total += float(bakeout.get(species, 0.0) or 0.0)
     return total

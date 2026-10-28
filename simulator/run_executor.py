@@ -944,7 +944,9 @@ def _json_safe(value: Any) -> Any:
 
     if isinstance(value, Mapping):
         return {str(k): _json_safe(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple, set, frozenset)):
+    if isinstance(value, (set, frozenset)):
+        return sorted((_json_safe(item) for item in value), key=repr)
+    if isinstance(value, (list, tuple)):
         return [_json_safe(item) for item in value]
     if isinstance(value, (str, bool)) or value is None:
         return value
