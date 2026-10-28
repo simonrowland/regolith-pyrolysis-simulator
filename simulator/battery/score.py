@@ -7771,12 +7771,9 @@ def _equilibrate_phase_assemblage(
         parameters = inspect.signature(backend.equilibrate).parameters
     except (TypeError, ValueError):
         parameters = {}
-    # AlphaMELTS refuses a subprocess call that does not name its run.
-    # A phase assemblage is one isothermal equilibration, the same mode
-    # the cell scorer passes. The cell call stays in binary_pot_battery
-    # because that caller also threads pO2 and the call timeout.
-    if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:
-        kwargs["subprocess_run_mode"] = "isothermal"
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+
+    kwargs.update(isothermal_run_kwargs(handle.name, parameters))
     if solute_fugacity_bar is not None:
         if not solute_fugacity_parameter:
             raise RuntimeError("printed solute fugacity has no parameter name")
