@@ -5887,3 +5887,69 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "1997jonesthermo",
+            "1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation",
+            'Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997.',
+        ),
+        (
+            "ammin-73-470-oneill-1988",
+            "ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit",
+            r'''O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486.''',
+        ),
+        (
+            "arxiv-1602-00658-fegley-rock-steam-solubility",
+            "arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation",
+            'Fegley, B., Jr., Jacobson, N. S., Williams, K. B., Plane, J. M., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", submitted to the Astrophysical Journal, arXiv:1602.00658.',
+        ),
+        (
+            "berman-1988-internally-consistent-mineral-thermodynamic-data",
+            "berman-1988-internally-consistent-mineral-thermodynamic-data::berman1988_akermanite_delta_fG::T=298.15:h=fc5697a85fa6",
+            "Berman, R. G. (1988), Thermodynamic data for minerals, Journal of Petrology, 29(2), 445-522.",
+        ),
+        (
+            "burcat-third-millennium",
+            "burcat-third-millennium::burcat_2005_table1_C_gas",
+            'Burcat, A. & Ruscic, B. (2005), "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with Updates from Active Thermochemical Tables", ANL-05/20, TAE 960.',
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table3_bse_composition::rows:h=3547f3dd9048",
+            'Fegley, B. Jr., Jacobson, N. S., Williams, K. B., Plane, J. M. C., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", The Astrophysical Journal 824(2):103.',
+        ),
+        (
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii",
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions",
+            'Hashimoto, A. & Nakano, Y. (2021), "Bubbles to Chondrites-II. Chemical fractionations in chondrites", Progress in Earth and Planetary Science 8:9.',
+        ),
+        (
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_abstract_experimental_ranges",
+            'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical Geology 139, 21-38.',
+        ),
+        (
+            "itoh-hino-banya-1997-mg-deoxidation",
+            "itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters",
+            'Itoh, H., Hino, M. and Ban-Ya, S. (1997), "Deoxidation Equilibrium of Magnesium in Liquid Iron", Tetsu-to-Hagané 83(10), 623-628.',
+        ),
+        (
+            "lpi-compendium-15013",
+            "lpi-compendium-15013::lpi_15013_table1_major_oxide_composition",
+            "Meyer, C. (2010), Lunar Sample Compendium entry 15013, Lunar and Planetary Institute/NASA.",
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity
