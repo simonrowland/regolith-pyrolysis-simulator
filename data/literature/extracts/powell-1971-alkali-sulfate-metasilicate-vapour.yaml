@@ -55,8 +55,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -116,8 +116,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -177,8 +177,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -204,7 +204,6 @@ species:
         page: 79
         table: '1'
         row: '5'
-      phase: l
       regime: knudsen_effusion
       units: mg min-1
       values:
@@ -225,11 +224,10 @@ species:
               value: 1130
             locator: *id004
         note: Raw rate printed in the source table; it is retained in mg min-1 because that unit is not converted
-          by the current migrator. No total furnace pressure is stated.
+          by the current migrator. No total furnace pressure is stated. The source does not state the condensed phase.
     - observation_id: powell_1971_t01_r05_apparent_knudsen_pressure
       type: partial_pressure
       locator: *id004
-      phase: l
       regime: knudsen_effusion
       units: torr
       derived_from:
@@ -238,8 +236,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -258,7 +256,7 @@ species:
               value: 1130
             locator: *id004
         note: P′ as printed; not promoted to p_sat or p_partial. The source does not print an experimental total
-          pressure or Clausing factor for this row.
+          pressure or Clausing factor for this row. The source does not state the condensed phase.
     - observation_id: powell_1971_t01_r06_mass_loss_rate
       type: rate_series
       locator: &id005
@@ -299,8 +297,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -360,8 +358,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -421,8 +419,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -482,8 +480,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -543,8 +541,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -604,8 +602,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -665,8 +663,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -692,7 +690,6 @@ species:
         page: 79
         table: '1'
         row: '13'
-      phase: cr
       regime: knudsen_effusion
       units: mg min-1
       values:
@@ -713,11 +710,10 @@ species:
               value: 1126
             locator: *id012
         note: Raw rate printed in the source table; it is retained in mg min-1 because that unit is not converted
-          by the current migrator. No total furnace pressure is stated.
+          by the current migrator. No total furnace pressure is stated. The source does not state the condensed phase.
     - observation_id: powell_1971_t01_r13_apparent_knudsen_pressure
       type: partial_pressure
       locator: *id012
-      phase: cr
       regime: knudsen_effusion
       units: torr
       derived_from:
@@ -726,8 +722,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -746,7 +742,7 @@ species:
               value: 1126
             locator: *id012
         note: P′ as printed; not promoted to p_sat or p_partial. The source does not print an experimental total
-          pressure or Clausing factor for this row.
+          pressure or Clausing factor for this row. The source does not state the condensed phase.
     - observation_id: powell_1971_t01_r14_mass_loss_rate
       type: rate_series
       locator: &id013
@@ -787,8 +783,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -821,8 +817,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -851,8 +847,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -881,8 +877,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -1012,7 +1008,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -1047,7 +1043,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -1082,7 +1078,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -1109,7 +1105,6 @@ species:
         page: 101
         row: '4'
         paragraph: JANAF-based candidate vapour-reaction calculation
-      phase: l
       regime: candidate_oxide_vapour_reaction
       units: Kp in atm^(3/2); alpha dimensionless as printed
       values:
@@ -1117,7 +1112,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -1137,14 +1132,13 @@ species:
               tag: value
               value: 1130
             locator: *id020
-        note: Kp is printed as a positive value in atm^(3/2); alpha is the degree of dissociation.
+        note: Kp is printed as a positive value in atm^(3/2); alpha is the degree of dissociation. The source does not state the condensed phase.
     - observation_id: powell_1971_p101_r05_dissociation_and_kp
       type: gibbs_table
       locator: &id021
         page: 101
         row: '5'
         paragraph: JANAF-based candidate vapour-reaction calculation
-      phase: cr
       regime: candidate_oxide_vapour_reaction
       units: Kp in atm^(3/2); alpha dimensionless as printed
       values:
@@ -1152,7 +1146,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -1172,7 +1166,7 @@ species:
               tag: value
               value: 1127
             locator: *id021
-        note: Kp is printed as a positive value in atm^(3/2); alpha is the degree of dissociation.
+        note: Kp is printed as a positive value in atm^(3/2); alpha is the degree of dissociation. The source does not state the condensed phase.
   Na2SO4:
     observations:
     - observation_id: powell_1971_t02_r02_mass_loss_rate
@@ -1215,8 +1209,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1276,8 +1270,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1337,8 +1331,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1398,8 +1392,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1459,8 +1453,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1520,8 +1514,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1581,8 +1575,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1642,8 +1636,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1703,8 +1697,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1764,8 +1758,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1825,8 +1819,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1886,8 +1880,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -1947,8 +1941,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2008,8 +2002,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2069,8 +2063,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2130,8 +2124,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2191,8 +2185,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2252,8 +2246,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -2740,7 +2734,7 @@ species:
         page: 45
         row: '1'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2764,7 +2758,7 @@ species:
         page: 45
         row: '2'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2788,7 +2782,7 @@ species:
         page: 45
         row: '3'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2812,7 +2806,7 @@ species:
         page: 45
         row: '4'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2836,7 +2830,7 @@ species:
         page: 45
         row: '5'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2860,7 +2854,7 @@ species:
         page: 45
         row: '6'
         paragraph: Equilibrium-constant values attributed to Eyber [46]
-      phase: cr
+      phase: l
       regime: sodium_sulphate_decomposition_equilibrium
       units: log(Kp/atm) as printed
       values:
@@ -2892,7 +2886,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -2927,7 +2921,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -2962,7 +2956,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -2997,7 +2991,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -3032,7 +3026,7 @@ species:
         schema_gap_note: The printed positive Kp and dissociation degree alpha have no exact Quantity token. Quantity.LOG10_K_REACTION
           is logarithmic only (simulator/battery/enums.py:70); the closed Quantity enum spans lines 62-112. The closed OBSERVATION_TYPES set permits gibbs_table
           (tools/validate_literature_extracts.py:79-100), whose absent quantity defaults to DELTA_FG in TYPE_QUANTITY
-          (simulator/battery/migrate.py:435-444). The descriptive quantity keeps this combined calculated output unknown.
+          (simulator/battery/migrate.py:435-438). The descriptive quantity keeps this combined calculated output unknown.
         method_class: measured_reduced
         evidence_class: measured_reduced
         derivation:
@@ -3095,8 +3089,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3156,8 +3150,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3217,8 +3211,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3278,8 +3272,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3339,8 +3333,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3400,8 +3394,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3461,8 +3455,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3522,8 +3516,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3583,8 +3577,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3644,8 +3638,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3705,8 +3699,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -3766,8 +3760,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4094,8 +4088,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4155,8 +4149,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4216,8 +4210,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4277,8 +4271,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4338,8 +4332,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4399,8 +4393,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4460,8 +4454,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4521,8 +4515,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4582,8 +4576,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4643,8 +4637,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4704,8 +4698,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4765,8 +4759,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4826,8 +4820,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -4887,8 +4881,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5001,8 +4995,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5062,8 +5056,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5123,8 +5117,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5184,8 +5178,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5245,8 +5239,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5306,8 +5300,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5367,8 +5361,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5428,8 +5422,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5489,8 +5483,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5550,8 +5544,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5611,8 +5605,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5672,8 +5666,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5733,8 +5727,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -5767,8 +5761,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -5797,8 +5791,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -5827,8 +5821,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -5857,8 +5851,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -5966,8 +5960,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6027,8 +6021,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6088,8 +6082,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6149,8 +6143,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6210,8 +6204,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6271,8 +6265,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6332,8 +6326,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6393,8 +6387,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6454,8 +6448,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6515,8 +6509,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6576,8 +6570,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6637,8 +6631,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6698,8 +6692,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6759,8 +6753,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6820,8 +6814,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6881,8 +6875,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6942,8 +6936,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -6976,8 +6970,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -7006,8 +7000,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -7036,8 +7030,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -7066,8 +7060,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -7096,8 +7090,8 @@ species:
         quantity: torsion_effusion_total_pressure
         schema_gap_note: 'Torsion P is the total pressure of an unresolved vapour mixture, not a species partial
           pressure or named-gas saturation pressure. No exact total mixed-vapour-pressure token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); its
-          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66); the p_sat
-          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5379-5387).'
+          pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66); the p_sat
+          identity path derives gas phase from a named gas species (simulator/battery/migrate.py:5385-5387).'
         method_class: measured_direct
         evidence_class: measured_direct
         method: torsion effusion pressure from vapour-jet recoil
@@ -7155,8 +7149,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7216,8 +7210,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7277,8 +7271,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7338,8 +7332,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7399,8 +7393,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7460,8 +7454,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7521,8 +7515,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7582,8 +7576,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7645,8 +7639,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7706,8 +7700,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7767,8 +7761,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7828,8 +7822,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7889,8 +7883,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -7950,8 +7944,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8011,8 +8005,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8072,8 +8066,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8133,8 +8127,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8194,8 +8188,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8255,8 +8249,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8316,8 +8310,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8377,8 +8371,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8440,8 +8434,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8501,8 +8495,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8562,8 +8556,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8623,8 +8617,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8684,8 +8678,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8745,8 +8739,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8806,8 +8800,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8867,8 +8861,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss
@@ -8928,8 +8922,8 @@ species:
         quantity: apparent_knudsen_pressure_assumed_mw
         schema_gap_note: 'The source reports P′ calculated from Knudsen weight loss with an assumed vapour molecular
           weight; this is not a species partial pressure or a named-gas saturation pressure. No exact total mixed-vapour-pressure
-          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (65-66);
-          simulator/battery/migrate.py:5379-5387 derives gas phase from a named gas species for p_sat.'
+          token exists in the closed Quantity enum (simulator/battery/enums.py:62-112); pressure tokens are Quantity.P_SAT and Quantity.P_PARTIAL (simulator/battery/enums.py:65-66);
+          simulator/battery/migrate.py:5385-5387 derives gas phase from a named gas species for p_sat.'
         method_class: measured_reduced
         evidence_class: measured_reduced
         method: Knudsen effusion pressure calculated from measured weight loss

@@ -22,7 +22,7 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 290
-    assert len(migrator.result.queue) == 647
+    assert len(migrator.result.queue) == 653
     assert not [
         issue
         for issue in migrator.result.validation.issues
@@ -71,10 +71,27 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         f"{EXTRACT.stem}::powell_1971_eyber_na2so4_r0{row}_log_kp"
         for row in range(1, 7)
     }
+    phase_unknown = {
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.identity.species is not None
+        and observation.identity.species.phase.is_unknown
+    }
+    assert phase_unknown == {
+        f"{EXTRACT.stem}::{observation_id}"
+        for observation_id in (
+            "powell_1971_t01_r05_mass_loss_rate",
+            "powell_1971_t01_r05_apparent_knudsen_pressure",
+            "powell_1971_t01_r13_mass_loss_rate",
+            "powell_1971_t01_r13_apparent_knudsen_pressure",
+            "powell_1971_p101_r04_dissociation_and_kp",
+            "powell_1971_p101_r05_dissociation_and_kp",
+        )
+    }
     assert all(
         not observation.identity.species.phase.is_unknown
-        for observation in observations.values()
-        if observation.identity.species is not None
+        for observation_id, observation in observations.items()
+        if observation.identity.species is not None and observation_id not in phase_unknown
     )
 
     # Render pins: PDF pages 79, 81, and 45. Values remain in their printed units/forms.
@@ -83,6 +100,12 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         for family in extract["species"].values()
         for row in family["observations"]
     }
+    assert "simulator/battery/enums.py:65-66" in rows[
+        "powell_1971_t01_r05_apparent_knudsen_pressure"
+    ]["values"]["schema_gap_note"]
+    assert "simulator/battery/migrate.py:5385-5387" in rows[
+        "powell_1971_t01_r05_apparent_knudsen_pressure"
+    ]["values"]["schema_gap_note"]
     assert (
         rows["powell_1971_t01_r02_mass_loss_rate"]["values"]["mass_loss_rate_as_printed"]
         == "3.33 x 10-3"
@@ -119,18 +142,27 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
 
     liquid_ids = {
         *(f"powell_1971_eyber_na2so4_r{row:02d}_pressure" for row in range(1, 6)),
+        *(f"powell_1971_eyber_na2so4_r{row:02d}_log_kp" for row in range(1, 7)),
         "powell_1971_p100_r01_dissociation_and_kp",
         "powell_1971_p100_r02_dissociation_and_kp",
         "powell_1971_t06_r01_slope_enthalpy",
         "powell_1971_t06_r03_slope_enthalpy",
-        *(f"powell_1971_p101_r{row:02d}_dissociation_and_kp" for row in range(1, 5)),
+        *(f"powell_1971_p101_r{row:02d}_dissociation_and_kp" for row in range(1, 4)),
     }
     assert all(rows[observation_id]["phase"] == "l" for observation_id in liquid_ids)
-    assert rows["powell_1971_p101_r05_dissociation_and_kp"]["phase"] == "cr"
     assert all(
         observations[f"{EXTRACT.stem}::{observation_id}"].identity.species.phase.value == "l"
         for observation_id in liquid_ids
+        if observations[f"{EXTRACT.stem}::{observation_id}"].identity.species is not None
     )
+    assert all(rows[observation_id].get("phase") is None for observation_id in {
+        "powell_1971_t01_r05_mass_loss_rate",
+        "powell_1971_t01_r05_apparent_knudsen_pressure",
+        "powell_1971_t01_r13_mass_loss_rate",
+        "powell_1971_t01_r13_apparent_knudsen_pressure",
+        "powell_1971_p101_r04_dissociation_and_kp",
+        "powell_1971_p101_r05_dissociation_and_kp",
+    })
 
     janaf_ids = {
         *(f"powell_1971_p100_r{row:02d}_dissociation_and_kp" for row in range(1, 6)),
