@@ -23,7 +23,8 @@ notes:
     pdf_page_index: 9
     section: Conventions Regarding Pure Substances
 - text: Only sodium and potassium oxide and silicate entries are extracted in this round. Follow-up candidates from
-    the same alkali tables are the remaining sulfates, carbonates, and halides; they are not included here.
+    Tables 99-100 are the other alkali sulfates, carbonates, and halides (including Na2SO4, Na2CO3, NaF, NaCl, NaBr,
+    NaI, K2SO4, K2CO3, KF, KCl, KBr, and KI); none are included here.
   locator:
     page: 41
     pdf_page_index: 40
@@ -181,10 +182,13 @@ species:
         T_K: 298.15
         value: '4.37'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
-          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
-          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
-          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
     - observation_id: nbs81_table99_NaO2_c_S
       type: heat_capacity_and_heat_content_series
       regime: tabulation
@@ -221,7 +225,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: NaO2
@@ -319,10 +323,13 @@ species:
         T_K: 298.15
         value: '2.74'
         fugacity_standard_state_as_printed: unit fugacity
-        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
-          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
-          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
-          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
     - observation_id: nbs81_table99_NaO2_g_S
       type: heat_capacity_and_heat_content_series
       regime: tabulation
@@ -349,7 +356,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: NaO2
@@ -545,10 +552,13 @@ species:
         T_K: 298.15
         value: '2.964'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
-          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
-          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
-          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
     - observation_id: nbs81_table99_Na2O_c_S
       type: heat_capacity_and_heat_content_series
       regime: tabulation
@@ -585,7 +595,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na2O
@@ -759,10 +769,13 @@ species:
         T_K: 298.15
         value: '3.3'
         fugacity_standard_state_as_printed: unit fugacity
-        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
-          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
-          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
-          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
     - observation_id: nbs81_table99_Na2O_g_S
       type: heat_capacity_and_heat_content_series
       regime: tabulation
@@ -789,7 +802,7 @@ species:
             column: 298.15 K table heading
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na2O
@@ -985,10 +998,13 @@ species:
         T_K: 298.15
         value: '3.75'
         standard_pressure_Pa: 101325
-        schema_gap: The printed quantity is H°298−H°0. The candidate quantity alias enthalpy_increment maps to Quantity.H_MINUS_H298
-          (simulator/battery/migrate.py, QUANTITY_ALIASES); its reference-temperature parsers reject 0 K (simulator/battery/migrate.py::_enthalpy_increment_subtype
-          and simulator/battery/identity.py::_parse_enthalpy_increment_subtype). Preserve this cell as printed with
-          an explicit non-token quantity; no exact stored quantity token represents a 298 K minus 0 K enthalpy increment.
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
     - observation_id: nbs81_table99_Na2O2_c_S
       type: heat_capacity_and_heat_content_series
       regime: tabulation
@@ -1025,7 +1041,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na2O2
@@ -1219,7 +1235,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na2SiO3
@@ -1369,7 +1385,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na2Si2O5
@@ -1520,7 +1536,7 @@ species:
               atmosphere to 101325 pascal.
       units: cal/deg-mole
       values:
-        quantity: entropy
+        quantity: S
         method_class: compilation_assessed
         evidence_class: compilation_assessed
         formula: Na4SiO4
@@ -1582,4 +1598,778 @@ species:
         T_K: 298.15
         value: '-868'
         value_as_printed: '-868.'
+        standard_pressure_Pa: 101325
+  KO2:
+    observations:
+    - observation_id: nbs81_table100_KO2_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: KO2 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 12
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: KO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: KO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-68.10'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_KO2_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: KO2 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 12
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: KO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: KO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-57.23'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_KO2_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: KO2 c
+        column: S° at 298.15 K
+        table_row_number: 12
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: KO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: KO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '27.9'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_KO2_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: KO2 c
+        column: C°p at 298.15 K
+        table_row_number: 12
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: KO2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: KO2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '18.53'
+        standard_pressure_Pa: 101325
+  K2O:
+    observations:
+    - observation_id: nbs81_table100_K2O_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O c
+        column: ΔfH° at 298.15 K
+        table_row_number: 14
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-86.4'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2O_g_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O g
+        column: ΔfH° at 298.15 K
+        table_row_number: 15
+        table_column_number: 6
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '-15'
+        value_as_printed: '-15.'
+        fugacity_standard_state_as_printed: unit fugacity
+  K2O2:
+    observations:
+    - observation_id: nbs81_table100_K2O2_c_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O2 c
+        column: ΔfH° at 298.15 K
+        table_row_number: 16
+        table_column_number: 6
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-118.1'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2O2_c_delta_fG
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O2 c
+        column: ΔfG° at 298.15 K
+        table_row_number: 16
+        table_column_number: 7
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard Gibbs energy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '-101.6'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2O2_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O2 c
+        column: S° at 298.15 K
+        table_row_number: 16
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O2 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O2
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '24.4'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2O2_g_delta_fH
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        row: K2O2 g
+        column: ΔfH° at 298.15 K
+        table_row_number: 17
+        table_column_number: 6
+      phase: gas
+      standard_state: the hypothetical ideal gas at unit fugacity
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 72
+            pdf_page_index: 71
+            table: '100'
+            row: K2O2 g
+            column: 298.15 K table heading
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2O2
+        phase: g
+        phase_as_printed: g
+        quantity_as_printed: standard enthalpy of formation at 298.15 K
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the hypothetical ideal gas at unit fugacity
+        T_K: 298.15
+        value: '-38'
+        value_as_printed: '-38.'
+        fugacity_standard_state_as_printed: unit fugacity
+  K2SiO3:
+    observations:
+    - observation_id: nbs81_table100_K2SiO3_c_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2SiO3 c
+        column: H°298−H°0
+        table_row_number: 23
+        table_column_number: 8
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '5.230'
+        standard_pressure_Pa: 101325
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
+    - observation_id: nbs81_table100_K2SiO3_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2SiO3 c
+        column: S° at 298.15 K
+        table_row_number: 23
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '34.9'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2SiO3_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2SiO3 c
+        column: C°p at 298.15 K
+        table_row_number: 23
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2SiO3 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2SiO3
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '28.3'
+        standard_pressure_Pa: 101325
+  K2Si2O5:
+    observations:
+    - observation_id: nbs81_table100_K2Si2O5_c_H298_minus_H0
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2Si2O5 c
+        column: H°298−H°0
+        table_row_number: 24
+        table_column_number: 8
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: kcal/mol
+      values:
+        quantity: enthalpy_298K_minus_0K_as_printed
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: H°298−H°0
+        units_as_printed: kcal/mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '6.888'
+        standard_pressure_Pa: 101325
+        schema_gap: The printed quantity is H°298−H°0. Quantity.H_MINUS_H298 (simulator/battery/enums.py:91) represents
+          an enthalpy increment relative to 298 K; its identity subtype parser rejects reference temperatures at
+          or below 0 K (simulator/battery/identity.py:804-805), and the observation mapper records only positive
+          reference_temperature_K values (simulator/battery/migrate.py:9151-9153). The compilation-column alias
+          _COMPILATION_CELL_QUANTITY['enthalpy_increment'] also maps to Quantity.H_MINUS_H298 (simulator/battery/migrate.py:6770),
+          but no exact quantity token represents H°298−H°0. Preserve this cell as printed with an explicit descriptive
+          non-token quantity.
+    - observation_id: nbs81_table100_K2Si2O5_c_S
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2Si2O5 c
+        column: S° at 298.15 K
+        table_row_number: 24
+        table_column_number: 9
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: standard entropy at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '45.55'
+        standard_pressure_Pa: 101325
+    - observation_id: nbs81_table100_K2Si2O5_c_Cp
+      type: heat_capacity_and_heat_content_series
+      regime: tabulation
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        row: K2Si2O5 c
+        column: C°p at 298.15 K
+        table_row_number: 24
+        table_column_number: 10
+      phase: cr
+      standard_state: the condensed phase under a pressure of one atmosphere
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 88
+            pdf_page_index: 87
+            table: '100'
+            row: K2Si2O5 c
+            column: 298.15 K table heading
+        standard_pressure_Pa:
+          state:
+            tag: value
+            value: 101325
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Conventions Regarding Pure Substances
+            note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard
+              atmosphere to 101325 pascal.
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: K2Si2O5
+        phase: cr
+        phase_as_printed: c
+        quantity_as_printed: heat capacity at 298.15 K
+        units_as_printed: cal/deg mol
+        standard_state_as_printed: the condensed phase under a pressure of one atmosphere
+        T_K: 298.15
+        value: '38.41'
         standard_pressure_Pa: 101325
