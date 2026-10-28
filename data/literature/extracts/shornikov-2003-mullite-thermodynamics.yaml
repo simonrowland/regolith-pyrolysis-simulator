@@ -1,0 +1,5403 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2003-mullite-thermodynamics
+source:
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (2003). A Mass Spectrometric Study
+    of the Thermodynamic Properties of Mullite. Russian Journal of Physical Chemistry, 77(7), 1044–1050.
+  year: 2003
+extraction:
+  method: MinerU table emit for Table 1 enthalpies; Table 1 entropy and Table 2 cells transcribed from
+    pdftotext-layout and checked against 600 dpi page renders; Figure 1 marker values digitized from a
+    600 dpi render.
+  date: '2026-10-18'
+  worker: trial-lxh-1018
+  provenance_path: text/shornikov-2003-mullite-thermodynamics/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r02_c04].values.value_as_printed
+  value: – 8.0
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 1
+    column: 4
+    note: Table 1 first data row checked against 600 dpi render.
+- path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04].values.value_as_printed
+  value: 11.05 ± 0.08
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 30
+    column: 4
+    note: Table 1 reference This work row checked against 600 dpi render.
+- path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r32_c04].values.value_as_printed
+  value: 12.9 ± 0.8
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 31
+    column: 4
+    note: Table 1 final data row checked against 600 dpi render.
+figures:
+- figure: '1'
+  caption_as_printed: 'Gibbs energies of formation of mullite from oxides: determined (1) by high-temperature
+    calorimetry [69], (2–4) from heterogeneous equilibria in slags [7, 10, 44], and (5–9) by Knudsen mass
+    spectrometry in [29, 32, 59, 60] and this work; calculated (10–16) from the thermochemical data in
+    [14, 17, 22, 25, 28, 33] and this work, (17) by the Redlich–Kister equation [49], (18) by the Monte
+    Carlo method [68], (19) by the Kapur–Froberg equation [24], (20) by the lattice model [26], (21) from
+    the data on the phase diagram [63], (22) by the quasi-chemical model [27]; and (23) estimated values
+    [67].'
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Single-panel plot; 600 dpi page render.
+  axes_as_published:
+    x: T, K
+    y: −ΔfG_T(M), kJ/mol
+  unmarked_series:
+  - 2
+  - 3
+  - 5
+  - 7
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 22
+experiments:
+- experiment_id: shornikov_2003_table1_row01_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [2].
+  locator: &id001
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id001
+- experiment_id: shornikov_2003_table1_row02_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [3-5].
+  locator: &id002
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 2
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id002
+- experiment_id: shornikov_2003_table1_row03_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [6].
+  locator: &id003
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 3
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id003
+- experiment_id: shornikov_2003_table1_row04_reference
+  method: heterogeneous equilibria in slags
+  attribution_as_printed: Table 1, reference [7].
+  locator: &id004
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 4
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator: *id004
+- experiment_id: shornikov_2003_table1_row05_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [8].
+  locator: &id005
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id005
+- experiment_id: shornikov_2003_table1_row06_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [9].
+  locator: &id006
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 6
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id006
+- experiment_id: shornikov_2003_table1_row07_reference
+  method: heterogeneous equilibria in slags
+  attribution_as_printed: Table 1, reference [10].
+  locator: &id007
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 7
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator: *id007
+- experiment_id: shornikov_2003_table1_row08_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [11].
+  locator: &id008
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 8
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id008
+- experiment_id: shornikov_2003_table1_row09_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [12].
+  locator: &id009
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 9
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator: *id009
+- experiment_id: shornikov_2003_table1_row10_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [13].
+  locator: &id010
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 10
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator: *id010
+- experiment_id: shornikov_2003_table1_row11_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [14, 15].
+  locator: &id011
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 11
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator: *id011
+- experiment_id: shornikov_2003_table1_row12_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [16].
+  locator: &id012
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 12
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id012
+- experiment_id: shornikov_2003_table1_row13_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [17].
+  locator: &id013
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id013
+- experiment_id: shornikov_2003_table1_row14_reference
+  method: recommended or estimated value
+  attribution_as_printed: Table 1, reference [18].
+  locator: &id014
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 14
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id014
+- experiment_id: shornikov_2003_table1_row15_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [19].
+  locator: &id015
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 15
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id015
+- experiment_id: shornikov_2003_table1_row16_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [20].
+  locator: &id016
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 16
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id016
+- experiment_id: shornikov_2003_table1_row17_reference
+  method: bomb calorimetry
+  attribution_as_printed: Table 1, reference [21].
+  locator: &id017
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 17
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id017
+- experiment_id: shornikov_2003_table1_row18_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [22].
+  locator: &id018
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 18
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator: *id018
+- experiment_id: shornikov_2003_table1_row19_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [23].
+  locator: &id019
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 19
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973'
+      locator: *id019
+- experiment_id: shornikov_2003_table1_row20_reference
+  method: Kapur–Froberg equation calculations
+  attribution_as_printed: Table 1, reference [24].
+  locator: &id020
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 20
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator: *id020
+- experiment_id: shornikov_2003_table1_row21_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [25].
+  locator: &id021
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 21
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1161'
+      locator: *id021
+- experiment_id: shornikov_2003_table1_row22_reference
+  method: lattice model calculations
+  attribution_as_printed: Table 1, reference [26].
+  locator: &id022
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 22
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator: *id022
+- experiment_id: shornikov_2003_table1_row23_reference
+  method: quasi-chemical model calculations
+  attribution_as_printed: Table 1, reference [27].
+  locator: &id023
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 23
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id023
+- experiment_id: shornikov_2003_table1_row24_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [28].
+  locator: &id024
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 24
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1812'
+      locator: *id024
+- experiment_id: shornikov_2003_table1_row25_reference
+  method: Knudsen mass spectrometry
+  attribution_as_printed: Table 1, reference [29].
+  locator: &id025
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 25
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator: *id025
+- experiment_id: shornikov_2003_table1_row26_reference
+  method: solution calorimetry
+  attribution_as_printed: Table 1, reference [30].
+  locator: &id026
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 26
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id026
+- experiment_id: shornikov_2003_table1_row27_reference
+  method: parametric model calculations
+  attribution_as_printed: Table 1, reference [31].
+  locator: &id027
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 27
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator: *id027
+- experiment_id: shornikov_2003_table1_row28_reference
+  method: Knudsen mass spectrometry
+  attribution_as_printed: Table 1, reference [32].
+  locator: &id028
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 28
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1617'
+      locator: *id028
+- experiment_id: shornikov_2003_table1_row29_reference
+  method: calculations from literature data
+  attribution_as_printed: Table 1, reference [33].
+  locator: &id029
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 29
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator: *id029
+- experiment_id: shornikov_2003_table1_this_work_row30
+  method: calculations from literature data
+  attribution_as_printed: Table 1, This work; method IX (calculations from literature data).
+  locator: &id030
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 30
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1790'
+      locator: *id030
+- experiment_id: shornikov_2003_kems_thermodynamic_series
+  method: knudsen_effusion_mass_spectrometry
+  attribution_as_printed: Table 1, This work; method IV (Knudsen mass spectrometry).
+  locator: &id031
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    row: 31
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1950'
+      locator: *id031
+- experiment_id: shornikov_2003_kems_table2
+  method: knudsen_effusion_mass_spectrometry
+  attribution_as_printed: Table 2, this work; thermodynamic properties calculated from partial-pressure
+    data in the Al2O3–SiO2 system.
+  locator:
+    page: 4
+    published_page: 1047
+    pdf_page_index: 3
+    table: '2'
+    row: 1
+    note: Table title says determined in this work from solid-phase data.
+- experiment_id: shornikov_2003_text_figure_range
+  method: author_stated_figure_interpretation
+  attribution_as_printed: Authors say this Gibbs-energy range is according to Figure 1.
+  locator: &id032
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    note: The authors' prose states the range from Figure 1.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator: *id032
+- experiment_id: shornikov_2003_text_ref66_melt_gibbs_extrapolation
+  method: extrapolation
+  attribution_as_printed: >-
+    Reference [66] determined the melt formation Gibbs energies in the Al2O3–SiO2 system; the sentence reports
+    their extrapolation to the temperature of fusion of mullite.
+  locator: &id073
+    page: 4
+    published_page: 1047
+    pdf_page_index: 3
+    note: >-
+      The sentence says "temperature of fusion of mullite" but prints no numeric temperature.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no_numeric_temperature_printed
+      locator: *id073
+- experiment_id: shornikov_2003_mullite_figure1_series_01
+  method: figure_digitization
+  attribution_as_printed: High-temperature calorimetry [69].
+  locator: &id033
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: square
+    series: 1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.1e+03'
+      locator: *id033
+- experiment_id: shornikov_2003_mullite_figure1_series_04
+  method: figure_digitization
+  attribution_as_printed: Heterogeneous equilibria in slags [7, 10, 44], series 2–4.
+  locator: &id034
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: filled circle
+    series: 4
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.8e+03'
+      locator: *id034
+- experiment_id: shornikov_2003_mullite_figure1_series_06
+  method: figure_digitization
+  attribution_as_printed: Knudsen mass spectrometry in [29, 32, 59, 60] and this work, series 5–9.
+  locator: &id035
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: filled triangle
+    series: 6
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.9e+03'
+      locator: *id035
+- experiment_id: shornikov_2003_mullite_figure1_series_08
+  method: figure_digitization
+  attribution_as_printed: Knudsen mass spectrometry in [29, 32, 59, 60] and this work, series 5–9.
+  locator: &id036
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: filled inverted triangle
+    series: 8
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2.2e+03'
+      locator: *id036
+- experiment_id: shornikov_2003_mullite_figure1_series_17
+  method: figure_digitization
+  attribution_as_printed: Redlich–Kister equation [49].
+  locator: &id037
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: filled diamond
+    series: 17
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2.1e+03'
+      locator: *id037
+- experiment_id: shornikov_2003_mullite_figure1_series_18
+  method: figure_digitization
+  attribution_as_printed: Monte Carlo method [68].
+  locator: &id038
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: square with cross
+    series: 18
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.9e+03'
+      locator: *id038
+- experiment_id: shornikov_2003_mullite_figure1_series_19
+  method: figure_digitization
+  attribution_as_printed: Kapur–Froberg equation [24].
+  locator: &id039
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: circle with cross
+    series: 19
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.9e+03'
+      locator: *id039
+- experiment_id: shornikov_2003_mullite_figure1_series_20
+  method: figure_digitization
+  attribution_as_printed: Lattice model [26].
+  locator: &id040
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: open triangle
+    series: 20
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.8e+03'
+      locator: *id040
+- experiment_id: shornikov_2003_mullite_figure1_series_21
+  method: figure_digitization
+  attribution_as_printed: Data on the phase diagram [63].
+  locator: &id041
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: crossed open triangle
+    series: 21
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.7e+03'
+      locator: *id041
+- experiment_id: shornikov_2003_mullite_figure1_series_23
+  method: figure_digitization
+  attribution_as_printed: Estimated values [67].
+  locator: &id042
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; rendered at 600 dpi.
+    figure: '1'
+    panel: single
+    marker_symbol: crossed diamond
+    series: 23
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1.8e+03'
+      locator: *id042
+- experiment_id: shornikov_2003_mullite_figure1_series_02
+  method: figure_curve
+  attribution_as_printed: Heterogeneous equilibria in slags [7, 10, 44].
+  locator: &id060
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 2
+- experiment_id: shornikov_2003_mullite_figure1_series_03
+  method: figure_curve
+  attribution_as_printed: Heterogeneous equilibria in slags [7, 10, 44].
+  locator: &id061
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 3
+- experiment_id: shornikov_2003_mullite_figure1_series_05
+  method: figure_curve
+  attribution_as_printed: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+  locator: &id062
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 5
+- experiment_id: shornikov_2003_mullite_figure1_series_07
+  method: figure_curve
+  attribution_as_printed: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+  locator: &id063
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 7
+- experiment_id: shornikov_2003_mullite_figure1_series_09
+  method: figure_curve
+  attribution_as_printed: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+  locator: &id064
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 9
+- experiment_id: shornikov_2003_mullite_figure1_series_10
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id065
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 10
+- experiment_id: shornikov_2003_mullite_figure1_series_11
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id066
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 11
+- experiment_id: shornikov_2003_mullite_figure1_series_12
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id067
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 12
+- experiment_id: shornikov_2003_mullite_figure1_series_13
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id068
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 13
+- experiment_id: shornikov_2003_mullite_figure1_series_14
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id069
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 14
+- experiment_id: shornikov_2003_mullite_figure1_series_15
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id070
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 15
+- experiment_id: shornikov_2003_mullite_figure1_series_16
+  method: figure_curve
+  attribution_as_printed: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+  locator: &id071
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 16
+- experiment_id: shornikov_2003_mullite_figure1_series_22
+  method: figure_curve
+  attribution_as_printed: Quasi-chemical model [27].
+  locator: &id072
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    note: Figure 1, single panel; unmarked line.
+    figure: '1'
+    panel: single
+    series: 22
+species:
+  Al6Si2O13:
+    observations:
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r02_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 1
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row01_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: – 8.0
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [2].
+        value: '-8.0'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 1
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r03_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 2
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row02_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '4.29'
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [3-5].
+        value: '4.29'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 2
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r04_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 3
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row03_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: –15.4
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [6].
+        value: '-15.4'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 3
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r05_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 4
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1773'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row04_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1773'
+        value_as_printed: 22.2 ± 4.4
+        method_as_printed: III
+        method_description: heterogeneous equilibria in slags
+        attribution: Table 1, reference [7].
+        value: '22.2'
+        temperature_span_as_printed: 1673–1873
+      uncertainty:
+        value: '4.4'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773'
+          locator: &id043
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 4
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1673.0
+      - 1873.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r05_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 4
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1773'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row04_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1773'
+        value_as_printed: 15.1 ± 3.0
+        method_as_printed: III
+        method_description: heterogeneous equilibria in slags
+        attribution: Table 1, reference [7].
+        value: '15.1'
+        temperature_span_as_printed: 1673–1873
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '3.0'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1773'
+          locator: *id043
+      T_range_K:
+      - 1673.0
+      - 1873.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r06_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 5
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row05_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 5.9 ± 2.5
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [8].
+        value: '5.9'
+      uncertainty:
+        value: '2.5'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: &id044
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 5
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r06_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 5
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row05_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 3.8 ± 0.4
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [8].
+        value: '3.8'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.4'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: *id044
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r07_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 6
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row06_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: –0.34
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [9].
+        value: '-0.34'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 6
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r08_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 7
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1800'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row07_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1800'
+        value_as_printed: –0.87 ± 1.70
+        method_as_printed: III
+        method_description: heterogeneous equilibria in slags
+        attribution: Table 1, reference [10].
+        value: '-0.87'
+        temperature_span_as_printed: 1700–1900
+      uncertainty:
+        value: '1.70'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator: &id045
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 7
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1700.0
+      - 1900.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r08_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 7
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1800'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row07_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1800'
+        value_as_printed: 2.09 ± 1.20
+        method_as_printed: III
+        method_description: heterogeneous equilibria in slags
+        attribution: Table 1, reference [10].
+        value: '2.09'
+        temperature_span_as_printed: 1700–1900
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '1.20'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1800'
+          locator: *id045
+      T_range_K:
+      - 1700.0
+      - 1900.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r09_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 8
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row08_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: –40.5
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [11].
+        value: '-40.5'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 8
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r10_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 9
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '968'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row09_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '968'
+        value_as_printed: 4.55 ± 0.29
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [12].
+        value: '4.55'
+      uncertainty:
+        value: '0.29'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '968'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 9
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r11_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 10
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '968'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row10_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '968'
+        value_as_printed: 5.46 ± 0.92
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [13].
+        value: '5.46'
+      uncertainty:
+        value: '0.92'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '968'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 10
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r12_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 11
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '2100'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row11_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2100'
+        value_as_printed: 5.37 ± 2.85
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [14, 15].
+        value: '5.37'
+      uncertainty:
+        value: '2.85'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2100'
+          locator: &id046
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 11
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r12_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 11
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '2100'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row11_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2100'
+        value_as_printed: 5.99 ± 0.42
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [14, 15].
+        value: '5.99'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.42'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2100'
+          locator: *id046
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r13_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 12
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row12_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 5.31 ± 0.42
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [16].
+        value: '5.31'
+      uncertainty:
+        value: '0.42'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: &id047
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 12
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r13_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 12
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row12_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 6.60 ± 1.34
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [16].
+        value: '6.60'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '1.34'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: *id047
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r14_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 13
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row13_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '5.82'
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [17].
+        value: '5.82'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: &id048
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 13
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r14_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 13
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row13_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '7.95'
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [17].
+        value: '7.95'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: *id048
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r15_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 14
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row14_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 5.84 ± 2.74
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [18].
+        value: '5.84'
+      uncertainty:
+        value: '2.74'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: &id049
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 14
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r15_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 14
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row14_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 3.79 ± 0.53
+        method_as_printed: X
+        method_description: recommended or estimated value
+        attribution: Table 1, reference [18].
+        value: '3.79'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.53'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: *id049
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r16_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 15
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row15_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '3.4'
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [19].
+        value: '3.4'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 15
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r17_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 16
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row16_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 7.62 ± 0.44
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [20].
+        value: '7.62'
+      uncertainty:
+        value: '0.44'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 16
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r18_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 17
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row17_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 6.14 ± 1.36
+        method_as_printed: II
+        method_description: bomb calorimetry
+        attribution: Table 1, reference [21].
+        value: '6.14'
+      uncertainty:
+        value: '1.36'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 17
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r19_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 18
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1850'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row18_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1850'
+        value_as_printed: 3.45 ± 0.07*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [22].
+        value: '3.45'
+        temperature_span_as_printed: 1600–2100
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+      uncertainty:
+        value: '0.07'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator: &id050
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 18
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1600.0
+      - 2100.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r19_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 18
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1850'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row18_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1850'
+        value_as_printed: 4.08 ± 0.04*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [22].
+        value: '4.08'
+        temperature_span_as_printed: 1600–2100
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.04'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator: *id050
+      T_range_K:
+      - 1600.0
+      - 2100.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r20_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 19
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '973'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row19_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '973'
+        value_as_printed: 8.14 ± 0.40
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [23].
+        value: '8.14'
+      uncertainty:
+        value: '0.40'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '973'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 19
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r21_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 20
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1873'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row20_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1873'
+        value_as_printed: '3.1'
+        method_as_printed: VII
+        method_description: Kapur–Froberg equation calculations
+        attribution: Table 1, reference [24].
+        value: '3.1'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: &id051
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 20
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r21_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 20
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1873'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row20_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1873'
+        value_as_printed: '5.3'
+        method_as_printed: VII
+        method_description: Kapur–Froberg equation calculations
+        attribution: Table 1, reference [24].
+        value: '5.3'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id051
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r22_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 21
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1161'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row21_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1161'
+        value_as_printed: 1.72 ± 0.84
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [25].
+        value: '1.72'
+        temperature_span_as_printed: 298–2023
+      uncertainty:
+        value: '0.84'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1161'
+          locator: &id052
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 21
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 298.0
+      - 2023.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r22_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 21
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1161'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row21_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1161'
+        value_as_printed: 3.48 ± 0.41
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [25].
+        value: '3.48'
+        temperature_span_as_printed: 298–2023
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.41'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1161'
+          locator: *id052
+      T_range_K:
+      - 298.0
+      - 2023.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r23_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 22
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '968'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row22_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '968'
+        value_as_printed: '4.59'
+        method_as_printed: V
+        method_description: lattice model calculations
+        attribution: Table 1, reference [26].
+        value: '4.59'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '968'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 22
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r24_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 23
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row23_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '5.86'
+        method_as_printed: VI
+        method_description: quasi-chemical model calculations
+        attribution: Table 1, reference [27].
+        value: '5.86'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: &id053
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 23
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r24_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 23
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row23_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: '7.90'
+        method_as_printed: VI
+        method_description: quasi-chemical model calculations
+        attribution: Table 1, reference [27].
+        value: '7.90'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator: *id053
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r25_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 24
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1812'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row24_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1812'
+        value_as_printed: 3.49 ± 0.03*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [28].
+        value: '3.49'
+        temperature_span_as_printed: 1600–2023
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+      uncertainty:
+        value: '0.03'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1812'
+          locator: &id054
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 24
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1600.0
+      - 2023.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r25_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 24
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1812'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row24_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1812'
+        value_as_printed: 5.23 ± 0.01*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [28].
+        value: '5.23'
+        temperature_span_as_printed: 1600–2023
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.01'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1812'
+          locator: *id054
+      T_range_K:
+      - 1600.0
+      - 2023.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r26_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 25
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1933'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row25_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1933'
+        value_as_printed: 15.9 ± 0.6*
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, reference [29].
+        value: '15.9'
+        temperature_span_as_printed: 1833–2033
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+      uncertainty:
+        value: '0.6'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1933'
+          locator: &id055
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 25
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1833.0
+      - 2033.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r26_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 25
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1933'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row25_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1933'
+        value_as_printed: 13.8 ± 0.6*
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, reference [29].
+        value: '13.8'
+        temperature_span_as_printed: 1833–2033
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.6'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1933'
+          locator: *id055
+      T_range_K:
+      - 1833.0
+      - 2033.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r27_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 26
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row26_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 4.20 ± 0.40
+        method_as_printed: I
+        method_description: solution calorimetry
+        attribution: Table 1, reference [30].
+        value: '4.20'
+      uncertainty:
+        value: '0.40'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 26
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r28_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 27
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '298'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row27_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value_as_printed: 10.74 ± 4.30
+        method_as_printed: VIII
+        method_description: parametric model calculations
+        attribution: Table 1, reference [31].
+        value: '10.74'
+      uncertainty:
+        value: '4.30'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 27
+            column: 2
+            note: T, K column
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r29_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 28
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1617'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row28_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1617'
+        value_as_printed: –0.81 ± 0.27*
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, reference [32].
+        value: '-0.81'
+        temperature_span_as_printed: 1472–1761
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+      uncertainty:
+        value: '0.27'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1617'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 28
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1472.0
+      - 1761.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r29_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 28
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1617'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row28_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1617'
+        value_as_printed: 1.43 ± 0.17*
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, reference [32].
+        value: '1.43'
+        temperature_span_as_printed: 1472–1761
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.17'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1617'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 28
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1472.0
+      - 1761.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r30_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 29
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1850'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row29_reference
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1850'
+        value_as_printed: 4.56 ± 0.01*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [33].
+        value: '4.56'
+        temperature_span_as_printed: 1600–2100
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+      uncertainty:
+        value: '0.01'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 29
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1600.0
+      - 2100.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r30_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 29
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1850'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_row29_reference
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1850'
+        value_as_printed: 7.20 ± 0.01*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, reference [33].
+        value: '7.20'
+        temperature_span_as_printed: 1600–2100
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.01'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 29
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1600.0
+      - 2100.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 30
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1790'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_this_work_row30
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1790'
+        value_as_printed: 11.05 ± 0.08
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, This work; method IX (calculations from literature data).
+        value: '11.05'
+        temperature_span_as_printed: 1400–2180
+      uncertainty:
+        value: '0.08'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1790'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 30
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1400.0
+      - 2180.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 30
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1790'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_table1_this_work_row30
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1790'
+        value_as_printed: 10.05 ± 0.04*
+        method_as_printed: IX
+        method_description: calculations from literature data
+        attribution: Table 1, This work; method IX (calculations from literature data).
+        value: '10.05'
+        temperature_span_as_printed: 1400–2180
+        footnote_as_printed: '*'
+        footnote_meaning: least-squares calculation from the temperature dependence of Gibbs energy
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.04'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1790'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 30
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1400.0
+      - 2180.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r32_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 31
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: '1950'
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_kems_thermodynamic_series
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '1950'
+        value_as_printed: 12.9 ± 0.8
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, This work; method IV (Knudsen mass spectrometry).
+        value: '12.9'
+        temperature_span_as_printed: 1720–2180
+      uncertainty:
+        value: '0.8'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1950'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 31
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1720.0
+      - 2180.0
+    - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r32_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+        row: 31
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: '1950'
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from simple oxides, as printed in Table 1.
+      per: mol_species
+      experiment: shornikov_2003_kems_thermodynamic_series
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '1950'
+        value_as_printed: 11.6 ± 0.4
+        method_as_printed: IV
+        method_description: Knudsen mass spectrometry
+        attribution: Table 1, This work; method IV (Knudsen mass spectrometry).
+        value: '11.6'
+        temperature_span_as_printed: 1720–2180
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.4'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1950'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: '1'
+            row: 31
+            column: 2
+            note: T, K column
+      T_range_K:
+      - 1720.0
+      - 2180.0
+
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 1
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 13.4 ± 2.6
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '13.4'
+        equations_as_printed: (4), (11)
+      uncertainty:
+        value: '2.6'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 1
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 1
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 10.9 ± 1.1
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '10.9'
+        equations_as_printed: (4), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '1.1'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 1
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 1
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 10.3 ± 0.8
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '-10.3'
+        equations_as_printed: (4), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '0.8'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 1
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 2
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.3 ± 1.9
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '12.3'
+        equations_as_printed: (6), (11)
+      uncertainty:
+        value: '1.9'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 2
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 2
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.3 ± 0.9
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '12.3'
+        equations_as_printed: (6), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.9'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 2
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 2
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 14.5 ± 1.2
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '-14.5'
+        equations_as_printed: (6), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '1.2'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 2
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 3
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.7 ± 2.1
+        attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '12.7'
+        equations_as_printed: (9), (11)
+      uncertainty:
+        value: '2.1'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 3
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 3
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.8 ± 1.0
+        attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '11.8'
+        equations_as_printed: (9), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '1.0'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 3
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 3
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Silica–mullite
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 13.1 ± 1.0
+        attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
+        concentration_interval_as_printed: Silica–mullite
+        value: '-13.1'
+        equations_as_printed: (9), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '1.0'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 3
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 4
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 13.1 ± 1.0
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '13.1'
+        equations_as_printed: (4), (11)
+      uncertainty:
+        value: '1.0'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 4
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 4
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.5 ± 0.7
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '11.5'
+        equations_as_printed: (4), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.7'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 4
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 4
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.0 ± 1.3
+        attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '-12.0'
+        equations_as_printed: (4), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '1.3'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 4
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 5
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.8 ± 2.2
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '12.8'
+        equations_as_printed: (6), (11)
+      uncertainty:
+        value: '2.2'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 5
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 5
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.7 ± 1.1
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '11.7'
+        equations_as_printed: (6), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '1.1'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 5
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 5
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.8 ± 1.0
+        attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '-12.8'
+        equations_as_printed: (6), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '1.0'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 5
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 6
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 13.0 ± 1.4
+        attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '13.0'
+        equations_as_printed: (10), (11)
+      uncertainty:
+        value: '1.4'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 6
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 6
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.4 ± 0.8
+        attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '11.4'
+        equations_as_printed: (10), (11)
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.8'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 6
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 6
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Mullite–alumina
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.8 ± 1.2
+        attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
+        concentration_interval_as_printed: Mullite–alumina
+        value: '-11.8'
+        equations_as_printed: (10), (11)
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '1.2'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 6
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c03
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 7
+        column: 3
+        note: Cell checked against 600 dpi page render
+        row_label: Recommended value
+        column_header: ΔfH_T, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.9 ± 0.8
+        attribution: Table 2, recommended value, this work.
+        concentration_interval_as_printed: Recommended value
+        value: '12.9'
+      uncertainty:
+        value: '0.8'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 7
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c04
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 7
+        column: 4
+        note: Cell checked against 600 dpi page render
+        row_label: Recommended value
+        column_header: ΔfS_T, J/(mol K)
+      units: J/(mol K)
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 11.6 ± 0.4
+        attribution: Table 2, recommended value, this work.
+        concentration_interval_as_printed: Recommended value
+        value: '11.6'
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The extract schema has no token for formation entropy delta_fS; the printed cell is retained.
+      uncertainty:
+        value: '0.4'
+        unit: J/(mol K)
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 7
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c05
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        table: '2'
+        row: 7
+        column: 5
+        note: Cell checked against 600 dpi page render
+        row_label: Recommended value
+        column_header: −ΔfG2180, kJ/mol
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides, as printed in the Table 2 title.
+      per: mol_species
+      experiment: shornikov_2003_kems_table2
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2180'
+        value_as_printed: 12.4 ± 0.5
+        attribution: Table 2, recommended value, this work.
+        concentration_interval_as_printed: Recommended value
+        value: '-12.4'
+        quantity_as_printed: −ΔfG2180
+        sign_interpretation: Printed column is −ΔfG; stored delta_fG carries the corresponding negative
+          sign.
+      uncertainty:
+        value: '0.5'
+        unit: kJ/mol
+        basis: as printed
+        note: confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2180'
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: '2'
+            row: 7
+            column: 5
+            note: Printed −ΔfG column specifies 2180 K.
+    - observation_id: shornikov_2003_mullite_thermodynamics_text_2100k_gibbs_range
+      type: gibbs_table
+      regime: tabulation
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        note: The authors' prose states the range from Figure 1.
+        section: Introduction
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides.
+      per: mol_species
+      experiment: shornikov_2003_text_figure_range
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2100'
+        range:
+        - '-10'
+        - '-5'
+        value_as_printed: −5 to −10 kJ/mol
+        attribution: 'Authors'' sentence: according to Figure 1.'
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2100'
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            note: Temperature printed in the sentence.
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_01
+      type: gibbs_table
+      regime: tabulation
+      locator: *id033
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_01
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.1e+03'
+        value: '-1.8'
+        value_as_published: −ΔfG_T(M) ≈ 1.8 kJ/mol
+        axis_ordinate_kJ_mol: 1.847
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: High-temperature calorimetry [69].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 412
+            - 253
+            page_pixel_xy:
+            - 662
+            - 503
+            temperature_K: 1070.64
+            axis_ordinate_kJ_mol: 1.842
+          - crop_pixel_xy:
+            - 411
+            - 254
+            page_pixel_xy:
+            - 661
+            - 504
+            temperature_K: 1069.96
+            axis_ordinate_kJ_mol: 1.851
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.1e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: square
+            series: 1
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_04
+      type: gibbs_table
+      regime: tabulation
+      locator: *id034
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_04
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.8e+03'
+        value: '-5.0'
+        value_as_published: −ΔfG_T(M) ≈ 5.0 kJ/mol
+        axis_ordinate_kJ_mol: 4.991
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Heterogeneous equilibria in slags [7, 10, 44], series 2–4.
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1520
+            - 590
+            page_pixel_xy:
+            - 1770
+            - 840
+            temperature_K: 1825.19
+            axis_ordinate_kJ_mol: 4.977
+          - crop_pixel_xy:
+            - 1520
+            - 593
+            page_pixel_xy:
+            - 1770
+            - 843
+            temperature_K: 1825.19
+            axis_ordinate_kJ_mol: 5.005
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.8e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: filled circle
+            series: 4
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_06
+      type: gibbs_table
+      regime: tabulation
+      locator: *id035
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_06
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.9e+03'
+        value: '-1.0e+01'
+        value_as_published: −ΔfG_T(M) ≈ 1.0 × 10^1 kJ/mol
+        axis_ordinate_kJ_mol: 9.958
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Knudsen mass spectrometry in [29, 32, 59, 60] and this work, series 5–9.
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1590
+            - 1126
+            page_pixel_xy:
+            - 1840
+            - 1376
+            temperature_K: 1872.86
+            axis_ordinate_kJ_mol: 9.963
+          - crop_pixel_xy:
+            - 1590
+            - 1125
+            page_pixel_xy:
+            - 1840
+            - 1375
+            temperature_K: 1872.86
+            axis_ordinate_kJ_mol: 9.953
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.9e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: filled triangle
+            series: 6
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_08
+      type: gibbs_table
+      regime: tabulation
+      locator: *id036
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_08
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '2.2e+03'
+        value: '-5.0'
+        value_as_published: −ΔfG_T(M) ≈ 5.0 kJ/mol
+        axis_ordinate_kJ_mol: 4.972
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Knudsen mass spectrometry in [29, 32, 59, 60] and this work, series 5–9.
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 2001
+            - 589
+            page_pixel_xy:
+            - 2251
+            - 839
+            temperature_K: 2152.75
+            axis_ordinate_kJ_mol: 4.967
+          - crop_pixel_xy:
+            - 2001
+            - 590
+            page_pixel_xy:
+            - 2251
+            - 840
+            temperature_K: 2152.75
+            axis_ordinate_kJ_mol: 4.977
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2.2e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: filled inverted triangle
+            series: 8
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_17
+      type: gibbs_table
+      regime: tabulation
+      locator: *id037
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_17
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '2.1e+03'
+        value: '-6.1'
+        value_as_published: −ΔfG_T(M) ≈ 6.1 kJ/mol
+        axis_ordinate_kJ_mol: 6.074
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Redlich–Kister equation [49].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1960
+            - 708
+            page_pixel_xy:
+            - 2210
+            - 958
+            temperature_K: 2124.83
+            axis_ordinate_kJ_mol: 6.074
+          - crop_pixel_xy:
+            - 1960
+            - 708
+            page_pixel_xy:
+            - 2210
+            - 958
+            temperature_K: 2124.83
+            axis_ordinate_kJ_mol: 6.074
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2.1e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: filled diamond
+            series: 17
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_18
+      type: gibbs_table
+      regime: tabulation
+      locator: *id038
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_18
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.9e+03'
+        value: '-5.4'
+        value_as_published: −ΔfG_T(M) ≈ 5.4 kJ/mol
+        axis_ordinate_kJ_mol: 5.377
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Monte Carlo method [68].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1591
+            - 633
+            page_pixel_xy:
+            - 1841
+            - 883
+            temperature_K: 1873.54
+            axis_ordinate_kJ_mol: 5.377
+          - crop_pixel_xy:
+            - 1591
+            - 633
+            page_pixel_xy:
+            - 1841
+            - 883
+            temperature_K: 1873.54
+            axis_ordinate_kJ_mol: 5.377
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.9e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: square with cross
+            series: 18
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_19
+      type: gibbs_table
+      regime: tabulation
+      locator: *id039
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_19
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.9e+03'
+        value: '-6.8'
+        value_as_published: −ΔfG_T(M) ≈ 6.8 kJ/mol
+        axis_ordinate_kJ_mol: 6.819
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Kapur–Froberg equation [24].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1592
+            - 789
+            page_pixel_xy:
+            - 1842
+            - 1039
+            temperature_K: 1874.22
+            axis_ordinate_kJ_mol: 6.828
+          - crop_pixel_xy:
+            - 1592
+            - 787
+            page_pixel_xy:
+            - 1842
+            - 1037
+            temperature_K: 1874.22
+            axis_ordinate_kJ_mol: 6.809
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.9e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: circle with cross
+            series: 19
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_20
+      type: gibbs_table
+      regime: tabulation
+      locator: *id040
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_20
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.8e+03'
+        value: '-4.8'
+        value_as_published: −ΔfG_T(M) ≈ 4.8 kJ/mol
+        axis_ordinate_kJ_mol: 4.777
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Lattice model [26].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1517
+            - 567
+            page_pixel_xy:
+            - 1767
+            - 817
+            temperature_K: 1823.15
+            axis_ordinate_kJ_mol: 4.763
+          - crop_pixel_xy:
+            - 1518
+            - 570
+            page_pixel_xy:
+            - 1768
+            - 820
+            temperature_K: 1823.83
+            axis_ordinate_kJ_mol: 4.791
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.8e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: open triangle
+            series: 20
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_21
+      type: gibbs_table
+      regime: tabulation
+      locator: *id041
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_21
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.7e+03'
+        value: '-4.9'
+        value_as_published: −ΔfG_T(M) ≈ 4.9 kJ/mol
+        axis_ordinate_kJ_mol: 4.940
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Data on the phase diagram [63].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1329
+            - 586
+            page_pixel_xy:
+            - 1579
+            - 836
+            temperature_K: 1695.12
+            axis_ordinate_kJ_mol: 4.940
+          - crop_pixel_xy:
+            - 1330
+            - 586
+            page_pixel_xy:
+            - 1580
+            - 836
+            temperature_K: 1695.80
+            axis_ordinate_kJ_mol: 4.940
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.7e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: crossed open triangle
+            series: 21
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_marker_23
+      type: gibbs_table
+      regime: tabulation
+      locator: *id042
+      units: kJ/mol
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_23
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        T_K: '1.8e+03'
+        value: '-5.1'
+        value_as_published: −ΔfG_T(M) ≈ 5.1 kJ/mol
+        axis_ordinate_kJ_mol: 5.093
+        axes_as_published:
+          x: T, K
+          y: −ΔfG_T(M), kJ/mol
+        attribution: Estimated values [67].
+        figure_read:
+          calibration_audit: shornikov-2003-mullite-thermodynamics.figure-audit.md
+          reads:
+          - crop_pixel_xy:
+            - 1446
+            - 604
+            page_pixel_xy:
+            - 1696
+            - 854
+            temperature_K: 1774.80
+            axis_ordinate_kJ_mol: 5.107
+          - crop_pixel_xy:
+            - 1446
+            - 601
+            page_pixel_xy:
+            - 1696
+            - 851
+            temperature_K: 1774.80
+            axis_ordinate_kJ_mol: 5.079
+      uncertainty:
+        value: '0.05'
+        unit: kJ/mol
+        basis: visual read uncertainty
+        note: estimated from marker-center width; confidence level not stated
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.8e+03'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Read twice from the calibrated linear x-axis.
+            figure: '1'
+            panel: single
+            marker_symbol: crossed diamond
+            series: 23
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_02
+      type: gibbs_table
+      regime: tabulation
+      locator: *id060
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_02
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '2'
+        attribution: Heterogeneous equilibria in slags [7, 10, 44].
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 2
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_03
+      type: gibbs_table
+      regime: tabulation
+      locator: *id061
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_03
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '3'
+        attribution: Heterogeneous equilibria in slags [7, 10, 44].
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 3
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_05
+      type: gibbs_table
+      regime: tabulation
+      locator: *id062
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_05
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '5'
+        attribution: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 5
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_07
+      type: gibbs_table
+      regime: tabulation
+      locator: *id063
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_07
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '7'
+        attribution: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 7
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_09
+      type: gibbs_table
+      regime: tabulation
+      locator: *id064
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_09
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '9'
+        attribution: Knudsen mass spectrometry in [29, 32, 59, 60] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 9
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_10
+      type: gibbs_table
+      regime: tabulation
+      locator: *id065
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_10
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '10'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 10
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_11
+      type: gibbs_table
+      regime: tabulation
+      locator: *id066
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_11
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '11'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 11
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_12
+      type: gibbs_table
+      regime: tabulation
+      locator: *id067
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_12
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '12'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 12
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_13
+      type: gibbs_table
+      regime: tabulation
+      locator: *id068
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_13
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '13'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 13
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_14
+      type: gibbs_table
+      regime: tabulation
+      locator: *id069
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_14
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '14'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 14
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_15
+      type: gibbs_table
+      regime: tabulation
+      locator: *id070
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_15
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '15'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 15
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_16
+      type: gibbs_table
+      regime: tabulation
+      locator: *id071
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_16
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '16'
+        attribution: Calculated from thermochemical data in [14, 17, 22, 25, 28, 33] and this work.
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 16
+    - observation_id: shornikov_2003_mullite_thermodynamics_fig1_curve_22
+      type: gibbs_table
+      regime: tabulation
+      locator: *id072
+      T_range_K:
+      - 1000.0
+      - 2200.0
+      units: kJ/mol as plotted
+      phase: cr
+      standard_state: Formation of mullite from oxides; M is mullite, as in Figure 1.
+      per: mol_species
+      experiment: shornikov_2003_mullite_figure1_series_22
+      values:
+        quantity: delta_fG
+        method_class: figure_only
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Unmarked model or literature curve; no numeric points sampled.
+        series_as_printed: '22'
+        attribution: Quasi-chemical model [27].
+        caption: Gibbs energies of formation of mullite from oxides; full caption is in figures[0].
+        T_range_basis: full Figure 1 panel x-axis; exact line endpoints are not tabulated
+      uncertainty:
+        note: not applicable; no point digitized
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1000'
+              interval_high: '2200'
+          locator:
+            page: 3
+            published_page: 1046
+            pdf_page_index: 2
+            note: Full Figure 1 panel x-axis; individual curve endpoints are not tabulated.
+            figure: '1'
+            panel: single
+            series: 22
+  Al2O3-SiO2_melt:
+    observations:
+    - observation_id: shornikov_2003_mullite_thermodynamics_text_ref66_melt_gibbs_extrapolation
+      type: gibbs_table
+      regime: tabulation
+      locator: *id073
+      units: kJ/mol
+      phase: l
+      standard_state: Gibbs energies of formation of melts in the Al2O3–SiO2 system, as stated in the sentence.
+      experiment: shornikov_2003_text_ref66_melt_gibbs_extrapolation
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        value_as_printed: '–12'
+        value: '-12'
+        attribution: >-
+          Reference [66], extrapolation of melt formation Gibbs energies to the temperature of fusion of mullite.
+      uncertainty:
+        note: no uncertainty printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: no_numeric_temperature_printed
+          locator: *id073
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator: *id073

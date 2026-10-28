@@ -1,0 +1,2330 @@
+schema_version: literature_extract.v1
+source_id: kems-214-hastie-1980-nbsir-80-2178
+source:
+  citation: Hastie, J. W., Bonnell, D. W., Plante, E. R. & Horton, W. S. (1980). Vaporization and Chemical
+    Transport Under Coal Gasification Conditions. NBSIR 80-2178 (DoE), National Bureau of Standards, December
+    1980.
+  year: 1980
+  doi: null
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir80-2178.pdf
+  corpus_asset: raw/kems-214-hastie-1980-nbsir-80-2178/kems-214-hastie-1980-nbsir-80-2178.pdf
+extraction:
+  method: Authoritative pdftotext-layout text and MinerU inventory, with all typed pressure cells transcribed
+    from 600 dpi renders of PDF pages 106 and 107 and the prose pressure point on page 99. Figures in
+    the coal-slag sections and Appendix B are figure-only records; no plotted values were digitised. The
+    MinerU table tool found no data table blocks in its parsed pages. Appendix A is a separate NaCl/Na2SO4
+    salt-vaporization study and is outside the requested alkali-bearing slag/silicate scope.
+  date: '2026-10-20'
+  worker: fam21-1020
+review_status: draft
+fidelity_samples:
+- path: species.Mg.observations[hastie_1980_table3_Mg_partial_pressure].values.points[0].pressure_atm
+  value: '1.48e-5'
+  locator:
+    page: 107
+    pdf_page_index: 106
+    published_page: 21
+    table: '3'
+    row: '1'
+    note: 600 dpi render checked against Table 3, row 1, Mg pressure cell.
+species:
+  K:
+    observations:
+    - observation_id: hastie_1980_main_K1_TMS_K_pressure_1466K
+      type: partial_pressure
+      locator: &id001
+        page: 99
+        pdf_page_index: 98
+        published_page: 13
+        note: Section 2.2.2; typical TMS data point
+      phase: gas
+      regime: transpiration
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: K
+        formula: K
+        method: transpiration mass spectrometry (TMS)
+        method_as_printed: P_i = k_i I_i T; k_i is obtained from the carrier-gas sensitivity and the appropriate
+          cross section and sensitivity factors.
+        sample_id: K1
+        system_as_published: K-enriched Illinois No. 6 coal slag
+        sample_composition_as_reported: K1 is the Illinois No. 6 coal slag; its initial composition is
+          given in the text, but its run-state composition at this pressure point is not stated.
+        carrier_gas_as_printed: N2
+        carrier_gas_pressure_atm_as_printed: '0.64'
+        ion_intensity_K_39_uV_as_printed: '200'
+        ion_intensity_N2_29_uV_as_printed: 3.2e4
+        points:
+        - T_K_as_printed: '1466'
+          T_K: 1466
+          T_C: '1192.85'
+          pressure_atm: '7.0e-6'
+          pressure_as_printed: 7.0 × 10^-6 atm
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1466'
+              locator: *id001
+            oxygen_partial_pressure:
+              value: about 5 × 10^-5
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: 5e-5
+                  approximate: true
+              locator:
+                page: 99
+                pdf_page_index: 98
+                published_page: 13
+                note: The text says TMS N2 typically contained about 5 × 10^-5 atm O2; not a point-specific
+                  measured value.
+            composition:
+              state:
+                tag: unknown
+                reason: K1 run-state composition at 1466 K is not reported; the initial composition is
+                  not the run-state composition.
+              locator: *id001
+          locator: *id001
+    context:
+    - observation_id: hastie_1980_main_table1_K2_slag_model_pressures
+      type: model_pressure_table
+      locator:
+        page: 17
+        pdf_page_index: 16
+        published_page: 7
+        table: '1'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        model: SOLGASMIX ideal- and non-ideal-solution thermodynamic model output
+        species:
+        - K
+        - KOH
+        - H2
+        - H2O
+        - O2
+        sample_id: K2
+        composition_as_printed: SiO2 47.3, Al2O3 11.1, Fe2O3 12, CaO 13.9, MgO 7.0, K2O 8.7 wt%
+        gas_condition_as_printed: 1 atm H2
+        rows_as_printed:
+        - species: K
+          ideal_1000K_atm: '6.7e-3'
+          ideal_1500K_atm: '1.8e-2'
+          nonideal_1000K_atm: '3.3e-8'
+          nonideal_1500K_atm: '4.6e-6'
+        - species: KOH
+          ideal_1000K_atm: '1.4e-2'
+          ideal_1500K_atm: '3.3e-3'
+          nonideal_1000K_atm: '8.2e-8'
+          nonideal_1500K_atm: '6.7e-7'
+        - species: H2
+          ideal_1000K_atm: '0.96'
+          ideal_1500K_atm: '0.95'
+          nonideal_1000K_atm: '0.97'
+          nonideal_1500K_atm: '0.97'
+        - species: H2O
+          ideal_1000K_atm: '2.3e-2'
+          ideal_1500K_atm: '3.4e-2'
+          nonideal_1000K_atm: '2.7e-2'
+          nonideal_1500K_atm: '2.7e-2'
+        - species: O2
+          ideal_1000K_atm: '4.2e-24'
+          ideal_1500K_atm: '4.5e-15'
+          nonideal_1000K_atm: '5.7e-24'
+          nonideal_1500K_atm: '2.7e-15'
+        activity_input_as_printed: K2O activity was an experimental input; K2O + SiO2 data were used.
+      note: Table 1 is explicitly thermodynamic model output, so these pressures remain model_derived
+        context and are not observations.
+    - observation_id: hastie_1980_main_table2_K2_slag_H2_model_pressures
+      type: model_pressure_table
+      locator:
+        page: 19
+        pdf_page_index: 18
+        published_page: 9
+        table: '2'
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        model: SOLGASMIX non-ideal multicomponent equilibrium calculation
+        species:
+        - H2
+        - H2O
+        - O2
+        - K
+        - KOH
+        - SiO
+        sample_id: K2
+        system_as_printed: K2 slag + H2
+        K2O_activity_coefficient_input_as_printed: 10^-8, independent of temperature
+        rows_as_printed:
+        - species: H2
+          1600K_atm: '0.11e-3'
+          1700K_atm: '0.63e-4'
+        - species: H2O
+          1600K_atm: '0.26e-3'
+          1700K_atm: '0.27e-3'
+        - species: O2
+          1600K_atm: '0.23e-9'
+          1700K_atm: '0.77e-8'
+        - species: K
+          1600K_atm: '0.57e-3'
+          1700K_atm: '0.60e-3'
+        - species: KOH
+          1600K_atm: '0.51e-4'
+          1700K_atm: '0.55e-4'
+        - species: SiO
+          1600K_atm: '0.54e-8'
+          1700K_atm: '0.31e-7'
+      note: Table 2 is explicitly equilibrium-model output; printed SiO values are retained here as model-derived
+        context.
+    - observation_id: hastie_1980_main_fig1_transpiration_reactor_photo
+      type: figure_record
+      locator:
+        page: 23
+        pdf_page_index: 22
+        figure: '1'
+      phase: transpiration mass-spectrometry apparatus
+      units: photograph; no numeric data
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        species:
+        - K
+        - Na
+        - O2
+        phase: transpiration mass-spectrometry apparatus
+        temperature_as_printed: not stated
+        axes_as_printed:
+          x: none; photograph
+          y: none
+        caption_as_printed: Photo of disassembled transpiration reactor showing the thermocouple, sample
+          boat, and capillary tube with beam-sampling nozzles attached.
+        panel: whole figure
+        series:
+        - name: reactor and sampling components
+          marker: photograph
+          marker_count: 0
+        attribution: This work
+        digitisation: deferred to a figure pass
+        schema_gap: No quantitative species or apparatus geometry token fits this photograph; candidate
+          p_partial and ion_intensity do not apply.
+    - observation_id: hastie_1980_main_fig2_K_O2_vs_temperature
+      type: figure_record
+      locator:
+        page: 25
+        pdf_page_index: 24
+        figure: '2'
+      phase: K2 slag
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        - O2
+        phase: K2 slag
+        temperature_as_printed: temperature axis 1333–1818 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: Temperature (K)
+          y: partial pressure (atm), logarithmic
+        caption_as_printed: Vaporization of K and O2 from the K2 slag, expressed as log P versus 1/T plots.
+          Open circles are O2 (KMS), closed circles O2 (TMS), open triangles K (KMS), and closed triangles
+          K (TMS); arrows mark decreasing-temperature points.
+        panel: whole figure
+        series:
+        - name: O2, KMS
+          marker: open circles
+          marker_count: 15
+          evidence_class: measured_reduced
+        - name: O2, TMS
+          marker: closed circles
+          marker_count: 14
+          evidence_class: measured_reduced
+        - name: K, KMS
+          marker: open triangles
+          marker_count: 29
+          evidence_class: measured_reduced
+        - name: K, TMS
+          marker: closed triangles
+          marker_count: 25
+          evidence_class: measured_reduced
+        attribution: This work; K2 slag
+        digitisation: deferred to a figure pass
+        sample_id: K2
+    - observation_id: hastie_1980_main_fig3_K_pressure_vs_water
+      type: figure_record
+      locator:
+        page: 26
+        pdf_page_index: 25
+        figure: '3'
+      phase: K2 slag
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        phase: K2 slag
+        temperature_as_printed: 1610
+        axes_as_printed:
+          x: H2O pressure (atm)
+          y: K pressure (atm), logarithmic
+        caption_as_printed: Dependence of K pressure on H2O pressure at constant temperature for the K2
+          slag (TMS data); the curve of slope 0.5 is the theoretical pressure dependence for reaction
+          (6).
+        panel: whole figure
+        series:
+        - name: K pressure, TMS
+          marker: open circles with error bars
+          marker_count: 6
+          evidence_class: measured_reduced
+        - name: reaction (6) slope 0.5
+          marker: theoretical line
+          marker_count: 0
+          evidence_class: model_derived
+        attribution: This work; theoretical line is reaction (6)
+        digitisation: deferred to a figure pass
+        sample_id: K2
+        N2_pressure_atm_as_printed: '0.21'
+      T_K: 1610
+    - observation_id: hastie_1980_main_fig4_KOH_pressure_vs_water
+      type: figure_record
+      locator:
+        page: 27
+        pdf_page_index: 26
+        figure: '4'
+      phase: K2 slag
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - KOH
+        - K
+        phase: K2 slag
+        temperature_as_printed: 1794
+        axes_as_printed:
+          x: apparent H2O pressure (atm)
+          y: pressure (atm), logarithmic
+        caption_as_printed: Dependence of KOH pressure on H2O apparent pressure at constant temperature
+          for the K2 slag (KMS data); the 0.5-slope curve represents the theoretical pressure dependence
+          for a process analogous to reaction (4).
+        panel: whole figure
+        series:
+        - name: KOH
+          marker: open circles
+          marker_count: 4
+          evidence_class: measured_reduced
+        - name: K divided by 100
+          marker: open triangle
+          marker_count: 1
+          evidence_class: measured_reduced
+        - name: analogy to reaction (4), slope 0.5
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        attribution: This work; theoretical comparison is reaction (4)
+        digitisation: deferred to a figure pass
+        sample_id: K2
+      T_K: 1794
+    - observation_id: hastie_1980_main_fig5_gas_response_to_added_hydrogen
+      type: figure_record
+      locator:
+        page: 28
+        pdf_page_index: 27
+        figure: '5'
+      phase: K2 slag
+      units: atm and mV as plotted
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - O2
+        - H2O
+        - H2
+        phase: K2 slag
+        temperature_as_printed: 1655
+        axes_as_printed:
+          x: applied H2 pressure (10^2 atm)
+          left_y: H2O and O2 pressure
+          right_y: H2 ion intensity (mV)
+        caption_as_printed: 'Response of the K2 slag system to added H2, showing conversion of slag O2
+          to H2O. Conditions: 1655 K, N2 carrier-gas pressure 0.18 atm, capillary nozzle.'
+        panel: whole figure
+        series:
+        - name: H2O pressure
+          marker: open circles
+          marker_count: 6
+          evidence_class: measured_reduced
+        - name: O2 pressure
+          marker: open triangles
+          marker_count: 7
+          evidence_class: measured_reduced
+        - name: H2 ion intensity
+          marker: open squares
+          marker_count: 5
+          evidence_class: measured_direct
+        attribution: This work
+        digitisation: deferred to a figure pass
+        sample_id: K2
+      T_K: 1655
+    - observation_id: hastie_1980_main_fig6_K_O2_vs_water_in_hydrogen
+      type: figure_record
+      locator:
+        page: 29
+        pdf_page_index: 28
+        figure: '6'
+      phase: K2 slag
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        - O2
+        phase: K2 slag
+        temperature_as_printed: 1655
+        axes_as_printed:
+          x: H2O pressure (atm)
+          left_y: K pressure (atm)
+          right_y: O2 pressure (atm)
+        caption_as_printed: 'K pressure (open symbols) and O2 pressure (closed symbols) with H2O pressure
+          for K2 slag in the presence of added H2. Conditions: 1655 K, N2 carrier-gas pressure 0.18 atm,
+          capillary nozzle.'
+        panel: whole figure
+        series:
+        - name: K pressure
+          marker: open circles
+          marker_count: 7
+          evidence_class: measured_reduced
+        - name: O2 pressure
+          marker: closed circles
+          marker_count: 6
+          evidence_class: measured_reduced
+        attribution: This work
+        digitisation: deferred to a figure pass
+        sample_id: K2
+      T_K: 1655
+    - observation_id: hastie_1980_main_fig7_K_intensity_burst_vs_time
+      type: figure_record
+      locator:
+        page: 30
+        pdf_page_index: 29
+        figure: '7'
+      phase: K2 slag
+      units: μV
+      values:
+        quantity: ion_intensity
+        method_class: figure_only
+        species:
+        - K
+        phase: K2 slag
+        temperature_as_printed: 1500
+        axes_as_printed:
+          x: time (minutes)
+          y: K+ ion intensity (μV)
+        caption_as_printed: 'K-species pressure-burst phenomenon, expressed as K+ ion intensity versus
+          time for K2 slag. Conditions: 1500 K, N2 carrier-gas pressure 0.21 atm, capillary nozzle.'
+        panel: whole figure
+        series:
+        - name: K+ ion-intensity burst
+          marker: open circles
+          marker_count: 22
+          evidence_class: measured_direct
+        attribution: This work
+        digitisation: deferred to a figure pass
+        sample_id: K2
+      T_K: 1500
+    - observation_id: hastie_1980_main_fig8_K_intensity_decay_vs_time
+      type: figure_record
+      locator:
+        page: 31
+        pdf_page_index: 30
+        figure: '8'
+      phase: K2 slag
+      units: μV
+      values:
+        quantity: ion_intensity
+        method_class: figure_only
+        species:
+        - K
+        phase: K2 slag
+        temperature_as_printed: 1570
+        axes_as_printed:
+          x: time (minutes)
+          y: K+ ion intensity (μV)
+        caption_as_printed: 'Typical K+ ion-intensity signal decay with time for K2 slag. Conditions:
+          1570 K, N2 carrier-gas pressure 0.21 atm, capillary nozzle.'
+        panel: whole figure
+        series:
+        - name: K+ ion-intensity decay
+          marker: open circles
+          marker_count: 17
+          evidence_class: measured_direct
+        attribution: This work
+        digitisation: deferred to a figure pass
+        sample_id: K2
+      T_K: 1570
+    - observation_id: hastie_1980_appb_fig4_K1_mass_spectrum
+      type: figure_record
+      locator:
+        page: 116
+        pdf_page_index: 115
+        figure: '4'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: mV and atm axes
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - H2O
+        - Na
+        - N2
+        - O2
+        - K
+        - H2S
+        - CO2
+        - SO2
+        - KO
+        - KOH
+        - SiS
+        - SiSH
+        - KS
+        - KSiO
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: 1428
+        axes_as_printed:
+          x: molecular weight (amu)
+          left_y: ion intensity (mV)
+          right_y: approximate partial pressure × 10^5 (atm)
+        caption_as_printed: Typical 30 eV mass spectrum of species evolved from K-enriched Illinois No.
+          6 coal slag K1 during initial heating at 1428 K (run 1), TMS with capillary probe; approximately
+          1 g sample, N2 pressure 0.5 atm and flow about 25 SCCM. Approximate partial pressures are shown
+          using the printed sensitivity relation.
+        panel: whole figure
+        series:
+        - name: TMS mass-spectrum trace and labeled species
+          marker: vertical spectral peaks
+          marker_count: 0
+          evidence_class: measured_reduced
+        attribution: This work; possible assignments are marked tentative in the caption
+        digitisation: deferred to a figure pass
+        sample_id: K1
+        method_as_printed: P_i = k_i I_i T; plotted pressure scale is approximate.
+      T_K: 1428
+    - observation_id: hastie_1980_appb_fig5_initial_volatiles
+      type: figure_record
+      locator:
+        page: 117
+        pdf_page_index: 116
+        figure: '5'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: mV and atm axes
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - H2O
+        - CO2
+        - SO2
+        - K
+        - Na
+        - K2CO3
+        - KAlO2
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: temperature axis 1250–1620 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: temperature (K)
+          left_y: ion intensity (mV)
+          right_y: pressure × 10^5 (atm)
+        caption_as_printed: Ion-intensity and partial-pressure variation of initial volatiles (K2O 19.5–19.1
+          wt%) with temperature for slag with melting point about 1700 ± 30 K (run 1), TMS; 0.5 atm N2,
+          capillary probe. Literature K2CO3(l) and KAlO2(s) curves are shown for comparison.
+        panel: whole figure
+        series:
+        - name: H2O
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: CO2
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: SO2
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: K × 2.6 pressure scale
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: Na × 1.5 pressure scale
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: K2CO3(l)
+          marker: literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        - name: KAlO2(s)
+          marker: literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        attribution: This work; K2CO3 and KAlO2 comparison curves are literature data
+        digitisation: deferred to a figure pass
+        sample_id: K1
+    - observation_id: hastie_1980_appb_fig6_K_pressure_temperature
+      type: figure_record
+      locator:
+        page: 118
+        pdf_page_index: 117
+        figure: '6'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: temperature axis 1250–1650 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: temperature (K)
+          y: K pressure (atm), logarithmic
+        caption_as_printed: K partial pressure versus temperature for K2O contents 19.1–17.8 wt% (run
+          1, KMS), 18.17–18.07 wt% (run 2, TMS), and 18.07–18.0 wt% (run 3, IMS/TMS). Literature pressure
+          curves for K2SO4(l), K2CO3(l), KAlO2(s), and K2O·9Al2O3−Al2O3(s) are comparisons; arrows show
+          run 3 chronology.
+        panel: whole figure
+        series:
+        - name: run 1, KMS, 19.1–17.8 wt% K2O
+          marker: open circles
+          marker_count: 11
+          evidence_class: measured_reduced
+        - name: run 2, TMS, 18.17–18.07 wt% K2O
+          marker: open squares
+          marker_count: 7
+          evidence_class: measured_reduced
+        - name: run 3, IMS/TMS, 18.07–18.0 wt% K2O
+          marker: open squares
+          marker_count: 8
+          evidence_class: measured_reduced
+        - name: K2SO4(l)
+          marker: dashed literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        - name: K2CO3(l)
+          marker: dashed literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        - name: KAlO2(s)
+          marker: dashed literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        - name: K2O·9Al2O3−Al2O3(s)
+          marker: dashed literature curve
+          marker_count: 0
+          evidence_class: quoted_attributed
+        attribution: This work for runs; literature attribution as stated in the caption
+        digitisation: deferred to a figure pass
+        sample_id: K1
+        standard_state_as_printed: K partial pressure; literature comparison curves are separately attributed.
+    - observation_id: hastie_1980_appb_fig8_K_pressure_vs_temperature_with_water
+      type: figure_record
+      locator:
+        page: 120
+        pdf_page_index: 119
+        figure: '8'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: temperature axis 1538–1695 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: temperature (K)
+          y: K pressure × 10^5 (atm), logarithmic
+        caption_as_printed: K-pressure dependence on temperature in H2O about 3 × 10^-2 atm and N2 at
+          0.5 atm, TMS with capillary probe.
+        panel: whole figure
+        series:
+        - name: K pressure
+          marker: open circles
+          marker_count: 7
+          evidence_class: measured_reduced
+        attribution: This work
+        digitisation: deferred to a figure pass
+        sample_id: K1
+        H2O_pressure_as_printed: about 3 × 10^-2 atm
+        N2_pressure_atm_as_printed: '0.5'
+    - observation_id: hastie_1980_appb_fig9_K_pressure_vs_water_pressure
+      type: figure_record
+      locator:
+        page: 121
+        pdf_page_index: 120
+        figure: '9'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        species:
+        - K
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: 1673
+        axes_as_printed:
+          x: H2O pressure (atm), logarithmic
+          y: K pressure × 10^5 (atm), logarithmic
+        caption_as_printed: K-pressure dependence on H2O content in N2 at 0.35 atm and 1673 K, TMS with
+          capillary probe. Dashed slope 0.5 is the theoretical equilibrium dependence for reaction (8).
+        panel: whole figure
+        series:
+        - name: K pressure
+          marker: open circles
+          marker_count: 6
+          evidence_class: measured_reduced
+        - name: reaction (8) slope 0.5
+          marker: dashed line
+          marker_count: 0
+          evidence_class: model_derived
+        attribution: This work; theoretical line is reaction (8)
+        digitisation: deferred to a figure pass
+        sample_id: K1
+        N2_pressure_atm_as_printed: '0.35'
+      T_K: 1673
+  K2O:
+    observations: []
+    context:
+    - observation_id: hastie_1980_appb_fig7_K2O_activity_coefficient
+      type: figure_record
+      locator:
+        page: 119
+        pdf_page_index: 118
+        figure: '7'
+      phase: K-enriched Illinois No. 6 coal slag K1
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: figure_only
+        species:
+        - K2O
+        phase: K-enriched Illinois No. 6 coal slag K1
+        temperature_as_printed: temperature axis 1200–1900 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: temperature (K)
+          y: K2O activity coefficient, logarithmic; labels give remaining K2O mole fraction
+        caption_as_printed: KMS variation of the apparent K2O activity coefficient with temperature and
+          composition for slag. Labels 0.08–0.154 are K2O mole fraction remaining; runs 1–3 were consecutive
+          on one sample.
+        panel: whole figure
+        series:
+        - name: run 1
+          marker: open circles
+          marker_count: 10
+          evidence_class: measured_reduced
+        - name: run 2
+          marker: triangles
+          marker_count: 11
+          evidence_class: measured_reduced
+        - name: run 3
+          marker: open circles
+          marker_count: 10
+          evidence_class: measured_reduced
+        attribution: This work; pure-K2O reference data from [14] and Natola and Touzain (1970)
+        digitisation: deferred to a figure pass
+        sample_id: K1
+        composition_as_printed: remaining K2O mole fractions labeled 0.08–0.154; individual composition
+          values are not digitised.
+        standard_state_as_printed: pure K2O reference; the phase is inferred from the reference
+          temperature range and K2O phase equilibrium.
+        standard_state:
+          phase: liquid
+          inferred: true
+          basis: Pure K2O melts at 919 K (Natola and Touzain, 1970, DOI 10.1139/v70-324); the plotted
+            reference data span 1200–1900 K, so the stable reference phase is liquid throughout.
+          transition_notice: The plotted range begins 281 K above the fusion point, outside the approximately
+            100 K transition notice range.
+  Mg:
+    observations:
+    - observation_id: hastie_1980_table3_Mg_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+      phase: gas
+      regime: kems_effusion
+      condensed_form: solid
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: Mg
+        formula: Mg
+        method: Knudsen mass spectrometry
+        regime: kems_effusion
+        method_as_printed: The Mg+ ion intensity was calibrated against the known Mg pressure over MgO(s);
+          Table 1 gives the Mg KMS cross section and sensitivity factor.
+        system_as_published: MgO(s) + H2 system; reaction (3)
+        points:
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '1.48e-5'
+          pressure_as_printed: 1.48 × 10^-5 atm
+          locator: &id002
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '1'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id002
+            oxygen_partial_pressure:
+              value: '7.42e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.42e-7'
+              locator: *id002
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '1.66e-5'
+          pressure_as_printed: 1.66 × 10^-5 atm
+          locator: &id003
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '2'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id003
+            oxygen_partial_pressure:
+              value: '4.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.84e-7'
+              locator: *id003
+        - T_K_as_printed: '2022'
+          T_K: 2022
+          T_C: '1748.85'
+          pressure_atm: '6.10e-6'
+          pressure_as_printed: 6.10 × 10^-6 atm
+          locator: &id004
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '3'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2022'
+              locator: *id004
+            oxygen_partial_pressure:
+              value: '9.73e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '9.73e-7'
+              locator: *id004
+        - T_K_as_printed: '2022'
+          T_K: 2022
+          T_C: '1748.85'
+          pressure_atm: '5.14e-6'
+          pressure_as_printed: 5.14 × 10^-6 atm
+          locator: &id005
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '4'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2022'
+              locator: *id005
+            oxygen_partial_pressure:
+              value: '1.19e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.19e-6'
+              locator: *id005
+        - T_K_as_printed: '2029'
+          T_K: 2029
+          T_C: '1755.85'
+          pressure_atm: '6.92e-6'
+          pressure_as_printed: 6.92 × 10^-6 atm
+          locator: &id006
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '5'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2029'
+              locator: *id006
+            oxygen_partial_pressure:
+              value: '1.07e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.07e-6'
+              locator: *id006
+          also_reported_at:
+            page: 106
+            pdf_page_index: 105
+            published_page: 20
+            table: '2'
+            row: Typical reaction (3) data at 2029 K
+            note: Same 2029 K partial-pressure point as Table 3; represented once under d-068.
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '9.73e-6'
+          pressure_as_printed: 9.73 × 10^-6 atm
+          locator: &id007
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '6'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id007
+            oxygen_partial_pressure:
+              value: '1.75e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.75e-6'
+              locator: *id007
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '1.32e-5'
+          pressure_as_printed: 1.32 × 10^-5 atm
+          locator: &id008
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '7'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id008
+            oxygen_partial_pressure:
+              value: '1.10e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.10e-6'
+              locator: *id008
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '1.81e-5'
+          pressure_as_printed: 1.81 × 10^-5 atm
+          locator: &id009
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '8'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id009
+            oxygen_partial_pressure:
+              value: '7.12e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.12e-7'
+              locator: *id009
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '2.99e-5'
+          pressure_as_printed: 2.99 × 10^-5 atm
+          locator: &id010
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '9'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id010
+            oxygen_partial_pressure:
+              value: '3.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '3.84e-7'
+              locator: *id010
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '2.79e-5'
+          pressure_as_printed: 2.79 × 10^-5 atm
+          locator: &id011
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '10'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id011
+            oxygen_partial_pressure:
+              value: '2.60e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.60e-7'
+              locator: *id011
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '2.26e-5'
+          pressure_as_printed: 2.26 × 10^-5 atm
+          locator: &id012
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '11'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id012
+            oxygen_partial_pressure:
+              value: '4.18e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.18e-6'
+              locator: *id012
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '2.95e-5'
+          pressure_as_printed: 2.95 × 10^-5 atm
+          locator: &id013
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '12'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id013
+            oxygen_partial_pressure:
+              value: '2.77e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.77e-6'
+              locator: *id013
+        - T_K_as_printed: '2098'
+          T_K: 2098
+          T_C: '1824.85'
+          pressure_atm: '3.07e-5'
+          pressure_as_printed: 3.07 × 10^-5 atm
+          locator: &id014
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '13'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2098'
+              locator: *id014
+            oxygen_partial_pressure:
+              value: '1.78e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.78e-6'
+              locator: *id014
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '5.33e-5'
+          pressure_as_printed: 5.33 × 10^-5 atm
+          locator: &id015
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '14'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id015
+            oxygen_partial_pressure:
+              value: '7.74e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.74e-6'
+              locator: *id015
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '5.98e-5'
+          pressure_as_printed: 5.98 × 10^-5 atm
+          locator: &id016
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '15'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id016
+            oxygen_partial_pressure:
+              value: '5.96e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '5.96e-6'
+              locator: *id016
+    context:
+    - observation_id: hastie_1980_appb_table1_KMS_TMS_calibration
+      type: calibration_table
+      locator:
+        page: 105
+        pdf_page_index: 104
+        published_page: 19
+        table: '1'
+      units: relative ionization cross section and sensitivity factors
+      values:
+        quantity: unavailable
+        method_class: measured_direct
+        candidate_tokens:
+        - ion_intensity
+        - partial_pressure
+        schema_gap: No store token types ionization cross sections or sensitivity factors; neither candidate
+          token fits the printed calibration constants.
+        rows_as_printed:
+        - species: N2
+          KMS_sigma: —
+          KMS_S: —
+          TMS_sigma: '1.48'
+          TMS_S: '1.0'
+        - species: O2
+          KMS_sigma: '2.62'
+          KMS_S: '0.177'
+          TMS_sigma: '1.26'
+          TMS_S: '1.3'
+        - species: H2O
+          KMS_sigma: '1.73'
+          KMS_S: '0.236'
+          TMS_sigma: '1.5'
+          TMS_S: '0.8'
+        - species: Mg
+          KMS_sigma: '3.44'
+          KMS_S: '0.204'
+          TMS_sigma: —
+          TMS_S: —
+        - species: MgOH
+          KMS_sigma: '4.98'
+          KMS_S: '0.156'
+          TMS_sigma: —
+          TMS_S: —
+        - species: K
+          KMS_sigma: —
+          KMS_S: —
+          TMS_sigma: '7.8'
+          TMS_S: '1.3'
+        - species: Na
+          KMS_sigma: —
+          KMS_S: —
+          TMS_sigma: '4.5'
+          TMS_S: '1.0'
+        notes_as_printed:
+        - Mg cross section from J. B. Mann, J. Chem. Phys. 46, 1646 (1967).
+        - H2O, O2, and MgOH cross sections estimated with 30 percent uncertainty.
+        - KMS O2 partial pressures are obtained through relationships (1) and (2); no cross section or
+          sensitivity data were required for K and O2.
+        - TMS sigma and S values measured directly as described in reference [16].
+        - K and Na TMS cross sections are cited to Kieffer and Dunn, Rev. Mod. Phys. 38, 1 (1966).
+      note: This table is instrument calibration, not an observation table; its values are retained as
+        method context.
+    - observation_id: hastie_1980_appb_table2_KMS_reduction_inputs
+      type: calibration_inputs
+      locator:
+        page: 106
+        pdf_page_index: 105
+        published_page: 20
+        table: '2'
+      units: as printed
+      values:
+        quantity: unavailable
+        method_class: measured_reduced
+        candidate_tokens:
+        - ion_intensity
+        - partial_pressure
+        schema_gap: A_i and k_i are reduction factors without a token; the printed I_i·T inputs are method
+          evidence. The four pressure cells are typed once from Table 3 and linked here as a second locator.
+        system_as_printed: Typical reaction (3) data at 2029 K
+        rows_as_printed:
+        - ion: Mg+
+          A_i: '0.78'
+          k_i_atm_per_uV_K: '3.16e-12'
+          I_i_times_T_uV_K: 2.19e6
+        - ion: O2+
+          A_i: '1.0'
+          k_i_atm_per_uV_K: '3.73e-12'
+          I_i_times_T_uV_K: 2.86e5
+        - ion: H2O+
+          A_i: '1.0'
+          k_i_atm_per_uV_K: '4.05e-12'
+          I_i_times_T_uV_K: 4.02e5
+        - ion: MgOH+
+          A_i: '0.78'
+          k_i_atm_per_uV_K: '2.85e-12'
+          I_i_times_T_uV_K: 1.58e3
+        pressure_values_are_single_observations_in: Table 3 at 2029 K (d-068).
+        calibration_note_as_printed: Values of sigma_i and S_i used to derive k_i are given in Table 1.
+    - observation_id: hastie_1980_appb_fig1_transpiration_mass_spectrometer_schematic
+      type: figure_record
+      locator:
+        page: 113
+        pdf_page_index: 112
+        figure: '1'
+      phase: transpiration mass spectrometer
+      units: schematic; no numeric data
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        species:
+        - Mg
+        - MgOH
+        - K
+        - Na
+        phase: transpiration mass spectrometer
+        temperature_as_printed: not stated
+        axes_as_printed:
+          x: none; schematic
+          y: none
+        caption_as_printed: Schematic of transpiration mass spectrometer system.
+        panel: whole figure
+        series:
+        - name: instrument components
+          marker: schematic
+          marker_count: 0
+        attribution: This work
+        digitisation: deferred to a figure pass
+        schema_gap: No quantitative species token fits an apparatus schematic; candidate p_partial and
+          ion_intensity do not apply.
+    - observation_id: hastie_1980_appb_fig2_H2O_equilibrium_test
+      type: figure_record
+      locator:
+        page: 114
+        pdf_page_index: 113
+        figure: '2'
+      phase: gas over MgO(s)
+      units: dimensionless axes
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        species:
+        - H2O
+        - H2
+        - O2
+        phase: gas over MgO(s)
+        temperature_as_printed: 2050
+        axes_as_printed:
+          x: log apparent H2 pressure (atm)
+          y: log apparent equilibrium constant
+        caption_as_printed: Mass-action test for equilibrium in H2O = H2 + 1/2 O2 over MgO(s) at 2050
+          K. Data at 20 eV; dashed line from JANAF [14].
+        panel: whole figure
+        series:
+        - name: present-work data
+          marker: open circles with error bars
+          marker_count: 5
+          evidence_class: measured_reduced
+        - name: JANAF [14]
+          marker: dashed line
+          marker_count: 0
+          evidence_class: quoted_attributed
+        attribution: Present-work measurements; JANAF [14] comparison
+        digitisation: deferred to a figure pass
+        schema_gap: No generic equilibrium-constant token fits this apparent Kp plot; candidate log10_Kf
+          and log10_K_star do not fit the printed reaction constant.
+      T_K: 2050
+  MgOH:
+    observations:
+    - observation_id: hastie_1980_table3_MgOH_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+      phase: gas
+      regime: kems_effusion
+      condensed_form: solid
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: MgOH
+        formula: MgOH
+        method: Knudsen mass spectrometry
+        regime: kems_effusion
+        method_as_printed: The MgOH+ pressure uses the KMS cross section and sensitivity factor in Table
+          1; its cross section is estimated with 30 percent uncertainty.
+        system_as_published: MgO(s) + H2 system; reaction (3)
+        points:
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '1.35e-8'
+          pressure_as_printed: 1.35 × 10^-8 atm
+          locator: &id017
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '1'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id017
+            oxygen_partial_pressure:
+              value: '7.42e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.42e-7'
+              locator: *id017
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '1.53e-8'
+          pressure_as_printed: 1.53 × 10^-8 atm
+          locator: &id018
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '2'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id018
+            oxygen_partial_pressure:
+              value: '4.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.84e-7'
+              locator: *id018
+        - T_K_as_printed: '2029'
+          T_K: 2029
+          T_C: '1755.85'
+          pressure_atm: '4.50e-9'
+          pressure_as_printed: 4.50 × 10^-9 atm
+          locator: &id019
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '5'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2029'
+              locator: *id019
+            oxygen_partial_pressure:
+              value: '1.07e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.07e-6'
+              locator: *id019
+          also_reported_at:
+            page: 106
+            pdf_page_index: 105
+            published_page: 20
+            table: '2'
+            row: Typical reaction (3) data at 2029 K
+            note: Same 2029 K partial-pressure point as Table 3; represented once under d-068.
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '1.44e-8'
+          pressure_as_printed: 1.44 × 10^-8 atm
+          locator: &id020
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '7'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id020
+            oxygen_partial_pressure:
+              value: '1.10e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.10e-6'
+              locator: *id020
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '2.40e-8'
+          pressure_as_printed: 2.40 × 10^-8 atm
+          locator: &id021
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '8'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id021
+            oxygen_partial_pressure:
+              value: '7.12e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.12e-7'
+              locator: *id021
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '4.10e-8'
+          pressure_as_printed: 4.10 × 10^-8 atm
+          locator: &id022
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '9'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id022
+            oxygen_partial_pressure:
+              value: '3.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '3.84e-7'
+              locator: *id022
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '3.62e-8'
+          pressure_as_printed: 3.62 × 10^-8 atm
+          locator: &id023
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '10'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id023
+            oxygen_partial_pressure:
+              value: '2.60e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.60e-7'
+              locator: *id023
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '1.72e-8'
+          pressure_as_printed: 1.72 × 10^-8 atm
+          locator: &id024
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '11'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id024
+            oxygen_partial_pressure:
+              value: '4.18e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.18e-6'
+              locator: *id024
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '4.75e-8'
+          pressure_as_printed: 4.75 × 10^-8 atm
+          locator: &id025
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '12'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id025
+            oxygen_partial_pressure:
+              value: '2.77e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.77e-6'
+              locator: *id025
+        - T_K_as_printed: '2098'
+          T_K: 2098
+          T_C: '1824.85'
+          pressure_atm: '4.08e-8'
+          pressure_as_printed: 4.08 × 10^-8 atm
+          locator: &id026
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '13'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2098'
+              locator: *id026
+            oxygen_partial_pressure:
+              value: '1.78e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.78e-6'
+              locator: *id026
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '7.43e-8'
+          pressure_as_printed: 7.43 × 10^-8 atm
+          locator: &id027
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '14'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id027
+            oxygen_partial_pressure:
+              value: '7.74e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.74e-6'
+              locator: *id027
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '1.09e-7'
+          pressure_as_printed: 1.09 × 10^-7 atm
+          locator: &id028
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '15'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id028
+            oxygen_partial_pressure:
+              value: '5.96e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '5.96e-6'
+              locator: *id028
+    context:
+    - observation_id: hastie_1980_appb_table3_Kp_and_reaction_enthalpy
+      type: typed_refusal
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+      units: Kp dimensionless; reaction enthalpy cal/mol
+      values:
+        quantity: unavailable
+        candidate_tokens:
+        - log10_Kf
+        - delta_fH
+        schema_gap: No generic reaction-Kp or reaction-enthalpy token fits these printed columns; log10_Kf
+          and delta_fH do not fit Kp or reaction (3) enthalpy.
+        method_class: model_derived
+        reaction_as_printed: Mg + 1/2 H2O + 1/4 O2 = MgOH
+        rows_as_printed:
+        - T_K: 2077
+          Kp: '11.3'
+          delta_H298_cal_per_mol_as_printed: '-42306'
+        - T_K: 2077
+          Kp: '11.0'
+          delta_H298_cal_per_mol_as_printed: '-42195'
+        - T_K: 2022
+          Kp: '14.4'
+          delta_H298_cal_per_mol_as_printed: '-42194'
+        - T_K: 2022
+          Kp: '12.5'
+          delta_H298_cal_per_mol_as_printed: '-41625'
+        - T_K: 2029
+          Kp: '15.8'
+          delta_H298_cal_per_mol_as_printed: '-42710'
+        - T_K: 2054
+          Kp: '14.4'
+          delta_H298_cal_per_mol_as_printed: '-42841'
+        - T_K: 2054
+          Kp: '13.6'
+          delta_H298_cal_per_mol_as_printed: '-42608'
+        - T_K: 2054
+          Kp: '13.8'
+          delta_H298_cal_per_mol_as_printed: '-42668'
+        - T_K: 2054
+          Kp: '12.3'
+          delta_H298_cal_per_mol_as_printed: '-42198'
+        - T_K: 2054
+          Kp: '12.3'
+          delta_H298_cal_per_mol_as_printed: '-42198'
+        - T_K: 2107
+          Kp: '8.73'
+          delta_H298_cal_per_mol_as_printed: '-41817'
+        - T_K: 2107
+          Kp: '10.8'
+          delta_H298_cal_per_mol_as_printed: '-42708'
+        - T_K: 2098
+          Kp: '8.67'
+          delta_H298_cal_per_mol_as_printed: '-41615'
+        - T_K: 2167
+          Kp: '6.28'
+          delta_H298_cal_per_mol_as_printed: '-41550'
+        - T_K: 2167
+          Kp: '6.34'
+          delta_H298_cal_per_mol_as_printed: '-41591'
+        average_delta_H298_cal_per_mol_as_printed: '-42188'
+        equation_note: The table derives delta_H298 from thermodynamic functions and Kp; these are not
+          delta_fH values.
+    - observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row3
+      type: typed_refusal
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+        row: '3'
+        note: 600 dpi render checked; exponent remains unreadable in the source scan
+      units: atm
+      values:
+        quantity: partial_pressure
+        candidate_tokens:
+        - partial_pressure
+        method_class: measured_reduced
+        species: MgOH
+        temperature_K_as_printed: 2022
+        pressure_as_printed: 3.34- [
+        unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value
+          inferred.
+        oxygen_partial_pressure_as_printed_at_same_row_atm: '9.73e-7'
+    - observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row4
+      type: typed_refusal
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+        row: '4'
+        note: 600 dpi render checked; exponent remains unreadable in the source scan
+      units: atm
+      values:
+        quantity: partial_pressure
+        candidate_tokens:
+        - partial_pressure
+        method_class: measured_reduced
+        species: MgOH
+        temperature_K_as_printed: 2022
+        pressure_as_printed: 1.09- [
+        unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value
+          inferred.
+        oxygen_partial_pressure_as_printed_at_same_row_atm: '1.19e-6'
+    - observation_id: hastie_1980_appb_table3_MgOH_pressure_unreadable_row6
+      type: typed_refusal
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+        row: '6'
+        note: 600 dpi render checked; exponent remains unreadable in the source scan
+      units: atm
+      values:
+        quantity: partial_pressure
+        candidate_tokens:
+        - partial_pressure
+        method_class: measured_reduced
+        species: MgOH
+        temperature_K_as_printed: 2054
+        pressure_as_printed: 6.16- [
+        unavailable_reason: The exponent glyph is not recoverable from the 600 dpi page render; no value
+          inferred.
+        oxygen_partial_pressure_as_printed_at_same_row_atm: '1.75e-6'
+    - observation_id: hastie_1980_appb_fig3_MgOH_equilibrium_constant
+      type: figure_record
+      locator:
+        page: 115
+        pdf_page_index: 114
+        figure: '3'
+      phase: gas over MgO(s)
+      units: dimensionless axes; kcal/mol annotations
+      values:
+        quantity: unavailable
+        method_class: figure_only
+        species:
+        - MgOH
+        - Mg
+        - H2O
+        - O2
+        phase: gas over MgO(s)
+        temperature_as_printed: temperature axis 1923–2170 K
+        axes_as_printed:
+          x: 10^4/T (K)
+          top_x: temperature (K)
+          y: Kp for reaction (3), logarithmic
+        caption_as_printed: Variation of the equilibrium constant with temperature for Mg + 1/2 H2O +
+          1/4 O2 = MgOH. Data at 20 eV. Solid curve through data from third-law analysis; dashed curves
+          from JANAF [14] estimates. Figure annotations are reaction enthalpies in kcal/mol.
+        panel: whole figure
+        series:
+        - name: present-work measurements
+          marker: open circles
+          marker_count: 11
+          evidence_class: measured_reduced
+        - name: authors' third-law curve
+          marker: solid line
+          marker_count: 0
+          evidence_class: model_derived
+        - name: JANAF [14] estimates
+          marker: dashed lines
+          marker_count: 0
+          evidence_class: quoted_attributed
+        attribution: Present-work measurements; third-law and JANAF comparisons
+        digitisation: deferred to a figure pass
+        enthalpy_annotations_as_printed: ΔH_T = −58.1, −44.4, −51.1 (second law), and −40.8 (third law)
+          kcal/mol; reaction (3), not ΔfH.
+        schema_gap: No generic equilibrium-constant token fits the printed Kp; candidate log10_Kf and
+          log10_K_star do not fit the printed reaction constant.
+  H2O:
+    observations:
+    - observation_id: hastie_1980_table3_H2O_partial_pressure
+      type: partial_pressure
+      locator:
+        page: 107
+        pdf_page_index: 106
+        published_page: 21
+        table: '3'
+      phase: gas
+      regime: kems_effusion
+      condensed_form: solid
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: H2O
+        formula: H2O
+        method: Knudsen mass spectrometry
+        regime: kems_effusion
+        method_as_printed: The H2O+ pressure uses the KMS cross section and sensitivity factor in Table
+          1; its cross section is estimated with 30 percent uncertainty.
+        system_as_published: MgO(s) + H2 system; reaction (3)
+        points:
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '7.56e-6'
+          pressure_as_printed: 7.56 × 10^-6 atm
+          locator: &id029
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '1'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id029
+            oxygen_partial_pressure:
+              value: '7.42e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.42e-7'
+              locator: *id029
+        - T_K_as_printed: '2077'
+          T_K: 2077
+          T_C: '1803.85'
+          pressure_atm: '1.01e-5'
+          pressure_as_printed: 1.01 × 10^-5 atm
+          locator: &id030
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '2'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2077'
+              locator: *id030
+            oxygen_partial_pressure:
+              value: '4.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.84e-7'
+              locator: *id030
+        - T_K_as_printed: '2022'
+          T_K: 2022
+          T_C: '1748.85'
+          pressure_atm: '1.47e-6'
+          pressure_as_printed: 1.47 × 10^-6 atm
+          locator: &id031
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '3'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2022'
+              locator: *id031
+            oxygen_partial_pressure:
+              value: '9.73e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '9.73e-7'
+              locator: *id031
+        - T_K_as_printed: '2022'
+          T_K: 2022
+          T_C: '1748.85'
+          pressure_atm: '2.64e-7'
+          pressure_as_printed: 2.64 × 10^-7 atm
+          locator: &id032
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '4'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2022'
+              locator: *id032
+            oxygen_partial_pressure:
+              value: '1.19e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.19e-6'
+              locator: *id032
+        - T_K_as_printed: '2029'
+          T_K: 2029
+          T_C: '1755.85'
+          pressure_atm: '1.63e-6'
+          pressure_as_printed: 1.63 × 10^-6 atm
+          locator: &id033
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '5'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2029'
+              locator: *id033
+            oxygen_partial_pressure:
+              value: '1.07e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.07e-6'
+              locator: *id033
+          also_reported_at:
+            page: 106
+            pdf_page_index: 105
+            published_page: 20
+            table: '2'
+            row: Typical reaction (3) data at 2029 K
+            note: Same 2029 K partial-pressure point as Table 3; represented once under d-068.
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '1.47e-6'
+          pressure_as_printed: 1.47 × 10^-6 atm
+          locator: &id034
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '6'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id034
+            oxygen_partial_pressure:
+              value: '1.75e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.75e-6'
+              locator: *id034
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '6.16e-6'
+          pressure_as_printed: 6.16 × 10^-6 atm
+          locator: &id035
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '7'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id035
+            oxygen_partial_pressure:
+              value: '1.10e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.10e-6'
+              locator: *id035
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '1.10e-5'
+          pressure_as_printed: 1.10 × 10^-5 atm
+          locator: &id036
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '8'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id036
+            oxygen_partial_pressure:
+              value: '7.12e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.12e-7'
+              locator: *id036
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '2.00e-5'
+          pressure_as_printed: 2.00 × 10^-5 atm
+          locator: &id037
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '9'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id037
+            oxygen_partial_pressure:
+              value: '3.84e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '3.84e-7'
+              locator: *id037
+        - T_K_as_printed: '2054'
+          T_K: 2054
+          T_C: '1780.85'
+          pressure_atm: '2.17e-5'
+          pressure_as_printed: 2.17 × 10^-5 atm
+          locator: &id038
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '10'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2054'
+              locator: *id038
+            oxygen_partial_pressure:
+              value: '2.60e-7'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.60e-7'
+              locator: *id038
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '3.72e-6'
+          pressure_as_printed: 3.72 × 10^-6 atm
+          locator: &id039
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '11'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id039
+            oxygen_partial_pressure:
+              value: '4.18e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '4.18e-6'
+              locator: *id039
+        - T_K_as_printed: '2107'
+          T_K: 2107
+          T_C: '1833.85'
+          pressure_atm: '1.34e-5'
+          pressure_as_printed: 1.34 × 10^-5 atm
+          locator: &id040
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '12'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2107'
+              locator: *id040
+            oxygen_partial_pressure:
+              value: '2.77e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.77e-6'
+              locator: *id040
+        - T_K_as_printed: '2098'
+          T_K: 2098
+          T_C: '1824.85'
+          pressure_atm: '1.76e-5'
+          pressure_as_printed: 1.76 × 10^-5 atm
+          locator: &id041
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '13'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2098'
+              locator: *id041
+            oxygen_partial_pressure:
+              value: '1.78e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1.78e-6'
+              locator: *id041
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '1.77e-5'
+          pressure_as_printed: 1.77 × 10^-5 atm
+          locator: &id042
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '14'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id042
+            oxygen_partial_pressure:
+              value: '7.74e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '7.74e-6'
+              locator: *id042
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          T_C: '1893.85'
+          pressure_atm: '3.39e-5'
+          pressure_as_printed: 3.39 × 10^-5 atm
+          locator: &id043
+            page: 107
+            pdf_page_index: 106
+            published_page: 21
+            table: '3'
+            row: '15'
+            note: Table 3, reaction (3) partial-pressure row
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2167'
+              locator: *id043
+            oxygen_partial_pressure:
+              value: '5.96e-6'
+              units: atm
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '5.96e-6'
+              locator: *id043
+    context: []

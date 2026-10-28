@@ -1,0 +1,32 @@
+source_id: oishi-1986-cu2o-cao-activities
+source:
+  citation: >-
+    Oishi T, Kondo Y, Ono K (1986). A Thermodynamic Study of Cu2O-CaO Melts
+    in Equilibrium with Liquid Copper. Transactions of the Japan Institute
+    of Metals 27(12):976-980.
+  doi: 10.2320/matertrans1960.27.976
+  year: 1986
+extraction:
+  method: MinerU table draft emit; row conditions and phase compositions transcribed by hand.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
+    unit: mass%
+    evidence_class: measured_direct
+    phase: l
+    published_page: 977
+    rows: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    temperature:
+      as_printed: '1573'
+      unit: K
+      locator: {page: 2, published_page: 977, pdf_page_index: 1, table: '1'}
+    values:
+      - {column: 4, species: Cu}
+      - {column: 5, species: O}
+      - {column: 6, species: CaO}
+      - {column: 7, species: MgO}

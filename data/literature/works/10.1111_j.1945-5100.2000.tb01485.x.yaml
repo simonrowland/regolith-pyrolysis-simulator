@@ -61,9 +61,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 954
+    page: 6
     published_page: 954
-    pdf_page_index: 6
+    pdf_page_index: 5
     table: '3'
     note: Table 3; full table row matrix
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::bulk_residue_furnace_series
@@ -77,9 +77,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 973
+        page: 25
         published_page: 973
-        pdf_page_index: 25
+        pdf_page_index: 24
         table: A7
         note: Multiple row-specific sample masses; no one series mass.
     printed_composition:
@@ -87,9 +87,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 973
+        page: 25
         published_page: 973
-        pdf_page_index: 25
+        pdf_page_index: 24
         table: A7
         note: Multiple residue and bulk Grosnaja rows.
   conditions:
@@ -98,9 +98,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 973
+        page: 25
         published_page: 973
-        pdf_page_index: 25
+        pdf_page_index: 24
         section: Appendix Table A7
         note: Rows contain 600 °C and 1800 °C conditions; no single experiment temperature applies.
   pressure_environment:
@@ -109,9 +109,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No total pressure is printed for the furnace measurement.
     sweep_gas:
@@ -119,9 +119,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: In-vacuo furnace extraction; no sweep gas.
     regime:
@@ -130,9 +130,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: A7
     note: Bulk residue furnace data are listed in Appendix Table A7; rows contain multiple residues and temperatures.
   fO2_control:
@@ -144,9 +144,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 control is printed.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::bulk-furnace-noble-gas-ms
@@ -156,18 +156,18 @@ experiments:
         tag: value
         value: Appendix Table A7 lists row-specific 600 °C and 1800 °C furnace steps.
       locator:
-        page: 973
+        page: 25
         published_page: 973
-        pdf_page_index: 25
+        pdf_page_index: 24
         table: A7
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 973
+        page: 25
         published_page: 973
-        pdf_page_index: 25
+        pdf_page_index: 24
         section: Appendix Table A7
         note: No single total duration is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::chainpur_csse
@@ -184,9 +184,9 @@ experiments:
           point: '0.00605'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 6.05 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -201,9 +201,9 @@ experiments:
               tag: value
               value: '6.05'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 6.05 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -212,13 +212,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 6.05 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -227,9 +228,9 @@ experiments:
           classification: LL3.4
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Chainpur
     form:
@@ -237,9 +238,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -247,9 +248,9 @@ experiments:
         tag: value
         value: LL3.4 meteorite; source sample Chainpur; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Chainpur
     pretreatment:
@@ -257,9 +258,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -267,9 +268,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -279,9 +280,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -289,9 +290,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -300,9 +301,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Chainpur
@@ -315,9 +316,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -328,18 +329,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -347,9 +348,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::cold_bokkeveld_csse
@@ -366,9 +367,9 @@ experiments:
           point: '0.0093'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 9.30 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -383,9 +384,9 @@ experiments:
               tag: value
               value: '9.3'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 9.30 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -394,13 +395,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 9.30 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -409,9 +411,9 @@ experiments:
           classification: CM2
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Cold Bokkeveld
     form:
@@ -419,9 +421,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -429,9 +431,9 @@ experiments:
         tag: value
         value: CM2 meteorite; source sample Cold Bokkeveld; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Cold Bokkeveld
     pretreatment:
@@ -439,9 +441,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -449,9 +451,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -461,9 +463,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -471,9 +473,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -482,9 +484,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Cold Bokkeveld
@@ -497,9 +499,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -510,18 +512,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -529,9 +531,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::dimmitt_csse
@@ -548,9 +550,9 @@ experiments:
           point: '0.02584'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 25.84 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -565,9 +567,9 @@ experiments:
               tag: value
               value: '25.84'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 25.84 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -576,13 +578,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 25.84 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -591,9 +594,9 @@ experiments:
           classification: H3.7
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Dimmitt
     form:
@@ -601,9 +604,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -611,9 +614,9 @@ experiments:
         tag: value
         value: H3.7 meteorite; source sample Dimmitt; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Dimmitt
     pretreatment:
@@ -621,9 +624,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -631,9 +634,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -643,9 +646,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -653,9 +656,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -664,9 +667,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Dimmitt
@@ -679,9 +682,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -692,18 +695,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -711,9 +714,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::grosnaja_csse
@@ -730,9 +733,9 @@ experiments:
           point: '0.00568'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 5.68 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -747,9 +750,9 @@ experiments:
               tag: value
               value: '5.68'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 5.68 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -758,13 +761,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 5.68 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -773,9 +777,9 @@ experiments:
           classification: CV3 ox.
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Grosnaja
     form:
@@ -783,9 +787,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -793,9 +797,9 @@ experiments:
         tag: value
         value: CV3 ox. meteorite; source sample Grosnaja; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Grosnaja
     pretreatment:
@@ -803,9 +807,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -813,9 +817,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -825,9 +829,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -835,9 +839,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -846,9 +850,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Grosnaja
@@ -861,9 +865,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -874,18 +878,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -893,9 +897,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::isna_csse
@@ -912,9 +916,9 @@ experiments:
           point: '0.00987'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 9.87 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -929,9 +933,9 @@ experiments:
               tag: value
               value: '9.87'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 9.87 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -940,13 +944,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 9.87 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -955,9 +960,9 @@ experiments:
           classification: CO3.7
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Isna
     form:
@@ -965,9 +970,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -975,9 +980,9 @@ experiments:
         tag: value
         value: CO3.7 meteorite; source sample Isna; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Isna
     pretreatment:
@@ -985,9 +990,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -995,9 +1000,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -1007,9 +1012,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -1017,9 +1022,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -1028,9 +1033,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Isna
@@ -1043,9 +1048,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -1056,18 +1061,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -1075,9 +1080,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 - experiment_id: 10.1111/j.1945-5100.2000.tb01485.x::experiment::lance_csse
@@ -1094,9 +1099,9 @@ experiments:
           point: '0.00678'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: 'Derived unit conversion only: printed 6.78 g × 10^-3 kg/g; no physical quantity was recomputed.'
         record: sample mass column
@@ -1111,9 +1116,9 @@ experiments:
               tag: value
               value: '6.78'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 6.78 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
@@ -1122,13 +1127,14 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              page: 951
+              page: 3
               published_page: 951
-              pdf_page_index: 3
+              pdf_page_index: 2
               table: '2'
               note: 'Derived unit conversion only: printed 6.78 g × 10^-3 kg/g; no physical quantity was recomputed.'
               record: sample mass column
         output_unit: kg
+        references: []
     printed_composition:
       state:
         tag: value
@@ -1137,9 +1143,9 @@ experiments:
           classification: CO3.4
           residue: HF/HCl-resistant residue
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Lancé
     form:
@@ -1147,9 +1153,9 @@ experiments:
         tag: value
         value: HF/HCl-resistant residue produced by alternating HF/HCl and HCl dissolution
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Residue form and preparation described in prose.
     characterization:
@@ -1157,9 +1163,9 @@ experiments:
         tag: value
         value: CO3.4 meteorite; source sample Lancé; residue yield and etching loss are in Table 2
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: Lancé
     pretreatment:
@@ -1167,9 +1173,9 @@ experiments:
         tag: value
         value: More than 10 alternating dissolution cycles; final residue cleaning and sulfur removal before CSSE
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
   conditions:
     temperature_K:
@@ -1177,9 +1183,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Acid, distillation, and pyrolysis temperatures vary by step; no single run temperature is assigned to this sample
           series.
@@ -1189,9 +1195,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: The source states in-vacuo operation but prints no total pressure.
     sweep_gas:
@@ -1199,9 +1205,9 @@ experiments:
         tag: not_applicable
         reason: not_applicable
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Closed-system in-vacuo acid etching; no sweep gas.
     regime:
@@ -1210,9 +1216,9 @@ experiments:
         reason: not_published
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Sample-specific CSSE series; appendix rows retain the individual etch-step conditions.
     record: Lancé
@@ -1225,9 +1231,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No pO2/fO2 or oxygen-buffer condition is printed; HNO3 is an oxidant/reagent, not a quantified fO2 control.
   bench_id: 10.1111/j.1945-5100.2000.tb01485.x::bench::csse-noble-gas-ms
@@ -1238,18 +1244,18 @@ experiments:
         value: Room-temperature and approximately 60 °C acid etch steps; nitric acid distilled onto residue at 90–130 °C;
           600 °C pre-step and 1800 °C pyrolysis; row-specific temperatures and durations are retained in appendix tables.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     total_duration_s:
       state:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Individual step durations are printed in appendix rows, but no single total duration is assigned to the series.
     cooling_or_quench:
@@ -1257,9 +1263,9 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: No run-wide cooling/quench schedule is printed.
 benches:
@@ -1272,9 +1278,9 @@ benches:
       tag: value
       value: Bulk-residue furnace noble-gas mass spectrometer
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: Bulk residue furnace measurements described immediately after the CSSE spectrometer.
   method:
@@ -1282,9 +1288,9 @@ benches:
       tag: value
       value: Furnace pyrolysis of bulk residues
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: Bulk residue furnace measurements described immediately after the CSSE spectrometer.
   detector:
@@ -1292,9 +1298,9 @@ benches:
       tag: value
       value: Faraday cup and multiplier in analogue mode
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: Bulk residue furnace measurements described immediately after the CSSE spectrometer.
   ionization:
@@ -1306,9 +1312,9 @@ benches:
           point: '100'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Bulk residue furnace measurements described immediately after the CSSE spectrometer.
   other_facts:
@@ -1321,9 +1327,9 @@ benches:
           categorical: ~100
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Bulk residue furnace measurements described immediately after the CSSE spectrometer.
     unit: M/ΔM
@@ -1336,9 +1342,9 @@ benches:
           categorical: 4He=11; 20Ne=0.5; 40Ar=390; 84Kr=0.06; 132Xe=0.06
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical blanks for bulk sample furnace measurements.
     unit: 10^-10 cm^3 STP
@@ -1351,9 +1357,9 @@ benches:
       tag: value
       value: Closed-system stepped-etching noble-gas mass spectrometer
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: CSSE apparatus described for Tables A1-A6.
   method:
@@ -1361,9 +1367,9 @@ benches:
       tag: value
       value: Closed-system stepped etching (CSSE) of HF/HCl-resistant residues
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: Carrier phase Q oxidized in vacuo by nitric acid; released gases measured directly.
   detector:
@@ -1372,9 +1378,9 @@ benches:
       value: Noncommercial 60° mass spectrometer, 21 cm radius; multiplier in counting mode and Faraday cup for higher ion
         currents
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: CSSE spectrometer description and detector modes.
   ionization:
@@ -1386,9 +1392,9 @@ benches:
           point: '45'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Electrons at 45 eV used to reduce double ionization of 40Ar and CO2.
   temperature_measurement:
@@ -1397,9 +1403,9 @@ benches:
         tag: value
         value: Temperature set by the acid/etch and pyrolysis procedure; no per-run thermocouple or setpoint record is printed.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Procedure temperatures are printed, but no instrument temperature measurement metadata are given.
   heating_method:
@@ -1407,9 +1413,9 @@ benches:
       tag: value
       value: Acid vaporization/distillation and furnace pyrolysis in a closed system
     locator:
-      page: 951
+      page: 3
       published_page: 951
-      pdf_page_index: 3
+      pdf_page_index: 2
       section: Noble gas analysis
       note: Acid distilled onto sample and heated; aliquots pyrolysed at 1800 °C.
   other_facts:
@@ -1422,9 +1428,9 @@ benches:
           categorical: '60'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed analyzer geometry.
     unit: degree
@@ -1437,9 +1443,9 @@ benches:
           categorical: '21'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed analyzer geometry.
     unit: cm
@@ -1452,9 +1458,9 @@ benches:
           categorical: ~550
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed CSSE mass resolution; sufficient to resolve 3He/HD and benzene/78Kr.
     unit: M/ΔM
@@ -1467,9 +1473,9 @@ benches:
           categorical: '>10'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Printed minimum/approximate number of alternating dissolution cycles.
     unit: cycles
@@ -1482,9 +1488,9 @@ benches:
           categorical: 10.4 M HF / 1.0 M HCl
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Printed alternating HF/HCl solution.
     unit: M
@@ -1497,9 +1503,9 @@ benches:
           categorical: 6.0 M HCl
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Printed alternating HCl solution.
     unit: M
@@ -1512,9 +1518,9 @@ benches:
           categorical: room temperature and ~60
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Printed acid-step temperatures.
     unit: °C
@@ -1527,9 +1533,9 @@ benches:
           categorical: ≥8
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
         note: Printed minimum duration per dissolution step.
     unit: h
@@ -1542,9 +1548,9 @@ benches:
           categorical: 65% / 14.4
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed nitric-acid concentration.
     unit: '% / M'
@@ -1557,9 +1563,9 @@ benches:
           categorical: 90–130
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed temperature when acid was distilled onto the sample.
     unit: °C
@@ -1572,9 +1578,9 @@ benches:
           categorical: '-25'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed cold-trap condition.
     unit: °C
@@ -1587,9 +1593,9 @@ benches:
           categorical: '280'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed CaO and Zr/Ti getter temperature.
     unit: °C
@@ -1602,9 +1608,9 @@ benches:
           categorical: -196 and ~-115
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed charcoal separation temperatures for He/Ne and Ar/Kr/Xe.
     unit: °C
@@ -1617,9 +1623,9 @@ benches:
           categorical: '600'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed pre-step for reactive gases and adsorbed atmospheric gases.
     unit: °C
@@ -1632,9 +1638,9 @@ benches:
           categorical: '1800'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: Printed main pyrolysis step.
     unit: °C
@@ -1648,9 +1654,9 @@ benches:
           bound_value: '10'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
         note: 'Printed estimate: up to 10% after contaminated low-temperature steps were pumped off.'
     unit: '%'
@@ -1663,9 +1669,9 @@ benches:
           point: '4'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical CSSE procedure blank.
     unit: 10^-10 cm^3 STP
@@ -1678,9 +1684,9 @@ benches:
           point: '0.009'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical CSSE procedure blank.
     unit: 10^-10 cm^3 STP
@@ -1693,9 +1699,9 @@ benches:
           point: '30'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical CSSE procedure blank.
     unit: 10^-10 cm^3 STP
@@ -1708,9 +1714,9 @@ benches:
           point: '0.0003'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical CSSE procedure blank; verified against PDF text/table page.
     unit: 10^-10 cm^3 STP
@@ -1723,9 +1729,9 @@ benches:
           point: '0.0002'
           approximate: false
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Data Reduction
         note: Printed typical CSSE procedure blank; verified against PDF text/table page.
     unit: 10^-10 cm^3 STP
@@ -1733,9 +1739,9 @@ context:
 - observation_id: busemann_2000_method_and_per_observation_conditions
   type: method
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     section: Experimental procedure; Noble gas analysis
   units: as printed
   values:
@@ -1747,59 +1753,59 @@ context:
         60 °C; each step at least 8 h.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
     - name: sulfur_removal_and_cleaning
       value: Sulfur removed with CS2/acetone; final residue cleaned with 0.1 M HCl, propanol, and acetone.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Sample preparation
     - name: oxidation_reagent
       value: 65% HNO3 (14.4 M); acid vapor at room temperature, then distilled onto the sample and heated at 90–130 °C.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     - name: gas_separation
       value: Activated charcoal separated He/Ne, Ar, and Kr/Xe at -196 °C and approximately -115 °C.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     - name: bulk_pyrolysis
       value: Aliquots measured by pyrolysis at 1800 °C after a 600 °C reactive-gas check step.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     - name: teflon_contamination
       value: Low-temperature steps contaminated by Teflon-derived reactive gases were pumped off; authors estimate up to 10%
         noble-gas loss.
       method_class: measured
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: Noble gas analysis
     - name: blank_correction
       value: Further blank corrections of all major CSSE steps are negligible; air-contaminated Kr/Xe steps corrected using
         unaffected Ar and mean Q Ar/Kr and Ar/Xe ratios.
       method_class: measured
       locator:
-        page: 952
+        page: 4
         published_page: 952
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: Data Reduction
     - name: uncertainty_basis
       value: Reference isotope-concentration uncertainties include 1σ statistical errors, sample weight, dilution, blank,
@@ -1807,9 +1813,9 @@ context:
         terms.
       method_class: measured
       locator:
-        page: 952
+        page: 4
         published_page: 952
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: Uncertainties
   context_id: busemann-2000-phase-q-noble-gases::context::busemann_2000_method_and_per_observation_conditions
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
@@ -1818,9 +1824,9 @@ context:
 - observation_id: busemann_2000_numeric_figure_values_refused
   type: figure_numeric_data
   locator:
-    page: 953
+    page: 5
     published_page: 953
-    pdf_page_index: 5
+    pdf_page_index: 4
     figure: 1-12
     note: Figures inspected; no plotted coordinates imported.
   units: as plotted
@@ -1836,97 +1842,97 @@ context:
       status: refused
       reason: not_digitized
       locator:
-        page: 953
+        page: 5
         published_page: 953
-        pdf_page_index: 5
+        pdf_page_index: 4
         figure: '1'
     - figure: '2'
       status: refused
       reason: not_digitized
       locator:
-        page: 955
+        page: 7
         published_page: 955
-        pdf_page_index: 7
+        pdf_page_index: 6
         figure: '2'
     - figure: '3'
       status: refused
       reason: not_digitized
       locator:
-        page: 958
+        page: 10
         published_page: 958
-        pdf_page_index: 10
+        pdf_page_index: 9
         figure: '3'
     - figure: '4'
       status: refused
       reason: not_digitized
       locator:
-        page: 958
+        page: 10
         published_page: 958
-        pdf_page_index: 10
+        pdf_page_index: 9
         figure: '4'
     - figure: '5'
       status: refused
       reason: not_digitized
       locator:
-        page: 958
+        page: 10
         published_page: 958
-        pdf_page_index: 10
+        pdf_page_index: 9
         figure: '5'
     - figure: '6'
       status: refused
       reason: not_digitized
       locator:
-        page: 959
+        page: 11
         published_page: 959
-        pdf_page_index: 11
+        pdf_page_index: 10
         figure: '6'
     - figure: '7'
       status: refused
       reason: not_digitized
       locator:
-        page: 959
+        page: 11
         published_page: 959
-        pdf_page_index: 11
+        pdf_page_index: 10
         figure: '7'
     - figure: '8'
       status: refused
       reason: not_digitized
       locator:
-        page: 961
+        page: 13
         published_page: 961
-        pdf_page_index: 13
+        pdf_page_index: 12
         figure: '8'
     - figure: '9'
       status: refused
       reason: not_digitized
       locator:
-        page: 962
+        page: 14
         published_page: 962
-        pdf_page_index: 14
+        pdf_page_index: 13
         figure: '9'
     - figure: '10'
       status: refused
       reason: not_digitized
       locator:
-        page: 963
+        page: 15
         published_page: 963
-        pdf_page_index: 15
+        pdf_page_index: 14
         figure: '10'
     - figure: '11'
       status: refused
       reason: not_digitized
       locator:
-        page: 964
+        page: 16
         published_page: 964
-        pdf_page_index: 16
+        pdf_page_index: 15
         figure: '11'
     - figure: '12'
       status: refused
       reason: not_digitized
       locator:
-        page: 966
+        page: 18
         published_page: 966
-        pdf_page_index: 18
+        pdf_page_index: 17
         figure: '12'
   context_id: busemann-2000-phase-q-noble-gases::context::busemann_2000_numeric_figure_values_refused
   work_id: 10.1111/j.1945-5100.2000.tb01485.x
@@ -1935,9 +1941,9 @@ context:
 - observation_id: busemann_2000_table2_samples_weights_and_yields
   type: characterization
   locator:
-    page: 951
+    page: 3
     published_page: 951
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '2'
     note: Table 2; all sample rows
   units: g, mg, and %, as printed
@@ -1956,9 +1962,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 2
         note: Entire source row; cells below retain column locators.
@@ -1969,9 +1975,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 1 (Sample)
@@ -1981,9 +1987,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 2 (Class)
@@ -1993,9 +1999,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 3 (Mass (g))
@@ -2005,9 +2011,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 4 (Yield (mg))
@@ -2017,9 +2023,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 5 (Yield (%))
@@ -2029,9 +2035,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 2
           column: 6 (Mass loss on etching (%))
@@ -2039,9 +2045,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 3
         note: Entire source row; cells below retain column locators.
@@ -2052,9 +2058,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 1 (Sample)
@@ -2064,9 +2070,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 2 (Class)
@@ -2076,9 +2082,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 3 (Mass (g))
@@ -2088,9 +2094,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 4 (Yield (mg))
@@ -2100,9 +2106,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 5 (Yield (%))
@@ -2112,9 +2118,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 3
           column: 6 (Mass loss on etching (%))
@@ -2122,9 +2128,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 4
         note: Entire source row; cells below retain column locators.
@@ -2135,9 +2141,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 1 (Sample)
@@ -2147,9 +2153,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 2 (Class)
@@ -2159,9 +2165,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 3 (Mass (g))
@@ -2171,9 +2177,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 4 (Yield (mg))
@@ -2183,9 +2189,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 5 (Yield (%))
@@ -2195,9 +2201,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 4
           column: 6 (Mass loss on etching (%))
@@ -2205,9 +2211,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 5
         note: Entire source row; cells below retain column locators.
@@ -2218,9 +2224,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 1 (Sample)
@@ -2230,9 +2236,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 2 (Class)
@@ -2242,9 +2248,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 3 (Mass (g))
@@ -2254,9 +2260,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 4 (Yield (mg))
@@ -2266,9 +2272,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 5 (Yield (%))
@@ -2278,9 +2284,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 5
           column: 6 (Mass loss on etching (%))
@@ -2288,9 +2294,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 6
         note: Entire source row; cells below retain column locators.
@@ -2301,9 +2307,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 1 (Sample)
@@ -2313,9 +2319,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 2 (Class)
@@ -2325,9 +2331,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 3 (Mass (g))
@@ -2337,9 +2343,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 4 (Yield (mg))
@@ -2349,9 +2355,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 5 (Yield (%))
@@ -2361,9 +2367,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 6
           column: 6 (Mass loss on etching (%))
@@ -2371,9 +2377,9 @@ context:
       method_class: measured
       evidence_class: printed_table
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         record: row 7
         note: Entire source row; cells below retain column locators.
@@ -2384,9 +2390,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 1 (Sample)
@@ -2396,9 +2402,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 2 (Class)
@@ -2408,9 +2414,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 3 (Mass (g))
@@ -2420,9 +2426,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 4 (Yield (mg))
@@ -2432,9 +2438,9 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 5 (Yield (%))
@@ -2444,61 +2450,61 @@ context:
         printed_blank: false
         method_class: measured
         locator:
-          page: 951
+          page: 3
           published_page: 951
-          pdf_page_index: 3
+          pdf_page_index: 2
           table: '2'
           record: row 7
           column: 6 (Mass loss on etching (%))
     footnotes_as_printed:
     - text: '*Natural History Museum, London (M. M. Grady).'
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 1
     - text: †Russian Academy of Science, Moscow (Y. A. Shukolyukov).
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 2
     - text: ‡National Museum Natural History, Smithsonian Institution, Washington,
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 3
     - text: '"USNM 5890", 5.5 g (G. J. MacPherson); Max-Planck-Institute for Chemistry, Mainz, 2.5 g (J. Zipfel); University
         of Cologne, 2.0 g (U. Herpers).'
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 4
     - text: §University of Cologne, 4.3 g (U. Herpers).
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 5
     - text: '#Lost.'
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 6
     - text: Weighing error, probably because of remaining solvents or acid.
       locator:
-        page: 951
+        page: 3
         published_page: 951
-        pdf_page_index: 3
+        pdf_page_index: 2
         table: '2'
         note: Table 2 footnote 7
   context_id: busemann-2000-phase-q-noble-gases::context::busemann_2000_table2_samples_weights_and_yields

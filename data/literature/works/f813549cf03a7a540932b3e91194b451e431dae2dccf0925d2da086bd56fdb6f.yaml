@@ -1,0 +1,179 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f
+  citation: Shornikov, S. I. (2024). Thermodynamic properties of the FeO–P4O10 melts. Experiment in Geosciences, 30(1), 73–76.
+  source_ids:
+  - shornikov-2024-iron-phosphate-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:shornikov-2024-iron-phosphate-melts
+      role: pdf
+      path: raw/shornikov-2024-iron-phosphate-melts/shornikov-2024-iron-phosphate-melts.pdf
+      sha256:
+        tag: value
+        value: 23b280d7a3d1e55238bd44fa81f3d7650ee771a8f0db97598fd947eca2323eb4
+    - asset_id: pdftotext:shornikov-2024-iron-phosphate-melts
+      role: pdftotext
+      path: text/shornikov-2024-iron-phosphate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shornikov-2024-iron-phosphate-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f::experiment::shornikov_2024_feo_p4o10_model
+  kind: literature
+  method:
+    tag: value
+    value: engine_evaluation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: range_only_not_a_single_temperature
+      locator:
+        page: 2
+        published_page: 73
+        pdf_page_index: 1
+        section: Abstract
+        note: The model covers 600–1700 K.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f
+  locator:
+    page: 2
+    published_page: 73
+    pdf_page_index: 1
+    section: Abstract
+    note: Semi-empirical model calculations for 600–1700 K. No Knudsen cell is used in this paper.
+context:
+- observation_id: shornikov_2024_feo_p4o10_fig1_phase_diagram
+  type: phase_diagram
+  locator:
+    page: 3
+    published_page: 74
+    pdf_page_index: 2
+    figure: '1'
+  units: figure-only
+  values:
+    quantity: FeO–P4O10 phase diagram
+    method_class: figure_only
+    attribution: Compiled in this paper from the melting citations named in the introduction.
+    reason: Region diagram. Boundaries were not digitized.
+  context_id: shornikov-2024-iron-phosphate-melts::context::shornikov_2024_feo_p4o10_fig1_phase_diagram
+  work_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f
+  source_id: shornikov-2024-iron-phosphate-melts
+  species: FeO
+- observation_id: shornikov_2024_feo_p4o10_fig4_mixing_energy
+  type: mixing_energy_curve
+  locator:
+    page: 4
+    published_page: 75
+    pdf_page_index: 3
+    figure: '4'
+    panel: B
+    note: Caption series 9, mixing energy at 1673 K. Continuous teal stroke, no marker centre. Not an activity.
+  units: kJ/mol as plotted on the Delta G / RT axis; the axis label is lg a_i, Delta G^m / RT
+  values:
+    quantity: mixing energy
+    method_class: figure_only
+    admission_status: typed_refusal
+    series: 9
+    temperature_K: 1673
+    reason: Continuous calculated stroke. No numeric minimum is printed.
+  context_id: shornikov-2024-iron-phosphate-melts::context::shornikov_2024_feo_p4o10_fig4_mixing_energy
+  work_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f
+  source_id: shornikov-2024-iron-phosphate-melts
+  species: mixing
+- observation_id: shornikov_2024_feo_p4o10_model_scope
+  type: model_scope
+  locator:
+    page: 3
+    published_page: 74
+    pdf_page_index: 2
+    section: body
+  units: as reported
+  values:
+    quantity: model scope
+    method_class: model_derived
+    temperature_range_K:
+    - 600
+    - 1700
+    model: Semi-empirical model (Shornikov, 2019).
+    model_inputs: Standard Gibbs energies of FeO and P4O10 in the crystalline and liquid state, and of FeP4O11, FeP2O6, Fe2P2O7,
+      Fe3P2O8 and Fe5P3O13. Gas species from Barin (1995) and Stolyarova et al. (2004).
+    gas_species_considered:
+    - Fe
+    - Fe2
+    - FeO
+    - FeO2
+    - P
+    - P2
+    - P3
+    - P4
+    - PO
+    - PO2
+    - P2O3
+    - P2O4
+    - P2O5
+    - P3O6
+    - P4O6
+    - P4O7
+    - P4O8
+    - P4O9
+    - P4O10
+    - FePO2
+    - FePO3
+    - O
+    - O2
+    - O3
+    - O4
+    condensed_compounds_as_printed:
+    - formula: FeP4O11
+      oxide_equivalent: FeO · P4O10
+      congruent_melting_K: 998±10
+      source: Weil and Glaum, 1998
+    - formula: FeP2O6
+      oxide_equivalent: 2FeO · P4O10
+      congruent_melting_K: 1218±8
+      source: Zhang, 2010
+    - formula: Fe2P2O7
+      oxide_equivalent: 4FeO · P4O10
+      congruent_melting_K: 1378±8
+      source: Zhang, 2010
+    - formula: Fe3P2O8
+      oxide_equivalent: 6FeO · P4O10
+      congruent_melting_K: 1323±15
+      source: Tromel and Schwerdtfeger
+    fe_partial_pressure_bound: The Fe partial vapor pressure, and gaseous FePO2 and FePO3, over these iron phosphates does
+      not exceed 10^-12 atm at 1275–1525 K. Published page 75. The 600 dpi render of PDF page 4 prints the exponent as a superscript
+      minus. This is a bound, not a point.
+    mixing_energy_minimum: The minimum mixing energy is in the concentration range close to the eutectic between Fe2P2O7 and
+      FeP2O6. No numeric minimum is printed.
+  context_id: shornikov-2024-iron-phosphate-melts::context::shornikov_2024_feo_p4o10_model_scope
+  work_id: f813549cf03a7a540932b3e91194b451e431dae2dccf0925d2da086bd56fdb6f
+  source_id: shornikov-2024-iron-phosphate-melts
+  species: FeO

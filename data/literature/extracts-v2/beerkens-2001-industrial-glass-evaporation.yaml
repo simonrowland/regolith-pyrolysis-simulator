@@ -1,0 +1,922 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml
+observations:
+- observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_1_co_partial_pressure
+  experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1767.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+    fO2_Pa:
+      tag: value
+      value: '3000'
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '100'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam18-1019
+      date: '2026-10-19'
+      evidence:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
+  notices: []
+  source_id: beerkens-2001-industrial-glass-evaporation
+  locator:
+    page: 10
+    published_page: 254
+    pdf_page_index: 9
+    table: '3'
+    note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
+  read_from: pdf:beerkens-2001-industrial-glass-evaporation
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1494'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+    fO2_Pa:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed pO2 0.03 × 10^5 Pa; converted to Pa without calculating oxygen pressure.
+    water_vapor_pressure_Pa:
+      state:
+        tag: value
+        value: '60000'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed 0.6 × 10^5 Pa; converted to Pa.
+    composition:
+      state:
+        tag: unknown
+        reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    sample_id:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    gas_velocity_m_s:
+      state:
+        tag: value
+        value: '0.5'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: The paper says gas velocities were calculated with a CFD model.
+    temperature_K:
+      state:
+        tag: value
+        value: '1767.15'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1494'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
+        output_unit: K
+        references: []
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:beerkens-2001-industrial-glass-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_2_co_partial_pressure
+  experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1767.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+    fO2_Pa:
+      tag: value
+      value: '0'
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam18-1019
+      date: '2026-10-19'
+      evidence:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
+  notices: []
+  source_id: beerkens-2001-industrial-glass-evaporation
+  locator:
+    page: 10
+    published_page: 254
+    pdf_page_index: 9
+    table: '3'
+    note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
+  read_from: pdf:beerkens-2001-industrial-glass-evaporation
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1494'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+    water_vapor_pressure_Pa:
+      state:
+        tag: value
+        value: '60000'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed 0.6 × 10^5 Pa; converted to Pa.
+    composition:
+      state:
+        tag: unknown
+        reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    sample_id:
+      state:
+        tag: value
+        value: '2'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    gas_velocity_m_s:
+      state:
+        tag: value
+        value: '0.5'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: The paper says gas velocities were calculated with a CFD model.
+    temperature_K:
+      state:
+        tag: value
+        value: '1767.15'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1494'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
+        output_unit: K
+        references: []
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:beerkens-2001-industrial-glass-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_3_co_partial_pressure
+  experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1784.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+    fO2_Pa:
+      tag: value
+      value: '0'
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam18-1019
+      date: '2026-10-19'
+      evidence:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
+  notices: []
+  source_id: beerkens-2001-industrial-glass-evaporation
+  locator:
+    page: 10
+    published_page: 254
+    pdf_page_index: 9
+    table: '3'
+    note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
+  read_from: pdf:beerkens-2001-industrial-glass-evaporation
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1511'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+    water_vapor_pressure_Pa:
+      state:
+        tag: value
+        value: '60000'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed 0.6 × 10^5 Pa; converted to Pa.
+    composition:
+      state:
+        tag: unknown
+        reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    sample_id:
+      state:
+        tag: value
+        value: '3'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    gas_velocity_m_s:
+      state:
+        tag: value
+        value: '0.7'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: The paper says gas velocities were calculated with a CFD model.
+    temperature_K:
+      state:
+        tag: value
+        value: '1784.15'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1511'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
+        output_unit: K
+        references: []
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:beerkens-2001-industrial-glass-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_4_co_partial_pressure
+  experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1784.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+    fO2_Pa:
+      tag: value
+      value: '0'
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1300'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam18-1019
+      date: '2026-10-19'
+      evidence:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
+  notices: []
+  source_id: beerkens-2001-industrial-glass-evaporation
+  locator:
+    page: 10
+    published_page: 254
+    pdf_page_index: 9
+    table: '3'
+    note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
+  read_from: pdf:beerkens-2001-industrial-glass-evaporation
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1511'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: 'Model-derived condition (CFD): the paper says the glass-surface temperatures were calculated with a CFD model.'
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed pO2 0 × 10^5 Pa; retained as printed zero.
+    water_vapor_pressure_Pa:
+      state:
+        tag: value
+        value: '60000'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: Printed 0.6 × 10^5 Pa; converted to Pa.
+    composition:
+      state:
+        tag: unknown
+        reason: Only Na2O content 16.5 wt% is printed; the full glass composition is not reported.
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    sample_id:
+      state:
+        tag: value
+        value: '4'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+    gas_velocity_m_s:
+      state:
+        tag: value
+        value: '0.7'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: The paper says gas velocities were calculated with a CFD model.
+    temperature_K:
+      state:
+        tag: value
+        value: '1784.15'
+      locator:
+        page: 10
+        published_page: 254
+        pdf_page_index: 9
+        table: '3'
+        note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1511'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 254
+              pdf_page_index: 9
+              table: '3'
+              note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
+        output_unit: K
+        references: []
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:beerkens-2001-industrial-glass-evaporation
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: beerkens-2001-industrial-glass-evaporation::beerkens_2001_text_extra_nacl_evaporated_fraction
+  experiment_id: 10.34657/13064::beerkens-2001-industrial-glass-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: NaCl
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: value
+      value: initial_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: The prose names float glass and changing soda quality but gives no complete melt composition.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.5'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Beek, A. R. M. ter and Thole, E. J. M. C. (1992), reference 37.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam18-1019
+      date: '2026-10-19'
+      evidence:
+        page: 11
+        published_page: 255
+        pdf_page_index: 10
+        figure: '10'
+        section: Evaporation of other species from glass melts
+        note: The prose gives an approximate fraction for extra NaCl input, not a digitized figure point.
+  notices: []
+  source_id: beerkens-2001-industrial-glass-evaporation
+  locator:
+    page: 11
+    published_page: 255
+    pdf_page_index: 10
+    figure: '10'
+    section: Evaporation of other species from glass melts
+    note: The prose gives an approximate fraction for extra NaCl input, not a digitized figure point.
+  read_from: pdf:beerkens-2001-industrial-glass-evaporation
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The prose does not state the furnace temperature for this cited test.
+      locator:
+        page: 11
+        published_page: 255
+        pdf_page_index: 10
+        section: Evaporation of other species from glass melts
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No numeric oxygen pressure is stated for the cited test.
+      locator:
+        page: 11
+        published_page: 255
+        pdf_page_index: 10
+        section: Evaporation of other species from glass melts
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names float glass and changing soda quality but gives no complete melt composition.
+      locator:
+        page: 11
+        published_page: 255
+        pdf_page_index: 10
+        section: Evaporation of other species from glass melts

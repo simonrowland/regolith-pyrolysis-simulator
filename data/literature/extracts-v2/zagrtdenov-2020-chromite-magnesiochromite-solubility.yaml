@@ -48,10 +48,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -147,6 +147,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -203,6 +204,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -249,10 +251,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -348,6 +350,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -404,6 +407,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -450,10 +454,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -542,6 +546,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -598,6 +603,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -644,10 +650,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -743,6 +749,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -799,6 +806,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -845,10 +853,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -944,6 +952,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1000,6 +1009,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -1046,10 +1056,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1145,6 +1155,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1201,6 +1212,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -1247,10 +1259,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1346,6 +1358,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1402,6 +1415,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -1448,10 +1462,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1547,6 +1561,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1603,6 +1618,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -1649,10 +1665,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1732,6 +1748,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1788,6 +1805,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -1834,10 +1852,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1933,6 +1951,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -1989,6 +2008,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E19
   identity:
@@ -2035,10 +2055,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2134,6 +2154,7 @@ observations:
               table: '3'
               note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.; row=E19; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2190,6 +2211,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -2236,10 +2258,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2335,6 +2357,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2391,6 +2414,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -2437,10 +2461,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2536,6 +2560,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2592,6 +2617,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -2638,10 +2664,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2737,6 +2763,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2793,6 +2820,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -2839,10 +2867,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2938,6 +2966,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -2994,6 +3023,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -3040,10 +3070,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3139,6 +3169,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3195,6 +3226,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -3241,10 +3273,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3340,6 +3372,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3396,6 +3429,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -3442,10 +3476,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3541,6 +3575,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3597,6 +3632,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -3643,10 +3679,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3742,6 +3778,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3798,6 +3835,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -3844,10 +3882,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3927,6 +3965,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -3983,6 +4022,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -4029,10 +4069,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4128,6 +4168,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -4184,6 +4225,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E23_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E23
   identity:
@@ -4230,10 +4272,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4329,6 +4371,7 @@ observations:
               table: '3'
               note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.; row=E23; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -4385,6 +4428,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -4431,10 +4475,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4530,6 +4574,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -4586,6 +4631,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -4632,10 +4678,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4731,6 +4777,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -4787,6 +4834,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -4833,10 +4881,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4932,6 +4980,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -4988,6 +5037,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5034,10 +5084,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5133,6 +5183,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -5189,6 +5240,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5235,10 +5287,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5318,6 +5370,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -5374,6 +5427,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5420,10 +5474,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5519,6 +5573,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -5575,6 +5630,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5621,10 +5677,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5704,6 +5760,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -5760,6 +5817,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5806,10 +5864,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5889,6 +5947,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -5945,6 +6004,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -5991,10 +6051,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6090,6 +6150,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -6146,6 +6207,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -6192,10 +6254,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6291,6 +6353,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -6347,6 +6410,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E24_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E24
   identity:
@@ -6393,10 +6457,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6476,6 +6540,7 @@ observations:
               table: '3'
               note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.; row=E24; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -6532,6 +6597,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -6578,10 +6644,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6677,6 +6743,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -6733,6 +6800,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -6779,10 +6847,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6878,6 +6946,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -6934,6 +7003,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -6980,10 +7050,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7079,6 +7149,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -7135,6 +7206,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -7181,10 +7253,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7280,6 +7352,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -7336,6 +7409,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -7382,10 +7456,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7481,6 +7555,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -7537,6 +7612,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -7583,10 +7659,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7682,6 +7758,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -7738,6 +7815,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -7784,10 +7862,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7883,6 +7961,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -7939,6 +8018,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -7985,10 +8065,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8084,6 +8164,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -8140,6 +8221,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -8186,10 +8268,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8269,6 +8351,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -8325,6 +8408,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -8371,10 +8455,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8470,6 +8554,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -8526,6 +8611,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E25_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E25
   identity:
@@ -8572,10 +8658,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8671,6 +8757,7 @@ observations:
               table: '3'
               note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.; row=E25; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -8727,6 +8814,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -8773,10 +8861,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8872,6 +8960,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -8928,6 +9017,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -8974,10 +9064,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9073,6 +9163,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -9129,6 +9220,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -9175,10 +9267,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9274,6 +9366,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -9330,6 +9423,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -9376,10 +9470,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9475,6 +9569,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -9531,6 +9626,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -9577,10 +9673,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9660,6 +9756,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -9716,6 +9813,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -9762,10 +9860,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9861,6 +9959,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -9917,6 +10016,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -9963,10 +10063,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10046,6 +10146,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -10102,6 +10203,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -10148,10 +10250,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10231,6 +10333,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -10287,6 +10390,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -10333,10 +10437,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10416,6 +10520,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -10472,6 +10577,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -10518,10 +10624,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10617,6 +10723,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -10673,6 +10780,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E26_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E26
   identity:
@@ -10719,10 +10827,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ-2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10818,6 +10926,7 @@ observations:
               table: '3'
               note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.; row=E26; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -10874,6 +10983,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -10920,10 +11030,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11019,6 +11129,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -11075,6 +11186,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -11121,10 +11233,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11220,6 +11332,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -11276,6 +11389,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -11322,10 +11436,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11414,6 +11528,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -11470,6 +11585,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -11516,10 +11632,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11615,6 +11731,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -11671,6 +11788,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -11717,10 +11835,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11816,6 +11934,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -11872,6 +11991,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -11918,10 +12038,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12017,6 +12137,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -12073,6 +12194,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -12119,10 +12241,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12218,6 +12340,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -12274,6 +12397,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -12320,10 +12444,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12419,6 +12543,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -12475,6 +12600,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -12521,10 +12647,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12604,6 +12730,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -12660,6 +12787,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -12706,10 +12834,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12805,6 +12933,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -12861,6 +12990,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E27_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E27
   identity:
@@ -12907,10 +13037,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13006,6 +13136,7 @@ observations:
               table: '3'
               note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.; row=E27; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -13062,6 +13193,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -13108,10 +13240,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13207,6 +13339,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -13263,6 +13396,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -13309,10 +13443,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13408,6 +13542,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -13464,6 +13599,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -13510,10 +13646,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13602,6 +13738,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -13658,6 +13795,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -13704,10 +13842,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13803,6 +13941,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -13859,6 +13998,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -13905,10 +14045,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13988,6 +14128,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -14044,6 +14185,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -14090,10 +14232,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14189,6 +14331,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -14245,6 +14388,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -14291,10 +14435,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14374,6 +14518,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -14430,6 +14575,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -14476,10 +14622,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14575,6 +14721,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -14631,6 +14778,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -14677,10 +14825,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14776,6 +14924,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -14832,6 +14981,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -14878,10 +15028,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14977,6 +15127,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -15033,6 +15184,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E28_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E28
   identity:
@@ -15079,10 +15231,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15162,6 +15314,7 @@ observations:
               table: '3'
               note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.; row=E28; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -15218,6 +15371,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -15264,10 +15418,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15363,6 +15517,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -15419,6 +15574,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -15465,10 +15621,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15564,6 +15720,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -15620,6 +15777,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -15666,10 +15824,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15758,6 +15916,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -15814,6 +15973,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -15860,10 +16020,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15959,6 +16119,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -16015,6 +16176,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -16061,10 +16223,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16160,6 +16322,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -16216,6 +16379,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -16262,10 +16426,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16361,6 +16525,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -16417,6 +16582,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -16463,10 +16629,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16562,6 +16728,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -16618,6 +16785,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -16664,10 +16832,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16763,6 +16931,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -16819,6 +16988,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -16865,10 +17035,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16948,6 +17118,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -17004,6 +17175,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -17050,10 +17222,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17149,6 +17321,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -17205,6 +17378,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E29_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E29
   identity:
@@ -17251,10 +17425,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17350,6 +17524,7 @@ observations:
               table: '3'
               note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.; row=E29; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -17406,6 +17581,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -17452,10 +17628,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17551,6 +17727,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -17607,6 +17784,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -17653,10 +17831,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17752,6 +17930,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -17808,6 +17987,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -17854,10 +18034,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17953,6 +18133,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18009,6 +18190,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -18055,10 +18237,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18154,6 +18336,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18210,6 +18393,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -18256,10 +18440,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18339,6 +18523,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18395,6 +18580,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -18441,10 +18627,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18540,6 +18726,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18596,6 +18783,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -18642,10 +18830,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18725,6 +18913,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18781,6 +18970,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -18827,10 +19017,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18926,6 +19116,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -18982,6 +19173,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -19028,10 +19220,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19111,6 +19303,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -19167,6 +19360,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -19213,10 +19407,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19312,6 +19506,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -19368,6 +19563,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E30_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E30
   identity:
@@ -19414,10 +19610,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ+2) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19513,6 +19709,7 @@ observations:
               table: '3'
               note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.; row=E30; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -19569,6 +19766,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -19615,10 +19813,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19714,6 +19912,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -19770,6 +19969,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -19816,10 +20016,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19915,6 +20115,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -19971,6 +20172,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -20017,10 +20219,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20116,6 +20318,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -20172,6 +20375,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -20218,10 +20422,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20317,6 +20521,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -20373,6 +20578,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -20419,10 +20625,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20518,6 +20724,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -20574,6 +20781,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -20620,10 +20828,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20719,6 +20927,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -20775,6 +20984,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -20821,10 +21031,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20920,6 +21130,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -20976,6 +21187,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -21022,10 +21234,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21121,6 +21333,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -21177,6 +21390,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -21223,10 +21437,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21306,6 +21520,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -21362,6 +21577,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -21408,10 +21624,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21507,6 +21723,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -21563,6 +21780,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E31
   identity:
@@ -21609,10 +21827,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21708,6 +21926,7 @@ observations:
               table: '3'
               note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.; row=E31; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -21764,6 +21983,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -21810,10 +22030,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21909,6 +22129,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -21965,6 +22186,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -22011,10 +22233,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22110,6 +22332,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -22166,6 +22389,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -22212,10 +22436,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22311,6 +22535,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -22367,6 +22592,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -22413,10 +22639,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22512,6 +22738,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -22568,6 +22795,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -22614,10 +22842,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22697,6 +22925,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -22753,6 +22982,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -22799,10 +23029,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22898,6 +23128,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -22954,6 +23185,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -23000,10 +23232,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23083,6 +23315,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -23139,6 +23372,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -23185,10 +23419,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23284,6 +23518,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -23340,6 +23575,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -23386,10 +23622,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23469,6 +23705,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -23525,6 +23762,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -23571,10 +23809,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23670,6 +23908,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -23726,6 +23965,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E32
   identity:
@@ -23772,10 +24012,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23855,6 +24095,7 @@ observations:
               table: '3'
               note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.; row=E32; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -23911,6 +24152,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_al2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -23957,10 +24199,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24056,6 +24298,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=Al2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -24112,6 +24355,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cao
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -24158,10 +24402,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24257,6 +24501,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=CaO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -24313,6 +24558,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cr2o3
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -24359,10 +24605,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24451,6 +24697,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=Cr2O3
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -24507,6 +24754,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_feo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -24553,10 +24801,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24636,6 +24884,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=FeO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -24692,6 +24941,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_k2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -24738,10 +24988,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24821,6 +25071,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=K2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -24877,6 +25128,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mgo
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -24923,10 +25175,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25022,6 +25274,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=MgO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -25078,6 +25331,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mno
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -25124,10 +25378,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25207,6 +25461,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=MnO
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -25263,6 +25518,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_na2o
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -25309,10 +25565,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25408,6 +25664,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=Na2O
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -25464,6 +25721,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_p2o5
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -25510,10 +25768,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25593,6 +25851,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=P2O5
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -25649,6 +25908,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_sio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -25695,10 +25955,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25794,6 +26054,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=SiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -25850,6 +26111,7 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []
 - observation_id: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_tio2
   experiment_id: f9ee52c40b9bd723588662b4c6aab38ec0cd57e80e256032bc88560bda8a3686::experiment::zagrtdenov_2020_E33
   identity:
@@ -25896,10 +26158,10 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: buffer-relative fO2 (FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25979,6 +26241,7 @@ observations:
               table: '3'
               note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.; row=E33; column=TiO2
         output_unit: K
+        references: []
     gas_mix:
       state:
         tag: value
@@ -26035,3 +26298,4 @@ observations:
               pdf_page_index: 5
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
         output_unit: Pa
+        references: []

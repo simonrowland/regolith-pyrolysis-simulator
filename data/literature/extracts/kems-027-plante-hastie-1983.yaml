@@ -19,9 +19,10 @@ extraction:
     the 2026-08-03 OCR extract retained without rewriting values. Printed
     plate numbers for Figs 5 and 7 are swapped vs §8 captions (noted on
     locators).
+    validated in an internal review, 2026-09-06, hunts
   date: '2026-09-06'
   worker: hunt-RH-48
-  provenance_path: docs-private/research/2026-09-06-hunts/RH-48/kems-027-plante-hastie-1983/
+  provenance_path: raw/kems-027-plante-hastie-1983/kems-027-plante-hastie-1983.pdf
 review_status: draft
 fidelity_samples:
 - species: Na
@@ -30,7 +31,7 @@ fidelity_samples:
   field: cell_od_cm
   value: 0.80
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+    source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
     paragraph: 0.80 cm o.d. by 1.90 cm high
     line_range: '163'
 - species: Na
@@ -451,7 +452,7 @@ species:
       experiment: kms-vacuum-glass-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
         paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
         line_range: '145-163'
         figure: '2'
@@ -486,13 +487,13 @@ species:
               C appears in m_i / (Δt) = P_i C a √(M_i/(2πRT)) form; numeric Clausing for this
               orifice not given — partial observation only.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
             paragraph: C the Clausing factor, a the orifice area
             line_range: '145'
         cell_material:
           value: Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+            source_path: text/kems-027-plante-hastie-1983/mineru/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
             paragraph: Knudsen cell was made of 0.025 cm Pt sheet
             line_range: '163'
     - observation_id: plante_hastie_1983_table1_snw_glass_composition
@@ -1500,8 +1501,9 @@ metadata:
     note: Nominal recipe and analytical composition are distinguished column-by-column in table provenance;
       composition is sample metadata, not a rate time series.
     transcription:
-      page: 3
-      pdf_page_index: 9
+      page: 9
+      published_page: 3
+      pdf_page_index: 8
       table: '1'
       title: Simulated Nuclear Waste (SNW) Glass Composition
       method: visual_from_250dpi_pdftoppm
@@ -1554,8 +1556,9 @@ metadata:
     note: A is isotopic fraction; tau is quadrupole transmission; sigma is ionization cross section, not
       uncertainty. Calibration constants remain metadata.
     transcription:
-      page: 14
-      pdf_page_index: 20
+      page: 20
+      published_page: 14
+      pdf_page_index: 19
       table: '2'
       title: Mass Spectrometric Constants Used for Ions Over Simulated Nuclear Waste Glass
       method: visual_from_250dpi_pdftoppm
@@ -1598,8 +1601,9 @@ metadata:
     note: Integrated ion-current mass balance, not a timed gravimetric series. Complete derived table
       retained in corpus without misusing an observation type.
     transcription:
-      page: 15
-      pdf_page_index: 21
+      page: 21
+      published_page: 15
+      pdf_page_index: 20
       table: '3'
       title: Comparison of Calculated Weight Loss Data with Sample Composition (in mg)
       method: visual_from_250dpi_pdftoppm_rotated_90

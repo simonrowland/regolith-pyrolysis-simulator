@@ -104,6 +104,7 @@ def test_config_absent_legacy_fallback_emits_warning(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setattr("simulator.engine_local_config._LEGACY_WARNED", set())
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "simulator.engine_local_config.config_path",

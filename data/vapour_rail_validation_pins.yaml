@@ -167,32 +167,13 @@ species:
         evidence_refs:
           - data/vapor_pressures.yaml
   Fe:
-    tier: T3
+    tier: T2
     target_tier: T4
     validations:
       vaporock:
         pinned_residual_dex: 0.3407931412581238
         evidence_refs:
           - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
-      mass_spec:
-        # si-comparability 2026-08-08: pure-element solid-Fe Pound rows excluded
-        # as not_comparable_system_class; residual tightens to silicate/olivine set.
-        # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α excluded as
-        # not_comparable_condensed_form:crystalline (not form-correctable).
-        # Numeric max UNCHANGED at Hashimoto liquid 2073 K; grounding relabel only.
-        # old max 1.096910013 (was already Hashimoto liquid after olivine match at 0);
-        # excluded Costa points (multicell series 0.0066-0.2403 dex; the two
-        # single-T rows at 0.0) all sat far below 1.0969 -- did not set the ceiling.
-        pinned_residual_dex: 1.0969100130080565
-        evidence_refs:
-          - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
-          - docs/model-limitations.md#extract-store-reproduction-battery
-          - validation-data/pin-evidence/fe_mass_spec_class_comparable_2026-08-08.yaml
-          - validation-data/pin-evidence/fe_mass_spec_form_liquid_2026-08-09.yaml
-        internal_notes_refs:
-          - docs-private/research/2026-08-08-si-comparability/report.md
-          - docs-private/research/2026-08-09-form589-impl/report.md
-          - docs-private/research/2026-08-09-condensed-form/report.md
   FeO_association_gas:
     tier: T1
     target_tier: T4

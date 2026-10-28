@@ -1,0 +1,497 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2023-cai-melt-evaporation
+source:
+  citation: >-
+    Shornikov, S. I., and Yakovlev, O. I. (2023). Experimental study of
+    evaporation of the Ca–Al–inclusions of chondrite melts. Experiment in
+    Geosciences, 29(1), 8–10.
+  doi: null
+  year: 2023
+  corpus_asset: raw/shornikov-2023-cai-melt-evaporation/shornikov-2023-cai-melt-evaporation.pdf
+  corpus_sha256: 72aed8e0b15a010ea65269927fc99d061c14444d2412cf8d4be60f1f00a40a75
+extraction:
+  method: >-
+    Table 1 was drafted and emitted with mineru_table_draft, then regrouped as
+    an attributed initial-composition context table. All 12 numeric table cells
+    were checked against MinerU, pdftotext, and the 600 dpi page render. Figures
+    1–3 are recorded as figure contexts only; no figure values were digitised.
+  date: '2026-10-18'
+  worker: w4a2-1018
+review_status: draft
+species:
+  CaO:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_table1_initial_compositions
+        type: initial_sample_composition_table
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1. Initial compositions of CAIs types A and B and Murchison chondrite.
+        units: wt. % as printed
+        values:
+          quantity: initial_sample_compositions_as_printed
+          species_scope_as_printed: CaO, MgO, Al2O3, SiO2
+          source_type_note: >-
+            The text calls these typical compositions. A and B are attributed to
+            Grossman et al. (2000); Murchison is attributed to Diakonova et al.
+            (1979). These are quoted compositions retained as context, not new
+            measurements of the experimental samples.
+          row_count: 4
+          numeric_cell_count: 12
+          rows:
+            - row_number: 1
+              oxide: CaO
+              method_class: quoted_attributed
+              sample_compositions_wt_pct:
+                A: '36.2'
+                B: '27.6'
+                M: '4.4'
+              attribution_by_sample:
+                A: Grossman et al. (2000)
+                B: Grossman et al. (2000)
+                M: Diakonova et al. (1979)
+              locator:
+                page: 4
+                published_page: 9
+                pdf_page_index: 3
+                table: '1'
+                note: Table 1 row CaO.
+            - row_number: 2
+              oxide: MgO
+              method_class: quoted_attributed
+              sample_compositions_wt_pct:
+                A: '5.0'
+                B: '11.4'
+                M: '47.2'
+              attribution_by_sample:
+                A: Grossman et al. (2000)
+                B: Grossman et al. (2000)
+                M: Diakonova et al. (1979)
+              locator:
+                page: 4
+                published_page: 9
+                pdf_page_index: 3
+                table: '1'
+                note: Table 1 row MgO.
+            - row_number: 3
+              oxide: Al2O3
+              method_class: quoted_attributed
+              sample_compositions_wt_pct:
+                A: '38.3'
+                B: '32.3'
+                M: '2.5'
+              attribution_by_sample:
+                A: Grossman et al. (2000)
+                B: Grossman et al. (2000)
+                M: Diakonova et al. (1979)
+              locator:
+                page: 4
+                published_page: 9
+                pdf_page_index: 3
+                table: '1'
+                note: Table 1 row Al2O3.
+            - row_number: 4
+              oxide: SiO2
+              method_class: quoted_attributed
+              sample_compositions_wt_pct:
+                A: '20.5'
+                B: '28.7'
+                M: '45.9'
+              attribution_by_sample:
+                A: Grossman et al. (2000)
+                B: Grossman et al. (2000)
+                M: Diakonova et al. (1979)
+              locator:
+                page: 4
+                published_page: 9
+                pdf_page_index: 3
+                table: '1'
+                note: Table 1 row SiO2.
+      - observation_id: shornikov_2023_cai_modal_compositions
+        type: text_stated_composition_context
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          section: Introduction
+          note: Printed modal mineral proportions for CAI types A and B.
+        units: vol. % as printed
+        values:
+          quantity: modal_mineral_compositions_as_printed
+          method_class: quoted_unattributed
+          type_A:
+            melilite: '≥80'
+            spinel: '5–15'
+            other_mineral_formula_as_printed: Ca2(Mg,Al)[(Al.Si)2O7]
+          type_B:
+            melilite: '60–70'
+            fassaite: '10–25'
+            spinel: '~10'
+            other_mineral_formula_as_printed: Ca(Mg,Al,Ti+3,Ti+4)[(Al,Si)2O6]
+          note: >-
+            The paper describes type A as richer in calcium and aluminum oxides
+            and poorer in MgO and SiO2 than type B.
+      - observation_id: shornikov_2023_cai_age_context
+        type: author_context
+        locator:
+          page: 3
+          published_page: 8
+          pdf_page_index: 2
+          section: Introduction
+          note: Printed age for CAIs.
+        units: source prose; numeric_facts units stated per value
+        values:
+          quantity: introductory_claims
+          method_class: quoted_unattributed
+          statements:
+            - They represent the most primitive matter of the Solar System with an age of 4.567 billion years.
+          numeric_facts:
+            - name: CAI_age_as_printed
+              value: 4.567
+              unit: billion years
+              locator:
+                page: 3
+                published_page: 8
+                pdf_page_index: 2
+                section: Introduction
+      - observation_id: shornikov_2023_experimental_method_context
+        type: experimental_method_context
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          section: Experimental
+          note: KEMS method, studied samples, cell and ionization conditions.
+        units: printed units retained per field
+        values:
+          quantity: experimental_conditions_and_species_as_printed
+          method_class: quoted_unattributed
+          phase: l
+          temperature_range_K_as_printed: '1300–2600'
+          studied_sample_as_printed: natural inclusions of the Efremovka meteorite
+          studied_meteorite_class_as_printed: CV3
+          comparison_sample_as_printed: Murchison chondrite
+          comparison_meteorite_class_as_printed: CM2
+          sample_mass_mg_as_printed: '10–15'
+          cell_as_printed: tungsten cylindrical effusion cell
+          heating_as_printed: electron bombardment from tungsten cathodes
+          ionizing_electron_energy_eV_as_printed: '28'
+          method_as_printed: Knudsen effusion mass spectrometric method
+          detected_ions_as_printed:
+            - Ca+
+            - Mg+
+            - Al+
+            - AlO+
+            - Al2O+
+            - SiO+
+            - SiO2+
+            - O2+
+            - K+
+            - Na+
+            - SO2+
+            - Fe+
+            - Ni+
+            - Cr+
+            - TiO+
+            - TiO2+
+            - WO2+
+            - WO3+
+          listed_additional_sample_oxides:
+            - potassium
+            - sodium
+            - sulfur
+            - iron
+            - titanium
+            - chromium
+            - nickel
+          additional_oxide_amounts:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 4
+              published_page: 9
+              pdf_page_index: 3
+              section: Experimental
+      - observation_id: shornikov_2023_results_summary_context
+        type: author_stated_results_context
+        locator:
+          page: 5
+          published_page: 10
+          pdf_page_index: 4
+          section: Results and discussion
+          note: Printed temperature ranges and qualitative evaporation comparisons.
+        units: K as printed where stated
+        values:
+          quantity: evaporation_results_as_printed
+          method_class: quoted_unattributed
+          temperature_ranges_K_as_printed:
+            silicon_component_remains_in_CAIs: '>2500'
+          statements:
+            - It is possible to notice the predominance of vapor species corresponding to a higher content of calcium and aluminum oxides in the melt in the case of CAIs type A (Fig. 2A), and for the case of CAIs type B – the predominance of vapor species corresponding to a higher content of magnesium and silicon oxides in the melt (Fig. 2B).
+            - The high-temperature evaporation process occurs in an oxygen-enriched atmosphere.
+            - The authors suggest that initial CAI mineral condensation also occurs in an oxygen environment.
+      - observation_id: shornikov_2023_murchison_comparison_context
+        type: cited_comparison_context
+        locator:
+          page: 5
+          published_page: 10
+          pdf_page_index: 4
+          section: Results and discussion
+          note: "This article's comparison of its CAI type A/B curves with the Murchison curve in Fig. 2C (Murchison data: Yakovlev et al. 1987, PDF p4)."
+        units: K as printed
+        values:
+          quantity: murchison_evaporation_comparison_as_printed
+          method_class: author_estimate
+          sample_as_printed: Murchison chondrite (CM2)
+          temperature_ranges_K_as_printed:
+            higher_volatility: '1800–2100'
+            almost_complete_evaporation: '2200–2300'
+          comparison_as_printed: >-
+            A comparison of the temperature dependencies of partial pressures
+            of vapor species over CAIs melts of types A and B with that for the
+            case of Murchison chondrite (Fig. 2C) shows that the latter has a
+            slightly higher volatility at 1800–2100 K, due to the high content
+            of magnesium and silicon oxides in the melt (compared with CAIs
+            types A and B) and almost completely evaporates at 2200–2300 K.
+      - observation_id: shornikov_2023_fig1_temperature_regimes
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          figure: '1'
+        units: K and min as printed on the axes
+        values:
+          quantity: temperature
+          method_class: figure_only
+          phase: l
+          sample_identity: CAI melts of types A and B and Murchison chondrite
+          species_as_printed: CAI melts of types A and B; Murchison chondrite
+          phase_as_printed: liquid melts
+          temperature_as_printed: variable; T, K on the y-axis
+          axes_as_printed:
+            x: t, min
+            y: T, K
+          caption_as_printed: >-
+            Fig. 1. Temperature regimes of experiments on evaporation of CAIs
+            melts of types A and B and Murchison chondrite.
+          panel: single panel; no panel label printed
+          series_list:
+            - A: CAIs A, this work
+            - B: CAIs B, this work
+            - M: Murchison, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 31
+            B: 26
+            M: 27
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass
+  Ca:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_fig2_ca_partial_pressure
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          figure: '2'
+        units: log partial pressure; atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          gas_species: Ca(g)
+          species_as_printed: Ca(g)
+          phase: g
+          phase_as_printed: gas
+          temperature_axis: T, K
+          temperature_range_K_as_printed: '1800–2600'
+          temperature_as_printed: 1800–2600 K
+          axes_as_printed:
+            x: T, K
+            y: 'lg p_i, atm'
+          caption_as_printed: >-
+            Fig. 2. The partial pressures of vapor species (Ca, Mg, Al and SiO)
+            over CAIs melts of types A and B (A, B), as well as Murchison
+            chondrite (C) during evaporation at 1800–2600 K.
+          panel: A, B, C
+          series_list:
+            - A: CAIs melt type A, this work
+            - B: CAIs melt type B, this work
+            - C: Murchison chondrite, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 14
+            B: 12
+            C: 9
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass
+  Mg:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_fig2_mg_partial_pressure
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          figure: '2'
+        units: log partial pressure; atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          gas_species: Mg(g)
+          species_as_printed: Mg(g)
+          phase: g
+          phase_as_printed: gas
+          temperature_axis: T, K
+          temperature_range_K_as_printed: '1800–2600'
+          temperature_as_printed: 1800–2600 K
+          axes_as_printed:
+            x: T, K
+            y: 'lg p_i, atm'
+          caption_as_printed: >-
+            Fig. 2. The partial pressures of vapor species (Ca, Mg, Al and SiO)
+            over CAIs melts of types A and B (A, B), as well as Murchison
+            chondrite (C) during evaporation at 1800–2600 K.
+          panel: A, B, C
+          series_list:
+            - A: CAIs melt type A, this work
+            - B: CAIs melt type B, this work
+            - C: Murchison chondrite, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 12
+            B: 11
+            C: 13
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass
+  Al:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_fig2_al_partial_pressure
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          figure: '2'
+        units: log partial pressure; atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          gas_species: Al(g)
+          species_as_printed: Al(g)
+          phase: g
+          phase_as_printed: gas
+          temperature_axis: T, K
+          temperature_range_K_as_printed: '1800–2600'
+          temperature_as_printed: 1800–2600 K
+          axes_as_printed:
+            x: T, K
+            y: 'lg p_i, atm'
+          caption_as_printed: >-
+            Fig. 2. The partial pressures of vapor species (Ca, Mg, Al and SiO)
+            over CAIs melts of types A and B (A, B), as well as Murchison
+            chondrite (C) during evaporation at 1800–2600 K.
+          panel: A, B, C
+          series_list:
+            - A: CAIs melt type A, this work
+            - B: CAIs melt type B, this work
+            - C: Murchison chondrite, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 8
+            B: 11
+            C: 9
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass
+  SiO:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_fig2_sio_partial_pressure
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
+          figure: '2'
+        units: log partial pressure; atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          gas_species: SiO(g)
+          species_as_printed: SiO(g)
+          phase: g
+          phase_as_printed: gas
+          temperature_axis: T, K
+          temperature_range_K_as_printed: '1800–2600'
+          temperature_as_printed: 1800–2600 K
+          axes_as_printed:
+            x: T, K
+            y: 'lg p_i, atm'
+          caption_as_printed: >-
+            Fig. 2. The partial pressures of vapor species (Ca, Mg, Al and SiO)
+            over CAIs melts of types A and B (A, B), as well as Murchison
+            chondrite (C) during evaporation at 1800–2600 K.
+          panel: A, B, C
+          series_list:
+            - A: CAIs melt type A, this work
+            - B: CAIs melt type B, this work
+            - C: Murchison chondrite, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 16
+            B: 20
+            C: 10
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass
+  O:
+    observations: []
+    context:
+      - observation_id: shornikov_2023_fig3_oxygen_pressure
+        type: figure_record
+        locator:
+          page: 5
+          published_page: 10
+          pdf_page_index: 4
+          figure: '3'
+        units: log partial pressure; atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          gas_species: O + O2
+          species_as_printed: O + O2
+          phase: g
+          phase_as_printed: gas
+          temperature_axis: T, K
+          temperature_as_printed: variable; T, K on the x-axis
+          axes_as_printed:
+            x: T, K
+            y: 'lg (p_O + p_O2), atm'
+          caption_as_printed: >-
+            Fig. 3. The temperature dependencies of oxygen pressure over CAIs
+            melts of types A and B and Murchison chondrite during evaporation.
+          panel: single panel; no panel label printed
+          series_list:
+            - A: CAIs melt type A, this work
+            - B: CAIs melt type B, this work
+            - M: Murchison chondrite, Yakovlev et al. (1987)
+          marker_count_per_series:
+            A: 19
+            B: 24
+            M: 17
+          attribution: >-
+            CAI type A and B experiment series are from this work; the Murchison
+            comparison is attributed in the text to Yakovlev et al. (1987).
+          digitisation: deferred to a figure pass

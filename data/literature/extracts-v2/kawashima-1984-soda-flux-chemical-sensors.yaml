@@ -1,0 +1,1558 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kawashima-1984-soda-flux-chemical-sensors.yaml
+observations:
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=0bfb7e03f71e
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000000001'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00003'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.000000001'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=361c5e594fca
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00001'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=4736bb787b45
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00002'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_reported_for_this_point
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=59cc6df6d7fa
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000003'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0003'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000000003'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=6e162f8ce0a8
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000001'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00001'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000001'
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=8cbeb506e66f
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000001'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0003'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000000001'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=9de7a31c2c51
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000001'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0002'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000000001'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=c0d62a77b4ae
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000001'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000002'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000000001'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '4'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=c5226eef63a8
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000003'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00002'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000003'
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        figure: '3'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_emf_derived_na2o_activities::points:h=cb4e9103c0fa
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1558, 1588]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000000000003'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000001'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 4
+    published_page: 782
+    pdf_page_index: 3
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 3
+        published_page: 781
+        pdf_page_index: 2
+        section: Experimental Results
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.000000000003'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '6'
+    composition:
+      state:
+        tag: unknown
+        reason: full_liquid_composition_not_reported
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '6'
+  derivation:
+    relation: Na2O activity calculated from measured E1 by equation (3); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 782
+        pdf_page_index: 3
+        section: Experimental Results
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_na_vapor_partial_pressure::T=1573:h=5bc77c578879
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000003'
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '60000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_na_vapor_partial_pressure::T=1573:h=5bc77c578879
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 5
+    published_page: 783
+    pdf_page_index: 4
+    figure: '5'
+    section: Experimental Results
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '60000'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        figure: '5'
+        section: Experimental Results
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=6e4 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '60000'
+            locator:
+              page: 5
+              published_page: 783
+              pdf_page_index: 4
+              figure: '5'
+              section: Experimental Results
+        output_unit: Pa
+        references: []
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.0000000000003'
+      locator:
+        page: 5
+        published_page: 783
+        pdf_page_index: 4
+        section: Experimental Results
+  derivation:
+    relation: Sodium partial pressure calculated from measured E3 by equation (7); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 780
+        pdf_page_index: 1
+        section: Sodium vapour pressure measurement cell
+    references: []
+- observation_id: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_na_vapor_partial_pressure_with_fe2o3::T=1573:h=81c95a78113a
+  experiment_id: c83dcf6a1866c9194b324c5559667242c71d5fc45f71200b934e05f0c24a4b3d::kawashima-1984-soda-flux-chemical-sensors
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kawashima-1984-soda-flux-chemical-sensors::kawashima_1984_na_vapor_partial_pressure_with_fe2o3::T=1573:h=81c95a78113a
+  source_id: kawashima-1984-soda-flux-chemical-sensors
+  locator:
+    page: 6
+    published_page: 784
+    pdf_page_index: 5
+    figure: '7'
+    section: Discussion
+  read_from: pdf:kawashima-1984-soda-flux-chemical-sensors
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 784
+        pdf_page_index: 5
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 6
+        published_page: 784
+        pdf_page_index: 5
+        figure: '7'
+        section: Discussion
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=1e3 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 6
+              published_page: 784
+              pdf_page_index: 5
+              figure: '7'
+              section: Discussion
+        output_unit: Pa
+        references: []
+  derivation:
+    relation: Sodium partial pressure calculated from measured E3 by equation (7); numeric EMF readings are not printed.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 780
+        pdf_page_index: 1
+        section: Sodium vapour pressure measurement cell
+    references: []

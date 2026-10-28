@@ -1,0 +1,1403 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2024-sodium-phosphate-melts.yaml
+observations:
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2a_series10
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted Na2O activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 10, this study at 1673 K. Continuous stroke on panel A.; panel=A
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: Caption series 10, this study at 1673 K. Continuous stroke on panel A.; panel=A
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 10, this study at 1673 K. Continuous stroke on panel A.; panel=A
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2a_series11
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted Na2O activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 11, this study at 1873 K. Continuous stroke on panel A.; panel=A
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: Caption series 11, this study at 1873 K. Continuous stroke on panel A.; panel=A
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 11, this study at 1873 K. Continuous stroke on panel A.; panel=A
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2a_series8
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted Na2O activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 8, calculated in the present study at 1073 K. 600 dpi render of PDF page 3: continuous stroke
+          on panel A, no marker centre.; panel=A'
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: 'Caption series 8, calculated in the present study at 1073 K. 600 dpi render of PDF page 3: continuous stroke on
+      panel A, no marker centre.; panel=A'
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 8, calculated in the present study at 1073 K. 600 dpi render of PDF page 3: continuous stroke
+          on panel A, no marker centre.; panel=A'
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2a_series9
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted Na2O activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke on the 600 dpi render. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 9, this study at 1173 K. Continuous stroke on panel A.; panel=A
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: Caption series 9, this study at 1173 K. Continuous stroke on panel A.; panel=A
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 9, this study at 1173 K. Continuous stroke on panel A.; panel=A
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2b_series10
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted P4O10 activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 10 at 1673 K. Continuous stroke on panel B.; panel=B
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: Caption series 10 at 1673 K. Continuous stroke on panel B.; panel=B
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 10 at 1673 K. Continuous stroke on panel B.; panel=B
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2b_series11
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted P4O10 activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 11 at 1873 K. Continuous stroke on panel B.; panel=B
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: Caption series 11 at 1873 K. Continuous stroke on panel B.; panel=B
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: Caption series 11 at 1873 K. Continuous stroke on panel B.; panel=B
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2b_series8
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Published page 69 (PDF page 4): the initial values of the standard Gibbs
+        energies of formation of Na2O and P4O10 are taken in the crystalline and liquid state (Glushko et al., 1978–1982).
+        The paper does not state which of those phases is the reference of the plotted P4O10 activity.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 8 at 1073 K. 600 dpi render: continuous stroke labelled 8 on panel B. Series 9 is not labelled
+          on panel B.; panel=B'
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: 'Caption series 8 at 1073 K. 600 dpi render: continuous stroke labelled 8 on panel B. Series 9 is not labelled on
+      panel B.; panel=B'
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 8 at 1073 K. 600 dpi render: continuous stroke labelled 8 on panel B. Series 9 is not labelled
+          on panel B.; panel=B'
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig2c_series10
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: NaPO3
+      phase:
+        tag: unknown
+        reason: phase string 'condensed' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, series,
+      temperature_K, compound_as_printed, reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 10, NaPO3 activity at 1673 K. 600 dpi render: one continuous stroke labelled 10. Series 8, 9
+          and 11 are not labelled on panel C. NaPO3 is printed as the compound 2Na2O · P4O10.; panel=C'
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 3
+    published_page: 68
+    pdf_page_index: 2
+    figure: '2'
+    note: 'Caption series 10, NaPO3 activity at 1673 K. 600 dpi render: one continuous stroke labelled 10. Series 8, 9 and
+      11 are not labelled on panel C. NaPO3 is printed as the compound 2Na2O · P4O10.; panel=C'
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 68
+        pdf_page_index: 2
+        figure: '2'
+        note: 'Caption series 10, NaPO3 activity at 1673 K. 600 dpi render: one continuous stroke labelled 10. Series 8, 9
+          and 11 are not labelled on panel C. NaPO3 is printed as the compound 2Na2O · P4O10.; panel=C'
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig3_na
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated strokes. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 69
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 13, calculated Na pressure. Continuous strokes on panels A and B.
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 69
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption series 13, calculated Na pressure. Continuous strokes on panels A and B.
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig3_napo3
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: NaPO3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated strokes. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 69
+        pdf_page_index: 3
+        figure: '3'
+        note: 'Caption series 12, calculated NaPO3 pressure. 600 dpi render: a continuous stroke labelled 12 on panel A (over
+          NaPO3) and on panel B (over Na3PO4). No marker centre. Legend glyphs in the frames are the keys for the cited series,
+          not extra data.'
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 69
+    pdf_page_index: 3
+    figure: '3'
+    note: 'Caption series 12, calculated NaPO3 pressure. 600 dpi render: a continuous stroke labelled 12 on panel A (over
+      NaPO3) and on panel B (over Na3PO4). No marker centre. Legend glyphs in the frames are the keys for the cited series,
+      not extra data.'
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig3_o2
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated strokes. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 69
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 14, calculated O2 pressure. Continuous strokes on panels A and B.
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 69
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption series 14, calculated O2 pressure. Continuous strokes on panels A and B.
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig3a_po
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100, 1400]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre. The 10^-8 atm sentence is a bound, stored on the model-scope row.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 69
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 15, calculated PO. Labelled on panel A only. The body says PO and PO2 over NaPO3 at 1100–1400
+          K do not exceed 10^-8 atm.; panel=A
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 69
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption series 15, calculated PO. Labelled on panel A only. The body says PO and PO2 over NaPO3 at 1100–1400 K do
+      not exceed 10^-8 atm.; panel=A
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts
+- observation_id: shornikov-2024-sodium-phosphate-melts::shornikov_2024_na2o_p4o10_fig3a_po2
+  experiment_id: 2355bf806d15487c8b2443781e8a6d7df6283a4cb77d72a164f28cdf45ca1e04::experiment::shornikov_2024_na2o_p4o10_model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100, 1400]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, series,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No read uncertainty, because no marker centre was admitted.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Continuous calculated stroke. No marker centre.
+    decided_by:
+      worker: t1372-w2-w7-t1
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 69
+        pdf_page_index: 3
+        figure: '3'
+        note: Caption series 16, calculated PO2. Labelled on panel A only.; panel=A
+  notices: []
+  source_id: shornikov-2024-sodium-phosphate-melts
+  locator:
+    page: 4
+    published_page: 69
+    pdf_page_index: 3
+    figure: '3'
+    note: Caption series 16, calculated PO2. Labelled on panel A only.; panel=A
+  read_from: pdf:shornikov-2024-sodium-phosphate-melts

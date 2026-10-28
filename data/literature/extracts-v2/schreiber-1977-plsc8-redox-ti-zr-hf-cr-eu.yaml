@@ -1,0 +1,1123 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu.yaml
+observations:
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_cr_muan_1976::points:h=c82008457231
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.9'
+    interval_high: '0.95'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Muan (1976)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Cr(III)-Cr(II)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 identifies the material only as synthetic glass.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_cr_schreiber_haskin_1976::points:h=201aadef5e7e
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.65'
+    interval_high: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schreiber and Haskin (1976)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Cr(III)-Cr(II)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 identifies the material only as synthetic glass.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_eu_philpotts_drake::points:h=ddeee758ed98
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Eu
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.2'
+      units: fraction
+      note: Printed ±0.2; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Philpotts (1970), Drake (1975)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Eu(III)-Eu(II)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample formation or measurement temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The cited material is identified only as lunar basalt.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_ti_agrell_1970::points:h=78cbc82521c4
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.08'
+    interval_high: '0.25'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Agrell et al. (1970)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Ti(IV)-Ti(III)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample measurement temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The cited material is identified only as Cr-Ti-spinel.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_ti_many_works_armalcolite::points:h=213a9b24fabf
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.04'
+    interval_high: '0.13'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+    attribution: Range consistent with many works cited in Table 3 footnote 2.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Ti(IV)-Ti(III)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample measurement temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The cited material is identified only as armalcolite.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_ti_sung_1974::points:h=1c9a88d2f652
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.3'
+    interval_high: '0.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.3'
+      units: fraction
+      note: Printed ±0.3; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Sung et al. (1974)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Ti(IV)-Ti(III)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample measurement temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The cited material is identified only as pyroxene.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_ti_weeks_1973::points:h=8645fd4fefc7
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      units: fraction
+      note: Printed ±0.03; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Weeks (1973)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Ti(IV)-Ti(III)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited sample measurement temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The cited material is identified only as plagioclase.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::schreiber_1977_t3_ti_wells_hapke_1977::points:h=f260f59b622b
+  experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: interval
+    interval_low: '0.01'
+    interval_high: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wells and Hapke (1977)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+    note: row=Ti(IV)-Ti(III)
+  read_from: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  point_conditions:
+    fO2_log:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment oxygen fugacity.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 3 does not state the cited experiment temperature.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 identifies the material only as synthetic glass.
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 16
+        published_page: 1800
+        pdf_page_index: 15
+        table: '3'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []

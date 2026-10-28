@@ -54,7 +54,7 @@ experiments:
       locator:
         page: 1164
         paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
       inference:
         relation: Torr_to_Pa
         inputs:
@@ -72,8 +72,9 @@ experiments:
             locator:
               page: 1164
               paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+              source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -85,8 +86,8 @@ experiments:
   work_id: 10.2320/jinstmet1952.31.10_1164
   locator:
     table: '1'
-    line_range: 8157-8200
-    source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+    line_range: 192-194
+    source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   apparatus:
     cell_material_and_liner:
       state:
@@ -94,5 +95,5 @@ experiments:
         value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 30 mm — shortened vs Homma 1966)
       locator:
         paragraph: るつぼ (CP-2) の寸法は内径 38 mm
-        line_range: experimental method
-        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        line_range: 27
+        source_path: text/kems-002-ohno-1967/mineru/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md

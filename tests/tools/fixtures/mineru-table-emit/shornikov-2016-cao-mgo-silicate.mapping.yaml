@@ -1,0 +1,79 @@
+# Table 1 only. The Sn ppb table on PDF page 1 belongs to the preceding
+# abstract and is not this paper. Empty condensed-phase cells are blank
+# in the source and are skipped, not stored as zero. O2 0.000 is a
+# printed zero.
+source_id: shornikov-2016-cao-mgo-silicate
+source:
+  citation: >-
+    Shornikov, S. I. (2016), Thermodynamic properties of the CaO–MgO–SiO2
+    melts, Experiment in Geosciences, vol. 22, no. 1, pp. 40–42.
+  year: 2016
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: trial-grok-1018
+review_status: draft
+fidelity_samples:
+  - path: species.CaO.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02].values.value
+    value: '-421.511'
+    locator:
+      page: 2
+      pdf_page_index: 1
+      table: '1'
+      note: >-
+        Solid CaO. The pinned spelling is the MinerU cell, ASCII hyphen
+        U+002D. The page glyph is an en-dash. PDF page 2, published page 41.
+  - path: species.CaO.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04].values.value
+    value: '-409.450'
+    locator:
+      page: 2
+      pdf_page_index: 1
+      table: '1'
+      note: >-
+        Liquid CaO. MinerU ASCII hyphen. PDF page 2, published page 41.
+  - path: species.Ca.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06].values.value
+    value: '-21.080'
+    locator:
+      page: 2
+      pdf_page_index: 1
+      table: '1'
+      note: >-
+        Gas Ca. MinerU ASCII hyphen. PDF page 2, published page 41.
+tables:
+  - page: 2
+    table_index: 2
+    published_page: 41
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mole
+    per: mol_species
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '2000'
+      unit: K
+      column_header: 'ΔfG°2000, kJ/mole'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        column_header: 'ΔfG°2000, kJ/mole'
+        note: >-
+          The temperature is the 2000 printed in each Gibbs-energy column
+          header and in the table caption. Published page 41.
+    attribution: >-
+      Table caption: "calculated in present study"; formation from elements
+      at 2000 K. The text cites the model inputs (Glushko et al., 1978-1982;
+      Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are
+      not stored in this extract, so the rows are quoted_attributed.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

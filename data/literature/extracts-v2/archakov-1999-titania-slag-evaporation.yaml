@@ -45,7 +45,7 @@ observations:
       reason: profile transition_temperature does not use reservoir
     composition:
       tag: unknown
-      reason: no composition mapped from source
+      reason: Only the TiO2 mole percentage is printed, not a complete composition.
     fO2_Pa:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
@@ -133,3 +133,4 @@ observations:
     - pdf:archakov-1999-titania-slag-evaporation
     parameters: []
     output_unit: K
+    references: []

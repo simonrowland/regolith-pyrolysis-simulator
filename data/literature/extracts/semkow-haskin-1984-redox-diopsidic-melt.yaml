@@ -1,0 +1,80 @@
+schema_version: literature_extract.v1
+source_id: semkow-haskin-1984-redox-diopsidic-melt
+source:
+  citation: >-
+    Semkow, K. W. and Haskin, L. A. (1984). Redox equilibria in diopsidic
+    melt. 15th Lunar and Planetary Science Conference, Abstracts of Papers
+    Submitted, part 2, 752–753 (LPSC XV).
+  year: 1984
+extraction:
+  method: >-
+    Scanned two-page LPSC abstract. MinerU supplied the Table 1 draft; every
+    value was checked against the 600 dpi PDF page 2 render. Table 1 reports
+    standard cell potentials, an equilibrium constant, and reaction standard
+    thermodynamic quantities. None has a matching quantity token in the
+    battery schema: the potential, K, and reaction ΔG/ΔH/ΔS remain context.
+    The abstract reports measurements and derived thermodynamic values; no
+    values were inferred beyond those printed.
+  date: '2026-10-20'
+  worker: codex
+  provenance_path: text/semkow-haskin-1984-redox-diopsidic-melt/mineru/p001-p002/
+review_status: draft
+species:
+  paper_context:
+    observations: []
+    context:
+      - observation_id: semkow1984_table1_thermodynamic_parameters
+        type: experiment_series
+        locator: {page: 2, pdf_page_index: 1, published_page: 753, table: '1'}
+        units: printed units per field
+        reason: >-
+          No token matches standard cell potential, this reaction's
+          equilibrium constant, or standard reaction ΔG, ΔH, and ΔS. Candidate
+          tokens checked: valence_ratio, log10_Kf, delta_fG, delta_fH, S,
+          partial_molar_enthalpy; none describes these quantities on the
+          printed reaction and standard basis.
+        values:
+          quantity: standard_cell_potential_equilibrium_constant_and_reaction_thermodynamics
+          method_class: measured_reduced
+          reaction_as_printed: >-
+            M0(diop) + 1/2 O2(g) = M2+(diop) + O2-(diop)
+          reference_state: standard state, abstract's reaction (1); diopside melt
+          temperature_C: 1450
+          atmosphere: air; pO2 referenced to 1 atm for the separate E* statement
+          points:
+            - species: Fe
+              E0_V: '-0.218 ± 0.014'
+              K_mol_L_atm: '0.054 ± 0.010'
+              delta_G0_kcal_mol: '10.0 ± 0.7'
+              delta_H0_kcal_mol: '-56.0 ± 4.1'
+              delta_S0_eu: '-38.3 ± 2.0'
+            - species: Co
+              E0_V: '-0.208 ± 0.014'
+              K_mol_L_atm: '0.062 ± 0.012'
+              delta_G0_kcal_mol: '9.6 ± 0.7'
+              delta_H0_kcal_mol: '-57.5 ± 7.4'
+              delta_S0_eu: '-38.9 ± 3.9'
+            - species: Ni
+              E0_V: '-0.330 ± 0.004'
+              K_mol_L_atm: '0.012 ± 0.001'
+              delta_G0_kcal_mol: '15.2 ± 0.2'
+              delta_H0_kcal_mol: '-47.9 ± 3.6'
+              delta_S0_eu: '-36.6 ± 2.0'
+            - species: Zn
+              E0_V: '-0.128 ± 0.004'
+              K_mol_L_atm: '0.180 ± 0.011'
+              delta_G0_kcal_mol: '5.9 ± 0.2'
+              delta_H0_kcal_mol: '-61.2 ± 3.8'
+              delta_S0_eu: '-38.9 ± 2.1'
+      - observation_id: semkow1984_text_standard_reduction_potential
+        type: experiment_series
+        locator: {page: 1, pdf_page_index: 0, published_page: 752, section: Abstract}
+        units: V
+        reason: No standard reduction-potential quantity token is available.
+        values:
+          quantity: standard_reduction_potential_E_star
+          method_class: measured_reduced
+          reaction_as_printed: O2(g) + 4e = 2O2-(diop)
+          value: '-0.73 ± 0.02'
+          temperature_C: 1450
+          reference: oxygen electrode equilibrated with oxygen at 1 atm

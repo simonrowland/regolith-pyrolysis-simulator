@@ -1,0 +1,49 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2013-cai-genesis-thermodynamics
+source:
+  citation: >-
+    Shornikov, S. I. (2013). Thermodynamics of Genesis of Ca–Al–Inclusions in
+    Chondrites. 76th Annual Meeting of the Meteoritical Society, abstract 5097.
+  year: 2013
+  doi: null
+  corpus_asset: raw/shornikov-2013-cai-genesis-thermodynamics/shornikov-2013-cai-genesis-thermodynamics.pdf
+  corpus_sha256: 389ebd1e4afe1c3d67070346437d387a668cd909fd147cc4d536b5c895e4e487
+extraction:
+  method: >-
+    Manual review of the one-page Meteoritical Society abstract 5097. MinerU
+    found no table. The 600 dpi page was read. The abstract criticizes other
+    calculations and prints no activity, pressure, Gibbs energy, or evaporation
+    coefficient.
+  date: '2026-10-20'
+  worker: t1372-w5
+review_status: draft
+species:
+  Al2O3:
+    observations: []
+    context:
+      - observation_id: shornikov_2013_5097_model_summary
+        type: model_summary
+        locator:
+          page: 1
+          pdf_page_index: 0
+          abstract: '5097'
+          section: Abstract
+        units: not applicable; no numeric target quantity is printed
+        values:
+          method_class: quoted_unattributed
+          system_as_printed: Ca–Al inclusions, discussed with CaO–MgO–Al2O3–SiO2
+          model_as_printed: semi-empirical model based on ideal associated solutions
+          temperature: not printed
+          measured_table: none
+          numeric_activities_pressures_or_coefficients: none printed
+          qualitative_result_as_printed: >-
+            The abstract says evaporation of the studied CAI compositions changes
+            the magnesium to silicon oxide ratio while the calcium to aluminum
+            oxide ratio stays constant. It criticizes Hertz–Knudsen coefficients,
+            partial-pressure balance equations, MELTS, and CMAS used by Grossman
+            and coauthors, and says a comparison with Knudsen effusion mass
+            spectrometry is satisfactory. No number from that comparison is printed.
+          reason: >-
+            No oxide activity, activity coefficient, partial pressure, vapour
+            species, partial Gibbs energy, or evaporation coefficient is printed
+            with a temperature and a composition.

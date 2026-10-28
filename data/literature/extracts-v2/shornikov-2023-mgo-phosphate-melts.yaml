@@ -1,0 +1,591 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2023-mgo-phosphate-melts.yaml
+observations:
+- observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_curve_1
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 61: the initial data are the Gibbs energies of formation
+        of the simple oxides MgO and P4O10 in the crystalline and liquid phases. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 1. Calculated lg a(MgO) at 1673 K.; panel=A
+  notices: []
+  source_id: shornikov-2023-mgo-phosphate-melts
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '2'
+    note: Curve 1. Calculated lg a(MgO) at 1673 K.; panel=A
+  read_from: pdf:shornikov-2023-mgo-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 1. Calculated lg a(MgO) at 1673 K.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_curve_3
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 61: the initial data are the Gibbs energies of formation
+        of the simple oxides MgO and P4O10 in the crystalline and liquid phases. The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Curve spans composition; no single mole percent is printed for this line.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study
+  admission:
+    status: rejected
+    reason: Continuous calculated curve has no discrete data markers; no numeric points are sampled.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 3. Calculated lg a(P4O10) at 1673 K.; panel=A
+  notices: []
+  source_id: shornikov-2023-mgo-phosphate-melts
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '2'
+    note: Curve 3. Calculated lg a(P4O10) at 1673 K.; panel=A
+  read_from: pdf:shornikov-2023-mgo-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Curve 3. Calculated lg a(P4O10) at 1673 K.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Curve spans composition; no single mole percent is printed for this line.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 62: symbols 4 and 10 are Ding et al. (2015);
+        symbol 5 is Oetting and McDonald (1963); symbols 6 and 7 are Lopatin et al. (1986); symbols 8 and 11 are Lopatin and
+        Semenov (1989). The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Cited comparison spans composition.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      component, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Ding et al. (2015); Oetting and McDonald (1963); Lopatin et al. (1986); Lopatin and Semenov (1989)
+  admission:
+    status: rejected
+    reason: Caption assigns symbols 4–8 to other papers. Coordinates were not read. Iwase et al. (1987) is cited in the text
+      for EMF activities at 1673 K over 8–14 mol% P4O10 and is not a symbol of this figure.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Symbols 4–8 on the P4O10 activity panel.; panel=A
+  notices: []
+  source_id: shornikov-2023-mgo-phosphate-melts
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '2'
+    note: Symbols 4–8 on the P4O10 activity panel.; panel=A
+  read_from: pdf:shornikov-2023-mgo-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The caption assigns these symbols to 1400, 1600, 1673 and 1800 K.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: Cited comparison spans composition.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_symbol_2
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Figure caption, published page 62: symbol 2 is the MgO activity from Ding
+        et al. (2015). The activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: Cited comparison spans composition.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, T_K, method_class, admission_status,
+      reason, component, curve_number, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Ding et al. (2015)
+  admission:
+    status: rejected
+    reason: Caption assigns symbol 2 to Ding et al. (2015), not a measurement of this article. Coordinates were not read.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Symbol 2 on the MgO activity panel.; panel=A
+  notices: []
+  source_id: shornikov-2023-mgo-phosphate-melts
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '2'
+    note: Symbol 2 on the MgO activity panel.; panel=A
+  read_from: pdf:shornikov-2023-mgo-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+        note: Symbol 2 on the MgO activity panel.; panel=A
+    composition:
+      state:
+        tag: unknown
+        reason: Cited comparison spans composition.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '2'
+- observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig3_partial_pressures
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: The panels are the compounds Mg3P2O8 and Mg2P2O7, not a composition series.
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, reason,
+      attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: the present study for lines 1–4; Lopatin for symbols 5–7
+  admission:
+    status: rejected
+    reason: Lines 1–4 are continuous calculated curves with no discrete markers. Symbols 5–7 are Lopatin and Semenov (1989)
+      and Lopatin et al. (1986), not measurements of this article. No pressure was read.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '3'
+        note: Lines 1–4 are calculated partial pressures of O2, Mg, PO and PO2 over Mg3P2O8 and Mg2P2O7. Symbols 5–7 are Knudsen
+          measurements from Lopatin.
+  notices: []
+  source_id: shornikov-2023-mgo-phosphate-melts
+  locator:
+    page: 5
+    published_page: 62
+    pdf_page_index: 4
+    figure: '3'
+    note: Lines 1–4 are calculated partial pressures of O2, Mg, PO and PO2 over Mg3P2O8 and Mg2P2O7. Symbols 5–7 are Knudsen
+      measurements from Lopatin.
+  read_from: pdf:shornikov-2023-mgo-phosphate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Fig. 3A spans about 1700–1900 K and Fig. 3B about 1400–1600 K.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The panels are the compounds Mg3P2O8 and Mg2P2O7, not a composition series.
+      locator:
+        page: 5
+        published_page: 62
+        pdf_page_index: 4
+        figure: '3'

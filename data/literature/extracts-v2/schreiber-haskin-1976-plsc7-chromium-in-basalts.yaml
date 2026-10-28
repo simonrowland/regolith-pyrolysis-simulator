@@ -1,0 +1,1212 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml
+observations:
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_BG_CrIII_fraction::T=1773.15:h=0b0c35e57947
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.6393175292945558099893654084'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.55'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=BG
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.2'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=BG
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_BG_CrII_fraction::T=1773.15:h=01134dab1f25
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.6393175292945558099893654084'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=BG
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.2'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=BG
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_B_CrIII_fraction::T=1773.15:h=03ce369ca9d1
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.001275606173500439925962071498'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=B
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.9'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=B
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_B_CrII_fraction::T=1773.15:h=9e71b4739c9a
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.001275606173500439925962071498'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=B
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.9'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=B
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_G_CrIII_fraction::T=1773.15:h=845b15872938
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '254.5168926727082047556908743'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=G
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.6'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=G
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_G_CrII_fraction::T=1773.15:h=836c0f07c943
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '254.5168926727082047556908743'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 2
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=G
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.6'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=G
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_YG_CrIII_fraction::T=1773.15:h=5b052c61559d
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 3
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=YG
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=YG
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
+- observation_id: schreiber-haskin-1976-plsc7-chromium-in-basalts::schreiber_1976_fig4_YG_CrVI_fraction::T=1773.15:h=ac71f1b80306
+  experiment_id: bd5c0c2ddbf02ce3306adc1f1022cb7382273480dcceed4a670678920fe60409::schreiber-haskin-1976-plsc7-chromium-in-basalts
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 6
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: schreiber-haskin-1976-plsc7-chromium-in-basalts
+  locator:
+    page: 9
+    published_page: 1229
+    pdf_page_index: 8
+    figure: '4'
+    note: panel=none; row=YG
+  read_from: pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    fO2_log:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+        note: panel=none; row=YG
+    composition:
+      state:
+        tag: unknown
+        reason: Table 3 has dashed, unreported oxide entries; the full composition is incomplete.
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 53.9 wt%
+          MgO: 29.3 wt%
+          Al2O3: 10.7 wt%
+          CaO: 5.7 wt%
+          Cr2O3: 0.5 wt%
+      locator:
+        page: 16
+        published_page: 1236
+        pdf_page_index: 15
+        table: '3'
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 9
+        published_page: 1229
+        pdf_page_index: 8
+        figure: '4'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:schreiber-haskin-1976-plsc7-chromium-in-basalts
+    parameters: []
+    output_unit: dimensionless fraction as printed
+    references: []
