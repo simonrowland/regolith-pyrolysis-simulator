@@ -18,6 +18,26 @@ extraction:
   date: '2026-10-18'
   worker: w9-1018
 review_status: draft
+fidelity_samples:
+  - path: species.Na2O.context[rego_1988_fig6_na2o_blast_furnace_slag_isoactivity].values.series[2].activity_label_as_published
+    value: '-7.56'
+    locator:
+      published_page: 658
+      pdf_page_index: 3
+      figure: '6'
+      note: >-
+        Figure 6 legend at 600 dpi. The open square under Log a(Na2O) is -7.56
+        at 10 wt pct Al2O3.
+  - species: Na2O
+    observation_id: rego_1988_fig6_sq_01
+    field: activity
+    value: '-7.56'
+    locator:
+      published_page: 658
+      pdf_page_index: 3
+      figure: '6'
+      note: >-
+        Figure 6 open square rego_1988_fig6_sq_01. Printed log a(Na2O) = -7.56.
 species:
   Na2O:
     observations:
@@ -3865,16 +3885,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.02'
+        series: '-7.56'
         marker_symbol: open square
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3193.91, 812.87). Read 2 stroke-bbox centre (3196.50, 812.00). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.37033 and s=0.13136, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3193.91, 812.87). Read 2 stroke-bbox centre (3196.50, 812.00). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.37033 and s=0.13136, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.02'
+        activity: '-7.56'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -3932,16 +3952,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.02'
+        series: '-7.56'
         marker_symbol: open square
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3552.25, 1051.13). Read 2 stroke-bbox centre (3551.00, 1055.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.41750 and s=0.10084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3552.25, 1051.13). Read 2 stroke-bbox centre (3551.00, 1055.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.41750 and s=0.10084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.02'
+        activity: '-7.56'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -3999,16 +4019,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.02'
+        series: '-7.56'
         marker_symbol: open square
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3927.59, 1254.70). Read 2 stroke-bbox centre (3928.50, 1253.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.46685 and s=0.07477, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3927.59, 1254.70). Read 2 stroke-bbox centre (3928.50, 1253.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.46685 and s=0.07477, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.02'
+        activity: '-7.56'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4066,16 +4086,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.02'
+        series: '-7.56'
         marker_symbol: open square
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (4278.22, 1464.32). Read 2 stroke-bbox centre (4278.00, 1463.50). Printed log a(Na2O) = -7.02. Printed axis ratios r=0.51292 and s=0.04792, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (4278.22, 1464.32). Read 2 stroke-bbox centre (4278.00, 1463.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.51292 and s=0.04792, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.02'
+        activity: '-7.56'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4133,16 +4153,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.53'
+        series: '-7.97'
         marker_symbol: open triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3753.46, 1533.94). Read 2 stroke-bbox centre (3756.50, 1533.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.44423 and s=0.03901, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3753.46, 1533.94). Read 2 stroke-bbox centre (3756.50, 1533.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.44423 and s=0.03901, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.53'
+        activity: '-7.97'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4200,16 +4220,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.53'
+        series: '-7.97'
         marker_symbol: open triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (4087.67, 1675.33). Read 2 stroke-bbox centre (4085.50, 1675.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.48810 and s=0.02090, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (4087.67, 1675.33). Read 2 stroke-bbox centre (4085.50, 1675.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.48810 and s=0.02090, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.53'
+        activity: '-7.97'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4267,16 +4287,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.56'
+        series: '-7.72'
         marker_symbol: open circle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3202.08, 977.18). Read 2 stroke-bbox centre (3205.00, 976.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.37154 and s=0.11032, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3202.08, 977.18). Read 2 stroke-bbox centre (3205.00, 976.50). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.37154 and s=0.11032, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.56'
+        activity: '-7.72'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4334,16 +4354,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.56'
+        series: '-7.72'
         marker_symbol: open circle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3488.79, 1183.21). Read 2 stroke-bbox centre (3487.50, 1182.00). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.40929 and s=0.08393, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3488.79, 1183.21). Read 2 stroke-bbox centre (3487.50, 1182.00). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.40929 and s=0.08393, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.56'
+        activity: '-7.72'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4401,16 +4421,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.56'
+        series: '-7.72'
         marker_symbol: open circle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3839.70, 1394.32). Read 2 stroke-bbox centre (3840.50, 1393.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.45543 and s=0.05689, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3839.70, 1394.32). Read 2 stroke-bbox centre (3840.50, 1393.50). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.45543 and s=0.05689, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.56'
+        activity: '-7.72'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4468,16 +4488,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.56'
+        series: '-7.72'
         marker_symbol: open circle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (4121.29, 1550.67). Read 2 stroke-bbox centre (4119.50, 1549.50). Printed log a(Na2O) = -7.56. Printed axis ratios r=0.49242 and s=0.03686, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (4121.29, 1550.67). Read 2 stroke-bbox centre (4119.50, 1549.50). Printed log a(Na2O) = -7.72. Printed axis ratios r=0.49242 and s=0.03686, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.56'
+        activity: '-7.72'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4535,16 +4555,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.97'
+        series: '-7.53'
         marker_symbol: open inverted triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3216.53, 718.83). Read 2 stroke-bbox centre (3217.00, 718.00). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.37321 and s=0.14341, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3216.53, 718.83). Read 2 stroke-bbox centre (3217.00, 718.00). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.37321 and s=0.14341, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.97'
+        activity: '-7.53'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4602,16 +4622,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.97'
+        series: '-7.53'
         marker_symbol: open inverted triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3519.33, 985.66). Read 2 stroke-bbox centre (3522.50, 985.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.41314 and s=0.10923, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3519.33, 985.66). Read 2 stroke-bbox centre (3522.50, 985.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.41314 and s=0.10923, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.97'
+        activity: '-7.53'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4669,16 +4689,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.97'
+        series: '-7.53'
         marker_symbol: open inverted triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (3994.25, 1129.20). Read 2 stroke-bbox centre (3994.00, 1127.00). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.47550 and s=0.09084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (3994.25, 1129.20). Read 2 stroke-bbox centre (3994.00, 1127.00). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.47550 and s=0.09084, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.97'
+        activity: '-7.53'
         printed_form: log10
         T_C: 1400
         composition_mol:
@@ -4736,16 +4756,16 @@ species:
         published_page: 658
         pdf_page_index: 3
         figure: '6'
-        series: '-7.97'
+        series: '-7.53'
         marker_symbol: open inverted triangle
         note: >-
-          600 dpi page pixels. Read 1 NCC centre (4235.69, 1381.09). Read 2 stroke-bbox centre (4234.00, 1380.50). Printed log a(Na2O) = -7.97. Printed axis ratios r=0.50730 and s=0.05858, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
+          600 dpi page pixels. Read 1 NCC centre (4235.69, 1381.09). Read 2 stroke-bbox centre (4234.00, 1380.50). Printed log a(Na2O) = -7.53. Printed axis ratios r=0.50730 and s=0.05858, Al2O3 mass fraction 0.10. Mole fractions use simulator.battery.migrate.oxide_molar_mass.
       standard_state: pure liquid Na2O at 1400 C
       units: log10 activity as printed
       values:
         quantity: activity
         method_class: figure_only
-        activity: '-7.97'
+        activity: '-7.53'
         printed_form: log10
         T_C: 1400
         composition_mol:

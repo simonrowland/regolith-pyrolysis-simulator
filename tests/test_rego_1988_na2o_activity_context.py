@@ -46,6 +46,16 @@ FIGURE_PINS = {
         "stored": {"Na2O": "0.16", "MgO": "0.2", "SiO2": "0.64"},
     },
 }
+FIG6_PRINTED_LEGEND = (
+    ("-7.53", "open inverted triangle", "10 wt pct", 4),
+    ("-7.53", "filled inverted triangle", "20 wt pct", 4),
+    ("-7.56", "open square", "10 wt pct", 4),
+    ("-7.56", "filled square", "20 wt pct", 4),
+    ("-7.72", "open circle", "10 wt pct", 4),
+    ("-7.72", "filled circle", "20 wt pct", 4),
+    ("-7.97", "open triangle", "10 wt pct", 2),
+    ("-7.97", "filled triangle", "20 wt pct", 0),
+)
 DEFERRED_FIGURES = {
     "rego_1988_fig1_equilibration_apparatus",
     "rego_1988_fig2_approach_to_equilibrium_compositions",
@@ -290,6 +300,38 @@ def test_rego_1988_tables_text_context_and_fig5_labels_are_pinned() -> None:
     assert vapor["values"]["method_class"] == "quoted_attributed"
 
 
+def _assert_fig6_activities_match_printed_legend(extract: dict) -> None:
+    """Figure 6 activities come from the printed legend, not from the audit CSV."""
+
+    figure = next(
+        row
+        for row in extract["species"]["Na2O"]["context"]
+        if row["observation_id"] == "rego_1988_fig6_na2o_blast_furnace_slag_isoactivity"
+    )
+    series = figure["values"]["series"]
+    assert [
+        (
+            item["activity_label_as_published"],
+            item["marker"],
+            item["Al2O3_content_as_published"],
+            item["marker_count"],
+        )
+        for item in series
+    ] == list(FIG6_PRINTED_LEGEND)
+    by_marker = {item["marker"]: item["activity_label_as_published"] for item in series}
+    assert len(by_marker) == len(series)
+    figure_rows = [
+        row
+        for row in extract["species"]["Na2O"]["observations"]
+        if row["locator"]["figure"] == "6"
+    ]
+    assert len(figure_rows) == 26
+    for row in figure_rows:
+        printed = by_marker[row["locator"]["marker_symbol"]]
+        assert row["values"]["activity"] == printed
+        assert row["locator"]["series"] == printed
+
+
 def test_rego_1988_figure_reads_match_the_audit_csv() -> None:
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     rows = _audit_rows()
@@ -340,6 +382,33 @@ def test_rego_1988_figure_reads_match_the_audit_csv() -> None:
     assert sum(row["figure"] == "6" for row in rows) == 26
     for path in FIGURE_CROPS.values():
         assert path.stat().st_size > 10000
+
+
+def test_rego_1988_fig6_activities_follow_the_printed_legend() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_fig6_activities_match_printed_legend(extract)
+
+
+def test_rego_1988_fig6_yaml_and_csv_relabel_fails_against_printed_legend() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    rows = _audit_rows()
+    relabelled = 0
+    for observation in extract["species"]["Na2O"]["observations"]:
+        if observation["locator"].get("marker_symbol") != "open square":
+            continue
+        if observation["locator"].get("figure") != "6":
+            continue
+        observation["locator"]["series"] = "-7.02"
+        observation["values"]["activity"] = "-7.02"
+        relabelled += 1
+    for row in rows:
+        if row["figure"] == "6" and row["marker"] == "open square":
+            row["series_label"] = "-7.02"
+            relabelled += 1
+    assert relabelled == 8
+    _assert_figure_rows_match(extract, rows)
+    with pytest.raises(AssertionError):
+        _assert_fig6_activities_match_printed_legend(extract)
 
 
 def test_rego_1988_figure_csv_or_yaml_mutation_fails() -> None:
