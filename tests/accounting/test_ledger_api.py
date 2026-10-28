@@ -29,7 +29,6 @@ def test_terminal_rump_class_projection_preserves_numeric_pin():
     }
 
 
-@pytest.mark.xfail(strict=True, reason="b-895: refractory trace oxides classified as other")
 @pytest.mark.parametrize("species", ["Y2O3", "Sc2O3", "ZrO2", "HfO2", "ThO2", "UO2"])
 @pytest.mark.parametrize("account", ["process.cleaned_melt", "terminal.slag"])
 def test_terminal_rump_classifies_refractory_trace_oxides(species, account):
