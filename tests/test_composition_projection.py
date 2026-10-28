@@ -10,7 +10,24 @@ from simulator.composition_projection import (
     classify_projected_bulk,
     format_projected_component_mol,
     projected_component_moles_per_kg,
+    _projected_liquidus_refusal_reason,
 )
+
+
+@pytest.mark.parametrize(
+    ('fraction', 'refused'), [(0.005, False), (0.006, True)],
+)
+def test_liquidus_veto_counts_total_original_bulk_fraction(fraction, refused):
+    reason = _projected_liquidus_refusal_reason({'dropped_components': [
+        {'component': 'MnO', 'mass_fraction': fraction},
+        {'component': 'P2O5', 'mass_fraction': fraction},
+    ]})
+    if refused:
+        assert reason.startswith('composition_projected_over_threshold:')
+        assert 'total=1.2 wt%' in reason
+        assert 'MnO' in reason and 'P2O5' in reason
+    else:
+        assert reason is None
 
 
 def test_one_wt_percent_boundary_is_within_threshold():
