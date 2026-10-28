@@ -259,7 +259,10 @@ def _mre_raw_graph_requirement(
     # the crystalline source voltage as provenance only; putting it back into
     # a yield gate would undo the fusion correction. The raw/fallback guard
     # still compares graph and static E0 when a graph query was refused.
-    if reference.authority == MRE_GRAPH_AUTHORITY:
+    if (
+        reference.authority == MRE_GRAPH_AUTHORITY
+        and reference.raw_graph_voltage_V != reference.voltage
+    ):
         return effective_requirement_V
     return effective_requirement_V + reference.raw_graph_voltage_V - reference.voltage
 
