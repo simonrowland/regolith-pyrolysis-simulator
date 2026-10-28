@@ -674,6 +674,20 @@ def test_reference_anchor_reproduces_controller_join_and_kems_column():
     assert summary["empirical_kems_total"] == 9
 
 
+def test_magma_report_discloses_alkali_exclusion_cost():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    reference_rows = benchmark.run_reference_anchors(fixture)
+
+    report = benchmark.generate_report(
+        fixture, [], [], [], reference_rows=reference_rows
+    )
+
+    assert (
+        "alkali exclusion cost: +0.63 dex; in-domain alkali RMSE: 1.72 dex"
+        in report
+    )
+
+
 def test_reference_anchor_refuses_tracked_snapshot_hash_mismatch():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     fixture["reference_anchors"]["imcc_magma"]["tracked_sha256"] = "0" * 64
