@@ -4773,8 +4773,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if (redox_state.get('origin') == 'closed_ledger'
                 and 'FE_FEO_SATURATION_BOUND' in redox_state.get('flags', ())):
             # Reuse the existing run-notice channel after activity selection.
-            # Below the cap this carries only a notice, never a claim that
-            # OpenIMCC ran. The bound is a stability limit, not an imposed x.
+            # Below the activity activation edge this carries only a notice. Once
+            # selected, preserve the activity evidence even below the vapour
+            # cap. The bound is a stability limit, not an imposed x.
             diagnostic.setdefault('high_t_melt_activity', {}).setdefault(
                 'notices', []).append({
                     'code': 'FE_FEO_SATURATION_BOUND',

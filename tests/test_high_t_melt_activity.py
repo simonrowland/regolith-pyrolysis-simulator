@@ -2218,7 +2218,11 @@ def test_cap_crossing_over_screen_emits_typed_notice() -> None:
     )
 
 
-@pytest.mark.parametrize('temperature_K', [CAP_MINUS_T_K, CAP_PLUS_T_K])
+@pytest.mark.parametrize('temperature_K', [
+    openimcc_bridge_module._temperature_domain_K()[0] - 0.1,
+    CAP_MINUS_T_K,
+    CAP_PLUS_T_K,
+])
 def test_closed_iw_bound_uses_existing_notice_container(temperature_K):
     from dataclasses import replace
 
@@ -2230,17 +2234,23 @@ def test_closed_iw_bound_uses_existing_notice_container(temperature_K):
     })
     result = _provider().dispatch(request)
     payload = result.diagnostic['high_t_melt_activity']
-    # The existing run-output container can carry just a notice below the
-    # cap; it must not claim OpenIMCC evaluation where none was requested.
+    # Activity evaluation begins at its own certified edge, below the vapour
+    # cap. Below the activity activation edge the container is notice-only.
     bound_notice, = (n for n in payload['notices']
                     if n['code'] == 'FE_FEO_SATURATION_BOUND')
     assert bound_notice['bound'] == 'lower'
     assert bound_notice['fO2_log'] == request.control_inputs['intrinsic_fO2_log']
-    if temperature_K < VAPOROCK_T_MAX_K:
-        assert set(payload) == {'notices'}
-    else:
+    activity_selected = vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K,
+        controls=request.control_inputs,
+        quantity_class='activity',
+    )
+    if activity_selected:
         assert payload['provider'] == 'openimcc'
         assert payload['fallback'] is False
+        assert payload['above_vaporock_cap'] is (temperature_K > VAPOROCK_T_MAX_K)
+    else:
+        assert set(payload) == {'notices'}
 
 
 def test_recipe_default_and_constant_gamma_escape_are_threaded() -> None:
