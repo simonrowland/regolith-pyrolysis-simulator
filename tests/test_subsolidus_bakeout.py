@@ -648,6 +648,16 @@ def test_joint_release_stays_within_pipe_capacity():
     sim._calculate_evaporation = _evaporate
     seen = {}
     transport_calls = []
+    inventory_at_flow_resolution = []
+    real_capacity = sim._controlled_o2_transport_capacity
+
+    def _capacity(flux, **kwargs):
+        inventory_at_flow_resolution.append(
+            sim.atom_ledger.kg_by_account(OVERHEAD_GAS_ACCOUNT)
+        )
+        return real_capacity(flux, **kwargs)
+
+    sim._controlled_o2_transport_capacity = _capacity
     real_estimate = sim.overhead_model.estimate_transport_state
 
     def _estimate(flux, melt, *args, **kwargs):
@@ -703,6 +713,8 @@ def test_joint_release_stays_within_pipe_capacity():
     sim._apply_c0_bakeout = _bakeout
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
     sim.step()
+    # Pending SO2/O2 is already in the joint inlet, not prior inventory.
+    assert inventory_at_flow_resolution[0] == {}
     pump_admitted = 2.0 * scale
     decision = [
         call for call in transport_calls

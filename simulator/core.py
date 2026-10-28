@@ -15666,10 +15666,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
-        self._commit_pending_subsolidus_release()
         effective_transport_capacity = (
             self._controlled_o2_transport_capacity(inlet_flux)
         )
+        # The joint inlet already includes the pending solid-host gas. Read
+        # prior holdup before committing that source into the same account.
+        self._commit_pending_subsolidus_release()
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
         )
@@ -15694,12 +15696,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     # same pre-tick holdup. Post-route overhead already holds
                     # this tick's source; reading it again counts that source
                     # twice and changes pressure after condenser routing.
-                    retained_holdup_kg=(
-                        effective_transport_capacity.retained_holdup_kg
-                        if effective_transport_capacity is not None
-                        else None
-                    ),
+                    retained_holdup_kg=effective_transport_capacity.retained_holdup_kg,
                 )
+                # Rejection can only reduce the inlet. A pipe inside its
+                # nominal band before routing cannot acquire an overload here.
+                if effective_transport_capacity is not None else None
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity
