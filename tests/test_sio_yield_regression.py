@@ -549,21 +549,12 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     )
 
     assert "wall_deposit_kg" in report
-    # This projection subtracts nearly equal bulk-melt SiO2 inventories.  The
-    # 03616bb20 Chapman-Enskog D_AB ratio (0.9879823545) changes wall routing
-    # and therefore the cancellation path.  On 2026-09-25 b-573 re-grounding,
-    # green treated the projected MAGEMin liquidus as unavailable and used the
-    # Kress floor (F=0 through 1200 C, then F=1); tip uses projected bounds.
-    # The first projected bounds are lunar 918.75--1370.3125 C after dropping
-    # 0.308801 wt% MnO+P2O5, and Mars 1018.75--1320.3125 C after dropping
-    # 0.880961 wt% P2O5.  Both drops are within the 1.0 wt% ruling bound.
-    # Derivation: the freeze-gate fraction enters the active redox capacity as
-    # C_m_effective = C_m_full * F, and each hour applies
-    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before the SiO
-    # route and terminal ledger cancellation.  Re-running the 24-hour report
-    # therefore re-grounds the two cancellation residuals, not a free tuning
-    # parameter; canonical atom-ledger closure remains independently bounded
-    # at 5e-12 percent.
+    # This projection subtracts nearly equal bulk-melt SiO2 inventories.
+    # b-899's prepared iron inventory and inverse-Kress potential change
+    # activities and SiO supply to the existing routing/cancellation path.
+    # The values below are route-subtraction residuals, not yields or a
+    # scalar n/C_m integration. Canonical atom-ledger closure remains
+    # independently bounded at 5e-12 percent.
     # b-850 round 2: corrected alkali dimer pressures slightly change melt
     # activities, SiO flux, and restored terminal capture. This is a residual
     # after subtracting nearly equal Si inventories, so the small route shift
@@ -571,9 +562,8 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     expected_closure_error_pct = {
         # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         "lunar_mare_low_ti": 2.715361335824935e-07,
-        # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
-        # from reservoir.fo2_buffer; the unbacked remainder is held and the
-        # resulting subtraction residual is reported by the production resolver.
+        # Each matrix has its own subtraction residual; a larger or smaller
+        # residual does not establish a change in recovered Si yield.
         # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         "mars_basalt": 2.8394928218105905e-07,
     }

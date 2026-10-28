@@ -213,15 +213,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # overstated D_AB by 1.216%. SiO/N2 at 1973.15 K and 1000 Pa moves
     # 0.0496927555 -> 0.0490955656 m^2/s. The 1050 C cold-liner Si+SiO2
     # deposit follows: 8.452523682217e-06 -> 8.191796266986e-06 (−3.085%).
-    # 2026-09-25 b-573 projected-bulk freeze-gate re-grounding: this helper's
-    # lunar 24-hour report now uses the projected 918.75--1370.3125 C bounds
-    # after the 0.308801 wt% MnO+P2O5 predict-and-flag drop, instead of the
-    # green Kress-floor step.  The derivation is C_m_effective = C_m_full * F,
-    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective, then the corrected
-    # wall route integrates the resulting Si/SiO2 flux as J * A * M * 3600,
-    # capped by available supply.  Re-grounding that executable chain moves
-    # the 1050 C product deposit, without changing the 1400/1500 C threshold
-    # zeros; this is a physics-derived pin, not a tuning adjustment.
+    # b-899: the prepared iron inventory and its inverse-Kress potential
+    # change SiO supply; source telemetry no longer advances a separate scalar.
+    # This fixture selects the unavailable-MAGEMin/Kress-floor path above.
+    # The unchanged wall owner integrates its supply-limited Si/SiO2 flux;
+    # the 1400/1500 C zero-deposit checks retain the temperature threshold.
     # b-732: fixed unavailable-MAGEMin scenario. The default report with real
     # MAGEMin yields 8.191905995448e-06 kg through its liquid-fraction/redox
     # inputs; this wall-step pin now passes with either engine config.
