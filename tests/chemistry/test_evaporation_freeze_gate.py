@@ -3647,6 +3647,14 @@ def test_registered_opaque_gate_suppliers_cannot_share_foreign_curve(
         'binding_revision': 'unproven-r1',
         'transport': 'unknown',
     }
+    assert notice['notices'][0]['governs'] == (
+        'cross-process cache replay and capture, plus '
+        'in-process gate-curve memo reuse'
+    )
+    message = notice['notices'][0]['message'].lower()
+    assert 'in-process gate-curve memo reuse' in message
+    assert 'gate curve is recomputed' in message
+    assert 'live computation and its value are unaffected' in message
 
 
 @pytest.mark.parametrize('memo_scope', ['local', 'shared'])
@@ -6041,12 +6049,16 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
                 'kind': 'engine_binding_not_admitted',
                 'identity': identity.as_dict(),
                 'reason': reason,
-                'governs': 'cross-process cache replay and capture only',
+                'governs': (
+                    'cross-process cache replay and capture, plus '
+                    'in-process gate-curve memo reuse'
+                ),
                 'message': (
                     'Engine binding not admitted on this host '
-                    f'({reason}); this only disables cross-process cache '
-                    'replay and capture. Live computation and its value are '
-                    'unaffected. To admit, run '
+                    f'({reason}); this disables cross-process cache replay '
+                    'and capture, plus in-process gate-curve memo reuse. '
+                    'The gate curve is recomputed; live computation and its '
+                    'value are unaffected. To admit, run '
                     'scripts/assess_engine_bindings.py'
                 ),
             }
@@ -6140,6 +6152,14 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
         assert [item['reason'] for item in notice['notices']] == [
             'install provenance unverifiable'
         ]
+        assert notice['notices'][0]['governs'] == (
+            'cross-process cache replay and capture, plus '
+            'in-process gate-curve memo reuse'
+        )
+        message = notice['notices'][0]['message'].lower()
+        assert 'in-process gate-curve memo reuse' in message
+        assert 'gate curve is recomputed' in message
+        assert 'live computation and its value are unaffected' in message
     else:
         assert notice is None
 

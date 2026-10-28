@@ -9,6 +9,7 @@ import os
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -91,6 +92,36 @@ class GateCurveEvidence:
     eligible: bool
     identity: BindingIdentity | None = None
     provenance: Mapping[str, Any] | None = None
+
+
+class _BindingAdmissionRefusalScope(Enum):
+    CROSS_PROCESS_CACHE_ONLY = (
+        "cross-process cache replay and capture only",
+        "this only disables cross-process cache replay and capture. Live "
+        "computation and its value are unaffected.",
+    )
+    GATE_CURVE_MEMO = (
+        "cross-process cache replay and capture, plus in-process "
+        "gate-curve memo reuse",
+        "this disables cross-process cache replay and capture, plus "
+        "in-process gate-curve memo reuse. The gate curve is recomputed; "
+        "live computation and its value are unaffected.",
+    )
+    SELECTED_BINDING_ONLY = (
+        "cross-process cache replay and capture for the selected binding only",
+        "this disables cross-process cache replay and capture for the "
+        "selected binding only. In-process gate-curve memo reuse remains "
+        "available for a fingerprinted primary producer. Live computation "
+        "and its value are unaffected.",
+    )
+
+    @property
+    def governs(self) -> str:
+        return self.value[0]
+
+    @property
+    def explanation(self) -> str:
+        return self.value[1]
 
 
 _SELECTED_PRODUCER_IDENTITIES = {
@@ -369,6 +400,7 @@ def _live_selected_binding_eligibility(
             sim,
             identity,
             "binding dependency selection unverifiable",
+            scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
         )
     eligible = True
     for identity in identities:
@@ -379,10 +411,16 @@ def _live_selected_binding_eligibility(
                 sim,
                 identity,
                 "install provenance unverifiable",
+                scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
             )
             eligible = False
             continue
-        if not live_cache_eligibility(sim, identity, provenance):
+        if not _live_cache_eligibility(
+            sim,
+            identity,
+            provenance,
+            refusal_scope=_BindingAdmissionRefusalScope.SELECTED_BINDING_ONLY,
+        ):
             eligible = False
     return eligible
 
@@ -506,6 +544,7 @@ def _live_binding_cache_evidence(
                 sim,
                 identity,
                 "install provenance unverifiable",
+                scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
             )
             selected_bindings_eligible()
             return GateCurveEvidence(
@@ -611,6 +650,7 @@ def _live_binding_cache_evidence(
                 sim,
                 identity,
                 "install provenance unverifiable",
+                scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
             )
             selected_bindings_eligible()
             return GateCurveEvidence(
@@ -670,6 +710,7 @@ def _live_binding_cache_evidence(
             sim,
             identity,
             "install provenance unverifiable",
+            scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
         )
         selected_bindings_eligible()
         return GateCurveEvidence(
@@ -809,6 +850,7 @@ def write_gate_curve_memo_record(
             ),
             "unproven gate producer; register its adapter; in-process reuse "
             "of this producer's gate curves is off",
+            scope=_BindingAdmissionRefusalScope.GATE_CURVE_MEMO,
         )
     redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
     origin = write_gate_curve_memo_origin(
@@ -1581,6 +1623,27 @@ def live_cache_eligibility(
     published_fingerprint: str | None = None,
     require_published_fingerprint: bool = False,
 ) -> bool:
+    return _live_cache_eligibility(
+        sim,
+        identity,
+        current_provenance,
+        receipt_path=receipt_path,
+        published_fingerprint=published_fingerprint,
+        require_published_fingerprint=require_published_fingerprint,
+        refusal_scope=_BindingAdmissionRefusalScope.CROSS_PROCESS_CACHE_ONLY,
+    )
+
+
+def _live_cache_eligibility(
+    sim: Any,
+    identity: BindingIdentity,
+    current_provenance: Mapping[str, Any],
+    *,
+    receipt_path: str | Path | None = None,
+    published_fingerprint: str | None = None,
+    require_published_fingerprint: bool = False,
+    refusal_scope: _BindingAdmissionRefusalScope,
+) -> bool:
     try:
         authorize_binding(
             identity,
@@ -1600,7 +1663,12 @@ def live_cache_eligibility(
                 "live binding was not admitted after initialization",
             )
     except EngineBindingAdmissionError as exc:
-        return _record_live_cache_refusal(sim, identity, exc.reason)
+        return _record_live_cache_refusal(
+            sim,
+            identity,
+            exc.reason,
+            scope=refusal_scope,
+        )
     return True
 
 
@@ -1608,6 +1676,8 @@ def _record_live_cache_refusal(
     sim: Any,
     identity: BindingIdentity,
     reason: str,
+    *,
+    scope: _BindingAdmissionRefusalScope,
 ) -> bool:
     notices = getattr(sim, "_engine_binding_admission_notices", None)
     if not isinstance(notices, list):
@@ -1615,7 +1685,7 @@ def _record_live_cache_refusal(
         sim._engine_binding_admission_notices = notices
     key = identity.as_dict()
     if not any(
-        notice.get("identity") == key
+        notice.get("identity") == key and notice.get("governs") == scope.governs
         for notice in notices
         if isinstance(notice, Mapping)
     ):
@@ -1625,12 +1695,10 @@ def _record_live_cache_refusal(
                 "kind": "engine_binding_not_admitted",
                 "identity": key,
                 "reason": reason,
-                "governs": "cross-process cache replay and capture only",
+                "governs": scope.governs,
                 "message": (
                     "Engine binding not admitted on this host "
-                    f"({reason}); this only disables cross-process cache "
-                    "replay and capture. Live computation and its value are "
-                    "unaffected. To admit, run "
+                    f"({reason}); {scope.explanation} To admit, run "
                     "scripts/assess_engine_bindings.py"
                 ),
             }

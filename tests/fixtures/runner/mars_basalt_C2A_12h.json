@@ -121,7 +121,8 @@
             "transport": "subprocess"
           },
           "reason": "receipt missing",
-          "message": "binding not admitted on this host (receipt missing); replay and capture disabled; run scripts/assess_engine_bindings.py"
+          "governs": "cross-process cache replay and capture only",
+          "message": "Engine binding not admitted on this host (receipt missing); this only disables cross-process cache replay and capture. Live computation and its value are unaffected. To admit, run scripts/assess_engine_bindings.py"
         }
       ]
     },
