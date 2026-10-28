@@ -164,11 +164,10 @@ def test_c0b_coevaporation_uses_hot_train_flux_and_debits_ledger(
     sim.melt.background_gas_species = "O2"
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
     sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
-    equilibrium = sim._get_equilibrium()
     sim.melt.campaign = CampaignPhase.C2B
-    hot_flux = sim._calculate_evaporation(equilibrium)
+    hot_flux = sim._calculate_evaporation(sim._get_equilibrium())
     sim.melt.campaign = CampaignPhase.C0B
-    cleanup_flux = sim._calculate_evaporation(equilibrium)
+    cleanup_flux = sim._calculate_evaporation(sim._get_equilibrium())
 
     # Same source state and gas cover: the cleanup label adds P carriers,
     # but must not suppress the ordinary hot-train evaporating species.
