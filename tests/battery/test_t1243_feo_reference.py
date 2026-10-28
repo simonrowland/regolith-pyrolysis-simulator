@@ -562,6 +562,11 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
     """A typed source Fe condition enables the d-305 closed redox solve."""
     rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
     assert len(rows) == 24
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.L
+        for row in rows
+    )
     context = _context(migration)
     for experiment_id in {row.experiment_id for row in rows}:
         experiment = context.experiments[experiment_id]
