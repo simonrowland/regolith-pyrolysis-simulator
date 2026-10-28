@@ -142,6 +142,17 @@ def _make_available_magemin(monkeypatch, fake_module):
     binary discovery and the Python-bridge import so no real MAGEMin
     install is required.
     """
+    # Successful fake bridge solves explicitly include native control evidence.
+    # Missing/mismatched readbacks are exercised independently in
+    # test_magemin_fo2_readback.py, without this success-only fixture.
+    original = getattr(fake_module, 'minimize', None)
+    if original is not None:
+        def native_solve(**kwargs):
+            raw = original(**kwargs)
+            if isinstance(raw, dict):
+                raw = {**raw, 'fO2': kwargs['log_fO2'], 'ph': ['qfm']}
+            return raw
+        fake_module = types.SimpleNamespace(minimize=native_solve)
     _disable_configured_magemin_path(monkeypatch)
     monkeypatch.setattr(
         MAGEMinBackend,
@@ -174,6 +185,11 @@ def _make_fake_magemin_cli_liquidus(monkeypatch):
             temperature_arg.split("=", 1)[1]
         )
         calls.append(args)
+        offset = float(next(a.split('=', 1)[1] for a in args if a.startswith('--buffer_n=')))
+        native = MAGEMinBackend._qfm_logfo2_oneill(temperature_C) + offset
+        output = Path(_kwargs['cwd']) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text(f'log10(fO2) {native:.12f}\n')
         liquid_fraction = max(
             0.0,
             min(1.0, (temperature_C - 1000.0) / 200.0),
@@ -1439,7 +1455,7 @@ def test_magemin_explicit_pymagemin_runtime_failure_retries_subprocess(monkeypat
 
     def fake_subprocess(**kwargs):
         fallback_calls.append(kwargs)
-        return {"phases": {"liq": {"mass_kg": 1.0}}}
+        return {"phases": {"liq": {"mass_kg": 1.0}}, "fO2": kwargs["fO2_log"], "ph": ["qfm"]}
 
     monkeypatch.setattr(
         backend,
@@ -1599,12 +1615,15 @@ def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
 
     def fake_run(args, **kwargs):
         calls.append((args, kwargs))
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text('log10(fO2) -9.0\n')
         return subprocess.CompletedProcess(
             args,
             0,
             stdout=(
-                'Phase :      cpx       ol       ol       ne      trd\n'
-                'Mode  :  0.00000  0.00025  0.00010  0.00047  0.66605\n'
+                'Phase :      cpx       ol       ol       ne      trd qfm\n'
+                'Mode  :  0.00000  0.00025  0.00010  0.00047  0.66605 0.0\n'
             ),
             stderr='',
         )
@@ -1706,7 +1725,7 @@ def test_magemin_explicit_julia_runtime_failure_retries_subprocess(monkeypatch):
 
     def fake_subprocess(**kwargs):
         fallback_calls.append(kwargs)
-        return {"phases": {"liq": {"mass_kg": 1.0}}}
+        return {"phases": {"liq": {"mass_kg": 1.0}}, "fO2": kwargs["fO2_log"], "ph": ["qfm"]}
 
     monkeypatch.setattr(
         backend,
@@ -2335,7 +2354,7 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
             phases["liq"] = {"mass_kg": frac}
         if frac < 1.0:
             phases["ol"] = {"mass_kg": 1.0 - frac}
-        return {"phases": phases, "converged": True}
+        return {"phases": phases, "converged": True, "fO2": _kwargs["fO2_log"], "ph": ["qfm"]}
 
     backend._call_magemin = fake_call
     bulk = {"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0}
@@ -3288,20 +3307,12 @@ def test_magemin_live_smoke_runs_real_binary(request):
         pressure_bar=2000.0,
     )
 
-    # No library-boundary error. Oxides with no ig endmember (P2O5/MnO/NiO/CoO)
-    # are a composition_projected refusal, tested separately; this live smoke
-    # stays inside the documented ig bulk order.
-    assert result.status == "ok", result.warnings
-    assert not any("failed" in w for w in result.warnings), result.warnings
-    # MAGEMin reports a phase assemblage including a silicate liquid.
-    assert result.phases_present
-    assert any(
-        name.lower().startswith("liq") for name in result.phases_present
-    ), result.phases_present
-    assert result.phase_masses_kg
-    # At 1200 C this analog is liquid-dominated.
-    assert 0.0 < result.liquid_fraction <= 1.0
-    # Shadow posture: MAGEMin holds no AtomLedger authority, ever.
+    # This bulk loses its buffer at these controls despite native status=0.
+    assert result.status == 'not_converged'
+    assert result.diagnostics['buffer_phase_present'] is False
+    assert result.diagnostics['authoritative_for_requested_conditions'] is False
+    assert result.diagnostics['solved_fO2_log'] == pytest.approx(-9.3179, abs=1e-5)
+    assert result.phase_masses_kg == {}
     assert result.ledger_transition is None
     assert backend.ledger_account_policies() == ()
 
@@ -3340,7 +3351,12 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     )
     assert result.status == "ok", result.warnings
 
-    projection = backend._build_db_bulk_projection(composition)
+    from simulator.melt_backend.base import project_melt_to_oxide_projection
+    input_projection = project_melt_to_oxide_projection(
+        composition_kg=composition, composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(input_projection.oxide_wt_pct)
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
@@ -3348,6 +3364,7 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
         temperature_C=temperature_C,
         fO2_log=fO2_log,
     )
+    buffer_n = result.diagnostics['applied_fO2_buffer_n']
     direct_args = [
         str(_LIVE_MAGEMIN_BINARY.resolve()),
         "--Verb=1",
@@ -3397,11 +3414,11 @@ def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
         output = Path(cwd) / "output"
         output.mkdir()
         (output / "_matlab_output.txt").write_text(
-            "aMgO nan\naSiO2 +8.9e-1\n"
+            "log10(fO2) -9.0\naMgO nan\naSiO2 +8.9e-1\n"
         )
         return types.SimpleNamespace(
             returncode=0,
-            stdout="Status : 0 [success]\nPhase : liq\nMode  : 1.000000\n",
+            stdout="Status : 0 [success]\nPhase : liq qfm\nMode  : 1.000000 0.000000\n",
             stderr="",
         )
 
@@ -3420,7 +3437,7 @@ def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
     assert result.diagnostics["backend_status_reason"] == "engine_not_converged"
     assert result.diagnostics["magemin_native_activity_invalid"] is True
     assert result.diagnostics["magemin_solver_status"] == 0
-    assert result.diagnostics["magemin_native_phase"] == ("liq",)
+    assert result.diagnostics["magemin_native_phase"] == ("liq", "qfm")
     assert result.activity_coefficients == {}
 
 
@@ -3750,13 +3767,16 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(
     class FakeCompleted:
         returncode = 0
         stderr = ""
-        stdout = "Phase : liq\nMode  : 1.000\n"
+        stdout = "Phase : liq qfm\nMode  : 1.000 0.000\n"
 
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
         captured["cwd"] = kwargs.get("cwd")
         child_env = kwargs.get("env")
         captured["env"] = dict(os.environ if child_env is None else child_env)
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text('log10(fO2) -8.0\n')
         return FakeCompleted()
 
     fake_binary = tmp_path / "MAGEMin"
@@ -3972,7 +3992,8 @@ def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
         fO2_log=-8.0,
         pressure_bar=2000.0,
     )
-    assert result.status == "ok", result.warnings
+    assert result.status == "not_converged", result.warnings
+    assert result.diagnostics["buffer_phase_present"] is False
 
     size_after = dump_path.stat().st_size if dump_path.exists() else 0
     assert size_after == size_before
@@ -4131,6 +4152,9 @@ def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
 
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir(exist_ok=True)
+        (output / '_matlab_output.txt').write_text('log10(fO2) -7.0\n')
         return FakeCompleted()
 
     monkeypatch.setattr(
@@ -4163,11 +4187,11 @@ def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
     assert any(arg == "--buffer=mw" for arg in captured["args"])
     assert any(arg == "--buffer_n=0.000000" for arg in captured["args"])
     assert result.status == "out_of_domain"
-    assert result.fO2_log == -12.0
+    assert result.fO2_log == -7.0
     assert result.diagnostics["operating_point_clamped"] is True
     assert result.diagnostics["fO2_clamped"] is True
     assert result.diagnostics["requested_fO2_log"] == -12.0
-    assert result.diagnostics["solved_fO2_log"] is None
+    assert result.diagnostics["solved_fO2_log"] == -7.0
     assert result.diagnostics["applied_fO2_buffer"] == "mw"
     assert result.diagnostics["authoritative_for_requested_conditions"] is False
 
