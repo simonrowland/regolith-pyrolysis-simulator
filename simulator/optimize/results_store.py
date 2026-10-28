@@ -1529,17 +1529,10 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
     for gate, item in payload.items():
         threshold = item["threshold"]
         gate_name = str(item["gate"])
-        authoritative_default = not (
-            gate_name == "coating" and "authoritative" not in item
-        )
-        authoritative_raw = (
-            item["authoritative"]
-            if "authoritative" in item
-            else authoritative_default
-        )
-        status_value = str(item.get("status", "available"))
+        authoritative_raw = item.get("authoritative", False)
+        status_value = str(item.get("status", "warning"))
         authoritative_value = _strict_bool(authoritative_raw)
-        output_status = str(item.get("output_status", "authoritative"))
+        output_status = str(item.get("output_status", "status_bearing"))
         status_reason = str(item.get("status_reason", ""))
         status_payload = (
             _jsonable(item.get("status_payload", {}))
