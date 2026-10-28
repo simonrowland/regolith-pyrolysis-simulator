@@ -14,8 +14,8 @@
   "pdf_page": 219,
   "page": 213,
   "name_as_published": "FAYALITE",
-  "formula_as_published": "Fe 2 Si0 4",
-  "formula": "Fe 2 Si0 4",
+  "formula_as_published": "Fe2SiO4",
+  "formula": "Fe2SiO4",
   "phase": "Crystals 298.15° to melting point 1490°K. Liquid 1490' to 2000°K.",
   "gram_formula_weight": {
     "as_published": "203.778",
@@ -1831,6 +1831,14 @@
   ],
   "corrections": [
     {
+      "correction_id": "b1259-p219-formula_as_published",
+      "pdf_page": 219,
+      "field": "formula_as_published",
+      "layout_as_extracted": "Fe 2 Si0 4",
+      "printed_token": "Fe2SiO4",
+      "evidence": "PDF page 219 image visibly prints 'Fe2SiO4'"
+    },
+    {
       "correction_id": "b1259-p219-temperature-01",
       "pdf_page": 219,
       "field": "temperature",
@@ -1860,11 +1868,11 @@
       "field": "H_minus_H298",
       "layout_as_extracted": "23.310",
       "printed_token": "28.310",
-      "correction_provenance": "image_read_reconstruction",
       "evidence": "1000 | 28.310 | 82.78 | 54.47",
       "record_id": "b1259-ht-0188-fayalite",
       "ocr_token": "23.310",
-      "image_quote": "1000 | 28.310 | 82.78 | 54.47"
+      "image_quote": "1000 | 28.310 | 82.78 | 54.47",
+      "correction_provenance": "image_read_reconstruction"
     }
   ],
   "record_id": "b1259-ht-0188-fayalite",

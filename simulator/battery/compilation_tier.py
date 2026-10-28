@@ -60,7 +60,10 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
-from simulator.battery.polymorph_dictionary import canonical_element_allotrope
+from simulator.battery.polymorph_dictionary import (
+    canonical_element_allotrope,
+    unrecognised_polymorph_spelling,
+)
 from simulator.battery.records import (
     DecisionBand,
     Notice,
@@ -1176,7 +1179,12 @@ def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
 
 def _poly_name(identity: Identity) -> str | None:
     poly = polymorph_token(identity.species)
-    return None if poly is None else poly.value
+    if poly is not None:
+        return poly.value
+    state = identity.species.polymorph
+    if state is not None and state.is_unknown:
+        return unrecognised_polymorph_spelling(state.reason)
+    return None
 
 
 def _same_mineral(engine_poly: str | None, identity_poly: str | None) -> bool:
