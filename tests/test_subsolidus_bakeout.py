@@ -311,6 +311,25 @@ def _sulfate_reaction(**overrides):
     return reaction
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+def test_competing_bakeout_channels_refuse_before_host_allocation(reverse):
+    reactions = [_sulfate_reaction(reaction_id=name) for name in ("a", "b")]
+    if reverse:
+        reactions.reverse()
+    result = _dispatch_bakeout(
+        temperature_C=726.85,
+        vapour_batch_flux_pressures_Pa={"SO2": 20.0},
+        solid_host_area_m2=1.0, max_throughput_kg_hr=1e6, dt_hr=1.0,
+        alpha={"SO2": 0.4},
+        molar_mass_kg_mol={s: _molar(s) for s in ("SO2", "O2", "CaO")},
+        reactions=reactions,
+    )
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "competing_solid_host_channels"
+    assert result.transition is None
+    assert not result.diagnostic.get("accepted_extent_mol_by_reaction")
+
+
 def test_solid_host_below_400_k_is_unavailable():
     result = _dispatch_bakeout(
         temperature_C=25.0,

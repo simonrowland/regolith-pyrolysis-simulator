@@ -8,6 +8,10 @@ salt bucket).  Assertions use published stoichiometry, not simulator parity.
 from __future__ import annotations
 
 from pathlib import Path
+import json
+import os
+import subprocess
+import sys
 
 import pytest
 
@@ -29,6 +33,74 @@ def _sim(feedstocks):
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _limiting_carbon_probe(carbon_mol=1.0):
+    from tests.test_subsolidus_bakeout import _molar
+
+    host_kg = {"CaSO4": _molar("CaSO4"), "FeSO4": 2 * _molar("FeSO4")}
+    # 1000 kg batch: wt% = kg / 10. One CaSO4 and two FeSO4 each
+    # claim one mol C, so the full demand is two mol C.
+    feed = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": carbon_mol * _molar("C"),
+            "cation_sulfate_product": "oxide",
+            "reactions": ["sulfate_so3_to_so2_co"],
+        },
+        "composition_wt_pct": {
+            "SiO2": 100 - sum(host_kg.values()) / 10,
+            **{s: kg / 10 for s, kg in host_kg.items()},
+        },
+    }
+    sim = _sim({"feed": feed})
+    sim.load_batch("feed", mass_kg=1000, additives_kg={"C": carbon_mol * _molar("C")})
+    sim.atom_ledger.assert_balanced()
+    consumed = sum(
+        amounts.get("C", 0.0) / _molar("C")
+        for spec in sim._stage0_carbon_cleanup_specs
+        for account, amounts, _origin in spec["debits"]
+        if account == "process.reagent_inventory"
+    )
+    return {
+        "ledger": sim.atom_ledger.mol_by_account(),
+        "reserved": sim._stage0_bakeout_reserved_carbon_kg / _molar("C"),
+        "consumed": consumed,
+    }
+
+
+def _carbon_seed(seed):
+    result = subprocess.run(
+        [sys.executable, "-c", "import json; from tests.test_stage0_cation_routing "
+         "import _limiting_carbon_probe; print(json.dumps(_limiting_carbon_probe()))"],
+        cwd=REPO_ROOT, env={**os.environ, "PYTHONHASHSEED": str(seed)},
+        text=True, capture_output=True, check=True, timeout=120,
+    )
+    return json.loads(result.stdout)
+
+
+def test_carbon_seed5_numeric_pin():
+    result = _carbon_seed(5)
+    assert result["ledger"]["process.cleaned_melt"]["Fe2O3"].hex() == "0x1.ffffffffffffep-1"
+    assert result["ledger"]["terminal.offgas"]["SO2"].hex() == "0x1.ffffffffffffep+0"
+    assert result["reserved"] == 0.0
+
+
+def test_sulfate_carbon_allocation_ignores_hash_seed():
+    first, second = (_carbon_seed(seed) for seed in (1, 5))
+    assert first == second
+    # FeSO4's sourced decomposition row releases more Gibbs energy per C
+    # at the default Stage-0 endpoint (1323.15 K) than CaSO4's row.
+    assert first["ledger"]["process.cleaned_melt"]["Fe2O3"] == pytest.approx(1.0)
+    assert first["ledger"]["terminal.offgas"]["SO2"] == pytest.approx(2.0)
+    assert first["reserved"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize("carbon_mol", [0.25, 1.0, 1.5, 2.0])
+def test_sulfate_carbon_claims_share_one_budget(carbon_mol):
+    result = _limiting_carbon_probe(carbon_mol)
+    assert result["reserved"] + result["consumed"] <= carbon_mol + 1e-12
+    assert result["reserved"] + result["consumed"] == pytest.approx(carbon_mol)
 
 
 def _carbonate_decomposition_extent(
