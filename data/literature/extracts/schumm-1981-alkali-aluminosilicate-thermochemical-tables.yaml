@@ -898,7 +898,379 @@ species:
         series:
         - T_K: 298
           entropy: 31.95
+  KAlSiO4:
+    observations:
+    - observation_id: schumm81_kaliophilite_cp
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: cp
+      phase: cr
+      standard_state: solid kaliophilite as printed
+      units: cal/deg-mole
+      values:
+        quantity: cp
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: No separate Cp source annotation is printed.
+        series:
+        - T_K: 298
+          cp: 28.63
+          printed_row_index: 3
+        - T_K: 300
+          cp: 28.73
+          printed_row_index: 4
+        - T_K: 400
+          cp: 33.05
+          printed_row_index: 5
+        - T_K: 500
+          cp: 35.98
+          printed_row_index: 6
+        - T_K: 600
+          cp: 38.37
+          printed_row_index: 7
+        - T_K: 700
+          cp: 40.5
+          printed_row_index: 8
+        - T_K: 800
+          cp: 42.49
+          printed_row_index: 9
+        - T_K: 810
+          cp: 42.68
+          printed_row_index: 10
+        - T_K: 810
+          cp: 42.5
+          printed_row_index: 11
+        - T_K: 900
+          cp: 42.5
+          printed_row_index: 12
+        - T_K: 1000
+          cp: 42.5
+          printed_row_index: 13
+        - T_K: 1100
+          cp: 42.5
+          printed_row_index: 14
+        - T_K: 1200
+          cp: 42.5
+          printed_row_index: 15
+        - T_K: 1300
+          cp: 42.5
+          printed_row_index: 16
+        - T_K: 1400
+          cp: 42.5
+          printed_row_index: 17
+        - T_K: 1500
+          cp: 42.5
+          printed_row_index: 18
+        - T_K: 1600
+          cp: 42.5
+          printed_row_index: 19
+        - T_K: 1700
+          cp: 42.5
+          printed_row_index: 20
+        - T_K: 1800
+          cp: 42.5
+          printed_row_index: 21
+    - observation_id: schumm81_kaliophilite_H_minus_H298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: H_minus_H298
+      phase: cr
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: H_minus_H298
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'H−H298 and S−S298: 68PAN.'
+        series:
+        - T_K: 298
+          enthalpy_increment: 0.0
+          printed_row_index: 3
+        - T_K: 300
+          enthalpy_increment: 0.05
+          printed_row_index: 4
+        - T_K: 400
+          enthalpy_increment: 3.16
+          printed_row_index: 5
+        - T_K: 500
+          enthalpy_increment: 6.62
+          printed_row_index: 6
+        - T_K: 600
+          enthalpy_increment: 10.34
+          printed_row_index: 7
+        - T_K: 700
+          enthalpy_increment: 14.28
+          printed_row_index: 8
+        - T_K: 800
+          enthalpy_increment: 18.43
+          printed_row_index: 9
+        - T_K: 810
+          enthalpy_increment: 18.86
+          printed_row_index: 10
+        - T_K: 810
+          enthalpy_increment: 19.03
+          printed_row_index: 11
+        - T_K: 900
+          enthalpy_increment: 22.85
+          printed_row_index: 12
+        - T_K: 1000
+          enthalpy_increment: 27.1
+          printed_row_index: 13
+        - T_K: 1100
+          enthalpy_increment: 31.35
+          printed_row_index: 14
+        - T_K: 1200
+          enthalpy_increment: 35.6
+          printed_row_index: 15
+        - T_K: 1300
+          enthalpy_increment: 39.85
+          printed_row_index: 16
+        - T_K: 1400
+          enthalpy_increment: 44.1
+          printed_row_index: 17
+        - T_K: 1500
+          enthalpy_increment: 48.35
+          printed_row_index: 18
+        - T_K: 1600
+          enthalpy_increment: 52.6
+          printed_row_index: 19
+        - T_K: 1700
+          enthalpy_increment: 56.85
+          printed_row_index: 20
+        - T_K: 1800
+          enthalpy_increment: 61.1
+          printed_row_index: 21
+    - observation_id: schumm81_kaliophilite_delta_fH
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: delta_fH
+      phase: cr
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fH
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 66BAR/ADA.'
+        series:
+        - T_K: 298
+          delta_fH: -506.4
+          printed_row_index: 3
+          sigma: 0.5
+        - T_K: 300
+          delta_fH: -506.41
+          printed_row_index: 4
+        - T_K: 400
+          delta_fH: -507.14
+          printed_row_index: 5
+        - T_K: 500
+          delta_fH: -507.06
+          printed_row_index: 6
+        - T_K: 600
+          delta_fH: -506.8
+          printed_row_index: 7
+        - T_K: 700
+          delta_fH: -506.4
+          printed_row_index: 8
+        - T_K: 800
+          delta_fH: -505.88
+          printed_row_index: 9
+        - T_K: 810
+          delta_fH: -505.82
+          printed_row_index: 10
+        - T_K: 810
+          delta_fH: -505.65
+          printed_row_index: 11
+        - T_K: 900
+          delta_fH: -505.17
+          printed_row_index: 12
+        - T_K: 1000
+          delta_fH: -507.26
+          printed_row_index: 13
+        - T_K: 1100
+          delta_fH: -506.81
+          printed_row_index: 14
+        - T_K: 1200
+          delta_fH: -506.41
+          printed_row_index: 15
+        - T_K: 1300
+          delta_fH: -506.06
+          printed_row_index: 16
+        - T_K: 1400
+          delta_fH: -505.76
+          printed_row_index: 17
+        - T_K: 1500
+          delta_fH: -505.5
+          printed_row_index: 18
+        - T_K: 1600
+          delta_fH: -505.29
+          printed_row_index: 19
+        - T_K: 1700
+          delta_fH: -517.11
+          printed_row_index: 20
+        - T_K: 1800
+          delta_fH: -516.92
+          printed_row_index: 21
+      uncertainty:
+        confidence_level: not_stated
+        note: Printed ±0.50 kcal/mol applies to the 298 K formation enthalpy anchor only; confidence level not stated.
+    - observation_id: schumm81_kaliophilite_delta_fG
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: delta_fG
+      phase: cr
+      standard_state: solid kaliophilite as printed
+      units: kcal/mol
+      values:
+        quantity: delta_fG
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'ΔfH298: 66BAR/ADA; no separate ΔfG source annotation is printed.'
+        series:
+        - T_K: 298
+          delta_fG: -478.71
+          printed_row_index: 3
+        - T_K: 300
+          delta_fG: -478.53
+          printed_row_index: 4
+        - T_K: 400
+          delta_fG: -469.1
+          printed_row_index: 5
+        - T_K: 500
+          delta_fG: -459.6
+          printed_row_index: 6
+        - T_K: 600
+          delta_fG: -450.13
+          printed_row_index: 7
+        - T_K: 700
+          delta_fG: -440.72
+          printed_row_index: 8
+        - T_K: 800
+          delta_fG: -431.37
+          printed_row_index: 9
+        - T_K: 810
+          delta_fG: -430.44
+          printed_row_index: 10
+        - T_K: 810
+          delta_fG: -430.44
+          printed_row_index: 11
+        - T_K: 900
+          delta_fG: -422.11
+          printed_row_index: 12
+        - T_K: 1000
+          delta_fG: -412.72
+          printed_row_index: 13
+        - T_K: 1100
+          delta_fG: -403.29
+          printed_row_index: 14
+        - T_K: 1200
+          delta_fG: -393.89
+          printed_row_index: 15
+        - T_K: 1300
+          delta_fG: -384.53
+          printed_row_index: 16
+        - T_K: 1400
+          delta_fG: -375.2
+          printed_row_index: 17
+        - T_K: 1500
+          delta_fG: -365.88
+          printed_row_index: 18
+        - T_K: 1600
+          delta_fG: -356.58
+          printed_row_index: 19
+        - T_K: 1700
+          delta_fG: -347.19
+          printed_row_index: 20
+        - T_K: 1800
+          delta_fG: -337.19
+          printed_row_index: 21
+    - observation_id: schumm81_kaliophilite_S298
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 28
+        published_page: 22
+        pdf_page_index: 27
+        note: Printed heading KAlSiO4 kaliophilite; no numbered table caption.
+        column: S298
+      phase: cr
+      standard_state: solid kaliophilite as printed
+      units: cal/deg-mole
+      unit_as_printed: cal/deg,mol
+      uncertainty:
+        confidence_level: not_stated
+        S298: +/- 0.30 cal/deg,mol
+        note: Confidence level not stated.
+      values:
+        quantity: S
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        primary_sources_as_printed: 'S298: 53KEL/TOD.'
+        series:
+        - T_K: 298
+          entropy: 31.85
 fidelity_samples:
+  - path: species.KAlSiO4.observations[schumm81_kaliophilite_cp].values.series[0]
+    value:
+      T_K: 298
+      cp: 28.63
+      printed_row_index: 3
+    locator:
+      page: 28
+      published_page: 22
+    note: 298 K cp cell from the rendered printed table.
+  - path: species.KAlSiO4.observations[schumm81_kaliophilite_H_minus_H298].values.series[0]
+    value:
+      T_K: 298
+      enthalpy_increment: 0.0
+      printed_row_index: 3
+    locator:
+      page: 28
+      published_page: 22
+    note: 298 K H_minus_H298 cell from the rendered printed table.
+  - path: species.KAlSiO4.observations[schumm81_kaliophilite_delta_fH].values.series[0]
+    value:
+      T_K: 298
+      delta_fH: -506.4
+      printed_row_index: 3
+      sigma: 0.5
+    locator:
+      page: 28
+      published_page: 22
+    note: 298 K delta_fH cell from the rendered printed table.
+  - path: species.KAlSiO4.observations[schumm81_kaliophilite_delta_fG].values.series[0]
+    value:
+      T_K: 298
+      delta_fG: -478.71
+      printed_row_index: 3
+    locator:
+      page: 28
+      published_page: 22
+    note: 298 K delta_fG cell from the rendered printed table.
+  - path: species.KAlSiO4.observations[schumm81_kaliophilite_S298].values.series[0]
+    value:
+      T_K: 298
+      entropy: 31.85
+    locator:
+      page: 28
+      published_page: 22
+    note: S298 cell is copied from the table heading.
+
   - path: species.NaAlSi2O6.observations[schumm81_jadeite_cp].values.series[0]
     value:
       T_K: 298
