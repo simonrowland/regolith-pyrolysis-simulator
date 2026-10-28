@@ -3855,7 +3855,10 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
             "pO2_bar": sim._headspace_transport_pO2_bar(),
-            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            "intrinsic_fO2_log": sim._current_melt_redox_fO2_log(),
+            "melt_redox_state": {
+                "origin": "closed_ledger", **sim._last_intrinsic_redox_state,
+            },
             "process_phase": "stage0",
         },
     )
@@ -3969,7 +3972,10 @@ def test_shadow_parity_across_short_simulation_run(
             pressure_bar=sim.melt.p_total_mbar / 1000.0,
             control_inputs={
                 "pO2_bar": sim._headspace_transport_pO2_bar(),
-                "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+                "intrinsic_fO2_log": sim._current_melt_redox_fO2_log(),
+                "melt_redox_state": {
+                    "origin": "closed_ledger", **sim._last_intrinsic_redox_state,
+                },
             },
         )
         kernel_vp = dict(
@@ -4052,7 +4058,10 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
             "pO2_bar": sim._headspace_transport_pO2_bar(),
-            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            "intrinsic_fO2_log": sim._current_melt_redox_fO2_log(),
+            "melt_redox_state": {
+                "origin": "closed_ledger", **sim._last_intrinsic_redox_state,
+            },
             "process_phase": "stage0",
         },
     )
