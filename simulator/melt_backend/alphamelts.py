@@ -2152,12 +2152,16 @@ class _MELTSBackendSupport(MeltBackend):
                 raise ValueError('cooling path invalid phase thermodynamics')
         masses = {name: data['reference_mass_kg']
                   for name, data in phases['phase_thermo'].items()}
-        liquid_mass = masses.get('liquid', 0.0)
         total_mass = sum(masses.values())
         fraction = float(row['F'])
-        if (total_mass <= 0 or not 0 <= fraction <= 1
+        try:
+            self._resolve_ok_liquid_fraction(
+                liquid_fraction=fraction, phase_masses_kg=masses,
+            )
+        except LiquidFractionInvalidError as exc:
+            raise ValueError('cooling path liquid fraction disagrees with phases') from exc
+        if (not 0 <= fraction <= 1
                 or abs(total_mass * 1000 - float(row['mass'])) > .001
-                or abs(liquid_mass / total_mass - fraction) > 1.e-6
                 or (melt_regime(liquid_fraction=fraction, epsilon=0) is MeltRegime.FROZEN
                     and any(p['phase'] == 'liquid' for p in instances))):
             raise ValueError('cooling path liquid fraction disagrees with phases')
