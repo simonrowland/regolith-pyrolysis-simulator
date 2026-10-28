@@ -177,15 +177,34 @@ def test_silica_glass_reads_stage_3_collected_kg():
     }
 
 
-def test_silica_glass_zero_when_stage_3_missing():
-    """No stage 3 in the train → zero capture, no crash."""
+def test_silica_glass_capture_is_unavailable_when_stage_3_is_missing():
     sim = SimpleNamespace(
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=None,
     )
     result = classify_products(sim)
-    assert result['pure_silica_glass']['stage_3_capture_kg'] == 0.0
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] is None
+    assert silica['flag']['status'] == 'unavailable'
+    assert silica['flag']['reason']
+    assert silica['stage_3_kg_by_species'] == {}
+
+
+def test_silica_glass_capture_is_zero_when_stage_3_exists_with_no_collection():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(
+            stages=[None, None, None, SimpleNamespace(collected_kg={})],
+        ),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+
+    silica = result['pure_silica_glass']
+    assert silica['stage_3_capture_kg'] == 0.0
+    assert 'flag' not in silica
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
