@@ -1038,9 +1038,11 @@ def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
         return 2.0 * interpolate(submelt_points, T_K)
 
     segments = ellingham_fit_segments("Na")
+    # The below-table conversion uses the nearest, lowest-T alpha segment.
+    # Near Tm the active fusion-constrained alpha segment is used directly.
     alpha_gas = next(
         segment
-        for segment in reversed(segments)
+        for segment in segments
         if "Na(g)" in segment.phase_basis
         and "Na2O(alpha)" in segment.phase_basis
     )
