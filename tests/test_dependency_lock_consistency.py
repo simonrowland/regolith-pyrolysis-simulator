@@ -103,18 +103,16 @@ def test_git_dependency_revisions_match_uv_lock() -> None:
 
 
 def _is_dependency_declaration_file(path: str) -> bool:
-    if path.startswith("tests/fixtures/"):
+    lowered_path = path.lower()
+    if lowered_path.startswith("tests/"):
+        # Test files and fixtures are examples, not declarations for this project.
         return False
 
-    parts = path.split("/")
-    filename = parts[-1].lower()
-    return (
-        "requirements" in parts[:-1]
-        or filename == "pipfile"
-        or (
-            filename.endswith(".txt")
-            and ("requirements" in filename or "constraints" in filename)
-        )
+    parts = lowered_path.split("/")
+    filename = parts[-1]
+    return any("requirement" in part or "constraint" in part for part in parts) or (
+        filename
+        in {"pipfile", "pipfile.lock", "poetry.lock", "setup.cfg", "setup.py"}
     )
 
 
@@ -271,15 +269,27 @@ def test_requirements_file_option_is_rejected_with_its_line(tmp_path: Path) -> N
         )
 
 
-def test_unlisted_tracked_requirements_file_is_rejected(tmp_path: Path) -> None:
+def test_unlisted_tracked_dependency_declaration_files_are_rejected(
+    tmp_path: Path,
+) -> None:
     subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
-    (tmp_path / "other-requirements.txt").write_text("synthetic-dep>=1.0\n")
+    declaration_paths = (
+        "other-requirements.txt",
+        "Requirements/prod.in",
+        "constraints/prod.in",
+        "REQUIREMENTS-dev.TXT",
+    )
+    for path in declaration_paths:
+        declaration = tmp_path / path
+        declaration.parent.mkdir(parents=True, exist_ok=True)
+        declaration.write_text("synthetic-dep>=1.0\n")
     subprocess.run(
-        ["git", "add", "--", "other-requirements.txt"], cwd=tmp_path, check=True
+        ["git", "add", "--", *declaration_paths], cwd=tmp_path, check=True
     )
 
-    with pytest.raises(AssertionError, match="other-requirements.txt"):
+    with pytest.raises(AssertionError) as error:
         _assert_supported_declaration_files(tmp_path)
+    assert all(path in str(error.value) for path in declaration_paths)
 
 
 def _assert_declared_versions_match_uv_lock(
