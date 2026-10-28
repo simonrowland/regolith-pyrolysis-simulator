@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import Phase, Quantity
 from tests.battery.factories import migrate_one_extract
 
 
@@ -67,6 +67,8 @@ def test_beerkens_activity_identity_survives_isolated_migration() -> None:
         "::beerkens_2003_float_glass_activity_at_1673K"
     )
     assert scalar.identity.quantity.value is Quantity.ACTIVITY
+    assert scalar.identity.species.phase.is_value
+    assert scalar.identity.species.phase.value is Phase.L
     assert scalar.value.point == Decimal("1.7E-8")
     assert scalar.value.approximate
     assert scalar.identity.temperature_K.is_value
@@ -75,3 +77,5 @@ def test_beerkens_activity_identity_survives_isolated_migration() -> None:
     assert Decimal("0.12") < dict(scalar.identity.composition.value.components)["Na2O"] < Decimal("0.13")
     assert migrator.result.validation.hard_issues == ()
     assert sum(len(rows) for rows in migrator.result.context_by_work.values()) == 2
+    assert all(row.identity.quantity.is_value for row in migrator.result.observations.values())
+    assert all(row.identity.species.phase.is_value for row in migrator.result.observations.values())

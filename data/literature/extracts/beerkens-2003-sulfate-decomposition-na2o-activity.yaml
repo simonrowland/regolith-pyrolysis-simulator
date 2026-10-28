@@ -18,7 +18,7 @@ fidelity_samples:
       intercept_as_printed: '8.33'
     locator: {page: 6, published_page: 1898, section: 'VI. Results for the Sodium Oxide Activity'}
   - species: Na2O
-    observation_id: beerkens_2003_model_glass_activity_temperature_fit
+    observation_id: beerkens_2003_float_glass_activity_temperature_fit
     field: fit
     value:
       inverse_temperature_coefficient_as_printed: '-46000'
@@ -82,6 +82,6 @@ species:
           composition:
             state: {tag: value, value: {basis: oxide_weight_percent_as_published, amount_basis: mass_percent, components: [[SiO2, '72.2'], [Na2O, '13.4'], [CaO, '9.5'], [MgO, '2.2'], [Al2O3, '1.5'], [K2O, '0.9']]}}
             locator: {page: 4, published_page: 1896, note: 'Float-glass composition reported on p. 1896; the activity is for float glass.'}
-        phase: soda_lime_silica_glass_melt
+        phase: l
         standard_state: {state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Na2O, phase: {tag: unknown, reason: not_published}, polymorph: {tag: unknown, reason: not_published}}, component_basis: Na2O}}, inferred: false}
         units: dimensionless
