@@ -1,0 +1,1754 @@
+schema_version: literature_extract.v1
+source_id: zhang-2021-acsesc-si
+source:
+  citation: 'Zhang, Z., Nie, N. X., Mendybaev, R. A., Liu, M.-C., Hu, J. J., Hopp, T., Alp, E. E., Lavina, B., Bullock,
+    E. S., McKeegan, K. D. & Dauphas, N. (2021), Supporting Information for “Loss and isotopic fractionation of
+    alkali elements during diffusion-limited evaporation from molten silicate: theory and experiments”, ACS Earth
+    and Space Chemistry 5, 755–784.'
+  year: 2021
+extraction:
+  method: SI Table S1 and main-article Table 1 transcribed from born-digital pdftotext; row and column assignments
+    checked against page renders. Bulk mass-loss percentages reduced from printed Table S1 weights; residue compositions
+    stored as printed.
+  date: '2026-10-27'
+  worker: w1027naA-zhang-2021-acsesc-si
+  provenance_path: text/zhang-2021-acsesc-si/pdftotext-layout.txt
+review_status: draft
+schema_gaps:
+- Table S1 initial/final sample weights have no standalone mass-measurement quantity token; retained as measured-direct
+  typed refusal, with mass-loss fractions linked to those weights.
+- A complete multicomponent residue-composition vector has no value field in the current migrator; each run is retained
+  as a typed-refused residue_composition_vs_time row; all nine printed oxide cells remain under printed_residue_oxide_wt_pct.
+fidelity_samples:
+- path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[0].mass_before_mg
+  value: 40.4
+  locator:
+    page: 9
+    table: S1
+    row: Bas1400C0m1
+- path: species.unknown.observations[zhang_2021_table1_bas1400c15m_residue_composition].values.printed_residue_oxide_wt_pct.composition_wt_pct.Na2O
+  value: 0.66
+  locator:
+    page: 71
+    table: '1'
+    row: Bas1400C15m
+- path: species.unknown.observations[zhang_2021_table1_bas1200c40h_residue_composition].values.printed_residue_oxide_wt_pct.composition_wt_pct.Rb2O
+  value: 0.67
+  locator:
+    page: 71
+    table: '1'
+    row: Bas1200C40h
+- path: species.unknown.observations[zhang_si_table_s1_bas1200c40h_mass_loss].values.mass_loss_wt_pct
+  value: 5.539
+  locator:
+    page: 9
+    table: S1
+    row: Bas1200C40h
+scope_assessment:
+  document_type: supporting information for experimental and theoretical study of alkali evaporation from basaltic
+    melt
+  requested_measurements: measured Na(g)/Na vapour pressure or Na-specific evaporation flux
+  measured_direct_observations: 12
+  measured_reduced_bulk_mass_loss_points: 12
+  absent_from_source:
+  - printed Na(g)/Na vapour pressure
+  - printed Na-specific evaporation flux
+  - species-resolved evaporation mass balance
+  figure_read_candidates:
+  - 'Fig. S6 and Figs. S7-S15: spatial Na, K, Rb concentration profiles; no figure-only values transcribed.'
+  note: >-
+    Table S1 provides 12 whole-sample before/after masses. The main article Table 1 provides 12 run-level residue
+    compositions, stored as printed with its Table 1 locators; complete composition vectors are typed-refused by
+    the current value schema. SI Tables S2-S11 contain 608 individual EPMA spot analyses for spatial profiles
+    (S2–S9: 488; S10: 67; S11: 53); per controller ruling, those spot values are not transcribed or averaged in this
+    extract. No Na-specific flux or Na(g)/Na pressure is inferred.
+species:
+  unknown:
+    observations:
+    - observation_id: zhang_si_table_s1_published_weights
+      type: mass_loss
+      method: free_evaporation
+      locator:
+        page: 9
+        table: S1
+        note: Printed before/after weights for 12 experimental aliquots.
+      phase: l
+      units: mg
+      values:
+        quantity: untyped_sample_mass_measurements
+        method_class: measured_direct
+        runs:
+        - sample: Bas1400C0m1
+          mass_before_mg: 40.4
+          mass_after_mg: 40.2
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C0m1
+        - sample: Bas1400C0m2
+          mass_before_mg: 44.6
+          mass_after_mg: 44.3
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C0m2
+        - sample: Bas1400C15m
+          mass_before_mg: 56.5
+          mass_after_mg: 54.3
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C15m
+        - sample: Bas1400C30m
+          mass_before_mg: 59.0
+          mass_after_mg: 56.1
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C30m
+        - sample: Bas1400C60m
+          mass_before_mg: 40.9
+          mass_after_mg: 38.1
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C60m
+        - sample: Bas1400C90m
+          mass_before_mg: 25.9
+          mass_after_mg: 24.0
+          locator:
+            page: 9
+            table: S1
+            row: Bas1400C90m
+        - sample: Bas1200C0h1
+          mass_before_mg: 17.2
+          mass_after_mg: 17.2
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C0h1
+        - sample: Bas1200C0h2
+          mass_before_mg: 48.8
+          mass_after_mg: 48.8
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C0h2
+        - sample: Bas1200C1h
+          mass_before_mg: 45.4
+          mass_after_mg: 45.0
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C1h
+        - sample: Bas1200C4h
+          mass_before_mg: 45.7
+          mass_after_mg: 44.9
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C4h
+        - sample: Bas1200C10h
+          mass_before_mg: 69.2
+          mass_after_mg: 67.1
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C10h
+        - sample: Bas1200C40h
+          mass_before_mg: 34.3
+          mass_after_mg: 32.4
+          locator:
+            page: 9
+            table: S1
+            row: Bas1200C40h
+    - observation_id: zhang_2021_table1_bas1400c0m1_residue_composition
+      type: rate_series
+      locator: &id001
+        page: 71
+        table: '1'
+        row: Bas1400C0m1
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value: &id003
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C0m1
+        duration_min_as_published: 0
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 1.9
+            MgO: 7.11
+            CaO: 10.88
+            TiO2: 1.54
+            SiO2: 48.89
+            Al2O3: 15.29
+            FeO: 10.0
+            K2O: 2.5
+            Rb2O: 1.89
+          locator: *id001
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
+        starting_glass_wt_pct: &id004
+          Na2O: 2.27
+          MgO: 7.09
+          CaO: 11.21
+          TiO2: 1.79
+          SiO2: 45.94
+          Al2O3: 16.0
+          FeO: 10.67
+          K2O: 2.49
+          Rb2O: 1.86
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1400c0m2_residue_composition
+      type: rate_series
+      locator: &id002
+        page: 71
+        table: '1'
+        row: Bas1400C0m2
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id002
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C0m2
+        duration_min_as_published: 0
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 1.82
+            MgO: 7.08
+            CaO: 10.9
+            TiO2: 1.58
+            SiO2: 48.99
+            Al2O3: 15.33
+            FeO: 9.98
+            K2O: 2.46
+            Rb2O: 1.86
+          locator: *id002
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1400c15m_residue_composition
+      type: rate_series
+      locator: &id005
+        page: 71
+        table: '1'
+        row: Bas1400C15m
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C15m
+        duration_min_as_published: 15
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 0.66
+            MgO: 7.38
+            CaO: 11.25
+            TiO2: 1.6
+            SiO2: 50.31
+            Al2O3: 15.86
+            FeO: 10.15
+            K2O: 1.63
+            Rb2O: 1.12
+          locator: *id005
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1400c30m_residue_composition
+      type: rate_series
+      locator: &id006
+        page: 71
+        table: '1'
+        row: Bas1400C30m
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C30m
+        duration_min_as_published: 30
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 0.29
+            MgO: 7.45
+            CaO: 11.41
+            TiO2: 1.61
+            SiO2: 51.2
+            Al2O3: 16.16
+            FeO: 10.21
+            K2O: 1.19
+            Rb2O: 0.74
+          locator: *id006
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1400c60m_residue_composition
+      type: rate_series
+      locator: &id007
+        page: 71
+        table: '1'
+        row: Bas1400C60m
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C60m
+        duration_min_as_published: 60
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 0.01
+            MgO: 7.61
+            CaO: 11.46
+            TiO2: 1.63
+            SiO2: 52.55
+            Al2O3: 16.1
+            FeO: 10.28
+            K2O: 0.28
+            Rb2O: 0.1
+          locator: *id007
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1400c90m_residue_composition
+      type: rate_series
+      locator: &id008
+        page: 71
+        table: '1'
+        row: Bas1400C90m
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1400
+        sample: Bas1400C90m
+        duration_min_as_published: 90
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: b.d.l.
+            MgO: 7.65
+            CaO: 11.5
+            TiO2: 1.65
+            SiO2: 52.55
+            Al2O3: 16.29
+            FeO: 10.3
+            K2O: 0.05
+            Rb2O: b.d.l.
+          locator: *id008
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c0h1_residue_composition
+      type: rate_series
+      locator: &id009
+        page: 71
+        table: '1'
+        row: Bas1200C0h1
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C0h1
+        duration_min_as_published: 0
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 2.0
+            MgO: 6.63
+            CaO: 10.88
+            TiO2: 1.52
+            SiO2: 47.67
+            Al2O3: 15.24
+            FeO: 9.66
+            K2O: 2.56
+            Rb2O: 1.98
+          locator: *id009
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c0h2_residue_composition
+      type: rate_series
+      locator: &id010
+        page: 71
+        table: '1'
+        row: Bas1200C0h2
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C0h2
+        duration_min_as_published: 0
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 2.3
+            MgO: 6.46
+            CaO: 11.09
+            TiO2: 1.57
+            SiO2: 49.03
+            Al2O3: 15.41
+            FeO: 9.69
+            K2O: 2.58
+            Rb2O: 1.87
+          locator: *id010
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c1h_residue_composition
+      type: rate_series
+      locator: &id011
+        page: 71
+        table: '1'
+        row: Bas1200C1h
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C1h
+        duration_min_as_published: 55
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 1.99
+            MgO: 7.0
+            CaO: 10.98
+            TiO2: 1.55
+            SiO2: 48.43
+            Al2O3: 15.54
+            FeO: 10.05
+            K2O: 2.53
+            Rb2O: 1.93
+          locator: *id011
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c4h_residue_composition
+      type: rate_series
+      locator: &id012
+        page: 71
+        table: '1'
+        row: Bas1200C4h
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C4h
+        duration_min_as_published: 235
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 1.08
+            MgO: 7.19
+            CaO: 10.99
+            TiO2: 1.57
+            SiO2: 49.87
+            Al2O3: 15.54
+            FeO: 10.05
+            K2O: 2.15
+            Rb2O: 1.56
+          locator: *id012
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c10h_residue_composition
+      type: rate_series
+      locator: &id013
+        page: 71
+        table: '1'
+        row: Bas1200C10h
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C10h
+        duration_min_as_published: 595
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 0.69
+            MgO: 7.33
+            CaO: 11.13
+            TiO2: 1.59
+            SiO2: 50.27
+            Al2O3: 15.71
+            FeO: 10.17
+            K2O: 1.84
+            Rb2O: 1.27
+          locator: *id013
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_2021_table1_bas1200c40h_residue_composition
+      type: rate_series
+      locator: &id014
+        page: 71
+        table: '1'
+        row: Bas1200C40h
+      phase: glass
+      units: wt%
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value: *id003
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: '<'
+              bound_value: '0.0001'
+          locator:
+            page: 74
+            table: '4'
+            note: Vacuum-run pressure less than 1.0e-9 bar; unit conversion to Pa
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        T_C: 1200
+        sample: Bas1200C40h
+        duration_min_as_published: 2395
+        printed_residue_oxide_wt_pct:
+          composition_wt_pct:
+            Na2O: 0.1
+            MgO: 7.61
+            CaO: 11.18
+            TiO2: 1.64
+            SiO2: 51.61
+            Al2O3: 15.74
+            FeO: 10.35
+            K2O: 1.09
+            Rb2O: 0.67
+          locator: *id014
+        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
+          vector.
+        starting_glass_wt_pct: *id004
+      quench_state:
+        status: not_stated
+        procedure: quenched by cutting power supply off (1200°C zero-time held 5 min; 1400°C zero-time quenched
+          upon reaching target)
+        locator:
+          page: 9
+          section: 2.2 Vacuum evaporation experiments
+      method: electron probe microanalysis (EPMA)
+    - observation_id: zhang_si_table_s1_bas1400c0m1_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C0m1
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C0m1
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: &id015
+            tag: value
+            value:
+              kind: point
+              point: '0.0001'
+              approximate: true
+          locator: &id016
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: About 10^-6 mbar
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C0m1
+        duration_min_as_published: 0
+        mass_loss_wt_pct: 0.495
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1400c0m2_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C0m2
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C0m2
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C0m2
+        duration_min_as_published: 0
+        mass_loss_wt_pct: 0.673
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1400c15m_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C15m
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C15m
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C15m
+        duration_min_as_published: 15
+        mass_loss_wt_pct: 3.894
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1400c30m_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C30m
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C30m
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C30m
+        duration_min_as_published: 30
+        mass_loss_wt_pct: 4.915
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1400c60m_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C60m
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C60m
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C60m
+        duration_min_as_published: 60
+        mass_loss_wt_pct: 6.846
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1400c90m_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1400C90m
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1400
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1400C90m
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1400
+        sample: Bas1400C90m
+        duration_min_as_published: 90
+        mass_loss_wt_pct: 7.336
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c0h1_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C0h1
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C0h1
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C0h1
+        duration_min_as_published: 0
+        mass_loss_wt_pct: 0.0
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c0h2_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C0h2
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C0h2
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C0h2
+        duration_min_as_published: 0
+        mass_loss_wt_pct: 0.0
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c1h_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C1h
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C1h
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C1h
+        duration_min_as_published: 55
+        mass_loss_wt_pct: 0.881
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c4h_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C4h
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C4h
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C4h
+        duration_min_as_published: 235
+        mass_loss_wt_pct: 1.751
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c10h_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C10h
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C10h
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C10h
+        duration_min_as_published: 595
+        mass_loss_wt_pct: 3.035
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
+    - observation_id: zhang_si_table_s1_bas1200c40h_mass_loss
+      type: mass_loss
+      method: free_evaporation
+      derived_from: zhang_si_table_s1_published_weights
+      locator:
+        page: 9
+        table: S1
+        row: Bas1200C40h
+      phase: l
+      units: '%'
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: 1200
+          locator:
+            page: 71
+            table: '1'
+            row: Bas1200C40h
+        composition:
+          state:
+            tag: value
+            value:
+              Na2O: 2.27
+              MgO: 7.09
+              CaO: 11.21
+              TiO2: 1.79
+              SiO2: 45.94
+              Al2O3: 16.0
+              FeO: 10.67
+              K2O: 2.49
+              Rb2O: 1.86
+          locator:
+            page: 71
+            table: '1'
+            row: Initial glass
+        total_pressure_Pa:
+          state: *id015
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published_for_vacuum_run
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            note: No absolute fO2 printed for the vacuum runs
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        T_C: 1200
+        sample: Bas1200C40h
+        duration_min_as_published: 2395
+        mass_loss_wt_pct: 5.539
+        derivation:
+          relation: mass_loss_wt_pct = 100 * (mass_before_mg - mass_after_mg) / mass_before_mg
+          inputs:
+          - zhang_si_table_s1_published_weights
+          note: Whole-sample multi-element mass loss; not a Na-specific flux.
+        total_pressure_Pa: '0.0001'
+        starting_glass_wt_pct: *id004
