@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, RefusalReason
+from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity, RefusalReason
 from simulator.battery.migrate import Migrator
 
 
@@ -72,7 +72,14 @@ def test_kurka_table1_cells_and_isolated_redox_migration():
     }
     assert all(row.identity.quantity.is_value for row in migrated)
     assert all(row.identity.species.phase.is_value for row in migrated)
-    assert all(row.identity.species.phase.value is Phase.GLASS for row in migrated)
+    assert all(row.identity.species.phase.value is Phase.L for row in migrated)
+    oxide_rows = [
+        row
+        for row in migrated
+        if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert all(row.identity.phase_role.is_value for row in oxide_rows)
+    assert all(row.identity.phase_role.value is PhaseRole.MELT for row in oxide_rows)
     assert all(row.identity.temperature_K.is_value for row in migrated)
     assert all(row.identity.fO2_Pa.is_value for row in migrated)
     assert all(row.identity.composition.is_value for row in migrated)
@@ -95,10 +102,38 @@ def test_kurka_table1_cells_and_isolated_redox_migration():
     assert migrated_first.identity.composition.is_value
     assert dict(migrated_first.identity.composition.value.components)["FeO"] == Decimal("0.019")
     assert migrated_first.identity.total_pressure_Pa.is_unknown
+
+    # Table 1 rows 2 and 16 sum to 0.999 and 1.001. Their migrated oxide
+    # identities must preserve the printed amounts rather than close them.
+    printed_compositions = {
+        "2": {
+            "CaO": Decimal("0.388"),
+            "SiO2": Decimal("0.489"),
+            "FeO": Decimal("0.036"),
+            "Fe2O3": Decimal("0.086"),
+        },
+        "16": {
+            "CaO": Decimal("0.538"),
+            "SiO2": Decimal("0.452"),
+            "FeO": Decimal("0.003"),
+            "Fe2O3": Decimal("0.008"),
+        },
+    }
+    for suffix, expected in printed_compositions.items():
+        expected_total = Decimal("0.999") if suffix == "2" else Decimal("1.001")
+        assert sum(expected.values()) == expected_total
+        oxide = next(
+            row
+            for row in migrated
+            if f"row_{suffix}_feo_mole_fraction" in row.observation_id
+        )
+        valence = migrated_by_suffix[suffix]
+        assert dict(oxide.identity.composition.value.components) == expected
+        assert dict(valence.identity.composition.value.components) == expected
     for suffix, temperature in (("1", Decimal("1673.15")), ("8", Decimal("1873.15")), ("16", Decimal("1873.15"))):
         row = migrated_by_suffix[suffix]
         assert row.identity.quantity.value is Quantity.VALENCE_RATIO
-        assert row.identity.species.phase.value is Phase.GLASS
+        assert row.identity.species.phase.value is Phase.L
         assert row.identity.temperature_K.value == temperature
         assert row.identity.fO2_Pa.value == Decimal("21278.25")
         assert row.identity.composition.is_value
