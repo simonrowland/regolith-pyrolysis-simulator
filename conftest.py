@@ -335,6 +335,7 @@ class CpuBudgetExceeded(TimeoutError):
 class _CpuBudgetState:
     budget_seconds: float
     started_cpu_seconds: float
+    started_wall_seconds: float
     previous_limits: tuple[int, int]
     previous_handler: object
     exceeded: bool = False
@@ -360,11 +361,13 @@ def _start_cpu_budget(item: pytest.Item) -> _CpuBudgetState:
     """
     budget_seconds = cpu_budget_seconds(item)
     started_cpu_seconds = time.process_time()
+    started_wall_seconds = time.monotonic()
     previous_limits = resource.getrlimit(resource.RLIMIT_CPU)
     previous_handler = signal.getsignal(signal.SIGXCPU)
     state = _CpuBudgetState(
         budget_seconds=budget_seconds,
         started_cpu_seconds=started_cpu_seconds,
+        started_wall_seconds=started_wall_seconds,
         previous_limits=previous_limits,
         previous_handler=previous_handler,
     )
@@ -662,6 +665,18 @@ def pytest_runtest_makereport(
         state.failure_message = _cpu_budget_failure_message(state)
         report.outcome = "failed"
         report.longrepr = state.failure_message
+
+    if report.when == "teardown":
+        elapsed_wall_seconds = max(
+            0.0,
+            time.monotonic() - state.started_wall_seconds,
+        )
+        report.user_properties.extend(
+            (
+                ("cpu_seconds", f"{max(0.0, elapsed_cpu_seconds):.6f}"),
+                ("wall_seconds", f"{elapsed_wall_seconds:.6f}"),
+            )
+        )
 
 
 @pytest.hookimpl(optionalhook=True, tryfirst=True)

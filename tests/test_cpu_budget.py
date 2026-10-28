@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -134,3 +135,31 @@ def test_wall_guard_scales_with_cpu_budget() -> None:
 
     assert wall_guard_seconds(1) == 6
     assert wall_guard_seconds(300) == 1800
+
+
+def test_junit_xml_records_cpu_and_wall_seconds(tmp_path: Path) -> None:
+    junit_xml = tmp_path / "junit.xml"
+    result = _run_probe(
+        tmp_path,
+        """
+        import time
+        import pytest
+
+        @pytest.mark.cpu_budget(2)
+        def test_receipt():
+            time.sleep(0.05)
+        """,
+        junit_xml=junit_xml,
+    )
+
+    assert result.returncode == pytest.ExitCode.OK, _output(result)
+    testcase = ET.parse(junit_xml).getroot().find(".//testcase")
+    assert testcase is not None
+    properties_node = testcase.find("properties")
+    assert properties_node is not None
+    properties = {
+        prop.attrib["name"]: float(prop.attrib["value"])
+        for prop in properties_node.findall("property")
+    }
+    assert properties["cpu_seconds"] >= 0.0
+    assert properties["wall_seconds"] >= 0.0
