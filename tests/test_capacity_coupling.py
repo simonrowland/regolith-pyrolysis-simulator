@@ -821,8 +821,8 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert catalog_pa < pure_component_probe_pa[species_id]
             # Physical OOR can land near the pre-rg seam; pin the live value
             # so a future regression that re-inflates heating OOR is visible.
-            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-            assert catalog_pa == pytest.approx(0.7154959534800683, rel=1.0e-9)
+            # Merged finite-inventory redox / b-1043 gate-path probe.
+            assert catalog_pa == pytest.approx(0.7154959178247572, rel=1.0e-9)
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
@@ -1029,7 +1029,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # capacity; the merged finite-inventory Ar-cover value is 7.50%.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1037,9 +1037,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # Re-pinned at the merged b-899/b-1043 tip with the d-252 Ar cover.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.194563539079971, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1067,22 +1067,21 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # The d-252 cover/ramp still moves 1600 C to 1400 C; the
+        # ledger-derived redox state changes flux, transport load and melt mass.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.194563539079971,
+            7.499573687990316,
+            996.7039468312764,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # d-252's C0 setup and d-237 phosphorus retention yield the 35-transition
-    # roster measured by the studio-2 probe.
-    assert len(sim.atom_ledger.transitions) == 35
+    # The merged inventory/gate path yields this 39-transition roster;
+    # d-237 phosphorus retention remains unchanged.
+    assert len(sim.atom_ledger.transitions) == 39
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1109,12 +1108,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
+        "evaporate_TiO2_gas",
         "condense_TiO2_gas",
         "fe_redox_respeciation",
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-        "oxygen_reservoir_exchange",
         "overhead_bleed",
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         "metal_phase_stratification_diagnostic",
     )
     assert "evaporate_Fe" in ca_ti_reasons
@@ -1345,11 +1342,11 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         "condense_TiO2_gas",
     } <= reason_set
     assert tuple(reasons[-5:]) == (
-        "condense_TiO",
-        "evaporate_TiO2_gas",
         "condense_TiO2_gas",
         "fe_redox_respeciation",
+        "oxygen_reservoir_exchange",
         "overhead_bleed",
+        "metal_phase_stratification_diagnostic",
     )
 
 
