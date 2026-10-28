@@ -456,13 +456,7 @@ def test_predicate_readers_cannot_diverge() -> None:
         )
         shared = applicability_verdict(token, process_phase=phase, stage=stage)
         actual = _predicate_active(ordinary, state)
-        if stage == "c0b_p_cleanup":
-            assert actual == (
-                False,
-                "c0b_p_cleanup admits only P2O5-sourced carrier rules",
-            )
-        else:
-            assert actual == shared
+        assert actual == shared
 
         p_rule = SimpleNamespace(
             applicability_predicate=token,

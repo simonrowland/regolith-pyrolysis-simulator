@@ -1165,7 +1165,6 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
     steps = 0
     worst_delta_kg_hr = 0.0
     refused_reference_species_seen: set[str] = set()
-    c0b_refused_reference_species_seen: set[str] = set()
     proxy_accounted_species_seen: set[str] = set()
     while not sim.is_complete() and steps < 60:
         if sim.paused_for_decision:
@@ -1196,20 +1195,14 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
         # in 1a6ad25, made batch eligibility authoritative.
         # C0 retains phosphorus and uses the ordinary evaporation stage, so
-        # stage0-only carriers can be refused before C0B begins. The C0B-only
-        # reason check below applies only when that cleanup campaign is sampled;
-        # the legacy math helper has no stage predicate, so typed refusals stay
-        # outside wiring parity in every campaign. MC-4A makes CrO2 executable,
-        # so at C0B it follows that typed predicate refusal rather than missing
-        # a channel contract.
+        # stage0-only carriers can be refused before C0B begins. The legacy
+        # math helper has no stage predicate, so typed refusals stay outside
+        # wiring parity. C0B adds P carriers without excluding hot-train flux.
         for species in refused_reference_species:
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
-            if sampled_campaign is CampaignPhase.C0B:
-                c0b_refused_reference_species_seen.add(species)
-                assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (
-                    refusal["extra"]["detail"]
-                )
+        if sampled_campaign is CampaignPhase.C0B:
+            assert not {"Na", "K", "SiO", "CrO2"} & refused_reference_species
         refused_reference_species_seen.update(refused_reference_species)
 
         # b-314: tier-2 ``broad_proxy_not_intrinsic`` rows no longer satisfy
@@ -1264,11 +1257,9 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
 
     assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
     if feedstock_key in {"lunar_mare_low_ti", "s_type_asteroid_silicate"}:
-        assert "CrO2" in c0b_refused_reference_species_seen
-        # b-314: whenever CrO2 carries a flux pressure outside the C0b
-        # predicate refusal, it must be visibly accounted by the restored
-        # SC-67 surface (missing_alpha or the marked prototype fallback) —
-        # never evaporating on a bare proxy as if it were measured.
+        # b-314: CrO2 must be visibly accounted by the SC-67 surface
+        # (missing_alpha or the marked prototype fallback), never evaporating
+        # on a bare proxy as if it were measured.
         assert "CrO2" in (
             refused_reference_species_seen | proxy_accounted_species_seen
         )
