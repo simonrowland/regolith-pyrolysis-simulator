@@ -98,6 +98,7 @@ def test_table1_mn_distribution_rows_match_render_and_migrate(tmp_path: Path) ->
     gamma = migrated["simeonov_sano_1985_gamma_mn_carbon_saturated_iron"]
     assert gamma.value.point == Decimal("0.510")
     assert gamma.identity.quantity.value.value == "activity_coefficient"
+    assert gamma.identity.temperature_K.value == Decimal("1573.15")
     gamma_source = doc["species"]["Mn"]["observations"][0]
     assert gamma_source["values"]["method_class"] == "measured_reduced"
     assert gamma_source["derivation"]["parameters"][0][1]["state"]["value"] == "1.07"
@@ -124,6 +125,10 @@ def test_na2o_prose_conflict_and_figure_values_stay_typed_refused() -> None:
     assert context[1]["locator"]["published_page"] == 1120
     capacity = doc["species"]["Mn"]["context"][0]
     assert capacity["values"]["admission_status"] == "typed_refusal"
+    assert capacity["values"]["defining_equation_as_printed"] == (
+        "C_Mn2+ = (%Mn2+) / (a_Mn(l) · P_O2^1/2) = "
+        "K / (f_Mn2+ · a_O2-) (Eq. 8)"
+    )
     assert "no existing quantity token" in capacity["values"]["schema_gap"].lower()
     rows = capacity["values"]["table_rows"]
     assert len(rows) == 4

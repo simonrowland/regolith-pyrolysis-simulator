@@ -257,7 +257,6 @@ species:
         phase: l
         units: dimensionless
         standard_state: not stated in the paper for the reported gamma_Mn coefficient
-        T_C: '1300'
         point_conditions:
           temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'III.1'}}
           gas_mix: {state: {tag: value, value: CO}, locator: {page: 2, published_page: 1117, pdf_page_index: 1, section: 'II.1'}}
@@ -266,6 +265,7 @@ species:
         values:
           quantity: activity_coefficient
           formula: Mn
+          T_C: '1300'
           activity_coefficient: '0.510'
           reference_state_as_printed: gamma°_Mn in carbon-saturated iron; the paper does not name its reference endmember
           method_class: measured_reduced
@@ -289,7 +289,7 @@ species:
           schema_gap: No existing quantity token represents the printed manganous capacity C_Mn2+.
           reason: Preserve the printed capacity values and definition as context; do not change the schema.
           candidate_tokens_checked: [distribution_ratio, activity, activity_coefficient, phosphate_capacity, sulfide_capacity]
-          defining_equation_as_printed: C_Mn2+ = (%Mn2+) / (a_Mn(l) · P_O2^1/2) = K · a_O2- / f_Mn2+ (Eq. 8)
+          defining_equation_as_printed: C_Mn2+ = (%Mn2+) / (a_Mn(l) · P_O2^1/2) = K / (f_Mn2+ · a_O2-) (Eq. 8)
           reference_state_as_printed: a_Mn(l) is manganese activity in carbon-saturated iron with reference to liquid manganese
           equation_locator: {page: 3, published_page: 1118, pdf_page_index: 2, equation: '8'}
           table_rows:
