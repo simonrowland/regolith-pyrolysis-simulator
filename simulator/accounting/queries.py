@@ -113,6 +113,12 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "TiO2",
     "Cr2O3",
     "REE_oxides",
+    "Y2O3",
+    "Sc2O3",
+    "ZrO2",
+    "HfO2",
+    "ThO2",
+    "UO2",
 }) | REE_OXIDE_SPECIES
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})

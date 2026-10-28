@@ -937,14 +937,6 @@ TERMINAL_RUMP_ACCOUNTS = (
     'process.cleaned_melt',
     'terminal.slag',
 )
-TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
-    'CaO',
-    'MgO',
-    'Al2O3',
-    'TiO2',
-    'Cr2O3',
-    'REE_oxides',
-})
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({'SiO2'})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({'Fe', 'Ni', 'Co', 'Mn'})
 # TERMINAL_RUMP_CLASS_TOLERANCE_PCT: single source is simulator/accounting/queries.py
