@@ -752,16 +752,20 @@ class WarmEngineWorker:
             # start of a frame. Keep its existing framing and unpickling, but
             # run that blocking read where the caller can enforce this same
             # deadline and retain its cancellation checks.
-            reply: list[tuple[float, Any, BaseException | None]] = []
+            reply_lock = threading.Lock()
+            reply: tuple[float, Any, BaseException | None] | None = None
             reply_ready = threading.Event()
 
             def receive_reply() -> None:
+                nonlocal reply
                 try:
                     message = connection.recv()
                 except BaseException as exc:
-                    reply.append((time.monotonic(), None, exc))
+                    outcome = (time.monotonic(), None, exc)
                 else:
-                    reply.append((time.monotonic(), message, None))
+                    outcome = (time.monotonic(), message, None)
+                with reply_lock:
+                    reply = outcome
                 reply_ready.set()
 
             receiver = threading.Thread(
@@ -772,6 +776,16 @@ class WarmEngineWorker:
             receiver.start()
             try:
                 while True:
+                    with reply_lock:
+                        outcome = reply
+                    if outcome is not None:
+                        receiver.join()
+                        completed_at, message, receive_error = outcome
+                        # A complete receipt at the deadline is on time.
+                        timed_out = completed_at > deadline
+                        if not timed_out and receive_error is not None:
+                            raise receive_error
+                        break
                     with self._state_lock:
                         aborted = (
                             abort_event is not None and abort_event.is_set()
@@ -795,18 +809,18 @@ class WarmEngineWorker:
                         )
                     reply_remaining = deadline - time.monotonic()
                     if reply_remaining <= 0.0:
+                        # Recheck after reading the clock so an outcome
+                        # published while the caller resumed is not lost.
+                        with reply_lock:
+                            outcome = reply
+                        if outcome is not None:
+                            continue
                         timed_out = True
                         break
-                    if reply_ready.wait(min(
+                    reply_ready.wait(min(
                         ENGINE_WORKER_CANCEL_POLL_S,
                         reply_remaining,
-                    )):
-                        receiver.join()
-                        completed_at, message, receive_error = reply[0]
-                        timed_out = completed_at > deadline
-                        if not timed_out and receive_error is not None:
-                            raise receive_error
-                        break
+                    ))
                 if timed_out:
                     _pool_debug(
                         f'{self.name}: reply receive timeout after '
