@@ -31,6 +31,7 @@ from simulator.melt_backend.magemin import (
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.reduced_real_determinism import (
     GateCurveProviderOutcome,
+    PT0DeterminismStore,
     gate_curve_provider_outcome_for_status,
 )
 from simulator.runner import PyrolysisRun, build_per_hour_summary
@@ -285,6 +286,111 @@ def test_runner_reports_typed_startup_missing_input(monkeypatch):
     metadata = artifact['terminal']['run_metadata']
     assert metadata['liquid_fraction_provider'] == 'magemin'
     assert metadata['refusal_diagnostic']['reason'] == 'missing_input'
+
+
+@pytest.mark.parametrize('reason', ['engine_not_converged', 'engine_worker_timeout'])
+@pytest.mark.parametrize('status', ['unavailable', 'not_converged', 'out_of_domain'])
+def test_projected_solve_status_survives_actual_adapter_wrapping(
+    monkeypatch, status, reason, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    store = PT0DeterminismStore('capture')
+    sim.configure_pt0_determinism_store(store)
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = MAGEMinBackend()
+    assert backend.initialize({})
+    provider._backend = backend
+    provider._backend_initialised = True
+    original_equilibrate = backend.equilibrate
+    diagnostics = []
+    injected = []
+    original_dispatch = sim._dispatch_only
+
+    # Keep the adapter's projection and classification path real, while making
+    # every engine sample deterministic and inexpensive.
+    monkeypatch.setattr(
+        backend, '_call_magemin',
+        lambda **_kwargs: {'phases': {'liq': {'mass_kg': 1.0}}},
+    )
+
+    def sample(temperature_C, *args, **kwargs):
+        result = original_equilibrate(temperature_C, *args, **kwargs)
+        result_diagnostics = dict(result.diagnostics or {})
+        direct_projection = 'composition_projected_notice' in result_diagnostics
+        explicit_projection_retry = kwargs.get('projected_oxide_wt_pct') is not None
+        if direct_projection or explicit_projection_retry:
+            injected.append((temperature_C, direct_projection))
+            result_diagnostics['backend_status_reason'] = (
+                'silicate_window' if status == 'out_of_domain' else reason
+            )
+            return replace(
+                result,
+                status=status,
+                warnings=['injected projected-bulk solve refusal'],
+                diagnostics=result_diagnostics,
+            )
+        return result
+
+    def dispatch(*args, **kwargs):
+        result = original_dispatch(*args, **kwargs)
+        if args[0] is ChemistryIntent.GATE_LIQUID_FRACTION:
+            diagnostics.append(result.diagnostic)
+        return result
+
+    monkeypatch.setattr(backend, 'equilibrate', sample)
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    before = sim.atom_ledger.mol_by_account()
+    try:
+        if status == 'out_of_domain':
+            curve = sim._melt_redox_liquidus_gate_curve()
+            assert curve['source'] == 'kress91_liquid_calibration_floor'
+            assert curve['composition_projected_notice']['authority'] == 'extrapolated'
+            assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+        elif reason == 'engine_worker_timeout':
+            for _ in range(2):
+                with pytest.raises(EvaporationFluxRefusal) as error:
+                    sim._melt_redox_liquidus_gate_curve()
+                assert error.value.diagnostic['provider_diagnostic'] == diagnostics[-1]
+                assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
+                assert sim._freeze_gate_liquid_fraction_cache is None
+                assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+                assert shared_cache == {}
+                assert store.capture_sequence == []
+        else:
+            for _ in range(2):
+                curve = sim._melt_redox_liquidus_gate_curve()
+                assert curve['source'] == 'kress91_liquid_calibration_floor'
+                notice = curve['gate_provider_refusal']
+                assert notice['provider_outcome'] == 'numerical_failure'
+                assert notice['authority'] == 'extrapolated'
+                assert notice['qualification'] == 'numerical_failure_kress91_floor_prediction'
+                assert notice['provider_diagnostic'] == diagnostics[-1]
+                assert notice['provider_diagnostic']['backend_diagnostics'][
+                    'projected_liquidus_status'
+                ] == status
+                assert notice['certified_band']['min_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                assert sim._freeze_gate_provider_outcome.value == 'numerical_failure'
+                assert sim._freeze_gate_liquid_fraction_cache is None
+                assert sim._freeze_gate_liquid_fraction_curve_memo == {}
+                assert shared_cache == {}
+                assert store.capture_sequence == []
+                assert sim._make_snapshot().liquid_fraction_gate['redox'][
+                    'gate_provider_refusal'
+                ] == notice
+            assert len(diagnostics) == 2
+        assert any(direct for _temperature_C, direct in injected)
+        assert diagnostics[-1]['backend_status'] == 'out_of_domain'
+        assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_status'] == status
+        assert diagnostics[-1]['backend_diagnostics']['projected_liquidus_diagnostics'][
+            'backend_status_reason'
+        ] == ('silicate_window' if status == 'out_of_domain' else reason)
+        assert 'injected projected-bulk solve refusal' in diagnostics[-1]['backend_warnings']
+        assert sim.atom_ledger.mol_by_account() == before
+    finally:
+        backend.close()
 
 
 def test_small_projected_solve_stays_flagged_through_actual_adapter_wrapping(

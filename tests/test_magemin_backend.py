@@ -2453,7 +2453,10 @@ def test_magemin_bulk_projection_drop_at_1_01_wt_pct_is_refused(
     ]
 
 
-def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(monkeypatch):
+@pytest.mark.parametrize('database', ['ig', 'igad', 'mtl'])
+def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(
+    monkeypatch, database,
+):
     calls = []
 
     def minimize(**kwargs):
@@ -2466,7 +2469,7 @@ def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(monkeypatch):
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        backend.initialize({})
+        backend.initialize({'database': database})
 
     result = backend.equilibrate(
         1400.0,
@@ -2481,12 +2484,6 @@ def test_magemin_elemental_sulfur_is_not_a_projected_oxide_drop(monkeypatch):
         OutOfDomainReason.FORBIDDEN_SPECIES.value
     )
     assert PROJECTED_BULK_CLASSIFICATION_KEY not in result.diagnostics
-
-    with pytest.raises(MeltCompositionError, match="forbidden_species: S"):
-        backend._build_db_bulk_projection(
-            {"SiO2": 50.0, "MgO": 49.93, "S": 0.07},
-            database="igad",
-        )
 
 
 def test_magemin_bulk_projection_mass_fraction_float_hex_pin():
@@ -2725,13 +2722,24 @@ def test_magemin_db_projection_ume_and_mtl_orders_are_not_ig_shaped():
     assert "Na2O" in ume.composition_wt_pct
     assert "S" in ume.composition_wt_pct
     assert "K2O" not in ume.composition_wt_pct
+    assert ume.vector[ume.order.index("S")] == pytest.approx(0.5)
 
-    mtl = backend._build_db_bulk_projection(composition, database="mtl")
+    um = backend._build_db_bulk_projection(composition, database="um")
+    assert um.order == MAGEMinBackend._DB_BULK_ORDERS["um"]
+    assert "S" in um.composition_wt_pct
+    assert um.vector[um.order.index("S")] == pytest.approx(0.5)
+
+    mtl_composition = {
+        component: value
+        for component, value in composition.items()
+        if component != "S"
+    }
+    mtl = backend._build_db_bulk_projection(mtl_composition, database="mtl")
     assert mtl.order == MAGEMinBackend._DB_BULK_ORDERS["mtl"]
     assert len(mtl.vector) == 6
     assert "H2O" not in mtl.composition_wt_pct
     assert "S" not in mtl.composition_wt_pct
-    assert any("H2O" in warning and "S" in warning for warning in mtl.warnings)
+    assert any("H2O" in warning for warning in mtl.warnings)
 
 
 def test_magemin_db_projection_rejects_unknown_bulk_component():
