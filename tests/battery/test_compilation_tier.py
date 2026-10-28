@@ -1416,14 +1416,16 @@ def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     assert attempt.value is not None
     assert attempt.unit == "kJ_per_declared_mol_basis"
     residual = attempt.value - _PRINTED_DFG
-    # 0.442 kJ/mol O2 / n_ox 2 = 0.221 kJ/mol oxide.
-    assert abs(residual - Decimal("0.1832")) < Decimal("0.001")
+    # b-959 interpolates the printed JANAF liquid rows exactly; the former
+    # unconstrained fit had a +0.1832 kJ/mol Na2O residual at this 2200 K row.
+    assert abs(residual) < Decimal("0.001")
+    # Retain the original per-oxide fit-error ceiling as an additional guard.
     assert abs(residual) < Decimal("0.221")
     assert attempt.refusal_reason is None
 
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
     assert prediction.value is not None
-    assert float(prediction.value).hex() == "-0x1.d9f559b3d0780p+1"
+    assert float(prediction.value).hex() == float(attempt.value).hex()
     assert prediction.unit == attempt.unit
 
 
@@ -5234,7 +5236,7 @@ _OUTSIDE_SEGMENT_PIN = (
     ("TiO2", Phase.CR, "1000", "rutile", "Ti", (1100.0, 1166.0), "Ti(alpha)", True),
     ("TiO2", Phase.L, "3600", None, "Ti", (2130.0, 2600.0), "TiO2(l)", True),
     ("SiO2", Phase.L, "3500", None, "Si", (2500.0, 2600.0), "Si(l)", True),
-    ("Na2O", Phase.L, "3000", None, "Na", (2200.0, 2600.0), "Na(g)", True),
+    ("Na2O", Phase.L, "3100", None, "Na", (2900.0, 3000.0), "Na(g)", True),
     ("Cr2O3", Phase.CR, "400", None, "Cr", (1100.0, 2130.0), "Cr(s)", True),
     ("NiO", Phase.CR, "700", None, "Ni", (1100.0, 1728.0), "Ni(s)", True),
     ("MnO", Phase.CR, "1000", None, "Mn", (1100.0, 1360.0), "Mn(beta,s)", True),
@@ -5269,7 +5271,7 @@ _SAME_PHASE_METAL = {
     ("TiO2", "1000"): Phase.CR,
     ("TiO2", "3600"): Phase.L,
     ("SiO2", "3500"): Phase.L,
-    ("Na2O", "3000"): Phase.G,
+    ("Na2O", "3100"): Phase.G,
     ("Cr2O3", "400"): Phase.CR,
     ("NiO", "700"): Phase.CR,
     ("MnO", "1000"): Phase.CR,

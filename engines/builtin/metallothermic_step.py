@@ -140,6 +140,7 @@ from engines.builtin.vapor_pressure import (
     _ELLINGHAM_THERMO,
 )
 from simulator.chemistry.ellingham_thermo import (
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
@@ -150,7 +151,6 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
-    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
@@ -1839,7 +1839,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         """Return the oxide-stability crossover temperature in Celsius.
 
         V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 836.25 C, Na/Fe = 1181.5 C. Above a pair's crossover, the
+        K/Fe = 836.25 C, Na/Fe about 1183.67 C (b-959 liquid JANAF rows).
+        Above a pair's crossover, the
         reagent oxide is less stable than the target oxide, so reduction is
         thermodynamically disfavored; current recipe gates remain handled
         outside this helper. Returns None when the algebraic root falls
@@ -1919,7 +1920,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # strongly negative, so C3 may accept Cr2O3 while refusing TiO2.
         # FeO likewise keeps the raw Na/Fe crossover executable: the
         # NaO0.5 activity diagnostic must not turn a standard-state-negative
-        # dispatch above 1181.5 C into an accepted reduction.
+        # dispatch above the Na/Fe crossover into an accepted reduction.
         if "FeO" in margin:
             margin["FeO"] = min(
                 margin["FeO"],

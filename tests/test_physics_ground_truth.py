@@ -917,8 +917,8 @@ def test_molar_mass_ledger_derives_from_canonical_atomic_weight_table() -> None:
 @pytest.mark.parametrize(
     ("reductant", "target", "expected_c", "abs_tol_c"),
     [
-        # NIST-JANAF high-T oxide refit: Na2O/FeO crossover cited by Mandate.
-        ("Na", "Fe", 1181.5, 1.0),
+        # JANAF Na-013 liquid rows, regrounded in b-959, cross Fe-020 near 1184 C.
+        ("Na", "Fe", 1184.0, 1.0),
         # NIST-JANAF high-T oxide refit: K2O/FeO crossover cited by Mandate.
         ("K", "Fe", 836.25, 1.0),
     ],
