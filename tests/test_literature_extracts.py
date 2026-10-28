@@ -5953,3 +5953,59 @@ def test_compilation_assessed_rows_migrate_printed_identity(
     migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
     migrated = migrator.result.observations[migrated_observation_id]
     assert migrated.evidence.attribution == printed_identity
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "lpi-compendium-62231",
+            "lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446",
+            "Meyer, C. (2010), Lunar Sample Compendium: 62231 and 62241 Soils, Apollo 16 station 2.",
+        ),
+        (
+            "lpi-compendium-65701",
+            "lpi-compendium-65701::lpi_compendium_65701_chemical_composition_table::rows:h=1917b21f2ca4",
+            "Meyer, C. (2010), Lunar Sample Compendium: 65701, Lunar and Planetary Institute.",
+        ),
+        (
+            "pedley-marshall-1983-gaseous-monoxides",
+            "pedley-marshall-1983-gaseous-monoxides::pedley_marshall_1983_table_4_assessed_formation_enthalpies::rows:row=ago:h=66c3f8529598",
+            "Pedley, J. B. & Marshall, E. M. (1983). Thermochemical data for gaseous monoxides. J. Phys. Chem. Ref. Data 12, 967–1031",
+        ),
+        (
+            "robie-hemingway-wilson-1980-usgs-of-80-908",
+            "robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_gehlenite_summary_29815",
+            "Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report 80-908.",
+        ),
+        (
+            "ta-yamanaka-1997-metsoc",
+            "ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs",
+            'Yamanaka, A. & Tsuchiyama, A. (1997), "Evaporation experiments of Na from a Na2O-SiO2 melt by thermogravimetry: Measurement of evaporation coefficients", 60th Annual Meteoritical Society Meeting, abstract 5122.',
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-1",
+            "usgs-lunar-sourcebook-tab8-1::usgs_tab8_1_apollo11_mbas",
+            'Lunar Sourcebook, Chapter 8, Table A8.1, "Statistical data for concentrations of major elements" (TAB8_1R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-4",
+            "usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=6fb5a587202c",
+            'Lunar Sourcebook, Chapter 8, Table A8.4, "Statistical summary of the database for concentrations of frequently determined siderophile elements in mare basalts (MBAS) and in soils and regolith breccias (S&RB)" (TAB8_4R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "visscher-fegley-2013-debris-disks",
+            "visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions",
+            'Visscher, Channon & Fegley, Bruce (2013), "Chemistry of impact-generated silicate melt-vapor debris disks", The Astrophysical Journal Letters 767(1), L12.',
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity_second_batch(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity
