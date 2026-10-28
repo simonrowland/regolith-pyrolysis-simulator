@@ -2060,6 +2060,7 @@ def summarize_reference_anchors(
     controller_pool = [
         row for row in model_rows if row["species"] not in {"K", "Na"}
     ]
+    alkali_rows = [row for row in model_rows if row["species"] in {"K", "Na"}]
     expected = fixture["reference_anchors"][
         "expected_non_alkali_pooled_rmse_dex"
     ]
@@ -2067,7 +2068,18 @@ def summarize_reference_anchors(
     vaporock_pool = _rmse(
         float(row["vaporock_residual_dex"]) for row in controller_pool
     )
-    assert imcc_pool is not None and vaporock_pool is not None
+    alkali_imcc_rmse = _rmse(
+        float(row["imcc_residual_dex"]) for row in alkali_rows
+    )
+    all_species_imcc_rmse = _rmse(
+        float(row["imcc_residual_dex"]) for row in model_rows
+    )
+    assert (
+        imcc_pool is not None
+        and vaporock_pool is not None
+        and alkali_imcc_rmse is not None
+        and all_species_imcc_rmse is not None
+    )
     return {
         "shared_magma_count": len(model_rows),
         "max_reference_difference_dex": max(
@@ -2081,6 +2093,12 @@ def summarize_reference_anchors(
         "controller_pool_count": len(controller_pool),
         "controller_pool_imcc_rmse_dex": imcc_pool,
         "controller_pool_vaporock_rmse_dex": vaporock_pool,
+        "alkali_in_domain_count": len(alkali_rows),
+        "alkali_population_label": (
+            "Na/K rows in the in-domain shared SF04 MAGMA model-model join"
+        ),
+        "alkali_in_domain_imcc_rmse_dex": alkali_imcc_rmse,
+        "alkali_exclusion_delta_dex": all_species_imcc_rmse - imcc_pool,
         "controller_anchor_reproduced": (
             abs(imcc_pool - float(expected["imcc"])) < 5.0e-4
             and abs(vaporock_pool - float(expected["vaporock"])) < 5.0e-4
@@ -2965,6 +2983,12 @@ def generate_report(
                 "Controller regression pool (all non-alkali rows, including the O2 fO2 pin): "
                 f"IMCC **{anchor['controller_pool_imcc_rmse_dex']:.3f}** vs "
                 f"VapoRock **{anchor['controller_pool_vaporock_rmse_dex']:.3f}** dex; "
+                f"alkali exclusion cost +{anchor['alkali_exclusion_delta_dex']:.4f} dex; "
+                f"in-domain alkali RMSE "
+                f"{anchor['alkali_in_domain_imcc_rmse_dex']:.4f} dex across "
+                f"**{anchor['alkali_in_domain_count']}** "
+                f"{anchor['alkali_population_label']} on imcc-published "
+                f"(`{Path(fixture['packs']['imcc-published']).name}`); "
                 f"0.274/0.503 anchor reproduced: **{'yes' if anchor['controller_anchor_reproduced'] else 'no'}**.",
                 "",
                 f"Experimental KEMS snapshot: **{anchor['empirical_kems_scored']} scored / "
