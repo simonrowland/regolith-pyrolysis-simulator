@@ -2067,6 +2067,52 @@ def test_sso2_owner_execution_refuses_without_native_fe_split_count_on_timeout(
     assert "engine_compute_timeout" in partition["status_reason"]
 
 
+@pytest.mark.parametrize("failure_kind", ("remote_environment", "gate_refusal"))
+def test_sso2_owner_execution_envelopes_preserved_engine_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+    failure_kind: str,
+) -> None:
+    import simulator.optimize.sso2_evidence as evidence_module
+    from simulator.engine_pool import EngineWorkerRemoteError
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    if failure_kind == "remote_environment":
+        failure = EngineWorkerRemoteError(
+            "PermissionError",
+            "MAGEMin worker could not launch",
+            "worker traceback",
+            failure_disposition="environment",
+        )
+    else:
+        failure = EvaporationFluxRefusal(
+            "engine_compute_timeout",
+            {
+                "reason": "engine_compute_timeout",
+                "reason_code": "engine_compute_timeout",
+                "terminal_refusal": True,
+                "timeout_kind": "TimeoutExpired",
+            },
+        )
+
+    def fail_calibration(**_kwargs):
+        raise failure
+
+    monkeypatch.setattr(
+        evidence_module,
+        "_certified_full_feo_equiv_na_dose_kg",
+        fail_calibration,
+    )
+
+    execution = build_sso2_owner_recipe_execution(hours=9)
+
+    assert execution.status == "refused"
+    assert execution.reason == "engine_compute_timeout"
+    assert execution.failure_exception is failure
+    assert execution.refusal_diagnostic["reason_code"] == (
+        "engine_compute_timeout"
+    )
+
+
 def test_sso2_fallback_notice_ignores_unscoped_generic_run_species() -> None:
     from simulator.optimize.sso2_evidence import _unmeasured_alpha_fallback_notice
 

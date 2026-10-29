@@ -338,6 +338,39 @@ def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
     )
 
 
+def test_thermoengine_backend_preserves_native_environment_refusal() -> None:
+    failure = PermissionError('ThermoEngine native library unavailable')
+
+    class FailingTransport:
+        closed = False
+
+        def equilibrate(self, **_kwargs: object) -> ThermoEnginePayload:
+            raise failure
+
+        def close(self) -> None:
+            self.closed = True
+
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    transport = FailingTransport()
+    backend._thermoengine_transport = transport
+
+    with pytest.raises(PermissionError) as raised:
+        backend._equilibrate_thermoengine(
+            1400.0,
+            {'SiO2': 100.0},
+            -9.0,
+            1.0,
+            warnings=[],
+        )
+
+    assert raised.value is failure
+    assert raised.value.terminal_refusal is True
+    assert raised.value.reason_code == 'engine_compute_timeout'
+    assert raised.value.timeout_kind == 'PermissionError'
+    assert transport.closed is True
+
+
 def _fo2_echo_transport(payload: ThermoEnginePayload):
     class FakeTransport:
         def equilibrate(self, **kwargs):

@@ -3938,36 +3938,38 @@ def test_real_backend_refused_is_physics_refused_not_unavailable() -> None:
     assert "fo2_requires_iron" in result.notes
 
 
-def test_environment_disposition_refusal_aborts_optimizer_evaluation() -> None:
-    with pytest.raises(EvaluationAbort) as raised:
-        evaluate(
-            _valid_patch(),
-            "lunar_mare_low_ti",
-            "high",
-            profile=_real_backend_profile(),
-            executor=FakeExecutor(
-                _execution(
-                    status="refused",
-                    reason="liquid_fraction_provider_failed",
-                    error_message="MAGEMin worker could not be restarted",
-                    backend_status="refused",
-                    backend_authoritative=False,
-                    refusal_diagnostic={
-                        "reason": "liquid_fraction_provider_failed",
-                        "provider_diagnostic": {
-                            "backend_diagnostics": {
-                                "projected_liquidus_diagnostics": {
-                                    "backend_failure_disposition": "environment",
-                                },
+def test_environment_disposition_refusal_is_terminal_engine_timeout() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                status="refused",
+                reason="liquid_fraction_provider_failed",
+                error_message="MAGEMin worker could not be restarted",
+                backend_status="refused",
+                backend_authoritative=False,
+                refusal_diagnostic={
+                    "reason": "liquid_fraction_provider_failed",
+                    "provider_diagnostic": {
+                        "backend_diagnostics": {
+                            "projected_liquidus_diagnostics": {
+                                "backend_failure_disposition": "environment",
                             },
                         },
                     },
-                )
-            ),
-        )
+                },
+            )
+        ),
+    )
 
-    assert raised.value.category is FailureCategory.ENGINE_BUG
-    assert "environment" in str(raised.value)
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference is not None
+    assert result.run_reference.status == "refused"
+    assert result.run_reference.reason == "engine_compute_timeout"
 
 
 def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
@@ -5197,18 +5199,21 @@ def test_typed_physics_refusals_are_infeasible_trials_with_reason(
 
 
 def test_engine_compute_timeout_is_an_infeasible_physics_refusal() -> None:
-    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    failure = EngineWorkerRemoteError(
+        "TimeoutError",
+        "ThermoEngine remote solve timed out",
+        "worker traceback",
+        failure_disposition="environment",
+    )
 
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
-        executor=FakeExecutor(
-            exc=EngineWorkerTimeout(
-                "liquidus finder", 0.001, phase="job"
-            )
-        ),
+        executor=FakeExecutor(exc=failure),
     )
 
     assert not result.feasible
@@ -5216,6 +5221,8 @@ def test_engine_compute_timeout_is_an_infeasible_physics_refusal() -> None:
     assert result.run_reference is not None
     assert result.run_reference.status == "refused"
     assert result.run_reference.reason == "engine_compute_timeout"
+    assert failure.terminal_refusal is True
+    assert failure.reason_code == "engine_compute_timeout"
 
 
 def test_untyped_executor_exception_still_aborts_as_engine_bug() -> None:

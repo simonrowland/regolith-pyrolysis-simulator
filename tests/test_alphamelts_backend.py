@@ -708,7 +708,7 @@ def test_petthermotools_warm_bootstrap_import_failure_is_typed(monkeypatch):
 
 @pytest.mark.parametrize(
     'failure',
-    [ImportError, ModuleNotFoundError, KeyError],
+    [ImportError, ModuleNotFoundError, KeyError, OSError],
 )
 def test_petthermotools_initial_start_decodes_bootstrap_origin(
     monkeypatch,
@@ -763,6 +763,43 @@ def test_petthermotools_initial_start_decodes_bootstrap_origin(
     assert raised.value.exception_class == failure.__name__
     assert 'external-init' in raised.value.message
     assert 'worker initialization failed' not in str(raised.value)
+    if issubclass(failure, OSError):
+        assert raised.value.terminal_refusal is True
+        assert raised.value.reason_code == 'engine_compute_timeout'
+        assert raised.value.timeout_kind == 'OSError'
+
+
+def test_alphamelts_system_binary_probe_timeout_is_terminal(
+    monkeypatch,
+):
+    backend = alphamelts_module.AlphaMELTSBackend()
+    monkeypatch.setattr(backend, '_initialize_vapor_transport', lambda _c: None)
+    backend._vaporock_helper = types.SimpleNamespace(
+        initialize=lambda _config: None,
+        is_available=lambda: False,
+    )
+    monkeypatch.setattr(backend, '_find_project_binary', lambda _root: None)
+    monkeypatch.setattr(
+        'simulator.engine_local_config.find_alphamelts_binary',
+        lambda _root: None,
+    )
+    monkeypatch.setattr(Path, 'exists', lambda _path: False)
+
+    def timeout(args, *, timeout, **_kwargs):
+        raise subprocess.TimeoutExpired(args, timeout)
+
+    monkeypatch.setattr(
+        alphamelts_module,
+        '_run_alphamelts_subprocess',
+        timeout,
+    )
+
+    with pytest.raises(subprocess.TimeoutExpired) as caught:
+        backend.initialize({})
+
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutExpired'
 
 
 def test_petthermotools_initial_start_propagates_untagged_local_error(
@@ -6978,6 +7015,35 @@ def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
         )
 
 
+def test_thermoengine_transport_remote_timeout_is_terminal_and_typed():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+    remote_failure = EngineWorkerRemoteError(
+        'TimeoutError', 'remote equilibrium timed out', 'remote-traceback'
+    )
+
+    def _remote_timeout(_kwargs):
+        raise remote_failure
+
+    transport._worker.call = _remote_timeout
+
+    with pytest.raises(TimeoutError) as caught:
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt=_melts_domain_composition(),
+        )
+
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'TimeoutError'
+
+
 def test_thermoengine_transport_forwards_per_call_timeout():
     transport = ThermoEngineTransport(
         model_name='MELTSv1.0.2',
@@ -11306,6 +11372,21 @@ def test_native_call_preserves_declared_failure():
     assert captured.value is original
 
 
+def test_native_call_preserves_and_marks_environment_failure():
+    from engines.alphamelts.thermoengine import _thermoengine_native_call
+
+    original = PermissionError('native library unavailable')
+    with pytest.raises(PermissionError) as captured:
+        _thermoengine_native_call(
+            lambda: (_ for _ in ()).throw(original)
+        )
+
+    assert captured.value is original
+    assert captured.value.terminal_refusal is True
+    assert captured.value.reason_code == 'engine_compute_timeout'
+    assert captured.value.timeout_kind == 'PermissionError'
+
+
 def test_thermoengine_model_constructor_failure_is_typed():
     from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
 
@@ -11787,6 +11868,39 @@ def test_petthermotools_external_timeout_keeps_its_origin_type(monkeypatch):
     assert caught.value.terminal_refusal is True
     assert caught.value.reason_code == 'engine_compute_timeout'
     assert caught.value.timeout_kind == 'TimeoutExpired'
+
+
+def test_petthermotools_origin_tagged_oserror_is_terminal(monkeypatch):
+    from engines.alphamelts.petthermo import (
+        _PetThermoToolsExternalCallFailure,
+    )
+
+    backend = AlphaMELTSBackend()
+    failure = _PetThermoToolsExternalCallFailure(
+        'PermissionError', 'findLiq could not load its runtime'
+    )
+    monkeypatch.setattr(
+        backend,
+        '_require_petthermotools_runtime',
+        lambda: types.SimpleNamespace(findLiq=lambda *_a, **_k: None),
+    )
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda _c: {})
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+
+    def fail(*_args, **_kwargs):
+        raise failure
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fail)
+
+    with pytest.raises(_PetThermoToolsExternalCallFailure) as caught:
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1400.0
+        )
+
+    assert caught.value is failure
+    assert caught.value.terminal_refusal is True
+    assert caught.value.reason_code == 'engine_compute_timeout'
+    assert caught.value.timeout_kind == 'PermissionError'
 
 
 def test_petthermotools_remote_environment_refusal_keeps_remote_type():
