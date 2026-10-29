@@ -12,6 +12,9 @@ from simulator.battery.migrate import REPO_ROOT
 
 _NON_VAPOUR_QUANTITIES = {
     "ab_initio_enthalpy_of_formation",
+    # Sossi Table 4 values are liquid-oxide activity coefficients; gas_species
+    # names the vaporization reaction partner, not the measured species.
+    "activity_coefficient_this_work",
     "calibration_reference_gas_composition",
     "condensed_sample_mass",
     "deposit_edx_wt_pct_ranges",
