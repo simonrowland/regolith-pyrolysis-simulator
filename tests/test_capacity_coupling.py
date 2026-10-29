@@ -12,6 +12,7 @@ import yaml
 import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     OXYGEN_SPECIES,
@@ -1170,7 +1171,39 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    omitted_species = {
+        species for species, rate in demand_species.items()
+        if rate > 0.0 and released_species.get(species, 0.0) == 0.0
+    }
+    omitted_bounds_kg_hr = []
+    for species in omitted_species:
+        data = (
+            sim.vapor_pressures.get("metals", {}).get(species)
+            or sim.vapor_pressures.get("oxide_vapors", {}).get(species)
+        )
+        stoich = sim._evaporation_stoich(species, data)
+        # Here a rejected parent/O2 leg has mass a*r*dt <= floor, hence the
+        # omitted vapor rate r <= floor/(a*dt). Use the smallest positive
+        # kg-leg/kg-vapor coefficient (including vapor itself). TiO's O2
+        # coefficient is about 0.25: its vapor allowance is about 4*floor
+        # for this one-hour step. With no omissions the allowance is zero;
+        # N unit-coefficient omissions instead allow N*floor/dt, not floor.
+        coefficient = min(
+            value for value in (
+                1.0, stoich["oxide_per_product_kg"],
+                abs(stoich["O2_per_product_kg"]),
+            ) if value > 0.0
+        )
+        bound = _NUMERICAL_FLOOR_KG / coefficient  # dt = 1 hour
+        assert demand_species[species] * cap_record["scale"] <= bound
+        omitted_bounds_kg_hr.append(bound)
+    # Summing/scaling the finite rate map adds at most one capacity ULP
+    # per term; account for arithmetic error separately from rejected mass.
+    rounding_kg_hr = len(demand_species) * math.ulp(capacity_kg_hr)
+    assert released_kg_hr <= capacity_kg_hr + rounding_kg_hr
+    assert capacity_kg_hr - released_kg_hr <= (
+        math.fsum(omitted_bounds_kg_hr) + rounding_kg_hr
+    )
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
