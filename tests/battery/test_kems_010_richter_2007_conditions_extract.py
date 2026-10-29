@@ -201,6 +201,11 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
     assert len(residue_source_rows) == 51
     for source_row in residue_source_rows:
         assert source_row["phase"] == "glass"
+        row_locator = source_row["locator"]
+        assert row_locator["page"] == row_locator["published_page"] - 5543
+        assert row_locator["table"] == "1"
+        row_label = source_row["observation_id"].rsplit("_", 1)[-1]
+        assert row_locator["row"].casefold() == row_label.casefold()
         quench = source_row["point_conditions"]["quench_state"]
         assert quench["state"] == {"tag": "value", "value": "not_stated"}
         assert quench["locator"]["page"] == 5

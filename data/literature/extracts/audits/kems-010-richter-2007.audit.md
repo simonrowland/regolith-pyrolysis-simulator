@@ -16,7 +16,7 @@ The 2007 experimental rows do not print an absolute fO2, pO2, buffer, or gas rat
 
 All 51 Table 1 experiment records now point to their row-specific printed temperature and run time. The initial composition is linked to the single Table 1 `Starting material` row on page 6 (11.48 wt% MgO, 46.00 wt% SiO2, 19.39 wt% Al2O3, and 23.12 wt% CaO). All 50 mass-loss observation composition links cite that row with both absolute PDF page 6 and printed page 5549. The 8 numeric surface-area rows now link to the matching run experiment and temperature instead of a broad temperature range or the wrong run.
 
-The paper states on page 5 that the residues cooled to room temperature and were quenched to glass. Table 1 residue compositions therefore use phase `glass`, and their quench state is `not_stated`: the paper does not claim that quenching preserved or altered composition. Evaporation loss and flux observations remain phase `l`, because those values describe the hot run.
+The paper states on page 5 that the residues cooled to room temperature and were quenched to glass. Table 1 residue compositions therefore use phase `glass`, and their quench state is `not_stated`: the paper does not claim that quenching preserved or altered composition. All 51 residue observation row locators now carry the physical Table 1 page so their row-level temperatures retain page provenance through migration. Evaporation loss and flux observations remain phase `l`, because those values describe the hot run.
 
 ## Migration and identity axes
 
