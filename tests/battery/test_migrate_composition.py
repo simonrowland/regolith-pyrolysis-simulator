@@ -1550,6 +1550,55 @@ def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_compositi
     )
 
 
+def test_b704_jsc_partial_oxide_map_keeps_the_old_numeric_golden_before_fix() -> None:
+    path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "jsc_12023_table1_warren78_composition"
+    )
+    oxide_map = source_row["values"]["oxide_wt_pct"]
+
+    # Golden from the green converter: partial-map normalization invents a
+    # silica-free composition with this MgO mole fraction.
+    converted = wt_pct_to_mole_fraction(
+        {name: Decimal(str(amount)) for name, amount in oxide_map.items()}
+    )
+    assert converted.as_map()["MgO"] == Decimal(
+        "0.3600460805376726971963691396"
+    )
+
+
+def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_major() -> None:
+    path = REPO_ROOT / "data/literature/extracts/jsc-lunar-catalog-12023.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "jsc_12023_table1_warren78_composition"
+    )
+    assert source_row["values"]["absent_table_entries"].count("SiO2") == 1
+    assert sum(
+        Decimal(str(amount))
+        for amount in source_row["values"]["oxide_wt_pct"].values()
+    ) == Decimal("50.59")
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    observation = migrator.result.observations[
+        "jsc-lunar-catalog-12023::jsc_12023_table1_warren78_composition"
+    ]
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert observation.identity.composition.reason == (
+        "mass-percent composition does not close to 100 (sum=50.59); "
+        "missing major oxides: SiO2"
+    )
+
+
 def test_mole_percent_composition_converts_to_mole_fraction() -> None:
     composition = migrate_module._composition_located_from_plain(
         {
