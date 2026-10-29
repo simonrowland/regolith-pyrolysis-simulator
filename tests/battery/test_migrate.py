@@ -3829,6 +3829,15 @@ def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
     assert result.validation.hard_issues == ()
 
 
+# Whole-corpus validation pass: one full migrate + validate of every extract, so it is the
+# heaviest single test in this file. Measured pytest-worker CPU (process_time over the call
+# phase, the quantity the cpu_budget verdict uses), train/b172 12dc7267e, serial, niced:
+#   studio-2 at load 45-67, 5 runs: 370.3, 378.5, 362.4, 310.7, 372.1 s  (median 370.3, max 378.5)
+#   studio-3 serial (train, seq 1473): 278 s; studio-3 pr tier at -n 6: 308.9 s
+# CPU time itself rises ~35 % on a loaded host (cache/memory contention), so the budget is
+# sized from the loaded maximum: 500 s = 1.32 x 378.5 s, i.e. ~32 % headroom over the worst
+# observed run and 1.8 x the quiet-host 278 s. The default 300 s sits below every loaded run.
+@pytest.mark.cpu_budget(500)
 def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     report_path = REPO_ROOT / "data" / "battery" / "migration-report.md"
     works_dir = REPO_ROOT / "data" / "literature" / "works"
