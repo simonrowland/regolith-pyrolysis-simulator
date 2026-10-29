@@ -1491,6 +1491,50 @@ def test_melts_fe_redox_uses_ferric_fraction_only_without_weights(monkeypatch):
     assert len(calls) == 1
 
 
+def test_standalone_melts_fe_redox_prediction_closes_its_engine_handle(monkeypatch):
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    row4 = _borisov_row4()
+    opened = []
+
+    class FakeBackend:
+        def __init__(self):
+            self.close_calls = 0
+
+        def close(self):
+            self.close_calls += 1
+
+    def open_fake_engine(name):
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=True,
+            supports_intrinsic_fo2=True,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: _ok_cell(
+            fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0}
+        ),
+    )
+
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+
+    assert prediction.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0")
+    )
+    assert len(opened) == 1
+    assert opened[0].backend.close_calls == 1
+
+
 def test_melts_fe_redox_nonpositive_weights_do_not_fall_through(monkeypatch):
     row4 = _borisov_row4()
     _patch_melts_cell(

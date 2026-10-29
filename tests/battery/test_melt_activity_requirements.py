@@ -84,6 +84,101 @@ def test_nonfinite_activity_pressure_stays_required() -> None:
     assert "total_pressure_Pa" in profile_for(identity).required
 
 
+def test_standalone_activity_prediction_closes_its_engine_handle(monkeypatch) -> None:
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+    import simulator.battery.score as score_module
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    from simulator.battery.enums import AmountBasis, EvidenceClass
+    from simulator.battery.records import Composition
+    from tests.battery import factories as F
+    from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell
+
+    experiment = F.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = F.observation(
+        "standalone-activity-handle",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    close_calls: list[int] = []
+
+    class FakeBackend:
+        def close(self) -> None:
+            close_calls.append(1)
+
+    opened: list[EngineHandle] = []
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    monkeypatch.setattr(
+        score_module,
+        "_activity_request_or_contract_refusal",
+        lambda *_args, **_kwargs: (
+            SimpleNamespace(
+                payload={
+                    "composition_mol": {"SiO2": 0.5, "Al2O3": 0.5},
+                }
+            ),
+            None,
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda _handle, pot, **kwargs: EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.THERMOENGINE.value,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"SiO2_Liq": 0.9},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.value is not None
+    assert len(opened) == 1
+    assert close_calls == [1]
+
+
 def _reference_state(
     formula: str = "Na2O",
     basis: str = "oxide",
