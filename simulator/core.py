@@ -7899,14 +7899,61 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         molar_mass_kg_mol = molar_mass_g_mol / 1000.0
 
-        alpha_data = fe_row.get('evaporation_alpha') or {}
-        if not isinstance(alpha_data, Mapping) or 'value' not in alpha_data:
+        alpha_contract = fe_row.get('evaporation_alpha') or {}
+        if not isinstance(alpha_contract, Mapping):
             raise AccountingError(
-                'native Fe vapor partition requires grounded Fe '
-                'evaporation_alpha'
+                'native Fe vapor partition requires Fe evaporation_alpha metadata'
             )
-        alpha_spec = alpha_data['value']
+        # _apply_native_fe_saturation_split calls this only for a positive
+        # native-metal inventory. Use the separately fenced pure-metal row;
+        # the Fe melt alpha is an unrelated analytical upper bound.
+        alpha_data = next(
+            (
+                source
+                for source in alpha_contract.get('competing_sources', ())
+                if isinstance(source, Mapping)
+                and source.get('use') == 'native_metal_pond_only'
+            ),
+            None,
+        )
+        if (
+            not isinstance(alpha_data, Mapping)
+            or 'value' not in alpha_data
+            or 'temperature_range_K' not in alpha_data
+        ):
+            raise AccountingError(
+                'native Fe vapor partition requires the native_metal_pond_only '
+                'pure-Fe evaporation alpha'
+            )
+        alpha_spec = {
+            'form': 'scalar',
+            'value': alpha_data['value'],
+            'temperature_range_K': alpha_data['temperature_range_K'],
+        }
         alpha, alpha_evaluation = _evaluate_alpha_control('Fe', T_K, alpha_spec)
+        authority_status = (
+            'extrapolated'
+            if alpha_evaluation.get('alpha_s_extrapolated')
+            else 'measured'
+        )
+        authority_notice = str(
+            alpha_data.get('notice')
+            or 'McCabe solid-Fe alpha applies only within its measured system and band.'
+        )
+        liquid_transition_K = float(
+            alpha_data.get('liquid_transition_K') or math.inf
+        )
+        if T_K >= liquid_transition_K:
+            authority_status = 'out_of_domain'
+            authority_notice = (
+                f'{authority_notice} Evaluated at {T_K:.2f} K, where Fe is liquid; '
+                'no liquid-Fe evaporation coefficient is certified.'
+            )
+        alpha_evaluation.update({
+            'alpha_authority_status': authority_status,
+            'alpha_authority_notice': authority_notice,
+            'system_class': str(alpha_data.get('system_class') or ''),
+        })
 
         kernel_config = dict(
             getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
@@ -8067,6 +8114,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'carrier_gas': str(carrier_gas),
             'alpha_Fe': float(alpha),
             'alpha_source': str(alpha_data.get('source', '')),
+            'alpha_authority_status': authority_status,
+            'alpha_authority_notice': authority_notice,
             'alpha_s_evaluation': dict(alpha_evaluation),
             'source_label': vapor_pressure_source_label(
                 'native_fe_partition',
