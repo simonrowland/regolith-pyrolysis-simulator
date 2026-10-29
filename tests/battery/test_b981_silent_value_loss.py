@@ -148,14 +148,15 @@ def test_ohara_table1_po_partial_pressures_migrate_with_sample_conditions():
         assert temperature.locator is not None
         composition = conditions["composition"]
         assert composition.locator is not None
-        sample = int(observation.observation_id.rsplit("_sample_", 1)[1])
-        if sample == 20:
+        if not composition.state.is_value:
             assert not composition.state.is_value
             assert composition.state.reason == (
                 "Table 2 has no printed composition for sample 20"
             )
-        else:
-            assert composition.state.is_value
+    assert sum(
+        not (observation.point_conditions or {})["composition"].state.is_value
+        for observation in observations
+    ) == 1
 
 
 def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions():
