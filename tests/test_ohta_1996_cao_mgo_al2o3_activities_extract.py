@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from copy import deepcopy
+from pathlib import Path
 
 import yaml
 import pytest
@@ -14,8 +14,8 @@ from simulator.battery.migrate import Migrator, REPO_ROOT
 EXTRACT = REPO_ROOT / "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml"
 
 
-def _document() -> dict:
-    return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+def _document(path: Path = EXTRACT) -> dict:
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
 def _table_rows(document: dict) -> dict[str, dict[str, dict]]:
@@ -28,8 +28,8 @@ def _table_rows(document: dict) -> dict[str, dict[str, dict]]:
     return dict(rows)
 
 
-def test_table1_rendered_cells_and_row_count() -> None:
-    document = _document()
+def _assert_table1_rendered_cells_and_row_count(extract_path: Path) -> None:
+    document = _document(extract_path)
     rows = _table_rows(document)
     assert set(rows) == {f"1873-{i}" for i in range(1, 7)} | {f"1823-{i}" for i in range(1, 5)}
     assert sum(len(row) for row in rows.values()) == 130
@@ -55,10 +55,22 @@ def test_table1_rendered_cells_and_row_count() -> None:
         and observation["values"]["method_class"] == "measured_direct"
         for row in rows.values() for observation in row.values()
     )
-    mutated_rows = _table_rows(deepcopy(document))
-    mutated_rows["1873-1"]["Al_sol"]["values"]["component_amount"] = "43.6"
-    with pytest.raises(AssertionError):
-        assert mutated_rows["1873-1"]["Al_sol"]["values"]["component_amount"] == "43.5"
+
+
+def test_table1_rendered_cells_and_row_count(tmp_path: Path) -> None:
+    _assert_table1_rendered_cells_and_row_count(EXTRACT)
+
+    original = EXTRACT.read_text(encoding="utf-8")
+    needle = "component_amount: '43.5'\n"
+    assert original.count(needle) == 1
+    mutated_path = tmp_path / EXTRACT.name
+    mutated_path.write_text(
+        original.replace(needle, "component_amount: '43.6'\n", 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(AssertionError) as exc_info:
+        _assert_table1_rendered_cells_and_row_count(mutated_path)
+    assert "43.6" in str(exc_info.value)
 
 
 def test_ohta_extract_isolated_migration_and_survives_existing_values() -> None:
@@ -90,6 +102,21 @@ def test_ohta_extract_isolated_migration_and_survives_existing_values() -> None:
         for row in _table_rows(document).values()
         for observation in row.values()
     }
+    migrated_table = {
+        source_observation["observation_id"]: next(
+            observation
+            for observation_id, observation in result.observations.items()
+            if observation_id.endswith(source_observation["observation_id"])
+        )
+        for row in _table_rows(document).values()
+        for source_observation in row.values()
+    }
+    assert len(migrated_table) == len(table_ids) == 130
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.identity.composition.is_value
+        for observation in migrated_table.values()
+    )
     table_queue = [
         item for item in result.queue
         if item.source == "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml"
