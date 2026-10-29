@@ -482,6 +482,7 @@ def test_write_artifacts_emits_study_summary_schema(
 
     summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
 
+    assert summary["save_schema_version"] == 2
     for key in (
         "save_schema_version",
         "member_schema_version",
@@ -531,6 +532,38 @@ def test_write_artifacts_emits_study_summary_schema(
     assert manifest["strategy"]["config"]["budget"] == 4
     assert manifest["strategy"]["config"]["sampler_name"] == "random"
     assert manifest["replayable"] is True
+
+
+def test_study_summary_distinguishes_unavailable_and_empty_stage_three_glass() -> None:
+    from simulator.three_product_report import classify_products
+
+    def summarize(stages: list[object]) -> Mapping[str, Any]:
+        products = classify_products(
+            SimpleNamespace(
+                product_ledger=lambda: {},
+                train=SimpleNamespace(stages=stages),
+                atom_ledger=None,
+            )
+        )
+        record = SimpleNamespace(
+            product_summary={"product_classes": products},
+            trace_summary={},
+        )
+        payload = study._summary_products_payload(record)
+        assert payload is not None
+        return payload
+
+    missing_stage = summarize([])
+    assert missing_stage["glass_kg"] is None
+    assert missing_stage["glass_status"] == "unavailable"
+    assert missing_stage["glass_status_reason"] == "stage_3_missing"
+
+    empty_stage = summarize(
+        [None, None, None, SimpleNamespace(collected_kg={})]
+    )
+    assert empty_stage["glass_kg"] == {}
+    assert empty_stage["glass_status"] == "available"
+    assert empty_stage["glass_status_reason"] == ""
 
 
 def test_export_study_bundle_round_trip_hash_index(
