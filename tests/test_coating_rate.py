@@ -621,6 +621,8 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
+    # Rebaselined 2026-10-28 for t-1452: the run-level engine-binding admission notice gains `governs` and states its scope
+    # (cross-process cache replay and capture only); leaf diff vs 407e2f7b... is exactly those 2 notice leaves, no other value.
     # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
     # b-1028: 88 flux_dormant and 88 is_flux_dormant_by_epoch true->false,
     # 47 channel-state dormancy->refusal leaves, two refusal notes, counts
@@ -631,7 +633,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "407e2f7b851458f2dc611ace521fe5d0a47d6dbd252cdc367d1af35ab43b4a07"
+        "ec5daa3dcdd69f2f798ee1c7285e5897675003407465c66e2634513d1fd10ede"
     )
 
 
