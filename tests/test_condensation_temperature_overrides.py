@@ -969,9 +969,9 @@ def test_yaml_only_collector_band_reaches_all_consumers(
     sim = _collector_sim(setpoints)
     assert sim.train.stages[4].temp_range_C == band
 
-    seen = {'hkl_band': [], 'capture_budget': []}
+    seen = {'hkl_band': [], 'capture': []}
     original_band = condensation_module._stage_temp_band_C
-    original_budget = condensation_module._pressure_isolated_stage_efficiency
+    original_capture = condensation_module.CondensationModel._condensation_efficiency
 
     def observed_band(stage):
         result = original_band(stage)
@@ -979,14 +979,17 @@ def test_yaml_only_collector_band_reaches_all_consumers(
             seen['hkl_band'].append(result)
         return result
 
-    def observed_budget(stage, *args, **kwargs):
-        if stage.stage_number == 4:
-            seen['capture_budget'].append(stage.temp_range_C)
-        return original_budget(stage, *args, **kwargs)
+    def observed_capture(self, *args, **kwargs):
+        stage = kwargs.get('stage')
+        if stage is not None and stage.stage_number == 4:
+            seen['capture'].append(stage.temp_range_C)
+        return original_capture(self, *args, **kwargs)
 
     monkeypatch.setattr(condensation_module, '_stage_temp_band_C', observed_band)
     monkeypatch.setattr(
-        condensation_module, '_pressure_isolated_stage_efficiency', observed_budget,
+        condensation_module.CondensationModel,
+        '_condensation_efficiency',
+        observed_capture,
     )
     if initialize_before_reset:
         assert sim.condensation_model.train is sim.train
