@@ -11225,11 +11225,12 @@ def compile_residual(
         ),
         None,
     )
-    if (
-        unprinted_reference_phase is not None
-        and engine is Engine.INTERNAL_ANALYTICAL
-    ):
-        if experiment is not None and experiment.method.is_unknown:
+    if unprinted_reference_phase is not None:
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and experiment is not None
+            and experiment.method.is_unknown
+        ):
             return _refused(
                 RefusalReason.METHOD_UNKNOWN,
                 {
