@@ -1,0 +1,1707 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
+observations:
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ba::points:h=36dc727f3cd7
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1110'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 11, 9-26-5 residue column, Ba.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ce::points:h=23497e511490
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '115'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 2, 9-26-5 residue column, Ce.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_dy::points:h=f65772290366
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Dy
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '7.17'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 7, 9-26-5 residue column, Dy.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_er::points:h=bbebad893276
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Er
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '4.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 8, 9-26-5 residue column, Er.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_eu::points:h=fb902ba5b857
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2.57'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 5, 9-26-5 residue column, Eu.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_gd::points:h=1e583dae5ea6
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '8.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 6, 9-26-5 residue column, Gd.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_la::points:h=cf413f080dec
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: La
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '69'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 1, 9-26-5 residue column, La.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_lu::points:h=6b7b191760a7
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Lu
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.594'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 10, 9-26-5 residue column, Lu.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_nd::points:h=343ea9c4f972
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '45.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 3, 9-26-5 residue column, Nd.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_rb::points:h=18ce5c440433
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.57'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 12, 9-26-5 residue column, Rb.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sm::points:h=4e04580ad65d
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '8.67'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 4, 9-26-5 residue column, Sm.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sr::points:h=d18e67699119
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Sr
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '951'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 13, 9-26-5 residue column, Sr.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
+- observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_yb::points:h=405d151c41b6
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Yb
+      phase:
+        tag: unknown
+        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '3.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: masuda-tanaka-1979-vacuum-condensates
+  locator:
+    page: 5
+    published_page: 17
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 body row 9, 9-26-5 residue column, Yb.
+  read_from: pdf:masuda-tanaka-1979-vacuum-condensates
+  point_conditions:
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    T_C:
+      state:
+        tag: unknown
+        reason: source reports only an experiment-level crucible range; actual sample temperature varied locally and was not
+          measured per run
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    composition:
+      state:
+        tag: unknown
+        reason: complete_starting_composition_not_published
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+    exposure:
+      state:
+        tag: unknown
+        reason: interruption_time_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    sample_mass_kg:
+      state:
+        tag: unknown
+        reason: per_run_initial_charge_mass_not_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:masuda-tanaka-1979-vacuum-condensates
+    parameters: []
+    output_unit: ppm
+    references: []
