@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import textwrap
+from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -14,6 +15,19 @@ import pytest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_runtest_protocol_accepts_items_without_marker_api(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import conftest
+
+    monkeypatch.setattr(conftest, "_DOCS_PRIVATE_AUDIT_INSTALLED", False)
+    protocol = conftest.pytest_runtest_protocol(SimpleNamespace(), None)
+
+    assert next(protocol) is None
+    with pytest.raises(StopIteration):
+        next(protocol)
 
 
 def _run_probe(
