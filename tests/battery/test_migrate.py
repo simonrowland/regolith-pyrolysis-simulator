@@ -3005,6 +3005,64 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
+def test_nonclosing_phase_sample_composition_round_trips_as_unknown(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "partial-phase",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "oxide_weight_percent_as_published",
+                            "amount_basis": "mass_percent",
+                            "components": [["SiO2", "70"], ["MgO", "27.55"]],
+                        },
+                    },
+                    "locator": {"table": "1", "row": "4"},
+                }
+            },
+        }
+    ]
+    extract["species"] = {
+        "SiO2": {
+            "observations": [
+                {
+                    "observation_id": "partial-phase-silica",
+                    "experiment": "partial-phase",
+                    "type": "composition_series",
+                    "units": "wt_percent",
+                    "phase": "melt",
+                    "values": {
+                        "quantity": "equilibrium_phase_composition",
+                        "formula": "SiO2",
+                        "phase_label": "melt",
+                        "basis": "wt_percent",
+                        "component_amount": "70",
+                        "admission_status": "admitted",
+                    },
+                }
+            ]
+        }
+    }
+
+    root = _write_min_tree(tmp_path, extract)
+    migrate(root, write=True)
+    _works, _experiments, observations = load_migrated_store(root)
+
+    composition = observations[
+        "fixture-source::partial-phase-silica"
+    ].identity.composition
+    assert composition is not None
+    assert composition.is_unknown
+    assert "mass-percent composition does not close to 100 (sum=97.55)" in (
+        composition.reason or ""
+    )
+
+
 def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
