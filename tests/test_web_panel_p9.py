@@ -239,6 +239,33 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert not re.search(r"\bGrounded\b", html.split('<details', 1)[0])
 
 
+def test_p9_displays_engine_binding_admission_scope_from_run_metadata() -> None:
+    notice = {
+        "notices": [
+            {
+                "type": "typed_notice",
+                "kind": "engine_binding_not_admitted",
+                "governs": "cross-process cache replay and capture only",
+                "message": (
+                    "This only disables cross-process cache replay and capture. "
+                    "Live computation and its value are unaffected. To admit, "
+                    "run scripts/assess_engine_bindings.py."
+                ),
+            }
+        ]
+    }
+    metadata = _complete_metadata(engine_binding_admission_notice=notice)
+    html = _render_panel({
+        "header": {"engine_identity": {"name": "magemin"}},
+        "terminal": {"run_metadata": metadata},
+    })
+
+    binding_notice = _article(html, "Engine binding admission notice")
+    assert "cross-process cache replay and capture only" in binding_notice
+    assert "Live computation and its value are unaffected" in binding_notice
+    assert "scripts/assess_engine_bindings.py" in binding_notice
+
+
 def test_p9_degraded_run_keeps_reason_and_origin_and_never_claims_grounded() -> None:
     metadata = _complete_metadata(
         backend="internal-analytical",

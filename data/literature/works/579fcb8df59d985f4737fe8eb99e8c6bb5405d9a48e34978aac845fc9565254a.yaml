@@ -1,0 +1,557 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  citation: 'Schreiber, H. D. (1977). Redox states of Ti, Zr, Hf, Cr, and Eu in basaltic magmas: An experimental study. Proceedings
+    of the Eighth Lunar Science Conference, 1785-1807.'
+  source_ids:
+  - schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e78a054f8155aa22b20063b4b008343f30445072
+    files:
+    - asset_id: pdf:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+      role: pdf
+      path: raw/schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu/schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu.pdf
+      sha256:
+        tag: value
+        value: 2317ff73b7489ed17e9230f11c8067d2b925f8a3e7072522720a808cac80cfe6
+    - asset_id: pdftotext:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+      role: pdftotext
+      path: text/schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a::experiment::schreiber_1977_t3_prior_materials
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  locator:
+    page: 16
+    published_page: 1800
+    pdf_page_index: 15
+    table: '3'
+context:
+- observation_id: schreiber_1977_figure1_redox_ion_flow
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1786
+    figure: '1'
+  phase: l
+  units: schematic; no numeric data
+  values:
+    quantity: redox_ion_flow_diagram
+    method_class: figure_only
+    species:
+    - Cr
+    - Fe
+    - Ti
+    - Eu
+    temperature_as_published: typical crystallizing lunar magma; not stated
+    axes_as_published: none; schematic diagram
+    caption_as_published: A schematic illustration of the role of different redox states of Cr, Fe, Ti, and Eu in the crystallization
+      of a typical lunar magma. Some important minerals as well as modes of ion fractionation were not included in the diagram
+      for the sake of simplicity.
+    panel: single schematic
+    series:
+    - label: redox ion flow and mineral incorporation
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure1_redox_ion_flow
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_figure2_epr_spectra
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1790
+    figure: '2'
+  phase: glass
+  units: normalized EPR signal derivative versus gauss
+  values:
+    quantity: epr_spectrum
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    temperature_as_published: synthesis temperature not specified for representative spectra
+    axes_as_published:
+      x: magnetic field strength H (gauss)
+      y: dP''/dH
+    caption_as_published: Representative EPR spectra of Ti-, Eu-, and Cr-doped glasses of synthetic composition. The general
+      features of the three representative spectra were the same for both synthetic compositions. The spectra are shown as
+      the derivative of the absorption versus the magnetic field strength. A_pp is the intensity of the resonance signal;
+      the caption relates the resonance features to Ti(III), Eu(II), and Cr(III).
+    panel: single plot with stacked Ti3+, Eu2+, and Cr3+ spectra
+    series:
+    - label: Ti(III) spectrum
+      marker_count: 0
+    - label: Eu(II) spectrum
+      marker_count: 0
+    - label: Cr(III) spectrum
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure2_epr_spectra
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_figure3_epr_calibrations
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1791
+    figure: '3'
+  phase: glass
+  units: EPR normalized units and wt.% ion by redox titration
+  values:
+    quantity: redox_concentration_calibration
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    - Gd
+    temperature_as_published: 1500 °C filled symbols; 1550 °C open symbols
+    axes_as_published: EPR resonance intensity (A_pp) versus weight percent Ti(III), Eu(II), or Cr(III) determined by chemical
+      redox titration
+    caption_as_published: Calibration of the Ti(III), Eu(II), and Cr(III) EPR resonance intensities to the wt.% of each ion
+      determined by chemical redox titrations for synthetic glasses. Solid/open symbols denote 1500/1550 °C; circles/squares
+      denote FAS/FAD. Panels A, B and C show Ti(III), Eu(II) and Cr(III) calibrations; panel B also compares Gd(III).
+    panel: A Ti(III); B Eu(II) and Gd(III); C Cr(III)
+    series:
+    - label: Ti(III)
+      marker: circle and square
+      marker_count: uncounted
+    - label: Eu(II)
+      marker: circle and square
+      marker_count: uncounted
+    - label: Gd(III) comparison
+      marker: triangle and diamond
+      marker_count: uncounted
+    - label: Cr(III)
+      marker: circle and square
+      marker_count: uncounted
+    marker_count_note: Multiple temperatures and compositions share marker shapes; exact per-series counts have not been separated
+      in this deferred record.
+    attribution: This work; Gd(III) comparison is also measured in this work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure3_epr_calibrations
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_figure4_experimental_redox_equilibria
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 1794
+    figure: '4'
+  phase: glass
+  units: oxygen fugacity and degree of redox reduction
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    temperature_as_published: 1500 and 1550 °C
+    axes_as_published: x degree of reduction R or X; y oxygen fugacity
+    caption_as_published: Experimental results for the redox equilibria of Ti, Eu, and Cr in synthetic silicate melts with
+      respect to oxygen fugacity, temperature and melt composition. Solid/open symbols indicate 1500/1550 °C; circles/squares
+      indicate FAS/FAD. Panel A is Ti(IV)-Ti(III), panel B Eu(III)-Eu(II), and panel C Cr(VI)-Cr(III) and Cr(III)-Cr(II).
+    panel: A Ti; B Eu; C Cr(VI)-Cr(III) and Cr(III)-Cr(II)
+    series:
+    - label: Ti
+      marker: circles and squares
+      marker_count: uncounted
+    - label: Eu
+      marker: circles and squares
+      marker_count: uncounted
+    - label: Cr(VI)-Cr(III)
+      marker: circles and squares
+      marker_count: uncounted
+    - label: Cr(III)-Cr(II)
+      marker: circles and squares
+      marker_count: uncounted
+    - label: Johnston (1965) Ti comparison
+      marker: triangle
+      marker_count: uncounted
+    marker_count_note: Marker counts across temperature and composition series have not been separated in this deferred record.
+    attribution: Present work; Johnston (1965) comparison in panel A
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure4_experimental_redox_equilibria
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_figure5_redox_summary
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    published_page: 1796
+    figure: '5'
+  phase: glass
+  units: redox ratio and oxygen fugacity
+  values:
+    quantity: valence_ratio
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    T_C: 1500
+    axes_as_published: x log R; y -log P(O2) (oxygen fugacity)
+    caption_as_published: A summary of the Ti(IV)-Ti(III), Eu(III)-Eu(II), Cr(III)-Cr(II), and Cr(IV)-Cr(III) redox equilibria
+      in synthetic Fe-free silicate melts at 1500 °C with respect to imposed oxygen fugacity and bulk melt composition. Dashed/solid
+      lines denote FAD/FAS; oxygen buffer fugacities are calculated values extrapolated from Huebner (1971).
+    panel: single plot
+    series:
+    - label: Ti(IV)-Ti(III)
+      marker_count: 0
+    - label: Eu(III)-Eu(II)
+      marker_count: 0
+    - label: Cr(III)-Cr(II)
+      marker_count: 0
+    - label: Cr(IV)-Cr(III)
+      marker_count: 0
+    attribution: Present-work experimental results; buffer values from Huebner (1971)
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure5_redox_summary
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_figure6_reduction_potential_comparison
+  type: figure_record
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 1797
+    figure: '6'
+  phase: glass
+  units: relative reduction parameter and aqueous standard reduction potential
+  values:
+    quantity: reduction_potential
+    method_class: figure_only
+    species:
+    - Ti
+    - Eu
+    - Cr
+    - Fe
+    - V
+    - Mn
+    - Co
+    - Ce
+    temperature_as_published: adjusted to experimentally normalized lunar conditions
+    axes_as_published: x aqueous standard reduction potential; y log R at 1500 °C and log P(O2) = -8.8
+    caption_as_published: Relationship of a parameter proportional to a reduction potential of redox couples in silicate melts
+      to standard aqueous reduction potentials. R and X are defined in Fig. 5; values were adjusted to experimentally normalized
+      lunar conditions and combined with Johnston (1965).
+    panel: single plot
+    series:
+    - label: this work
+      marker: filled circle
+      marker_count: 3
+    - label: Johnston (1965) estimates
+      marker: open triangle
+      marker_count: 6
+    - label: guide line
+      marker_count: 0
+    attribution: Present work combined with Johnston (1965)
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_figure6_reduction_potential_comparison
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_hf_nonreduction
+  type: assessment
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1785
+    section: Abstract
+  units: qualitative
+  values:
+    quantity: Hf(IV) remains oxidized
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: Abstract reports no measured Hf reduced-state values; only that the trivalent state was not observed or predicted.
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_hf_nonreduction
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Hf
+- observation_id: schreiber_1977_table1_synthetic_and_basalt_compositions
+  type: table
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1788
+    table: '1'
+  units: wt% oxides except Eu in ppm, as printed
+  values:
+    quantity: bulk melt compositions and basalt comparison ranges
+    candidate_tokens:
+    - composition
+    table_row_count: 11
+    reason: Whole-sample melt recipes and compiled basalt ranges are context; they are not individual phase compositions.
+      Dashes are unreported.
+    footnotes:
+    - Each synthetic melt contained only a single redox oxide, either Ti, Cr, or Eu oxide.
+    - FAS is 53% forsterite, 27% anorthite, and 20% silica by weight.
+    - FAD is 25% forsterite, 6% anorthite, and 69% diopside by weight.
+    - Parenthesized TiO2 values are approximate ZrO2 or HfO2 concentrations when substituted for TiO2.
+    - Basalt ranges are cited to Taylor (1975).
+    - The Earth Eu value is cited to Haskin et al. (1968).
+    table_rows:
+    - oxide: SiO2
+      FAS: '53.9'
+      FAD: '51.1'
+      Earth: 44-53
+      Moon: 37-49
+    - oxide: Al2O3
+      FAS: '10.7'
+      FAD: '2.9'
+      Earth: 13-19
+      Moon: 7-14
+    - oxide: FeO
+      FAS: —
+      FAD: —
+      Earth: 7-14
+      Moon: 18-23
+    - oxide: MnO
+      FAS: —
+      FAD: —
+      Earth: 0.09-0.3
+      Moon: 0.21-0.29
+    - oxide: MgO
+      FAS: '29.3'
+      FAD: '26.1'
+      Earth: 4-10
+      Moon: 6-17
+    - oxide: CaO
+      FAS: '5.7'
+      FAD: '19.1'
+      Earth: 8-12
+      Moon: 8-12
+    - oxide: Na2O
+      FAS: —
+      FAD: —
+      Earth: 1.8-3.8
+      Moon: 0.1-0.5
+    - oxide: K2O
+      FAS: —
+      FAD: —
+      Earth: 0.3-1.9
+      Moon: 0.2-0.3
+    - oxide: TiO2
+      FAS: (1.3)^4
+      FAD: (1.3)^4
+      Earth: 0.9-3.3
+      Moon: 0.3-13
+    - oxide: Cr2O3
+      FAS: (0.1-0.6)
+      FAD: (0.1-0.8)
+      Earth: 0.005-0.04
+      Moon: 0.12-0.70
+    - oxide: Eu(ppm)
+      FAS: (9300)
+      FAD: (10600)
+      Earth: 1.9^6
+      Moon: 0.21-2.6
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_table1_synthetic_and_basalt_compositions
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_table2_reduction_enthalpies
+  type: table
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 1793
+    table: '2'
+  units: kcal/mole of O2 as printed
+  values:
+    quantity: fitted standard reduction reaction enthalpy
+    method_class: model_derived
+    candidate_tokens:
+    - delta_fH
+    table_row_count: 3
+    reason: These fitted reduction reaction enthalpies are not standard formation enthalpies from elements; no matching store
+      token exists.
+    table_rows:
+    - redox_couple: Ti(IV)->Ti(III)
+      FAS: 70 ± 28
+      FAD: 71 ± 19
+      average: 70 ± 23
+    - redox_couple: Eu(III)->Eu(II)
+      FAS: 44 ± 35
+      FAD: 36 ± 16
+      average: 40 ± 25
+    - redox_couple: Cr(III)->Cr(II)
+      FAS: 35 ± 12
+      FAD: 38 ± 3
+      average: 36 ± 8
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_table2_reduction_enthalpies
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_table3_current_cr_estimate
+  type: table
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 1800
+    table: '3'
+    row: Cr(III)-Cr(II), this study
+  units: dimensionless fraction as printed
+  values:
+    quantity: Cr(II) fraction in this study
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: This-study estimate derived from experimental redox curves, whose points are deferred with Figures 4 and 5.
+    value_as_published: 0.7-0.95
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_table3_current_cr_estimate
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Cr
+- observation_id: schreiber_1977_table3_current_eu_estimate
+  type: table
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 1800
+    table: '3'
+    row: Eu(III)-Eu(II), this study
+  units: dimensionless fraction as printed
+  values:
+    quantity: Eu(II) fraction in this study
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: This-study estimate derived from experimental redox curves, whose points are deferred with Figures 4 and 5.
+    value_as_published: 0.4-0.8
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_table3_current_eu_estimate
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Eu
+- observation_id: schreiber_1977_table3_current_ti_estimate
+  type: table
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 1800
+    table: '3'
+    row: Ti(IV)-Ti(III), this study
+  units: dimensionless fraction as printed
+  values:
+    quantity: Ti(III) fraction in this study
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: This-study estimate derived from experimental redox curves, whose points are deferred with Figures 4 and 5.
+    value_as_published: 0.01-0.07
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_table3_current_ti_estimate
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Ti
+- observation_id: schreiber_1977_zr_hf_nonreduction
+  type: assessment
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1785
+    section: Abstract
+  units: qualitative
+  values:
+    quantity: Zr(IV) and Hf(IV) remain oxidized
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: Abstract reports no measured Zr or Hf reduced-state values; only that trivalent states were not observed or predicted.
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_zr_hf_nonreduction
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Zr
+- observation_id: schreiber_1977_zr_table3_postulated_prior_fraction
+  type: table
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 1800
+    table: '3'
+    row: Zr(IV)-Zr(III), previous studies
+  units: dimensionless fraction as printed
+  values:
+    quantity: postulated Zr(III) fraction in lunar basalts
+    method_class: quoted_attributed
+    attribution: Postulated by Garg and Ehmann (1976)
+    admission_status: typed_unavailable
+    candidate_tokens:
+    - valence_ratio
+    value_as_published: 0.15-0.25
+    reason: The row is explicitly postulated, not a measured Zr value.
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_zr_table3_postulated_prior_fraction
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Zr
+- observation_id: schreiber_1977_zr_table3_zero_estimate
+  type: table
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 1800
+    table: '3'
+    row: Zr(IV)-Zr(III)
+  units: dimensionless fraction as printed
+  values:
+    quantity: Zr(III) fraction in this study
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: Printed zero is a study estimate, not a measured value; family instructions permit measured Zr/Hf values only.
+  context_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu::context::schreiber_1977_zr_table3_zero_estimate
+  work_id: 579fcb8df59d985f4737fe8eb99e8c6bb5405d9a48e34978aac845fc9565254a
+  source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
+  species: Zr

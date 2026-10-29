@@ -1,0 +1,1645 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/bouhifd-2007-basalt-thermochemistry.yaml
+observations:
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_liquidus_temperature_dta
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1430'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_liquidus_temperature_dta
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 4
+    published_page: 692
+    pdf_page_index: 3
+    section: Crystallized basalt
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 4
+        published_page: 692
+        pdf_page_index: 3
+        section: Crystallized basalt
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1570'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      value_K: 10
+      note: The source prints 1570 ± 10 K; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 2
+    published_page: 690
+    pdf_page_index: 1
+    section: Experimental methods, Basalt sample
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1570'
+      locator:
+        page: 2
+        published_page: 690
+        pdf_page_index: 1
+        section: Experimental methods, Basalt sample
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 2
+        published_page: 690
+        pdf_page_index: 1
+        section: Experimental methods, Basalt sample
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1393'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '64.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1393'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '64.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_albite_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1830'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '133'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1830'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '123.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_anorthite_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '82.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '78.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_diopside_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1490'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '89.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1490'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '88.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_fayalite_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2174'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '142'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2174'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '128.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_forsterite_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: FeTiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1640'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '21.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1640'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: FeTiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '17.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_ilmenite_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '54'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'
+- observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion_at_1430k
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1430'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '53.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: From the data of Richet and Bottinga (1984a, b), Richet et al. (1993b), Stebbins and Carmichael (1984), and
+      Naylor and Cook (1946), Table 6.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_table6_orthoclase_heat_of_fusion_at_1430k
+  source_id: bouhifd-2007-basalt-thermochemistry
+  locator:
+    page: 8
+    published_page: 696
+    pdf_page_index: 7
+    table: '6'
+  read_from: pdf:bouhifd-2007-basalt-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1430'
+      locator:
+        page: 8
+        published_page: 696
+        pdf_page_index: 7
+        table: '6'

@@ -13,35 +13,39 @@ extraction:
   method: >-
     AQ-acquired OA PDF ferry-inbox/acquired/metsoc-2019-6005.pdf
     (sha256 c09c421f62accbed788a44e15e17c42caed290a500c45503d154a44d7efe3c67;
-    1-page MetSoc abstract). pdftotext -layout + 300 dpi render of Table 1 and
-    printed ΔfH/ΔfS/ΔHfus values. N16 / N7 ruling: Table 1 gas-phase mol% is
-    explicitly "calculated from the values of the oxide activity" → typed_absence
-    (model/derived cohort; numbers not ingested). Figs 1–2 (lg pi and activities)
-    are figure-only and were not digitized. Printed formation enthalpy/entropy and
-    melting enthalpy/temperature landed as gibbs_table / transition_point.
+    1-page MetSoc abstract). pdftotext -layout + 300 dpi render of the printed
+    ΔfH/ΔfS/ΔHfus values, which landed as gibbs_table / transition_point.
+    Table 1 gas-phase mol% was admitted from a 600 dpi render on the duplicate
+    source id shornikov-2019-perovskite-abstract (same PDF sha256) and moved
+    here so this PDF has one extract. method_class stays model_derived. This
+    abstract does not print the oxide activities or a total pressure, so no
+    derived_from parent is stored. Figs 1–2 stay undigitized.
   date: '2026-09-23'
   worker: n16-aq-oa-batch-b
   provenance_path: data/literature/extracts/metsoc-2019-6005.yaml
 review_status: draft
-corrections: []
+corrections:
+- issue: table_1_relocated_from_duplicate_source
+  note: >-
+    The same PDF was also drafted as shornikov-2019-perovskite-abstract.
+    That extract and its audit are removed in the same commit. The 30
+    Table 1 cells and their three fidelity pins moved here. Observation
+    ids are unchanged. The obsolete Table 1 typed absence is removed.
+    Figs. 1 and 2 stay typed absences.
+  locators:
+  - pdf_page_index: 0
+    table: '1'
+    note: gas-phase mol % at 1700, 2241, and 2400 K
 scope_assessment:
   document_type: 1-page MetSoc abstract (KEMS perovskite / CaO–TiO2 evaporation)
-  scored_observations: 3
+  scored_observations: 33
   note: >-
     STEP 0: prior Shornikov extracts kems-033-shornikov-2010 (CAI melt LPSC 2010
     #1408) and kems-029-yakovlev-shornikov-2011 (Vestnik CAI) are different papers.
     No prior metsoc-2019-6005 / perovskite Knudsen CaTiO3 extract.
+    Table 1's typed absence is resolved: its 30 mol% cells are the
+    equilibrium_phase_composition rows on this extract.
 typed_absences:
-- kind: model_output
-  reason: owner_blocked_model_derived_cohort
-  item: Table 1 gas-phase composition over perovskite (mol %) at 1700 / 2241 / 2400 K
-  locator:
-    pdf_page_index: 1
-    table: '1'
-  note: >-
-    Abstract states Table 1 is "calculated from the values of the oxide activity"
-    (citing Shornikov & Yakovlev 2015). Not a direct measurement table. Numeric
-    mol% cells deliberately not ingested under measured-only rule.
 - kind: figure_only
   reason: not_digitized
   item: Fig. 1 partial pressures lg pi (atm) vs T over perovskite (species Ca, CaO, Ti, TiO, TiO2, O, O2, CaTiO3)
@@ -63,27 +67,60 @@ fidelity_samples:
   field: delta_fH_kJ_mol_as_printed
   value: -39.88
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
-    note: "enthalpy … of perovskite formation equal to −39.88±0.54 kJ/mol"
+    note: "enthalpy and entropy of perovskite formation equal to −39.88±0.54 kJ/mol"
 - species: CaTiO3
   observable: gibbs_table
   observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
   field: delta_fS_J_mol_K_as_printed
   value: 3.15
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
     note: "entropy of perovskite formation equal to … 3.15±0.28 J/(mol×K)"
 - species: CaTiO3
   observable: transition_point
   observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
-  field: melting_enthalpy_kJ_mol_as_printed
+  field: value
   value: 47.61
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Results and discussion
     note: "melting enthalpy of perovskite at 2241±10 K, equal to 47.61±1.84 kJ/mol"
+- species: 'O'
+  observable: 'equilibrium_phase_composition'
+  observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c02'
+  field: 'value'
+  value: '34'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: '1700 K O mol %; 600 dpi render of PDF page 1.'
+- species: 'CaO'
+  observable: 'equilibrium_phase_composition'
+  observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c05'
+  field: 'value'
+  value: '8.0e-3'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: '1700 K CaO cell; the render reads 8.0 times 10 to the -3.'
+- species: 'CaTiO3'
+  observable: 'equilibrium_phase_composition'
+  observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c11'
+  field: 'value'
+  value: '0.39'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: '2400 K CaTiO3 mol %; 600 dpi render of PDF page 1.'
 benches:
 - id: shornikov-yakovlev-2019-kems
   identity: {basis: described_in_this_work}
@@ -120,9 +157,15 @@ species:
       experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: formation enthalpy from oxide activities / partial pressures
+        note: >-
+          Single printed page, Results and discussion: "the enthalpy and entropy
+          of perovskite formation equal to −39.88±0.54 kJ/mol and 3.15±0.28
+          J/(mol×K), respectively". Determined from the CaO, TiO2 and CaTiO3
+          activities. Missing quantity: enthalpy of formation from the oxides,
+          not delta_fH.
       phase: solid_perovskite
       standard_state: enthalpy of perovskite formation as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
@@ -138,15 +181,21 @@ species:
         delta_fH_uncertainty_kJ_mol_as_printed: 0.54
         basis_as_printed: per 1 mol compound
         note: >-
-          Derived by authors from CaO, TiO2, CaTiO3 activities calculated from
-          measured partial pressures; central printed value retained.
+          Missing quantity: enthalpy of formation from the oxides (CaO + TiO2 =
+          CaTiO3), not delta_fH. The same sentence gives the oxide activities,
+          calculated from the partial pressures, as the source of the mixing
+          energy and of this formation enthalpy. Central printed value retained.
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
       experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: formation entropy from oxide activities / partial pressures
+        note: >-
+          Single printed page, Results and discussion: "3.15±0.28 J/(mol×K)".
+          Missing quantity: entropy of formation from the oxides, not S and not
+          entropy_of_fusion.
       phase: solid_perovskite
       standard_state: entropy of perovskite formation as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
@@ -161,34 +210,140 @@ species:
         delta_fS_J_mol_K_as_printed: 3.15
         delta_fS_uncertainty_J_mol_K_as_printed: 0.28
         basis_as_printed: per 1 mol compound
+        note: >-
+          Missing quantity: entropy of formation from the oxides, not S and not
+          entropy_of_fusion. Same Results sentence as the formation enthalpy.
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
       experiment: shornikov-2019-mo-kems
       type: transition_point
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         section: Results and discussion
-        note: melting enthalpy at printed melting temperature
+        note: >-
+          Single printed page, Results and discussion: "the melting enthalpy of
+          perovskite at 2241±10 K, equal to 47.61±1.84 kJ/mol (per 1 mol
+          compound)". heat_of_fusion at the stated 2241 K.
       T_range_K:
       - 2241
       - 2241
       phase: solid_to_liquid_perovskite
       standard_state: melting of perovskite as printed (per 1 mol compound)
       regime: knudsen_cell_mass_spectrometry_CaO_TiO2
-      units: kJ/mol and K as printed
+      units: kJ/mol
       uncertainty:
         melting_T_K: 10
         melting_enthalpy_kJ_mol: 1.84
         as_printed: 2241±10 K; 47.61±1.84 kJ/mol
       values:
-        quantity: melting_enthalpy_and_temperature
+        quantity: heat_of_fusion
         method_class: measured_reduced
         evidence_class: authors_own_KEMS
+        value: 47.61
+        T_K: 2241
         melting_T_K_as_printed: 2241
         melting_T_uncertainty_K_as_printed: 10
-        melting_enthalpy_kJ_mol_as_printed: 47.61
         melting_enthalpy_uncertainty_kJ_mol_as_printed: 1.84
         basis_as_printed: per 1 mol compound
-        T_K: 2241
+        note: >-
+          Mapped from the combined melting-enthalpy-and-temperature printing.
+          The paper gives both: 47.61±1.84 kJ/mol at 2241±10 K. This is fusion,
+          so the quantity is heat_of_fusion at that T.
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c11'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: '$CaTiO_3$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '3.9e-5'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$3.9×10^{-5}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c11'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: '$CaTiO_3$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '6.6e-2'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$6.6×10^{-2}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c11'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: '$CaTiO_3$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '0.39'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
     context:
     - observation_id: shornikov_yakovlev_2019_metsoc6005_method_T_ranges
       type: method
@@ -217,3 +372,868 @@ species:
         heterogeneous_reaction_as_printed: "[CaTiO3] = (CaTiO3)"
       uncertainty:
         note: none printed beyond stated T windows
+  O:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c02'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: 'O'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '34'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c02'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: 'O'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '16'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c02'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: 'O'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '17'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  O2:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c03'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: '$O_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '1.3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c03'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: '$O_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '1.2'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c03'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: '$O_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '1.4'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  Ca:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c04'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: 'Ca'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '35'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c04'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: 'Ca'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '10'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c04'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: 'Ca'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '8.6'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  CaO:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c05'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: 'CaO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '8.0e-3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$8.0×10^{-3}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c05'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: 'CaO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '3.4e-2'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$3.4×10^{-2}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c05'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: 'CaO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '5.1e-2'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$5.1×10^{-2}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  Ti:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c06'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: 'Ti'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '3.4e-5'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$3.4×10^{-5}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c06'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: 'Ti'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '2.8e-3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$2.8×10^{-3}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c06'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: 'Ti'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '6.0e-3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$6.0×10^{-3}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  TiO:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c07'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: 'TiO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '0.96'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c07'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: 'TiO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '8.2'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c07'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: 'TiO'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '11'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  TiO2:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c08'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: '$TiO_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '29'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c08'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: '$TiO_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '64'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c08'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: '$TiO_2$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '62'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  Ti2O3:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c09'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: '$Ti_2O_3$'
+      units: 'mol %'
+      mineru_flags:
+      - 'non_numeric_in_numeric_column'
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '4.7e-3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$4.7×10^{-3}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c09'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: '$Ti_2O_3$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '0.13'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c09'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: '$Ti_2O_3$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '0.15'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'
+  Ti2O4:
+    observations:
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r02_c10'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '1700'
+        column_header: '$Ti_2O_4$'
+      units: 'mol %'
+      mineru_flags:
+      - 'non_numeric_in_numeric_column'
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '1700'
+        value: '2.5e-3'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        value_as_printed: '$2.5×10^{-3}$'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '1700'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '1700'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r03_c10'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2241'
+        column_header: '$Ti_2O_4$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2241'
+        value: '0.11'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2241'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2241'
+            column_header: 'T, K'
+    - observation_id: 'shornikov_2019_perovskite_abstract_p001_t01_r04_c10'
+      type: 'equilibrium_phase_composition'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '2400'
+        column_header: '$Ti_2O_4$'
+      units: 'mol %'
+      mineru_flags: []
+      values:
+        quantity: 'equilibrium_phase_composition'
+        method_class: 'model_derived'
+        T_K: '2400'
+        value: '0.12'
+        attribution: 'The paragraph above Table 1 says the gas-phase composition over perovskite was calculated from the oxide activities. This abstract does not print those activities or a total pressure. Reference [5] is Shornikov and Yakovlev, Geochem. Int. 53, 690–699 (2015). No derived_from parent is stored.'
+        basis_as_published: 'gas-phase mol %'
+      phase: 'g'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: 'value'
+            value:
+              kind: 'point'
+              point: '2400'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            row_label: '2400'
+            column_header: 'T, K'

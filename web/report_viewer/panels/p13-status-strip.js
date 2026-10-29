@@ -209,9 +209,12 @@
     const regimeLabel = regimeHeadline(summary);
     const kn = emittedKn(summary);
     const knText = numberText(kn.value);
-    const gauge = kn.state !== "number"
-      ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number ${esc(knText)}"></div>`
-      : `<meter class="sec-p13-gauge" min="0" max="10" low="0.01" high="10" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
+    const viscousMax = summary?.VISCOUS_KNUDSEN_MAX;
+    const freeMolecularMin = summary?.FREE_MOLECULAR_KNUDSEN_MIN;
+    const hasGaugeBounds = hasNumber(viscousMax) && hasNumber(freeMolecularMin);
+    const gauge = kn.state !== "number" || !hasGaugeBounds
+      ? `<div class="sec-p13-gauge sec-p13-gauge--pending" aria-label="Knudsen number ${esc(knText)}${hasGaugeBounds ? "" : "; gauge bounds not emitted"}"></div>`
+      : `<meter class="sec-p13-gauge" min="0" max="${esc(String(freeMolecularMin))}" low="${esc(String(viscousMax))}" high="${esc(String(freeMolecularMin))}" optimum="0" value="${esc(String(kn.value))}" aria-label="Emitted Knudsen number ${esc(String(kn.value))}; low is the viscous end and high is the ballistic end"></meter>`;
     // Only transport_formula_id is displayed; never invent a backend formula id.
     const formula = hasOwn(summary || {}, "transport_formula_id")
       ? scalarValue(summary.transport_formula_id)

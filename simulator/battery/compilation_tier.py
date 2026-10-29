@@ -60,7 +60,10 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
-from simulator.battery.polymorph_dictionary import canonical_element_allotrope
+from simulator.battery.polymorph_dictionary import (
+    canonical_element_allotrope,
+    unrecognised_polymorph_spelling,
+)
 from simulator.battery.records import (
     DecisionBand,
     Notice,
@@ -881,7 +884,7 @@ def _ellingham_attempt(
         )
     formula = identity.species.formula
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    target = parse_species_formula(formula)
+    target = parse_species_formula(formula, species=identity.species)
     if target is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
@@ -1176,7 +1179,12 @@ def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
 
 def _poly_name(identity: Identity) -> str | None:
     poly = polymorph_token(identity.species)
-    return None if poly is None else poly.value
+    if poly is not None:
+        return poly.value
+    state = identity.species.polymorph
+    if state is not None and state.is_unknown:
+        return unrecognised_polymorph_spelling(state.reason)
+    return None
 
 
 def _same_mineral(engine_poly: str | None, identity_poly: str | None) -> bool:
@@ -1225,7 +1233,9 @@ def _resolve_symbol(engine: Engine, identity: Identity) -> tuple[str | None, str
         detail = getattr(_pure_phase_rows, "failure", "unread")
         return None, f"pure-phase-map-unavailable:{detail}"
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    target = parse_species_formula(identity.species.formula)
+    target = parse_species_formula(
+        identity.species.formula, species=identity.species
+    )
     if target is None:
         return None, "species-formula-unparsed"
     identity_poly = _poly_name(identity)
@@ -1553,7 +1563,9 @@ def _pure_phase_attempt(
         )
     returned = getattr(props, "formula", None)
     _is_comp, _is_internal, _is_sf04, parse_species_formula = _score_predicates()
-    if returned and parse_species_formula(str(returned)) != parse_species_formula(identity.species.formula):
+    if returned and parse_species_formula(
+        str(returned), species=identity.species
+    ) != parse_species_formula(identity.species.formula, species=identity.species):
         return _refuse(
             RefusalReason.IDENTITY_MISMATCH,
             "pure-phase-formula-disagrees",
@@ -3102,13 +3114,13 @@ def _tier_cell_from_payload_fields(
     derive_eligible: bool,
     numeric_value: Decimal | None = None,
 ) -> _TierCell:
-    from simulator.battery.score import _decision_band_kind
+    from simulator.battery.score import _decision_band_kind, _engine_from_residual_key
 
     request = row.get("candidate_request")
     engine = (
         str(request["engine"])
         if isinstance(request, Mapping) and request.get("engine")
-        else str(row.get("key") or "").rsplit("::", 1)[-1]
+        else _engine_from_residual_key(row.get("key"))
     )
     raw_numeric = row.get("numeric")
     numeric = None
@@ -3167,6 +3179,7 @@ def compilation_tier_lines(
 
     from simulator.battery.score import (
         Residual,
+        _engine_from_residual_key,
         _is_flagged_stratum_notice,
         _is_fusion_conversion_notice,
     )
@@ -3181,7 +3194,7 @@ def compilation_tier_lines(
             if observation is None:
                 continue
             yield _cell_from_observation(
-                engine=residual.key.rsplit("::", 1)[-1],
+                engine=_engine_from_residual_key(residual.key),
                 status=residual.status,
                 relation=residual.source_relation,
                 numeric=None if residual.numeric is None else residual.numeric.value,
@@ -3497,6 +3510,28 @@ def _nasa9_fit_phase_label(identity: Identity) -> str | None:
 
 
 def _nasa9_fit_comparisons(
+    context,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+    fit_records: Sequence[Mapping[str, object]] | None = None,
+) -> list[_Nasa9FitComparison]:
+    """Score NASA-9 cells with one lineage index for this store snapshot."""
+
+    from simulator.battery.validate import bound_work_inputs
+
+    with bound_work_inputs(
+        context.works, context.observations, context.experiments
+    ):
+        return _nasa9_fit_comparisons_with_bound_lineage(
+            context,
+            engines=engines,
+            invoke_pure_phase=invoke_pure_phase,
+            fit_records=fit_records,
+        )
+
+
+def _nasa9_fit_comparisons_with_bound_lineage(
     context,
     *,
     engines: Sequence[Engine],

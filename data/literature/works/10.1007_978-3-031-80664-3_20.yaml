@@ -71,6 +71,8 @@ experiments:
             kind: bound
             bound_operator: <=
             bound_value: '1.0'
+          note: 'p. 221 Experimental: "CaO (chemically pure), the content of the basic substance is not less than 97.5 wt%,
+            not more than 1.0 wt% CaCO3." Remaining composition unresolved.'
       locator:
         published_page: 221
         pdf_page_index: 7
@@ -136,6 +138,7 @@ experiments:
               section: Experimental
               note: Residual gas <=10^-10 atm converted using 101325 Pa/atm; chamber background, not sample pressure
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown

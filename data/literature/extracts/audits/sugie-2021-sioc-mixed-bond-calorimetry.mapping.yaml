@@ -1,0 +1,9 @@
+source_id: sugie-2021-sioc-mixed-bond-calorimetry
+input: born-digital pdftotext-layout plus MinerU table 4, table 5 and table 6 drafts
+mapping:
+  - {table: 1, physical_page: 5, disposition: context-whole-sample-elemental-analysis}
+  - {table: 2, physical_page: 10, disposition: context-nmr-bond-fractions}
+  - {table: 3, physical_page: 11, disposition: context-nmr-qn-fractions}
+  - {table: 4, physical_page: 15, disposition: context-raman-parameters}
+  - {table: 5, physical_page: 19, disposition: context-thermodynamic-cycles; printed-reaction-basis-preserved}
+  - {table: 6, physical_page: 19, disposition: four-delta-Hf-elem-values-typed; delta-Hds-delta-Hox-and-delta-Hf-comp-remain-context}

@@ -62,6 +62,7 @@ PER_HOUR_KEYS = {
     "shuttle_cycle",
     "mre_voltage_V",
     "mre_current_A",
+    "oxygen_reservoir",
 }
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",

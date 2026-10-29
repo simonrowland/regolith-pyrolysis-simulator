@@ -150,8 +150,8 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             },
             'glass': {
                 'species_kg': {species: kg, ...},
-                'class_total_kg': float,
-                'pure_silica_glass_kg': float,
+                'class_total_kg': float | None,
+                'pure_silica_glass_kg': float | None,
                 'industrial_mixed_glass_kg': float,
             },
             'industrial_mixed_glass': {
@@ -216,14 +216,28 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
 
     # ----- Class 2: pure silica glass (Stage 3 capture) -----
     stage_3_kg_by_species: dict[str, float] = {}
-    if len(train_stages) > 3:
+    stage_3_unavailable_reason: str | None = 'stage_3_missing'
+    if len(train_stages) > 3 and train_stages[3] is not None:
         stage_3 = train_stages[3]
-        collected = dict(getattr(stage_3, 'collected_kg', {}) or {})
+        collected = getattr(stage_3, 'collected_kg', None)
+        if isinstance(collected, Mapping):
+            stage_3_unavailable_reason = None
+        elif collected is None:
+            stage_3_unavailable_reason = 'stage_3_collection_missing'
+        else:
+            stage_3_unavailable_reason = 'stage_3_collection_malformed'
+    else:
+        collected = None
+    if stage_3_unavailable_reason is None:
         for species in PURE_SILICA_GLASS_SPECIES:
             kg = float(collected.get(species, 0.0))
             if kg > 0.0:
                 stage_3_kg_by_species[species] = kg
-    stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
+    stage_3_capture_kg = (
+        float(sum(stage_3_kg_by_species.values()))
+        if stage_3_unavailable_reason is None
+        else None
+    )
     saw_oxygen_hold = False
     saw_release_capture = False
     every_capture_followed_release_switch = True
@@ -291,7 +305,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     silica_is_product = (
         saw_release_capture and every_capture_followed_release_switch
     )
-    if not silica_is_product:
+    if stage_3_unavailable_reason is not None:
+        silica_product_kg: float | None = None
+        reported_stage_3_capture_kg: float | None = None
+        silica_certification_flag = {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'band': None,
+            'reason': stage_3_unavailable_reason,
+        }
+    elif not silica_is_product:
         silica_product_kg: float | None = 0.0
         reported_stage_3_capture_kg: float | None = stage_3_capture_kg
     else:
@@ -444,7 +467,9 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'stage_3_kg_by_species': reported_stage_3_species,
         'class_total_kg': silica_product_kg,
     }
-    if silica_is_product and silica_certification_flag is not None:
+    if silica_certification_flag is not None and (
+        silica_is_product or stage_3_unavailable_reason is not None
+    ):
         silica_bucket['flag'] = silica_certification_flag
 
     result = {

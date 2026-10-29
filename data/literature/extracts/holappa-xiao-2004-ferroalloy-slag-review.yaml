@@ -1,0 +1,231 @@
+schema_version: literature_extract.v1
+source_id: holappa-xiao-2004-ferroalloy-slag-review
+source:
+  citation: 'Holappa, L. & Xiao, Y. (2004), Slags in ferroalloys production—review of present knowledge, Journal of the South African Institute of Mining and Metallurgy, August 2004, pp. 429-438.'
+  year: 2004
+extraction:
+  method: 'Born-digital pdftotext-layout review. No numeric tables; review figure data are deferred, with cited-work attribution preserved. Model summaries and quoted ranges remain in context.'
+  date: '2026-10-20'
+  worker: fam34-1020
+review_status: draft
+species:
+  CrOx:
+    observations: []
+    context:
+      - observation_id: holappa_xiao_2004_chromium_oxide_review_values
+        type: relation
+        locator: {page: 2, published_page: 430, pdf_page_index: 1, section: Chromium-oxygen system}
+        units: °C; atm; mol %
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: chromium oxide phase-stability and slag composition statements cited by review
+          candidate_quantity_tokens: [phase_transition, activity, composition]
+          quoted_values:
+            - {value_as_printed: 'Cr3O4 exists above 1650 °C; attributed to the Cr-Cr2O3 equilibrium diagram', attribution: 'reference 2, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'CrO forms above 1665 °C', attribution: 'reference 2, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'oxygen partial pressure at the eutectic is of the order of 10^-12 atm', attribution: 'reference 2, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'CrOx in CaO-SiO2-MgO-Al2O3 slags ranges from about 7.5 mol% to 15 mol%', attribution: 'Xiao and Holappa, references 3-5, as cited by Holappa and Xiao'}
+          note: 'These are quoted bounds or review summaries rather than point observations; phase thresholds are not converted to point transition temperatures.'
+      - observation_id: holappa_xiao_2004_fig1_cr_cr2o3
+        type: figure_only
+        locator: {figure: '1', page: 2, published_page: 430, pdf_page_index: 1}
+        units: oxygen potential; temperature
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: equilibrium relations in Cr-Cr2O3 system
+          species: Cr and Cr2O3
+          phase: oxide-metal equilibrium
+          temperature_as_printed: as plotted
+          x_axis_as_printed: oxygen partial pressure / temperature as printed
+          y_axis_as_printed: phase stability field
+          caption_as_printed: 'Equilibrium relations in the Cr-Cr2O3 system.'
+          panel: single
+          series: [{name: 'phase boundaries', marker_count: 0}]
+          attribution: reference 2, as cited by Holappa and Xiao (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig2_chromium_valence
+        type: figure_only
+        locator: {figure: '2', page: 2, published_page: 430, pdf_page_index: 1}
+        units: fraction
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: oxidation state of chromium in CaO-SiO2-CrOx slag
+          species: Cr2+ and Cr3+
+          phase: slag
+          temperature_as_printed: equilibrium with metallic chromium
+          x_axis_as_printed: slag composition as plotted
+          y_axis_as_printed: divalent chromium fraction
+          caption_as_printed: 'Oxidation state of chromium in the CaO-SiO2-CrOx slag system in equilibrium with metallic chromium.'
+          panel: single
+          series: [{name: 'Cr2+ fraction', marker_count: null}]
+          attribution: reference 5, as cited by Holappa and Xiao (2004)
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig3_cro_activity
+        type: figure_only
+        locator: {figure: '3', page: 3, published_page: 431, pdf_page_index: 2}
+        units: activity; fraction
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: CrO activity and chromium oxidation state
+          species: CrO, Cr2+, Cr3+
+          phase: liquid slag equilibrated with metallic chromium
+          temperature_as_printed: 1873 K
+          x_axis_as_printed: N_CrOx
+          y_axis_as_printed: a_CrO and Cr2+/total Cr
+          caption_as_printed: 'Activity of CrO and oxidation state of chromium in CaO-SiO2-MgO-Al2O3-CrOx slag at 1873 K in equilibrium with metallic chromium; standard state—pure liquid CrO.'
+          panel: single
+          series: [{name: 'aCrO', marker_count: null}, {name: 'Cr2+/total Cr', marker_count: null}]
+          attribution: Xiao and Holappa, references 3-5, as cited by Holappa and Xiao
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig4_chromium_redox
+        type: figure_only
+        locator: {figure: '4', page: 3, published_page: 431, pdf_page_index: 2}
+        units: log10(pO2/atm); fraction
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: effect of oxygen partial pressure on chromium oxidation state in slag
+          species: Cr2+ and Cr3+
+          phase: slag
+          temperature_as_printed: 1500-1650 °C, series-specific as captioned
+          x_axis_as_printed: log pO2 (atm)
+          y_axis_as_printed: Cr2+/total Cr
+          caption_as_printed: 'The effect of oxygen partial pressure on the oxidation state of chromium in slag from different researchers.'
+          panel: single
+          series:
+            - {name: 'McCoy et al., 1530-1545 °C, B=0.61-1.25', marker_count: null}
+            - {name: 'Frohberg et al., 1600-1650 °C, B=1.3-1.5', marker_count: null}
+            - {name: 'Morita et al., 1600 °C, 2MgO.SiO2 saturated', marker_count: null}
+            - {name: 'Pretorius et al., 1500 °C, B=0.5-1.15', marker_count: null}
+            - {name: 'Xiao, 1600 °C, B=0.9-1.1', marker_count: null}
+            - {name: 'Pei et al., 1600 °C, B=2.2-2.4', marker_count: null}
+            - {name: 'Morita et al., 1600 °C, B=0.9-1.1', marker_count: null}
+          attribution: references 6-11, as cited in the figure legend
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig5_cro_activity_comparison
+        type: figure_only
+        locator: {figure: '5', page: 4, published_page: 432, pdf_page_index: 3}
+        units: activity
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: comparison of CrO activities in silicate slag
+          species: CrO
+          phase: liquid slag
+          temperature_as_printed: multiple cited studies
+          x_axis_as_printed: slag composition as plotted
+          y_axis_as_printed: a_CrO
+          caption_as_printed: 'Comparison of aCrO in silicate slag from different researchers.'
+          panel: single
+          series: [{name: 'cited researchers, as labelled in the figure', marker_count: null}]
+          attribution: cited works as labelled in the figure
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig6_viscosity
+        type: figure_only
+        locator: {figure: '6', page: 5, published_page: 433, pdf_page_index: 4}
+        units: viscosity
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: effect of CrOx addition on viscosity of CaO-SiO2 melt
+          species: CrOx
+          phase: liquid slag
+          temperature_as_printed: as plotted
+          x_axis_as_printed: CrOx addition
+          y_axis_as_printed: viscosity
+          caption_as_printed: 'The effect of CrOx addition on the viscosity of CaO-SiO2 melt.'
+          panel: single
+          series: [{name: 'Forsbacka data', marker_count: null}]
+          attribution: Forsbacka, reference 24
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig10_smelting_schematic
+        type: figure_only
+        locator: {figure: '10', page: 6, published_page: 434, pdf_page_index: 5}
+        units: not applicable
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: reaction diagram in submerged-arc furnace for chromite smelting
+          species: Cr, Fe, slag, gas
+          phase: furnace process schematic
+          x_axis_as_printed: not applicable
+          y_axis_as_printed: not applicable
+          caption_as_printed: 'A schematic reaction diagram in submerged arc furnace for chromite smelting.'
+          panel: single
+          series: [{name: 'process schematic', marker_count: 0}]
+          attribution: Holappa and Xiao (2004) review schematic
+          digitisation: deferred to a figure pass
+  MnO:
+    observations: []
+    context:
+      - observation_id: holappa_xiao_2004_manganese_review_values
+        type: relation
+        locator: {page: 5, published_page: 433, pdf_page_index: 4, section: Manganese-oxygen system}
+        units: °C; wt%; composition fraction; pressure unit not printed for cited clause
+        values:
+          method_class: quoted_attributed
+          quantity_as_printed: manganese oxide and slag ranges quoted in the review
+          candidate_quantity_tokens: [activity_coefficient, partial_pressure, composition, transition_temperature]
+          quoted_values:
+            - {value_as_printed: 'x in Mn1-xO ranges from about 0.11 in air to about 0.0004 with metallic Mn; pO2 approximately 10^-14 at 1600 °C', attribution: 'Grundy et al., reference 26, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'MnOx-SiO2 diagram study: pO2 range 10^-10 atm at 1130 °C to 10^-6 atm at 1555 °C', attribution: 'Glasser, reference 31, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'CaO-MnOx-SiO2 liquidus valley at 1600 °C spans about 67-43 wt% SiO2 in CaO-SiO2 and 52-19 wt% SiO2 in MnO-SiO2', attribution: 'Glasser, references 33-34, as cited by Holappa and Xiao'}
+            - {value_as_printed: 'quinary slag compositions: 5-30% MnO, 20-35% CaO, 5-15% MgO, 27-58% SiO2, and 5% Al2O3; liquidus temperatures 1300-1380 °C', attribution: 'Eric et al. and Reuter et al., references 36-37, as cited by Holappa and Xiao'}
+          note: 'These are review quotations or model/phase-diagram summaries, not row-level measurements; no endpoints are promoted to points.'
+      - observation_id: holappa_xiao_2004_fig7_mn_o_diagram
+        type: figure_only
+        locator: {figure: '7', page: 5, published_page: 433, pdf_page_index: 4}
+        units: oxygen potential; temperature
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: assessed Mn-O system phase diagram
+          species: MnO, Mn3O4, Mn2O3, MnO2
+          phase: oxide phases
+          temperature_as_printed: as plotted
+          x_axis_as_printed: temperature and oxygen potential as printed
+          y_axis_as_printed: phase stability fields
+          caption_as_printed: 'Assessed Mn-O system.'
+          panel: single
+          series: [{name: 'oxide phase boundaries', marker_count: 0}]
+          attribution: Grundy et al., reference 26
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig8_mn_slag_liquidus
+        type: figure_only
+        locator: {figure: '8', page: 6, published_page: 434, pdf_page_index: 5}
+        units: wt%
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: liquidus lines for CaO-Al2O3-SiO2-MnO system in equilibrium with Mn/Si alloy
+          species: MnO
+          phase: liquid + solid phases
+          temperature_as_printed: liquidus diagram
+          x_axis_as_printed: CaO and MnO mass percent
+          y_axis_as_printed: Al2O3+SiO2 composition at ratio 0.65
+          caption_as_printed: 'Liquidus lines for CaO-Al2O3-SiO2-MnO system in equilibrium with Mn/Si alloy (redrawn from Roghani et al. 35).'
+          panel: single
+          series: [{name: 'liquidus lines and phase fields', marker_count: 0}]
+          attribution: Roghani et al., reference 35
+          digitisation: deferred to a figure pass
+      - observation_id: holappa_xiao_2004_fig9_mno_equilibrium
+        type: figure_only
+        locator: {figure: '9', page: 6, published_page: 434, pdf_page_index: 5}
+        units: wt% MnO
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: MnO content in multicomponent slags equilibrated with FeMn alloy containing 10% Fe
+          species: MnO
+          phase: liquid slag with FeMn alloy
+          temperature_as_printed: 1350, 1400, 1450, 1500 °C series
+          x_axis_as_printed: B = sum(bases)/(%SiO2+Al2O3)
+          y_axis_as_printed: MnO content (wt%)
+          caption_as_printed: 'MnO content in multicomponent slags in equilibrium with FeMn alloys with 10 per cent iron.'
+          panel: single
+          series: [{name: '1350 °C', marker_count: null}, {name: '1400 °C', marker_count: null}, {name: '1450 °C', marker_count: null}, {name: '1500 °C', marker_count: null}]
+          attribution: Olsen et al., reference 40
+          digitisation: deferred to a figure pass

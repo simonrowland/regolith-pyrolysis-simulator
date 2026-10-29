@@ -250,20 +250,32 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
 ) -> None:
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    campaign_key = {
+        CampaignPhase.C5: "C5",
+        CampaignPhase.MRE_BASELINE: "mre_baseline",
+    }[campaign]
+    source_row = load_config_bundle().setpoints["campaigns"][campaign_key]
+    setpoints = {
+        "campaigns": {
+            campaign_key: {
+                key: source_row[key]
+                for key in ("pO2_mbar_default", "p_total_mbar_default")
+            }
+        },
+        "mre_voltage_sequence": {
+            "sequence": [
+                {
+                    "species": "FeO",
+                    "decomposition_V": 0.8,
+                    "min_hold_hours": 1,
+                }
+            ]
+        },
+        "chemistry_kernel": {"liquid_fraction_provider": "analytical"},
+    }
     sim = PyrolysisSimulator(
         backend,
-        {
-            "campaigns": {},
-            "mre_voltage_sequence": {
-                "sequence": [
-                    {
-                        "species": "FeO",
-                        "decomposition_V": 0.8,
-                        "min_hold_hours": 1,
-                    }
-                ]
-            },
-        },
+        setpoints,
         {"x": {"label": "X", "composition_wt_pct": {"FeO": 100.0}}},
         {"metals": {}, "oxide_vapors": {}},
     )
@@ -285,7 +297,14 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
     )
     monkeypatch.setattr(reproduction_module, "run_mre_reproduction", forbidden)
 
-    sim._step_mre()
+    assert sim._step_mre() > 0.0
 
     assert not hasattr(sim, "mre_reproduction")
     assert "yu_2025_hollow_anode" not in repr(sim.__dict__)
+    # Complete reduction exhausts the melt; no liquidus can be queried.
+    assert sim.atom_ledger.total_mol_by_account("process.cleaned_melt") == 0.0
+    assert sim.melt.oxygen_reservoir.redox_source_terms_applied is False
+    assert (
+        sim.melt.oxygen_reservoir.redox_source_skip_reason
+        == "no_melt_redox_capacity"
+    )

@@ -1,0 +1,81 @@
+source_id: simeonov-sano-1985-na-bearing-mno-activities
+source:
+  citation: 'Simeonov, S. R. & Sano, N. (1985), “Manganese Equilibrium Distribution between Carbon-saturated Iron Melts and Lime Based Slags Containing MnO, BaO, and Na2O”, Transactions of the Iron and Steel Institute of Japan 25, 1116–1121.'
+extraction:
+  method: MinerU table-tool draft; four stored Table 1 cells checked against the rendered page
+  date: '2026-10-27'
+  worker: w1027na5-sime85
+tables:
+  - page: 5
+    table_index: 1
+    published_page: 1120
+    printed_table: '1'
+    type: concentration_series
+    quantity: distribution_ratio
+    unit: dimensionless
+    evidence_class: measured_reduced
+    derivation:
+      relation: (MnO)/[Mn]
+      raw_inputs: not_printed
+    phase: l
+    experiment: simeonov-sano-1985-table1-mn-distribution
+    regime: slag_metal_equilibrium
+    rows: [2, 3, 4, 5]
+    temperature:
+      as_printed: '1300'
+      unit: C
+      locator: {page: 5, published_page: 1120, pdf_page_index: 4, table: '1'}
+    conditions:
+      - key: gas_mix
+        state: {tag: value, value: CO}
+        locator: {page: 5, published_page: 1120, pdf_page_index: 4, section: 'V'}
+    values:
+      - column: 4
+        species: MnO
+    render_verified:
+      - {row: 2, column: 1, text: '10'}
+      - {row: 2, column: 2, text: '1.25'}
+      - {row: 2, column: 3, text: '184'}
+      - {row: 2, column: 4, text: '0.80'}
+      - {row: 2, column: 5, text: '25.42'}
+      - {row: 2, column: 6, text: '10.53'}
+      - {row: 3, column: 1, text: '15'}
+      - {row: 3, column: 2, text: '1.13'}
+      - {row: 3, column: 3, text: '218'}
+      - {row: 3, column: 4, text: '0.64'}
+      - {row: 3, column: 5, text: '25.37'}
+      - {row: 3, column: 6, text: '10.52'}
+      - {row: 4, column: 1, text: '20'}
+      - {row: 4, column: 2, text: '1.20'}
+      - {row: 4, column: 3, text: '196'}
+      - {row: 4, column: 4, text: '0.53'}
+      - {row: 4, column: 5, text: '25.40'}
+      - {row: 4, column: 6, text: '10.50'}
+      - {row: 5, column: 1, text: '25'}
+      - {row: 5, column: 2, text: '1.50'}
+      - {row: 5, column: 3, text: '211'}
+      - {row: 5, column: 4, text: '0.41'}
+      - {row: 5, column: 5, text: '25.50'}
+      - {row: 5, column: 6, text: '10.53'}
+  - page: 5
+    table_index: 1
+    published_page: 1120
+    printed_table: '1'
+    type: measured_table_context
+    quantity: printed_table_values_without_compatible_token
+    unit: log manganous capacity as printed
+    evidence_class: quoted_attributed
+    phase: l
+    experiment: simeonov-sano-1985-table1-mn-distribution
+    regime: slag_metal_equilibrium
+    rows: [2, 3, 4, 5]
+    values:
+      - column: 6
+        species: Mn
+        schema_gap: No existing quantity token represents the printed manganous capacity C_Mn2+.
+        defining_equation: Eq. (8), page 3, published page 1118
+    render_verified:
+      - {row: 2, column: 6, text: '10.53'}
+      - {row: 3, column: 6, text: '10.52'}
+      - {row: 4, column: 6, text: '10.50'}
+      - {row: 5, column: 6, text: '10.53'}

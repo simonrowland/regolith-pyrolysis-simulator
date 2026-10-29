@@ -250,14 +250,20 @@ def test_http_ledger_transport_errors_return_json_error_body():
     with client.session_transaction() as browser_session:
         browser_session["ledger_client_id"] = client_id
     try:
+        unknown_account = client.get("/api/ledger/account/not.real")
         _assert_read_plane_transport_error(
-            client.get("/api/ledger/account/not.real"),
+            unknown_account,
             404,
         )
+        assert unknown_account.get_json()["error"] == (
+            "unknown ledger account: not.real"
+        )
+        unknown_view = client.get("/api/ledger/views/not_real")
         _assert_read_plane_transport_error(
-            client.get("/api/ledger/views/not_real"),
+            unknown_view,
             404,
         )
+        assert unknown_view.get_json()["error"] == "unknown ledger view: not_real"
         _assert_read_plane_transport_error(
             client.get("/api/ledger/account/process.cleaned_melt?units=grams"),
             400,

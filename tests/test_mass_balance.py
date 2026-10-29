@@ -34,6 +34,8 @@ from simulator.transport_constants import (
     VISCOUS_KNUDSEN_MAX,
 )
 from tests.chemistry.conftest import _build_sim
+from tests.chemistry.test_evaporation_freeze_gate import _freeze_gate_curve_with_outcome
+from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
 
 
 SIO_CLOSURE_MAX_REL_PCT = 5e-12
@@ -160,23 +162,22 @@ def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
 
 
 def _install_liquidus_stub(sim) -> None:
-    sim.backend.find_liquidus_solidus = lambda **_: SimpleNamespace(
-        status="ok",
-        solidus_T_C=1000.0,
-        liquidus_T_C=1300.0,
-    )
+    register_synthetic_gate_curve_producer(sim)
 
-    def gate_dispatch_unavailable(
+    def gate_dispatch(
         reasons,
         *,
         fO2_log,
         repair_notices=None,
         redox_state=None,
     ):
-        reasons.append("test liquidus stub bypasses gate dispatch")
-        return None
+        curve = sim._freeze_gate_curve_from_bounds(
+            solidus_T_C=1000.0, liquidus_T_C=1300.0,
+            source='gate_liquid_fraction', reasons=reasons,
+        )
+        return _freeze_gate_curve_with_outcome(sim, curve)
 
-    sim._freeze_gate_curve_from_gate_dispatch = gate_dispatch_unavailable
+    sim._freeze_gate_curve_from_gate_dispatch = gate_dispatch
 
 
 def _cumulative_transition_imbalance_kg(sim) -> float:
@@ -639,7 +640,7 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 # Nightly (2026-08-02 CI tiering): cumulative mass balance campaign (~141 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 @pytest.mark.serial
 def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
     monkeypatch,

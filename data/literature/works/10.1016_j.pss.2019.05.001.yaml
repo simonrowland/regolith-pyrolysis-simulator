@@ -105,6 +105,7 @@ experiments:
               section: '2.2'
               note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -122,7 +123,8 @@ experiments:
           tag: value
           value: Leybold Scrollvac SC 5 D
         locator:
-          page: 5
+          page: 6
+          published_page: 5
           pdf_page_index: 5
           figure: 2-4
           section: '2.2'
@@ -132,7 +134,8 @@ experiments:
           tag: value
           value: Leybold Turbovac SL 80
         locator:
-          page: 5
+          page: 6
+          published_page: 5
           pdf_page_index: 5
           figure: 2-4
           section: '2.2'
@@ -150,7 +153,8 @@ experiments:
           value: 0.5 mm diameter Type K mantle thermocouple inserted into the heater to measure the temperature of the sample
             holder
         locator:
-          page: 5
+          page: 6
+          published_page: 5
           pdf_page_index: 5
           figure: 2-4
           section: '2.2'
@@ -186,7 +190,7 @@ experiments:
   work_id: 10.1016/j.pss.2019.05.001
   locator:
     page: 18
-    pdf_page_index: 18
+    pdf_page_index: 17
     table: '2'
     note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
 benches:
@@ -245,6 +249,7 @@ benches:
                 section: '2.2'
                 note: Sample holder accommodates up to 2.8 mm diameter; unit conversion only
           output_unit: m
+          references: []
       height_m:
         state:
           tag: value
@@ -280,6 +285,7 @@ benches:
                 section: '2.2'
                 note: Sample holder accommodates up to 4.5 mm height; unit conversion only
           output_unit: m
+          references: []
   pumping_type:
     state:
       tag: value

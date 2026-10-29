@@ -14,8 +14,8 @@
   "pdf_page": 144,
   "page": 138,
   "name_as_published": "CRISTOBALITE",
-  "formula_as_published": "SiO",
-  "formula": "SiO",
+  "formula_as_published": "SiO2",
+  "formula": "SiO2",
   "phase": "a cristobalite 298.15° to 523°K. 0 cristobalite 523° to 2 2000°K. Cristobalite melts at 1996°K.",
   "gram_formula_weight": {
     "as_published": "60.085",
@@ -1960,6 +1960,14 @@
   "identity_disagreements": [],
   "ambiguities": [],
   "corrections": [
+    {
+      "correction_id": "b1259-p144-formula_as_published",
+      "pdf_page": 144,
+      "field": "formula_as_published",
+      "layout_as_extracted": "SiO",
+      "printed_token": "SiO2",
+      "evidence": "PDF page 144 image visibly prints 'SiO2'"
+    },
     {
       "correction_id": "b1259-p144-temperature-01",
       "pdf_page": 144,

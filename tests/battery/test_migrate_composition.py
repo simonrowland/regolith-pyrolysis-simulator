@@ -469,13 +469,25 @@ def _assert_plante_observations_use_analyzed_composition(
             f"::experiment::{experiment_id}"
         ), f"{source_id} is not independently bound to its source experiment"
         composition = observation.identity.composition
-        assert composition is not None and composition.is_value, source_id
-        actual = dict(composition.value.components)
-        assert len(actual) == 15 and set(actual) == set(expected), source_id
-        assert all(
-            abs(actual[name] - expected[name]) < Decimal("1e-11")
-            for name in expected
-        ), f"{source_id} composition differs from Table 1 analytical values"
+        if source_id == "plante_hastie_1983_table1_snw_glass_composition":
+            assert composition is not None and composition.is_value, source_id
+            actual = dict(composition.value.components)
+            assert len(actual) == 15 and set(actual) == set(expected), source_id
+            assert all(
+                abs(actual[name] - expected[name]) < Decimal("1e-11")
+                for name in expected
+            ), f"{source_id} composition differs from Table 1 analytical values"
+        else:
+            assert composition is not None and composition.is_unknown, source_id
+            assert "per-run composition is not published" in composition.reason
+            if observation.identity.quantity.is_value:
+                notices = [
+                    notice
+                    for notice in observation.notices
+                    if "composition_role=initial_charge_only" in notice.reason
+                ]
+                assert len(notices) == 1, source_id
+                assert notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
         if source_id in {
             "plante_hastie_1983_ru_re_sr_undetected",
             "plante_hastie_1983_detection_limits_quoted",
@@ -1092,11 +1104,12 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     )
     composition = row.identity.composition
     assert composition is not None and composition.is_unknown
-    assert "XxO" in composition.reason
+    assert "per-run composition is not published" in composition.reason
     printed = row.point_conditions["printed_composition"]
     assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
     condition = row.point_conditions["composition"]
-    assert condition.state.is_unknown and "XxO" in condition.state.reason
+    assert condition.state.is_unknown
+    assert "per-run composition is not published" in condition.state.reason
     waypoint = normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
     )
@@ -1104,8 +1117,10 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     assert waypoint.absence is not None
 
 
-def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Dropping the child refusal restores the parent's accepted composition."""
+def test_markova_initial_charge_stays_context_under_refusal_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dropping a component refusal cannot promote the initial charge to a datum."""
     from simulator.battery.waypoints import normalized_composition
     from tests.battery.test_waypoints import _bench
 
@@ -1148,14 +1163,11 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         if observation.observation_id.startswith(prefix)
         and observation.identity.temperature_K.value == target_t
     )
-    assert row.identity.composition.is_value
-    assert row.identity.composition.value == replace(
-        wt_pct_to_mole_fraction(raw["values"]["composition_wt_pct"]),
-        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    )
+    assert row.identity.composition.is_unknown
+    assert "per-run composition is not published" in row.identity.composition.reason
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
-    ).selected is not None
+    ).selected is None
 
 
 def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -1243,6 +1255,287 @@ def test_declared_map_skips_sample_codes_flags_and_condition_fields() -> None:
             "T_C": Decimal("0"),
         }
     ) == components
+
+
+def test_explicit_point_condition_composition_keeps_its_locator(
+    tmp_path: Path,
+) -> None:
+    """A printed point-condition composition is the identity, at its own locator.
+
+    Locator A is the composition table. Locator B is the observation table.
+    A row oxide map must not replace A, and a row with no explicit point
+    composition still anchors to its observation locator.
+    """
+
+    explicit = {"SiO2": "60", "MgO": "40"}
+    conflicting_explicit = {"SiO2": "70", "MgO": "30"}
+    conflicting_row = {"SiO2": "10", "MgO": "90"}
+    row_only = {"SiO2": "55", "CaO": "45"}
+    locator_a = {
+        "page": 2,
+        "table": "2",
+        "note": "slag composition printed in Table 2",
+    }
+    locator_b = {
+        "page": 8,
+        "table": "6",
+        "note": "mass loss rate printed in Table 6",
+    }
+
+    def composition_condition(components: dict[str, str], locator: dict[str, object]):
+        return {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "amount_basis": "mass_percent",
+                    "components": components,
+                },
+            },
+            "locator": locator,
+        }
+
+    def observation(
+        observation_id: str,
+        *,
+        locator: dict[str, object],
+        point_composition: dict[str, object] | None,
+        composition_wt_pct: dict[str, str] | None,
+    ) -> dict[str, object]:
+        values: dict[str, object] = {
+            "quantity": "mass_loss_rate",
+            "method_class": "measured_direct",
+            "mass_loss_rate": "1.5",
+            "T_C": 1300,
+        }
+        if composition_wt_pct is not None:
+            values["composition_wt_pct"] = composition_wt_pct
+        point_conditions: dict[str, object] = {
+            "T_C": {
+                "state": {"tag": "value", "value": 1300},
+                "locator": locator,
+            }
+        }
+        if point_composition is not None:
+            point_conditions["composition"] = point_composition
+        return {
+            "observation_id": observation_id,
+            "type": "rate_series",
+            "locator": locator,
+            "phase": "l",
+            "units": "1/s",
+            "values": values,
+            "point_conditions": point_conditions,
+        }
+
+    document = {
+        "schema_version": "literature_extract.v1",
+        "source_id": "fixture-source",
+        "source": {
+            "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+            "doi": "10.1234/FIXTURE",
+        },
+        "extraction": {
+            "method": "unit_test",
+            "date": "2026-10-27",
+            "worker": "pytest",
+        },
+        "review_status": "draft",
+        "fidelity_samples": [],
+        "species": {
+            "slag": {
+                "observations": [
+                    observation(
+                        "explicit-point-composition",
+                        locator=locator_b,
+                        point_composition=composition_condition(explicit, locator_a),
+                        composition_wt_pct=None,
+                    ),
+                    observation(
+                        "explicit-point-plus-row-map",
+                        locator=locator_b,
+                        point_composition=composition_condition(
+                            conflicting_explicit, locator_a
+                        ),
+                        composition_wt_pct=conflicting_row,
+                    ),
+                    observation(
+                        "row-map-only",
+                        locator=locator_b,
+                        point_composition=None,
+                        composition_wt_pct=row_only,
+                    ),
+                ]
+            }
+        },
+    }
+    result = migrate(_write_min_tree(tmp_path / "base", document), write=False)
+
+    def migrated(observation_id: str):
+        return result.observations[f"fixture-source::{observation_id}"]
+
+    explicit_row = migrated("explicit-point-composition")
+    assert explicit_row.identity.composition is not None
+    assert explicit_row.identity.composition.is_value
+    assert explicit_row.identity.composition.value == wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in explicit.items()}
+    )
+    explicit_condition = explicit_row.point_conditions["composition"]
+    assert explicit_condition.state.value == explicit_row.identity.composition.value
+    assert explicit_condition.locator is not None
+    assert explicit_condition.locator.page == 2
+    assert explicit_condition.locator.table == "2"
+    assert explicit_condition.locator.note == locator_a["note"]
+    assert explicit_row.locator is not None
+    assert explicit_row.locator.page == 8
+    assert explicit_row.locator.table == "6"
+
+    conflict_row = migrated("explicit-point-plus-row-map")
+    assert conflict_row.identity.composition is not None
+    assert conflict_row.identity.composition.is_value
+    assert conflict_row.identity.composition.value == wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in conflicting_explicit.items()}
+    )
+    assert conflict_row.identity.composition.value != wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in conflicting_row.items()}
+    )
+    conflict_condition = conflict_row.point_conditions["composition"]
+    assert conflict_condition.locator is not None
+    assert conflict_condition.locator.page == 2
+    assert conflict_condition.locator.table == "2"
+    assert conflict_condition.state.value == conflict_row.identity.composition.value
+
+    row_only_observation = migrated("row-map-only")
+    assert row_only_observation.identity.composition is not None
+    assert row_only_observation.identity.composition.is_value
+    assert row_only_observation.identity.composition.value == wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in row_only.items()}
+    )
+    row_only_condition = row_only_observation.point_conditions["composition"]
+    assert row_only_condition.locator is not None
+    assert row_only_condition.locator.page == 8
+    assert row_only_condition.locator.table == "6"
+    assert row_only_condition.locator.note == locator_b["note"]
+
+    mutated = deepcopy(document)
+    mutated_components = mutated["species"]["slag"]["observations"][0][
+        "point_conditions"
+    ]["composition"]["state"]["value"]["components"]
+    mutated_components["SiO2"] = "55"
+    mutated_components["MgO"] = "45"
+    mutated_result = migrate(
+        _write_min_tree(tmp_path / "mutated", mutated), write=False
+    )
+    mutated_row = mutated_result.observations[
+        "fixture-source::explicit-point-composition"
+    ]
+    assert mutated_row.identity.composition is not None
+    assert mutated_row.identity.composition.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("55"), "MgO": Decimal("45")}
+    )
+    assert mutated_row.identity.composition.value != explicit_row.identity.composition.value
+    mutated_condition = mutated_row.point_conditions["composition"]
+    assert mutated_condition.locator.page == 2
+    assert mutated_condition.locator.table == "2"
+
+
+def test_activity_row_without_numeric_point_keeps_explicit_point_composition(
+    tmp_path: Path,
+) -> None:
+    """An activity refusal with no numeric point still keeps locator A.
+
+    Seto Table 1 prints mol% on point_conditions and leaves activity null.
+    The exploded-point copy never runs, so the parent identity must carry
+    the explicit composition.
+    """
+
+    printed = {
+        "basis": "printed_mole_percent",
+        "amount_basis": "mole_percent",
+        "components": [["SiO2", "84"], ["Na2O", "16"], ["CaO", "0"]],
+    }
+    locator_a = {"page": 2, "table": "1", "note": "row 1 composition"}
+    locator_b = {"page": 4, "table": "3", "note": "activity row with no numeric point"}
+    document = {
+        "schema_version": "literature_extract.v1",
+        "source_id": "fixture-source",
+        "source": {
+            "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+            "doi": "10.1234/FIXTURE",
+        },
+        "extraction": {
+            "method": "unit_test",
+            "date": "2026-10-27",
+            "worker": "pytest",
+        },
+        "review_status": "draft",
+        "fidelity_samples": [],
+        "species": {
+            "Na2O": {
+                "observations": [
+                    {
+                        "observation_id": "activity-without-numeric-point",
+                        "type": "activity_coefficient",
+                        "locator": locator_b,
+                        "T_K": "1473",
+                        "phase": "l",
+                        "units": "dimensionless",
+                        "point_conditions": {
+                            "composition": {
+                                "state": {"tag": "value", "value": printed},
+                                "locator": locator_a,
+                            }
+                        },
+                        "values": {
+                            "quantity": "activity",
+                            "method_class": "quoted_attributed",
+                            "status": "typed_refusal",
+                            "reason": "no numeric activity point is printed",
+                            "activity": None,
+                        },
+                    }
+                ]
+            }
+        },
+    }
+    expected = migrate_module._composition_from_plain(printed)
+    result = migrate(_write_min_tree(tmp_path / "base", document), write=False)
+    row = result.observations["fixture-source::activity-without-numeric-point"]
+    assert row.value.kind is not ValueKind.POINT
+    assert row.identity.composition is not None
+    assert row.identity.composition.is_value
+    assert row.identity.composition.value == expected
+    condition = row.point_conditions["composition"]
+    assert condition.state.value == row.identity.composition.value
+    assert condition.locator is not None
+    assert condition.locator.page == 2
+    assert condition.locator.table == "1"
+    assert condition.locator.note == locator_a["note"]
+    assert row.locator is not None
+    assert row.locator.page == 4
+    assert row.locator.table == "3"
+
+    mutated = deepcopy(document)
+    mutated_components = mutated["species"]["Na2O"]["observations"][0][
+        "point_conditions"
+    ]["composition"]["state"]["value"]["components"]
+    mutated_components[0][1] = "80"
+    mutated_components[1][1] = "20"
+    mutated_printed = mutated["species"]["Na2O"]["observations"][0][
+        "point_conditions"
+    ]["composition"]["state"]["value"]
+    mutated_result = migrate(
+        _write_min_tree(tmp_path / "mutated", mutated), write=False
+    )
+    mutated_row = mutated_result.observations[
+        "fixture-source::activity-without-numeric-point"
+    ]
+    assert mutated_row.identity.composition is not None
+    assert mutated_row.identity.composition.value == migrate_module._composition_from_plain(
+        mutated_printed
+    )
+    assert mutated_row.identity.composition.value != expected
+    assert mutated_row.point_conditions["composition"].locator.page == 2
+    assert mutated_row.point_conditions["composition"].locator.table == "1"
 
 
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
@@ -2634,7 +2927,7 @@ def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> 
             ), (panel, row.get("observation_id"), identity_x0)
 
 
-def test_markova_1983_rows_use_each_points_own_printed_composition(
+def test_markova_1983_initial_charge_maps_remain_context_only(
     tmp_path: Path,
 ) -> None:
     source_path = (
@@ -2681,14 +2974,15 @@ def test_markova_1983_rows_use_each_points_own_printed_composition(
         if printed_wt != expected_wt:
             mismatches.append(f"{row['observation_id']}: printed map differs from source")
             continue
-        expected_x = dict(wt_pct_to_mole_fraction(expected_wt).components)
-        actual_x = _identity_composition_components(row)
-        if actual_x.keys() != expected_x.keys() or any(
-            abs(actual_x[oxide] - value) >= as_decimal("1e-12")
-            for oxide, value in expected_x.items()
+        composition = identity["composition"]
+        point = row["point_conditions"]["composition"]["state"]
+        if (
+            composition["tag"] != "unknown"
+            or point["tag"] != "unknown"
+            or "per-run composition is not published" not in composition["reason"]
         ):
             mismatches.append(
-                f"{row['observation_id']}: identity does not match its printed map"
+                f"{row['observation_id']}: initial charge became datum composition"
             )
     assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
 
@@ -2804,8 +3098,11 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
     assert len(zero_rows) == 2
     for row in zero_rows:
         assert row["admission"]["status"] == "pending"
-        assert row["identity"]["temperature_K"]["tag"] == "unknown"
-        assert "T_range_K" in row["identity"]["temperature_K"]["reason"]
+        temperature = row["identity"]["temperature_K"]
+        assert temperature["tag"] == "unknown"
+        assert temperature["reason"] == "no single temperature_K mapped from source"
+        assert "value" not in temperature
+        assert (row.get("point_conditions") or {}).get("temperature_K") is None
     assert {
         Decimal(row["value"]["point"])
         for row in mass_loss_rows.values()
@@ -2826,11 +3123,30 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         if _quantity(row) == "residue_component_composition"
     }
     assert len(residue) == 110
+    in_band_residue = {
+        observation_id: row
+        for observation_id, row in residue.items()
+        if Decimal("1950")
+        <= Decimal(row["identity"]["temperature_K"]["value"])
+        <= Decimal("2473.15")
+    }
+    assert len(in_band_residue) == 65
+    for observation_id, row in in_band_residue.items():
+        assert row["value"]["kind"] == "point", observation_id
+        assert row["identity"]["species"]["phase"]["value"] == "l", observation_id
+        assert row["evidence"]["class"]["value"] == "measured_direct", observation_id
+        temperature = row["point_conditions"]["temperature_K"]
+        assert temperature["state"]["tag"] == "value", observation_id
+        assert temperature["locator"]["table"] == "2", observation_id
+
     printed_cells = {
         ("VI", "1748.15", "MgO"): Decimal("36.92"),
+        ("VI", "1999.15", "SiO2"): Decimal("41.77"),
+        ("VI", "1999.15", "CaO"): Decimal("8.79"),
         ("VI", "2156.15", "SiO2"): Decimal("13.6"),
         ("VI", "2311.15", "MgO"): Decimal("0.0"),
         ("V", "1992.15", "MgO"): Decimal("8.11"),
+        ("V", "2473.15", "CaO"): Decimal("18.57"),
     }
     for (panel, temperature, oxide), expected in printed_cells.items():
         matching = [
@@ -3413,13 +3729,8 @@ def test_plante_hastie_analytical_rows_keep_printed_order(tmp_path: Path) -> Non
         assert dict(identity.value.components) == dict(expected.components)
 
 
-def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None:
-    """The 1450-1500 K pressures use the p.115 bulk charge, not the residual.
-
-    p.116 calculates the residual-melt change from those pressures. The
-    proxy stays on the pressure rows. The experiment initial is the bulk
-    charge itself and is not flagged.
-    """
+def test_shornikov_pressure_rows_keep_initial_charge_as_context(tmp_path: Path) -> None:
+    """The p.115 charge is not the unpublished per-run composition at p.116."""
 
     values = _extract_values(
         "shornikov-2025-saratov-alkali-evaporation.yaml",
@@ -3437,21 +3748,26 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
     )
     assert "residual melt" in role["locator"]["note"]
     printed = values["oxides_wt_pct"]
-    expected = wt_pct_to_mole_fraction(
-        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
-    )
     result = _migrate_real_extract(
         tmp_path, "shornikov-2025-saratov-alkali-evaporation.yaml"
     )
     for local_id in _SHORNIKOV_PRESSURE_ROWS:
         observation = _observation(result, local_id)
-        for composition in (
-            observation.identity.composition,
-            (observation.point_conditions or {})["composition"].state,
-        ):
-            assert composition is not None and composition.is_value
-            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            assert dict(composition.value.components) == dict(expected.components)
+        reason = "missing input: per-run composition is not published"
+        identity = observation.identity.composition
+        point = (observation.point_conditions or {})["composition"]
+        assert identity is not None and identity.is_unknown
+        assert reason in identity.reason
+        assert point.state.is_unknown and reason in point.state.reason
+        assert point.locator == observation.locator
+        role_notices = [
+            notice
+            for notice in observation.notices
+            if "composition_role=initial_charge_only" in notice.reason
+        ]
+        assert len(role_notices) == 1
+        assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
+        assert "initial charge is sample context" in role_notices[0].reason
     experiment = next(
         item
         for item in result.experiments.values()
@@ -3460,6 +3776,11 @@ def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None
     initial = experiment.sample.initial_composition
     assert initial is not None and initial.state.is_value
     assert initial.state.value.proxy_flag is None
+    assert dict(initial.state.value.components) == dict(
+        wt_pct_to_mole_fraction(
+            {oxide: as_decimal(weight) for oxide, weight in printed.items()}
+        ).components
+    )
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:

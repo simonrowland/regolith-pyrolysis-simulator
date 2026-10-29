@@ -1,0 +1,62 @@
+# Table 1 only. Table 2 is a multi-oxide starting composition, and two of its
+# temperature cells are printed ranges (1850-2400, 1700-2300). A point
+# temperature axis cannot represent that range without inventing a midpoint.
+source_id: shornikov-2019-lunar-meteorite-evaporation-model
+source:
+  citation: >-
+    Shornikov, S. I. (2019), “Thermodynamic modeling of evaporation processes
+    of lunar and meteorite substance,” Geochemistry International 57(8), 865–872.
+  doi: 10.1134/S001670291908010X
+  year: 2019
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-17'
+  worker: emit-1017
+review_status: draft
+fidelity_samples:
+  - path: species.CaO.observations[shornikov_2019_lunar_meteorite_evaporation_model_p004_t01_r03_c02].values.value
+    value: '-421.511'
+    locator:
+      page: 4
+      published_page: 868
+      pdf_page_index: 3
+      table: '1'
+      note: >-
+        The pinned spelling is the MinerU cell, ASCII hyphen U+002D. The page
+        glyph is an en-dash U+2013: –421.511. The decimals match.
+tables:
+  - page: 4
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    per: mol_species
+    published_page: 868
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '2000'
+      unit: K
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        column_header: '$\Delta {G}_{2000}^{\circ}$, kJ/mol'
+        note: >-
+          The temperature is the 2000 printed in the Gibbs-energy column header.
+    attribution: >-
+      Table 1 caption: “calculations in the course of this research”; the
+      preceding text cites thermodynamic data for binary oxide systems, but
+      does not state per-row input lineage.
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g

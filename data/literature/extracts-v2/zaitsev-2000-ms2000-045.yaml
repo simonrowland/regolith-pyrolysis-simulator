@@ -2,46 +2,6 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/zaitsev-2000-ms2000-045.yaml
 observations:
-- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
-  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'Table 1 activity-calculation input signals'
-    species:
-      formula: MnO
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Table 1 activity-calculation input signals'; refusing
-      to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: zaitsev-2000-ms2000-045
-  locator:
-    published_page: 5
-    pdf_page_index: 4
-    section: Experimental realisation and assignment of mass spectra
-  read_from: pdf:zaitsev-2000-ms2000-045
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=20fc0271d0dd
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -178,16 +138,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=4c016d372c0f
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -324,16 +291,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=5108850dbeb7
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -470,16 +444,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=90e76c6edfb8
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -616,16 +597,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=a36f9df6164d
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -762,16 +750,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=ae7cb2e7ec78
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -908,16 +903,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=e249f2236716
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1054,16 +1056,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=fb11ac14b869
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1200,16 +1209,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=1b814ba9fb0d
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1346,16 +1362,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=3ad00abc408c
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1492,16 +1515,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=3b5f8700c0db
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1638,16 +1668,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=520798e6f978
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1784,16 +1821,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=7ea65e1ba510
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -1930,16 +1974,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=7ec3aa337a82
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2076,16 +2127,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=aa2d60de8080
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2222,16 +2280,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=edaebfd932d9
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2368,16 +2433,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=18e6402eecd7
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2513,16 +2585,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=3c409b6ef138
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2658,16 +2737,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=52fda4d6e386
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2803,16 +2889,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=6a2538f665d9
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -2948,16 +3041,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=c6cdf52d8717
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3093,16 +3193,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=d1c1df522d80
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3238,16 +3345,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=e8bf4fa92902
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3383,16 +3497,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=f96565551f5b
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3528,16 +3649,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
       stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
       unpublished.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=004f00751eef
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3673,16 +3801,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=07be1f423a23
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3818,16 +3953,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=4b09b46326b4
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -3963,16 +4105,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=bd0898644f07
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -4108,16 +4257,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=e4afb5ff4817
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -4253,16 +4409,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ec35df3820af
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -4398,16 +4561,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ec416a0630af
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -4543,16 +4713,23 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []
 - observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ef64a161a603
   experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
   identity:
@@ -4688,13 +4865,20 @@ observations:
         published_page: 20
         pdf_page_index: 19
         table: '1'
-  derived_from:
-  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
   derivation:
     relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
       by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
       unpublished. Full printed relation in equations_page_4 context.'
-    inputs:
-    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    inputs: []
     parameters: []
     output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+        note: Numerical input currents are not reported.
+    references: []

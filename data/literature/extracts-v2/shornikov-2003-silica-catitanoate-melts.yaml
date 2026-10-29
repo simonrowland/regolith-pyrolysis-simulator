@@ -1,0 +1,4805 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2003-silica-catitanoate-melts.yaml
+observations:
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x0_39
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.0039'
+        - - CaTiO3
+          - '0.9961'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.025527'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.6 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (1530.2, 1480.4). Read log10 a = -1.593 ± 0.02; x(SiO2)
+          = 0.39 ± 0.6 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.; series=1;
+          marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (1530.2, 1480.4). Read log10 a = -1.593 ± 0.02; x(SiO2) = 0.39 ± 0.6 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.; series=1; marker_symbol=filled
+      circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (1530.2, 1480.4). Read log10 a = -1.593 ± 0.02; x(SiO2)
+          = 0.39 ± 0.6 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.; series=1;
+          marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x10_01
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.1001'
+        - - CaTiO3
+          - '0.8999'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.025527'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (1797.0, 1480.6). Read log10 a = -1.593 ± 0.02; x(SiO2)
+          = 10.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (1797.0, 1480.6). Read log10 a = -1.593 ± 0.02; x(SiO2) = 10.01 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (1797.0, 1480.6). Read log10 a = -1.593 ± 0.02; x(SiO2)
+          = 10.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x20_01
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2001'
+        - - CaTiO3
+          - '0.7999'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.007962'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2074.2, 1679.9). Read log10 a = -2.099 ± 0.02; x(SiO2)
+          = 20.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (2074.2, 1679.9). Read log10 a = -2.099 ± 0.02; x(SiO2) = 20.01 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2074.2, 1679.9). Read log10 a = -2.099 ± 0.02; x(SiO2)
+          = 20.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x29_99
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2999'
+        - - CaTiO3
+          - '0.7001'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.002512'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2350.7, 1877.7). Read log10 a = -2.600 ± 0.02; x(SiO2)
+          = 29.99 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (2350.7, 1877.7). Read log10 a = -2.600 ± 0.02; x(SiO2) = 29.99 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2350.7, 1877.7). Read log10 a = -2.600 ± 0.02; x(SiO2)
+          = 29.99 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x33_34
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3334'
+        - - CaTiO3
+          - '0.6666'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.001746'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2443.7, 1940.2). Read log10 a = -2.758 ± 0.02; x(SiO2)
+          = 33.34 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (2443.7, 1940.2). Read log10 a = -2.758 ± 0.02; x(SiO2) = 33.34 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2443.7, 1940.2). Read log10 a = -2.758 ± 0.02; x(SiO2)
+          = 33.34 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x40_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4'
+        - - CaTiO3
+          - '0.6'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000906'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2628.2, 2052.3). Read log10 a = -3.043 ± 0.02; x(SiO2)
+          = 40.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (2628.2, 2052.3). Read log10 a = -3.043 ± 0.02; x(SiO2) = 40.00 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2628.2, 2052.3). Read log10 a = -3.043 ± 0.02; x(SiO2)
+          = 40.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x50_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - CaTiO3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000419'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2905.3, 2184.7). Read log10 a = -3.378 ± 0.02; x(SiO2)
+          = 50.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (2905.3, 2184.7). Read log10 a = -3.378 ± 0.02; x(SiO2) = 50.00 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (2905.3, 2184.7). Read log10 a = -3.378 ± 0.02; x(SiO2)
+          = 50.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_cao_x60_01
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (6), published p. 114, anchors ln a(CaO) at a*(CaO). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.6001'
+        - - CaTiO3
+          - '0.3999'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000282'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (3183.0, 2252.2). Read log10 a = -3.549 ± 0.02; x(SiO2)
+          = 60.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 1, filled circle, CaO. Page pixel (3183.0, 2252.2). Read log10 a = -3.549 ± 0.02; x(SiO2) = 60.01 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 1, filled circle, CaO. Page pixel (3183.0, 2252.2). Read log10 a = -3.549 ± 0.02; x(SiO2)
+          = 60.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=1; marker_symbol=filled circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x20_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2'
+        - - CaTiO3
+          - '0.8'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.472063'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2074.0, 980.6). Read log10 a = -0.326 ± 0.03; x(SiO2)
+          = 20.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. An open-circle arc of series 5 sits on this square
+          and was not read. The square hole is complete.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (2074.0, 980.6). Read log10 a = -0.326 ± 0.03; x(SiO2) = 20.00 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%. An open-circle arc of series 5 sits on this square and was not read. The
+      square hole is complete.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2074.0, 980.6). Read log10 a = -0.326 ± 0.03; x(SiO2)
+          = 20.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. An open-circle arc of series 5 sits on this square
+          and was not read. The square hole is complete.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x29_96
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2996'
+        - - CaTiO3
+          - '0.7004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.162181'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2350.0, 1163.5). Read log10 a = -0.790 ± 0.02; x(SiO2)
+          = 29.96 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (2350.0, 1163.5). Read log10 a = -0.790 ± 0.02; x(SiO2) = 29.96 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2350.0, 1163.5). Read log10 a = -0.790 ± 0.02; x(SiO2)
+          = 29.96 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x33_35
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3335'
+        - - CaTiO3
+          - '0.6665'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.108893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2444.0, 1231.9). Read log10 a = -0.963 ± 0.02; x(SiO2)
+          = 33.35 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (2444.0, 1231.9). Read log10 a = -0.963 ± 0.02; x(SiO2) = 33.35 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2444.0, 1231.9). Read log10 a = -0.963 ± 0.02; x(SiO2)
+          = 33.35 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x40_14
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4014'
+        - - CaTiO3
+          - '0.5986'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.049204'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2632.0, 1368.0). Read log10 a = -1.308 ± 0.03; x(SiO2)
+          = 40.14 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve crosses the square. The hole is white and
+          the stroke peaks near 17 px rather than 23 px.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (2632.0, 1368.0). Read log10 a = -1.308 ± 0.03; x(SiO2) = 40.14 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve crosses the square. The hole is white and the stroke peaks
+      near 17 px rather than 23 px.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2632.0, 1368.0). Read log10 a = -1.308 ± 0.03; x(SiO2)
+          = 40.14 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve crosses the square. The hole is white and
+          the stroke peaks near 17 px rather than 23 px.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x49_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4998'
+        - - CaTiO3
+          - '0.5002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.013428'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2905.0, 1590.5). Read log10 a = -1.872 ± 0.02; x(SiO2)
+          = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (2905.0, 1590.5). Read log10 a = -1.872 ± 0.02; x(SiO2) = 49.98 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (2905.0, 1590.5). Read log10 a = -1.872 ± 0.02; x(SiO2)
+          = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x60_01
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.6001'
+        - - CaTiO3
+          - '0.3999'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.004375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (3183.0, 1782.6). Read log10 a = -2.359 ± 0.02; x(SiO2)
+          = 60.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (3183.0, 1782.6). Read log10 a = -2.359 ± 0.02; x(SiO2) = 60.01 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (3183.0, 1782.6). Read log10 a = -2.359 ± 0.02; x(SiO2)
+          = 60.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_x9_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.0998'
+        - - CaTiO3
+          - '0.9002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.011579'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.06'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.06 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (1796.0, 850.0). Read log10 a = 0.005 ± 0.06; x(SiO2)
+          = 9.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The top frame, log10 a = 0, bisects this square. The
+          ring fit is 2 px below that frame.; series=4; marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (1796.0, 850.0). Read log10 a = 0.005 ± 0.06; x(SiO2) = 9.98 ± 0.4 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%. The top frame, log10 a = 0, bisects this square. The ring fit is 2 px below
+      that frame.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (1796.0, 850.0). Read log10 a = 0.005 ± 0.06; x(SiO2)
+          = 9.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The top frame, log10 a = 0, bisects this square. The
+          ring fit is 2 px below that frame.; series=4; marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_catio3_xm0_13
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiO3) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the perovskite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0'
+        - - CaTiO3
+          - '1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.06'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.06 in log10 a and ±0.8 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (1516.0, 852.0). Read log10 a = 0.000 ± 0.06; x(SiO2)
+          = -0.13 ± 0.8 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The axes bisect this square. The stored composition
+          is the axis value x=0. The pixel centre is 0.13 mol% left of the axis, inside the symbol half-width.; series=4;
+          marker_symbol=open square'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 4, open square, CaTiO3. Page pixel (1516.0, 852.0). Read log10 a = 0.000 ± 0.06; x(SiO2) = -0.13 ± 0.8 mol%.
+      1 px is 0.00253 in log10 a and 0.036 mol%. The axes bisect this square. The stored composition is the axis value x=0.
+      The pixel centre is 0.13 mol% left of the axis, inside the symbol half-width.; series=4; marker_symbol=open square'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 4, open square, CaTiO3. Page pixel (1516.0, 852.0). Read log10 a = 0.000 ± 0.06; x(SiO2)
+          = -0.13 ± 0.8 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The axes bisect this square. The stored composition
+          is the axis value x=0. The pixel centre is 0.13 mol% left of the axis, inside the symbol half-width.; series=4;
+          marker_symbol=open square'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x10_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.1'
+        - - CaTiO3
+          - '0.9'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.002193'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (1796.7, 1901.0). Read log10 a = -2.659 ± 0.025;
+          x(SiO2) = 10.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (1796.7, 1901.0). Read log10 a = -2.659 ± 0.025; x(SiO2) = 10.00
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (1796.7, 1901.0). Read log10 a = -2.659 ± 0.025;
+          x(SiO2) = 10.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x20_01
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2001'
+        - - CaTiO3
+          - '0.7999'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.018493'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2074.1, 1535.5). Read log10 a = -1.733 ± 0.025;
+          x(SiO2) = 20.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (2074.1, 1535.5). Read log10 a = -1.733 ± 0.025; x(SiO2) = 20.01
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2074.1, 1535.5). Read log10 a = -1.733 ± 0.025;
+          x(SiO2) = 20.01 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x29_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2998'
+        - - CaTiO3
+          - '0.7002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.092683'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2350.4, 1259.4). Read log10 a = -1.033 ± 0.025;
+          x(SiO2) = 29.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (2350.4, 1259.4). Read log10 a = -1.033 ± 0.025; x(SiO2) = 29.98
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2350.4, 1259.4). Read log10 a = -1.033 ± 0.025;
+          x(SiO2) = 29.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x33_33
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3333'
+        - - CaTiO3
+          - '0.6667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.141906'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2443.4, 1186.4). Read log10 a = -0.848 ± 0.025;
+          x(SiO2) = 33.33 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (2443.4, 1186.4). Read log10 a = -0.848 ± 0.025; x(SiO2) = 33.33
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2443.4, 1186.4). Read log10 a = -0.848 ± 0.025;
+          x(SiO2) = 33.33 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x49_92
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4992'
+        - - CaTiO3
+          - '0.5008'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.656145'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.05'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.05 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2903.3, 924.2). Read log10 a = -0.183 ± 0.05;
+          x(SiO2) = 49.92 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 5 open circle is about 26 px below
+          this triangle and the two symbols touch.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (2903.3, 924.2). Read log10 a = -0.183 ± 0.05; x(SiO2) = 49.92
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 5 open circle is about 26 px below this triangle and
+      the two symbols touch.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (2903.3, 924.2). Read log10 a = -0.183 ± 0.05;
+          x(SiO2) = 49.92 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 5 open circle is about 26 px below
+          this triangle and the two symbols touch.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_sio2_x59_99
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (5), published p. 114, integrates ln a(SiO2) from x(SiO2)=1. The
+        samples stop at 60.00 mol% SiO2, so pure silica was not measured in the cell. The paper does not name a solid or a
+        liquid at that anchor. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5999'
+        - - CaTiO3
+          - '0.4001'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.891251'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (3182.3, 871.8). Read log10 a = -0.050 ± 0.025;
+          x(SiO2) = 59.99 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 3, filled down-triangle, SiO2. Page pixel (3182.3, 871.8). Read log10 a = -0.050 ± 0.025; x(SiO2) = 59.99
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 3, filled down-triangle, SiO2. Page pixel (3182.3, 871.8). Read log10 a = -0.050 ± 0.025;
+          x(SiO2) = 59.99 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=3; marker_symbol=filled down-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x0_36
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.0036'
+        - - CaTiO3
+          - '0.9964'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.239883'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.6 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (1529.5, 1096.6). Read log10 a = -0.620 ± 0.03;
+          x(SiO2) = 0.36 ± 0.6 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.;
+          series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (1529.5, 1096.6). Read log10 a = -0.620 ± 0.03; x(SiO2) = 0.36 ±
+      0.6 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.; series=2; marker_symbol=filled
+      up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (1529.5, 1096.6). Read log10 a = -0.620 ± 0.03;
+          x(SiO2) = 0.36 ± 0.6 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The y-axis line crosses the left of the marker.;
+          series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x10_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.1'
+        - - CaTiO3
+          - '0.9'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.243781'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (1796.6, 1093.8). Read log10 a = -0.613 ± 0.025;
+          x(SiO2) = 10.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (1796.6, 1093.8). Read log10 a = -0.613 ± 0.025; x(SiO2) = 10.00
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (1796.6, 1093.8). Read log10 a = -0.613 ± 0.025;
+          x(SiO2) = 10.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x20_03
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2003'
+        - - CaTiO3
+          - '0.7997'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.365595'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2074.7, 1024.3). Read log10 a = -0.437 ± 0.03;
+          x(SiO2) = 20.03 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The open square of series 4 is about 43 px
+          above this triangle. Both centres were read.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (2074.7, 1024.3). Read log10 a = -0.437 ± 0.03; x(SiO2) = 20.03 ±
+      0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The open square of series 4 is about 43 px above this triangle.
+      Both centres were read.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2074.7, 1024.3). Read log10 a = -0.437 ± 0.03;
+          x(SiO2) = 20.03 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The open square of series 4 is about 43 px
+          above this triangle. Both centres were read.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x29_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2998'
+        - - CaTiO3
+          - '0.7002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.399025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2350.5, 1009.5). Read log10 a = -0.399 ± 0.025;
+          x(SiO2) = 29.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (2350.5, 1009.5). Read log10 a = -0.399 ± 0.025; x(SiO2) = 29.98
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2350.5, 1009.5). Read log10 a = -0.399 ± 0.025;
+          x(SiO2) = 29.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x33_34
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3334'
+        - - CaTiO3
+          - '0.6666'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.383707'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2443.6, 1016.3). Read log10 a = -0.416 ± 0.025;
+          x(SiO2) = 33.34 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (2443.6, 1016.3). Read log10 a = -0.416 ± 0.025; x(SiO2) = 33.34
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2443.6, 1016.3). Read log10 a = -0.416 ± 0.025;
+          x(SiO2) = 33.34 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x49_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4998'
+        - - CaTiO3
+          - '0.5002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.198609'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2905.0, 1129.1). Read log10 a = -0.702 ± 0.025;
+          x(SiO2) = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (2905.0, 1129.1). Read log10 a = -0.702 ± 0.025; x(SiO2) = 49.98
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (2905.0, 1129.1). Read log10 a = -0.702 ± 0.025;
+          x(SiO2) = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_tio2_x60_00
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Equation (7), published p. 114, anchors ln a(TiO2) at a*(TiO2). The paper
+        states: "a*(i) is the activity of the i component of the CaTiO3 compound crystallized from the SiO2-CaTiO3 melt at
+        the concentration equal to x*(i)." x*(SiO2) is 10.94±0.18 mol% at 2100 K. This is a component in crystallized CaTiO3
+        at x*, not a pure-oxide endmember. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.6'
+        - - CaTiO3
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.095719'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.025'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.025 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (3182.5, 1253.9). Read log10 a = -1.019 ± 0.025;
+          x(SiO2) = 60.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 2, filled up-triangle, TiO2. Page pixel (3182.5, 1253.9). Read log10 a = -1.019 ± 0.025; x(SiO2) = 60.00
+      ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 2, filled up-triangle, TiO2. Page pixel (3182.5, 1253.9). Read log10 a = -1.019 ± 0.025;
+          x(SiO2) = 60.00 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=2; marker_symbol=filled up-triangle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x20_37
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2037'
+        - - CaTiO3
+          - '0.7963'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.609537'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker. The lower
+        arc is hidden by the series-4 square.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2084.0, 937.0). Read log10 a = -0.215 ± 0.03; x(SiO2)
+          = 20.37 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The centre is the constrained fit of the dark pixels
+          on the series-5 inner radius, 21 px, measured on the clean circle at (2905, 956) where 25 of 36 rays agree. The
+          visible arc spans 261 degrees. Fit centres run from x=2080 to x=2088, so the uncertainty is widened. The series-4
+          square at (2074.0, 980.6) hides the lower part of the ring.; series=5; marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (2084.0, 937.0). Read log10 a = -0.215 ± 0.03; x(SiO2) = 20.37 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The centre is the constrained fit of the dark pixels on the series-5
+      inner radius, 21 px, measured on the clean circle at (2905, 956) where 25 of 36 rays agree. The visible arc spans 261
+      degrees. Fit centres run from x=2080 to x=2088, so the uncertainty is widened. The series-4 square at (2074.0, 980.6)
+      hides the lower part of the ring.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2084.0, 937.0). Read log10 a = -0.215 ± 0.03; x(SiO2)
+          = 20.37 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The centre is the constrained fit of the dark pixels
+          on the series-5 inner radius, 21 px, measured on the clean circle at (2905, 956) where 25 of 36 rays agree. The
+          visible arc spans 261 degrees. Fit centres run from x=2080 to x=2088, so the uncertainty is widened. The series-4
+          square at (2074.0, 980.6) hides the lower part of the ring.; series=5; marker_symbol=open circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x29_93
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.2993'
+        - - CaTiO3
+          - '0.7007'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.948418'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2349.0, 861.0). Read log10 a = -0.023 ± 0.03; x(SiO2)
+          = 29.93 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The circle is
+          just inside the top of the frame.; series=5; marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (2349.0, 861.0). Read log10 a = -0.023 ± 0.03; x(SiO2) = 29.93 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The circle is just inside the top
+      of the frame.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2349.0, 861.0). Read log10 a = -0.023 ± 0.03; x(SiO2)
+          = 29.93 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The circle is
+          just inside the top of the frame.; series=5; marker_symbol=open circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x33_46
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3346'
+        - - CaTiO3
+          - '0.6654'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.011579'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2447.0, 850.0). Read log10 a = 0.005 ± 0.03; x(SiO2)
+          = 33.46 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The ring fit is
+          within 2 px of the log10 a = 0 frame.; series=5; marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (2447.0, 850.0). Read log10 a = 0.005 ± 0.03; x(SiO2) = 33.46 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The ring fit is within 2 px of the
+      log10 a = 0 frame.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2447.0, 850.0). Read log10 a = 0.005 ± 0.03; x(SiO2)
+          = 33.46 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle. The ring fit is
+          within 2 px of the log10 a = 0 frame.; series=5; marker_symbol=open circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x39_92
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.3992'
+        - - CaTiO3
+          - '0.6008'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.909913'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2626.0, 868.0). Read log10 a = -0.041 ± 0.03; x(SiO2)
+          = 39.92 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5; marker_symbol=open
+          circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (2626.0, 868.0). Read log10 a = -0.041 ± 0.03; x(SiO2) = 39.92 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2626.0, 868.0). Read log10 a = -0.041 ± 0.03; x(SiO2)
+          = 39.92 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5; marker_symbol=open
+          circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x49_98
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.4998'
+        - - CaTiO3
+          - '0.5002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.564937'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.05'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.05 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2905.0, 950.0). Read log10 a = -0.248 ± 0.05; x(SiO2)
+          = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 3 down-triangle touches this circle from
+          above.; series=5; marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (2905.0, 950.0). Read log10 a = -0.248 ± 0.05; x(SiO2) = 49.98 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 3 down-triangle touches this circle from above.; series=5;
+      marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (2905.0, 950.0). Read log10 a = -0.248 ± 0.05; x(SiO2)
+          = 49.98 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. The series 3 down-triangle touches this circle from
+          above.; series=5; marker_symbol=open circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x60_09
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.6009'
+        - - CaTiO3
+          - '0.3991'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.278612'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.02'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.02 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (3185.0, 1071.0). Read log10 a = -0.555 ± 0.02;
+          x(SiO2) = 60.09 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=5; marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (3185.0, 1071.0). Read log10 a = -0.555 ± 0.02; x(SiO2) = 60.09 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (3185.0, 1071.0). Read log10 a = -0.555 ± 0.02;
+          x(SiO2) = 60.09 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%.; series=5; marker_symbol=open circle'
+- observation_id: shornikov-2003-silica-catitanoate-melts::shornikov_2003_fig1_titanite_x9_90
+  experiment_id: bab5b5825fab491a3bddeb5800b15006b7c0ac60a124dc1a92551f47c78fdb22::experiment::shornikov-2003-fig1-2100k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaTiSiO5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 plots a(CaTiSiO5) in the SiO2-CaTiO3 melt at 2100 K. The paper does
+        not give a reference-state sentence for the titanite activity. The phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.099'
+        - - CaTiO3
+          - '0.901'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.140605'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10 activity
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: Read uncertainty is ±0.03 in log10 a and ±0.4 mol% SiO2. The paper prints no error bar on this marker.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w4-fix1-t5
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (1794.0, 1188.0). Read log10 a = -0.852 ± 0.03;
+          x(SiO2) = 9.90 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5;
+          marker_symbol=open circle'
+  notices: []
+  source_id: shornikov-2003-silica-catitanoate-melts
+  locator:
+    page: 4
+    published_page: 115
+    pdf_page_index: 3
+    figure: '1'
+    note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at y=1246.5,
+      -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5 and 80 mol%
+      at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals are at most 0.6
+      px. Series 5, open circle, CaTiSiO5. Page pixel (1794.0, 1188.0). Read log10 a = -0.852 ± 0.03; x(SiO2) = 9.90 ± 0.4
+      mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5; marker_symbol=open circle'
+  read_from: pdf:shornikov-2003-silica-catitanoate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 4
+        published_page: 115
+        pdf_page_index: 3
+        figure: '1'
+        note: '600 dpi PDF page 4 (published p. 115), 4959 by 7017 px. log10 a(i) ticks, residuals 0: 0 at y=852.0, -1 at
+          y=1246.5, -2 at y=1641.0, -3 at y=2035.5, -4 at y=2430.0. Scale 394.5 px per log unit. x(SiO2): 0 mol% at x=1519.5
+          and 80 mol% at x=3737.0. (3737.0-1519.5)/80 = 27.71875 px per mol% (277.1875 px per 10 mol%). Minor-tick residuals
+          are at most 0.6 px. Series 5, open circle, CaTiSiO5. Page pixel (1794.0, 1188.0). Read log10 a = -0.852 ± 0.03;
+          x(SiO2) = 9.90 ± 0.4 mol%. 1 px is 0.00253 in log10 a and 0.036 mol%. A curve passes through the circle.; series=5;
+          marker_symbol=open circle'

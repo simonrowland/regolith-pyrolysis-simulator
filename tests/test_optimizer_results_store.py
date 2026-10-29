@@ -14,6 +14,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.corpus_version import current_corpus_version
+from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -373,7 +374,13 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     scored = _scored(
         spec,
         result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
-        product_summary={"oxygen_kg": 10.0, "wall_deposit_kg": {}},
+        product_summary={
+            "oxygen_kg": 10.0,
+            "wall_deposit_kg": {},
+            "glass_kg": None,
+            "glass_status": "unavailable",
+            "glass_status_reason": "stage_3_missing",
+        },
     )
     store = ResultStore(
         tmp_path / "results.sqlite",
@@ -404,6 +411,9 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "backend_name": "alphamelts",
         "oxygen_kg": 10.0,
         "wall_deposit_kg": {},
+        "glass_kg": None,
+        "glass_status": "unavailable",
+        "glass_status_reason": "stage_3_missing",
     }
 
 
@@ -854,6 +864,31 @@ def test_deserialize_coating_margin_rederives_feasible_from_grounded_authority()
 
     assert margins["coating"].authoritative is False
     assert margins["coating"].feasible is True
+
+
+def test_deserialize_legacy_non_coating_margin_defaults_non_authoritative() -> None:
+    margins = _deserialize_margins(
+        {
+            "delivered_stream_purity": {
+                "gate": "delivered_stream_purity",
+                "feasible": True,
+                "margin": 1.0,
+                "threshold": {
+                    "id": "purity-threshold",
+                    "value": 1.0,
+                    "units": "fraction",
+                    "source": "profile",
+                    "source_ref": "legacy profile",
+                },
+                "observed": 2.0,
+                "detail": "legacy purity margin",
+            }
+        }
+    )
+
+    assert margins["delivered_stream_purity"].status == "warning"
+    assert margins["delivered_stream_purity"].authoritative is False
+    assert margins["delivered_stream_purity"].output_status == "status_bearing"
 
 
 def test_legacy_unavailable_coating_margin_is_not_selected(tmp_path) -> None:
@@ -1318,7 +1353,7 @@ def test_lookup_leaves_empty_objectives_empty_for_infeasible_rows(tmp_path) -> N
                     }
                 ),
             ),
-            "backend_authority_contradicts_status:unavailable",
+            "feasible_result_carries_degrading_backend_status:unavailable",
         ),
         (
             lambda spec: _scored(
@@ -1378,6 +1413,40 @@ def test_store_rejects_inadmissible_cache_writes_reason_coded_and_unwritten(
     assert store.lookup(spec) is None
     with sqlite3.connect(tmp_path / "results.sqlite") as conn:
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize(
+    "backend_status", sorted(DEGRADING_INTENT_RESULT_STATUSES)
+)
+def test_store_rejects_feasible_rows_with_every_degrading_backend_status(
+    tmp_path,
+    backend_status: str,
+) -> None:
+    """Feasibility contradicts a degrading run status, even if the backend is authoritative.
+
+    The predicate is feasible-vs-degrading: an authoritative backend may
+    refuse work, but that refusal cannot produce a feasible cache row.
+    """
+    spec = _base_spec(backend_name="alphamelts")
+    store = ResultStore(tmp_path / "results.sqlite")
+    scored = _scored(
+        spec,
+        result_blob=_admissible_trace(
+            {
+                "backend_status": backend_status,
+                "backend_authoritative": True,
+            }
+        ),
+    )
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-10-28T00:00:00Z")
+
+    assert (
+        f"feasible_result_carries_degrading_backend_status:{backend_status}"
+        in exc_info.value.reasons
+    )
+    assert store.lookup(spec) is None
 
 
 @pytest.mark.parametrize(
@@ -2341,7 +2410,9 @@ def test_deserialize_legacy_coating_margin_defaults_non_authoritative() -> None:
         }
     )
 
+    assert margins["coating"].status == "warning"
     assert margins["coating"].authoritative is False
+    assert margins["coating"].output_status == "status_bearing"
 
 
 def test_fresh_authoritative_coating_margin_round_trips_authoritative(

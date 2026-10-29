@@ -1,0 +1,1514 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2000-na-zno-phosphate-vaporization.yaml
+observations:
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_legend_glyphs
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Legend symbols only. Reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, T_K,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: 'Panel (c) legend glyphs sit with the numerals and are not on the data curves: square (4458, 8510) beside 1, circle
+      (4463, 8767) beside 2, upright triangle (4465, 9014) beside 3. Panel (d) legend glyphs, also not on the curves: circle
+      (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted triangle (5250, 9007) beside 4. Coordinates
+      were not stored as activities.'
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: 'Legend glyphs, not data. Panel (c): square (4458, 8510) beside 1, circle (4463, 8767) beside 2, upright triangle
+          (4465, 9014) beside 3. Panel (d): circle (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted
+          triangle (5250, 9007) beside 4.; panel=c'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: 'Legend glyphs, not data. Panel (c): square (4458, 8510) beside 1, circle (4463, 8767) beside 2, upright triangle
+      (4465, 9014) beside 3. Panel (d): circle (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted triangle
+      (5250, 9007) beside 4.; panel=c'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: 'Legend glyphs, not data. Panel (c): square (4458, 8510) beside 1, circle (4463, 8767) beside 2, upright triangle
+          (4465, 9014) beside 3. Panel (d): circle (5245, 8512) beside 2, upright triangle (5247, 8763) beside 3, inverted
+          triangle (5250, 9007) beside 4.; panel=c'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_na2o_x33
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.3324'
+        - - Na2O
+          - '0.3342666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000000006516284'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to
+          0.3 px across distance fractions 0.45 to 0.75. The horizontal curve passes through the square. Page pixel (3499.1,
+          8777.6). Read log10(a) = -14.186; x(ZnO) = 33.24 mol%.; panel=c; series=1; marker_symbol=filled square'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 1, filled square. Core centroid is stable to 0.3 px across distance fractions
+      0.45 to 0.75. The horizontal curve passes through the square. Page pixel (3499.1, 8777.6). Read log10(a) = -14.186;
+      x(ZnO) = 33.24 mol%.; panel=c; series=1; marker_symbol=filled square'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to
+          0.3 px across distance fractions 0.45 to 0.75. The horizontal curve passes through the square. Page pixel (3499.1,
+          8777.6). Read log10(a) = -14.186; x(ZnO) = 33.24 mol%.; panel=c; series=1; marker_symbol=filled square'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_na2o_x40
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.3993'
+        - - Na2O
+          - '0.2673666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000000004864072'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to
+          0.4 px across distance fractions 0.45 to 0.75. Page pixel (3787.3, 8806.3). Read log10(a) = -14.313; x(ZnO) = 39.93
+          mol%.; panel=c; series=1; marker_symbol=filled square'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 1, filled square. Core centroid is stable to 0.4 px across distance fractions
+      0.45 to 0.75. Page pixel (3787.3, 8806.3). Read log10(a) = -14.313; x(ZnO) = 39.93 mol%.; panel=c; series=1; marker_symbol=filled
+      square'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 1, filled square. Core centroid is stable to
+          0.4 px across distance fractions 0.45 to 0.75. Page pixel (3787.3, 8806.3). Read log10(a) = -14.313; x(ZnO) = 39.93
+          mol%.; panel=c; series=1; marker_symbol=filled square'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_p2o5_x33
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 61 (PDF page 4): Taking the pure oxides which form the ternary
+        system as the standard states the Gibbs-Duhem equation could be written as. Equation (14) integrates from a* at x*;
+        that x* is an integration anchor, not a different standard state. Equations (12) and (13) define a(P2O5) from reactions
+        (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the
+        solid. The plotted component is P2O5 and the bracketed solid is P4O10, so this row is not stored as a(P4O10). The
+        activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.332'
+        - - Na2O
+          - '0.3346666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000130017'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Centre is the centroid of
+          the marker core at distance-transform fractions 0.45, 0.60 and 0.75; those centres stay inside 1.5 px. Page pixel
+          (3497.0, 6894.0). Read log10(a) = -5.886; x(ZnO) = 33.20 mol%.; panel=c; series=3; marker_symbol=filled triangle'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 3, filled triangle. Centre is the centroid of the marker core at distance-transform
+      fractions 0.45, 0.60 and 0.75; those centres stay inside 1.5 px. Page pixel (3497.0, 6894.0). Read log10(a) = -5.886;
+      x(ZnO) = 33.20 mol%.; panel=c; series=3; marker_symbol=filled triangle'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Centre is the centroid of
+          the marker core at distance-transform fractions 0.45, 0.60 and 0.75; those centres stay inside 1.5 px. Page pixel
+          (3497.0, 6894.0). Read log10(a) = -5.886; x(ZnO) = 33.20 mol%.; panel=c; series=3; marker_symbol=filled triangle'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_p2o5_x40
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Published page 61 (PDF page 4): Taking the pure oxides which form the ternary
+        system as the standard states the Gibbs-Duhem equation could be written as. Equation (14) integrates from a* at x*;
+        that x* is an integration anchor, not a different standard state. Equations (12) and (13) define a(P2O5) from reactions
+        (2) and (11). Reaction (11) is printed [P4O10] + 2(PO) = 6(PO2), and the paper says the square brackets indicate the
+        solid. The plotted component is P2O5 and the bracketed solid is P4O10, so this row is not stored as a(P4O10). The
+        activity reference phase is not stated.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.3985'
+        - - Na2O
+          - '0.2681666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000002924152'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Core-centroid spread across
+          distance fractions 0.45 to 0.75 is under 2 px. Page pixel (3783.8, 6814.0). Read log10(a) = -5.534; x(ZnO) = 39.85
+          mol%.; panel=c; series=3; marker_symbol=filled triangle'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 3, filled triangle. Core-centroid spread across distance fractions 0.45 to
+      0.75 is under 2 px. Page pixel (3783.8, 6814.0). Read log10(a) = -5.534; x(ZnO) = 39.85 mol%.; panel=c; series=3; marker_symbol=filled
+      triangle'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 3, filled triangle. Core-centroid spread across
+          distance fractions 0.45 to 0.75 is under 2 px. Page pixel (3783.8, 6814.0). Read log10(a) = -5.534; x(ZnO) = 39.85
+          mol%.; panel=c; series=3; marker_symbol=filled triangle'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_zno_x33
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: ZnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: ZnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.332'
+        - - Na2O
+          - '0.3346666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000719449'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.28 px, radius
+          48.3 px, 210 inlier boundary pixels. Thresholds 70, 100, 130 and 160 leave the centre unchanged. Page pixel (3497.00,
+          6498.48). Read log10(a) = -4.143; x(ZnO) = 33.20 mol%.; panel=c; series=2; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.28 px, radius 48.3 px, 210 inlier boundary
+      pixels. Thresholds 70, 100, 130 and 160 leave the centre unchanged. Page pixel (3497.00, 6498.48). Read log10(a) = -4.143;
+      x(ZnO) = 33.20 mol%.; panel=c; series=2; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.28 px, radius
+          48.3 px, 210 inlier boundary pixels. Thresholds 70, 100, 130 and 160 leave the centre unchanged. Page pixel (3497.00,
+          6498.48). Read log10(a) = -4.143; x(ZnO) = 33.20 mol%.; panel=c; series=2; marker_symbol=filled circle'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1c_zno_x40
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: ZnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: ZnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - ZnO
+          - '0.3972'
+        - - Na2O
+          - '0.2694666667'
+        - - P2O5
+          - '0.3333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0001892344'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.03'
+      unit: log10(activity)
+      basis: visual read uncertainty
+      confidence_level: not_stated
+      note: ±0.03 in log10(a) and ±0.15 mol% ZnO. Calibration RMS is 0.015 in log10(a) and 0.035 mol%. The paper prints no
+        error bar.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.31 px, radius
+          46.9 px, 155 inlier boundary pixels. Thresholds 70 to 160 leave the centre unchanged. Page pixel (3778.43, 6403.12).
+          Read log10(a) = -3.723; x(ZnO) = 39.72 mol%. In-frame extrapolation: the marker centre y=6403.12 sits above the
+          top labelled log10(a) tick, which is -4 at y=6469, and still inside the frame. The unlabelled minor near y=6246
+          was not used. The read uses the labelled-tick line.; panel=c; series=2; marker_symbol=filled circle'
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the glyph:
+      -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a) = -0.004406614*y
+      + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146. Unlabelled minor ticks
+      at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064, 10 at 2496, 20 at 2930,
+      30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals -0.027, -0.011, +0.051,
+      -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and ±0.15 mol% ZnO. The paper
+      prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.31 px, radius 46.9 px, 155 inlier boundary
+      pixels. Thresholds 70 to 160 leave the centre unchanged. Page pixel (3778.43, 6403.12). Read log10(a) = -3.723; x(ZnO)
+      = 39.72 mol%. In-frame extrapolation: the marker centre y=6403.12 sits above the top labelled log10(a) tick, which is
+      -4 at y=6469, and still inside the frame. The unlabelled minor near y=6246 was not used. The read uses the labelled-tick
+      line.; panel=c; series=2; marker_symbol=filled circle'
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: '600 dpi PDF page 3 (published p. 60), 9732 by 15157 px. Labelled log10(a) ticks are the tick line, not the
+          glyph: -4 at y=6469, -6 at y=6919, -8 at y=7369, -10 at y=7825, -12 at y=8287, -14 at y=8737, -16 at y=9187. log10(a)
+          = -0.004406614*y + 24.493086. Residuals -0.0133, +0.0037, +0.0207, +0.0113, -0.0245, -0.0075, +0.0095; RMS 0.0146.
+          Unlabelled minor ticks at y=6246, 6696, 7602, 8058 and 8508 were not used. Labelled x(ZnO) mol% ticks: 0 at x=2064,
+          10 at 2496, 20 at 2930, 30 at 3358, 40 at 3793, 50 at 4221, 60 at 4652. mol% = 0.023184495*x - 47.880030. Residuals
+          -0.027, -0.011, +0.051, -0.026, +0.059, -0.018, -0.026 mol%; RMS 0.035. Read uncertainty is ±0.03 in log10(a) and
+          ±0.15 mol% ZnO. The paper prints no error bar on the marker. Series 2, filled circle. Circle fit rms 1.31 px, radius
+          46.9 px, 155 inlier boundary pixels. Thresholds 70 to 160 leave the centre unchanged. Page pixel (3778.43, 6403.12).
+          Read log10(a) = -3.723; x(ZnO) = 39.72 mol%. In-frame extrapolation: the marker centre y=6403.12 sits above the
+          top labelled log10(a) tick, which is -4 at y=6469, and still inside the frame. The unlabelled minor near y=6246
+          was not used. The read uses the labelled-tick line.; panel=c; series=2; marker_symbol=filled circle'
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1d_na2o
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300
+        K. Reference phase is not stated in this article.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, T_K,
+      component, reason, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  admission:
+    status: rejected
+    reason: Panel (d) is the Sn2P2O7-Zn2P2O7 join at 1300 K, previous data [13]. Its legend shows symbols 2, 3 and 4. No Na2O
+      square was found on panel (d). The two panel (c) squares stay on that panel.
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=1; marker_symbol=filled
+          square
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=1; marker_symbol=filled
+      square
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=1; marker_symbol=filled
+          square
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1d_p2o5
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: P2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300
+        K. Reference phase is not stated in this article.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, T_K,
+      component, reason, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  admission:
+    status: rejected
+    reason: 'Caption assigns panel (d), series 3, to previous data [13] at 1300 K. Five upright triangles were censused at
+      600 dpi and were not read: the shared-frame marker at page pixel (4945, 6626), and four off that frame at (6690, 8763),
+      (6980, 8670), (7267, 8569) and (7554, 8288). The shared-frame triangle is not a panel (c) point. Panel (c)''s triangle
+      series ends below it.'
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=3; marker_symbol=filled
+          triangle
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=3; marker_symbol=filled
+      triangle
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=3; marker_symbol=filled
+          triangle
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1d_sno
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300
+        K. Reference phase is not stated in this article.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, T_K,
+      component, reason, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  admission:
+    status: rejected
+    reason: 'Caption assigns panel (d), series 4, to SnO activities from previous data [13] at 1300 K. Five inverted triangles
+      off the shared frame were censused at 600 dpi and were not read: page pixels (6684, 6881), (6976, 6738), (7260, 6688),
+      (7550, 6583) and (7837, 6536).'
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=4; marker_symbol=inverted
+          triangle
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=4; marker_symbol=inverted
+      triangle
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=4; marker_symbol=inverted
+          triangle
+- observation_id: shornikov-2000-na-zno-phosphate-vaporization::shornikov_2000_fig1d_zno
+  experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: ZnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Fig. 1 caption, published page 60: panel (d) is previous data [13] at 1300
+        K. Reference phase is not stated in this article.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, T_K,
+      component, reason, attribution'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shilov, Shornikov, Archakov and Ivanova, Glass Phys. Chem. 24 (1998) 400, reference [13]
+  admission:
+    status: rejected
+    reason: 'Caption assigns panel (d), series 2, to previous data [13] at 1300 K. Five filled circles were censused at 600
+      dpi and were not read: the shared-frame marker at page pixel (4942, 6175), and four off that frame at (6683, 7021),
+      (6974, 7020), (7259, 7018) and (7547, 6991). The shared-frame circle is not a panel (c) point. Panel (c)''s circle series
+      ends below it.'
+    decided_by:
+      worker: t1372-w2-w6-t1
+      date: '2026-10-20'
+      evidence:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=2; marker_symbol=filled
+          circle
+  notices: []
+  source_id: shornikov-2000-na-zno-phosphate-vaporization
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=2; marker_symbol=filled
+      circle
+  read_from: pdf:shornikov-2000-na-zno-phosphate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        published_page: 60
+        pdf_page_index: 2
+        figure: '1'
+        note: Panel (d) is to the right of the panel (c) frame near page x = 4943 px.; panel=d; series=2; marker_symbol=filled
+          circle

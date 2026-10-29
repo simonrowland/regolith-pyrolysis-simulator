@@ -38,6 +38,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
+from functools import lru_cache
 import math
 import re
 import subprocess
@@ -68,6 +70,21 @@ FIDELITY_GRADUATION_LEDGER_SCHEMA = (
 )
 LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vocabulary.yaml"
 
+
+@lru_cache(maxsize=512)
+def _load_extract_yaml_cached(path: str, mtime_ns: int, size: int) -> Any:
+    return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+
+
+def load_extract_yaml(path: Path) -> Any:
+    """Load YAML with an in-process cache invalidated by file stat changes."""
+    resolved = path.resolve()
+    metadata = resolved.stat()
+    parsed = _load_extract_yaml_cached(
+        str(resolved), metadata.st_mtime_ns, metadata.st_size
+    )
+    return deepcopy(parsed)
+
 # Scored physics series. The first six are read by the rail/scoring machinery;
 # the d-032 additions (owner ruling 2026-09-21) are physics quantities the rail
 # could score, admitted from the invented-type cleanup with near-spellings
@@ -96,6 +113,7 @@ OBSERVATION_TYPES = frozenset(
         "chloride_capacity",
         "composition_series",
         "equilibrium_phase_composition",
+        "distribution_ratio",
     }
 )
 
@@ -175,7 +193,11 @@ PATH_VALUE_KEYS = frozenset(
         "table_provenance_root",
         "chapter_pdf",
         "corpus_asset",
+        "image_asset_as_published",  # published image filenames are relative asset paths
         "provenance_file",
+        "audit_file",
+        "audit_files",
+        "calibration_audit",
     }
 )
 
@@ -184,17 +206,17 @@ def _is_absolute_path(value: Any) -> bool:
     return isinstance(value, str) and bool(_ABS_PATH_RE.match(value))
 
 
-def _walk_absolute_path_values(
+def _walk_path_values(
     node: Any, *, path: str = ""
 ) -> list[tuple[str, str, str]]:
-    """Return (key, dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+    """Return (key, dotted-path, value) for PATH_VALUE_KEYS strings.
 
     Walks the *parsed* document, so a quoted scalar and a YAML alias
     (``source_path: *scan``) count exactly like an unquoted scalar, and an
     anchor reused N times yields N hits (one per place a consumer reads it).
-    A path key's value may be a string (checked), a list (each string element
-    checked, e.g. ``corpus_tables: [tables/x/t1.csv, ...]``; other elements
-    walked), or a mapping (walked, e.g. the ``transcription`` page/table dict).
+    A path key's value may be a string, a list (each string element checked,
+    e.g. ``corpus_tables: [tables/x/t1.csv, ...]``), or a mapping (walked,
+    e.g. the ``transcription`` page/table dict).
     """
     hits: list[tuple[str, str, str]] = []
     if isinstance(node, Mapping):
@@ -202,18 +224,24 @@ def _walk_absolute_path_values(
             key_s = str(key)
             child = f"{path}.{key_s}" if path else key_s
             if key_s in PATH_VALUE_KEYS:
-                if _is_absolute_path(value):
+                if isinstance(value, str):
                     hits.append((key_s, child, value))
-                    continue
-                if isinstance(value, (list, tuple)):
+                elif isinstance(value, (list, tuple)):
                     for i, item in enumerate(value):
-                        if _is_absolute_path(item):
+                        if isinstance(item, str):
                             hits.append((key_s, f"{child}[{i}]", item))
-            hits.extend(_walk_absolute_path_values(value, path=child))
+            hits.extend(_walk_path_values(value, path=child))
     elif isinstance(node, (list, tuple)):
         for i, item in enumerate(node):
-            hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
+            hits.extend(_walk_path_values(item, path=f"{path}[{i}]"))
     return hits
+
+
+def _walk_absolute_path_values(
+    node: Any, *, path: str = ""
+) -> list[tuple[str, str, str]]:
+    """Return absolute strings found under the owning PATH_VALUE_KEYS set."""
+    return [hit for hit in _walk_path_values(node, path=path) if _is_absolute_path(hit[2])]
 
 
 def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
@@ -233,6 +261,52 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
             f"{label}: {where[0]} must be repository-relative "
             f"(absolute/machine-local path refused): {value!r}{more}"
         )
+    return errors
+
+
+def _private_path_value_errors(doc: Any, label: str) -> list[str]:
+    """Refuse repository-private paths under every path-valued extract key."""
+    hits = [hit for hit in _walk_path_values(doc) if hit[2].startswith("docs-private/")]
+    by_value: dict[tuple[str, str], list[str]] = {}
+    for key, dotted, value in hits:
+        by_value.setdefault((key, value), []).append(dotted)
+    errors: list[str] = []
+    for (key, value), where in by_value.items():
+        more = f" (+{len(where) - 1} more via YAML aliases/repeats)" if len(where) > 1 else ""
+        errors.append(
+            f"{label}: {where[0]} must be repository-portable "
+            f"(docs-private path refused for {key}): {value!r}{more}"
+        )
+    return errors
+
+
+def _docs_private_prose_errors(doc: Any, label: str) -> list[str]:
+    """Refuse private-workspace references in extract prose, not path fields."""
+    errors: list[str] = []
+
+    def walk(node: Any, field_path: str = "") -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                key_s = str(key)
+                child_path = f"{field_path}.{key_s}" if field_path else key_s
+                if key_s in PATH_VALUE_KEYS and isinstance(value, str):
+                    continue
+                if key_s in PATH_VALUE_KEYS and isinstance(value, (list, tuple)):
+                    for index, item in enumerate(value):
+                        if not isinstance(item, str):
+                            walk(item, f"{child_path}[{index}]")
+                    continue
+                walk(value, child_path)
+        elif isinstance(node, (list, tuple)):
+            for index, value in enumerate(node):
+                walk(value, f"{field_path}[{index}]")
+        elif isinstance(node, str) and "docs-private" in node:
+            errors.append(
+                f"{label}:{field_path}: [docs-private-prose] private path reference "
+                "is forbidden in prose"
+            )
+
+    walk(doc)
     return errors
 
 
@@ -618,11 +692,11 @@ def _values_equal(
 
 
 def _path_is_observation_evidence(path: str) -> bool:
-    """True when a path-based sample pins observation values or equipment.
+    """True when a path-based sample pins observation or context evidence.
 
     Required shape::
 
-        species.<id>.observations[<obs_id|index>].(values|equipment)[....]
+        species.<id>.(observations|context)[<id|index>].(values|equipment)[....]
     """
     if not path or not isinstance(path, str):
         return False
@@ -632,7 +706,11 @@ def _path_is_observation_evidence(path: str) -> bool:
     if parts[0] != "species":
         return False
     obs_seg = _PATH_SEGMENT_RE.match(parts[2])
-    if not obs_seg or obs_seg.group(1) != "observations" or obs_seg.group(2) is None:
+    if (
+        not obs_seg
+        or obs_seg.group(1) not in ("observations", "context")
+        or obs_seg.group(2) is None
+    ):
         return False
     leaf_seg = _PATH_SEGMENT_RE.match(parts[3])
     if not leaf_seg:
@@ -1370,8 +1448,9 @@ def _check_fidelity_sample_shape(
     """Validate one fidelity sample's structure (path-based or structured).
 
     When ``enforce_observation_paths`` is True (non-allowlisted / new extracts),
-    path-based samples must pin under ``species.*.observations[...].(values|equipment)``
-    so metadata-only paths cannot satisfy the gate.
+        path-based samples must pin under
+        ``species.*.(observations|context)[...].(values|equipment)`` so
+        metadata-only paths cannot satisfy the gate.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     path = sample.get(path_keys[0]) if len(path_keys) == 1 else None
@@ -1394,8 +1473,8 @@ def _check_fidelity_sample_shape(
         if not _path_is_observation_evidence(str(path)):
             errors.append(
                 f"{sp}: path-based fidelity sample on new extracts must pin "
-                f"observation evidence "
-                f"(species.*.observations[id].(values|equipment)...); "
+                f"observation or context evidence "
+                f"(species.*.(observations|context)[id].(values|equipment)...); "
                 f"got path={path!r} (metadata-only paths refused)"
             )
     if "value" not in sample and "draft_value" not in sample:
@@ -1611,6 +1690,8 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
+    errors.extend(_docs_private_prose_errors(doc, label))
+
     for key_path in iter_unsupported_context_container_paths(doc):
         rendered_path = ".".join(key_path)
         errors.append(
@@ -1657,6 +1738,7 @@ def validate_extract_document(
     # extraction.provenance_path. b-713 replaced a line-regex count ceiling
     # that missed quoted scalars and YAML aliases.
     errors.extend(_absolute_path_value_errors(doc, label))
+    errors.extend(_private_path_value_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:
@@ -1732,13 +1814,14 @@ def validate_extract_file(
     check_fidelity_match: bool = False,
 ) -> list[str]:
     try:
-        text = path.read_text(encoding="utf-8")
-        doc = yaml.safe_load(text)
+        doc = load_extract_yaml(path)
     except Exception as exc:  # noqa: BLE001 — surface parse failures as validation errors
         return [f"{path}: failed to load YAML: {exc}"]
     if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
         errors: list[str] = []
+        errors.extend(_docs_private_prose_errors(doc, str(path)))
         errors.extend(_absolute_path_value_errors(doc, str(path)))
+        errors.extend(_private_path_value_errors(doc, str(path)))
         source_id = doc.get("source_id")
         if not isinstance(source_id, str) or not source_id:
             return [f"{path}: companion table source_id is required"]
@@ -1763,7 +1846,7 @@ def validate_extract_file(
             return errors
 
         try:
-            parent_doc = yaml.safe_load(parent_path.read_text(encoding="utf-8"))
+            parent_doc = load_extract_yaml(parent_path)
         except Exception as exc:  # noqa: BLE001 — surface parent parse failures
             errors.append(f"{parent_path}: failed to load YAML: {exc}")
             return errors

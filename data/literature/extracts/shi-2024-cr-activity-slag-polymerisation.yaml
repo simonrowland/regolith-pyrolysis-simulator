@@ -1,0 +1,4121 @@
+schema_version: literature_extract.v1
+source_id: shi-2024-cr-activity-slag-polymerisation
+source:
+  citation: Shi, C., Li, Z., Liu, Y. & Kobayashi, Y. (2024). Activity of Chromium Oxide in CaO–SiO2–MgO–Al2O3–MnO–CaF2–CrOx
+    Slag for Chromium Reducing Process. ISIJ International 64(6), 893–900.
+  doi: 10.2355/isijinternational.ISIJINT-2023-214
+  year: 2024
+extraction:
+  method: Born-digital pdftotext-layout primary; no MinerU table files are present. Tables 1–5 were transcribed
+    from the exact text layer and row/column bindings checked against 600 dpi PDF renders. Figures 1–7 are deferred
+    without numeric points.
+  date: '2026-10-20'
+  worker: fam25-1020
+review_status: draft
+fidelity_samples:
+- path: species.CrO.observations[shi2024_table3_n1_cro_activity].values.points[0].value
+  value: '0.0021415'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 897
+    table: '3'
+    row: '1'
+- path: species.CrO.observations[shi2024_table3_n1_cro_activity_coefficient].values.points[0].value
+  value: '6.0218'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 897
+    table: '3'
+    row: '1'
+- path: species.CrO.observations[shi2024_table2_n3_cro_mole_fraction].values.points[0].value
+  value: '0.0012434'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '3'
+experiments:
+- experiment_id: shi2024_sample_1
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.02
+  method: quench_equilibration
+  sample: '1'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '1'
+    note: Sample No. 1; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+- experiment_id: shi2024_sample_2
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.05
+  method: quench_equilibration
+  sample: '2'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '2'
+    note: Sample No. 2; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+- experiment_id: shi2024_sample_3
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.12
+  method: quench_equilibration
+  sample: '3'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '3'
+    note: Sample No. 3; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+- experiment_id: shi2024_sample_4
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.20
+  method: quench_equilibration
+  sample: '4'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '4'
+    note: Sample No. 4; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+- experiment_id: shi2024_sample_5
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.35
+  method: quench_equilibration
+  sample: '5'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '5'
+    note: Sample No. 5; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+- experiment_id: shi2024_sample_6
+  series: CaO–CaF2–MgO–Al2O3–SiO2–MnO–CrOx slag; initial CrO1.5 mass% 0.50
+  method: quench_equilibration
+  sample: '6'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 896
+    table: '2'
+    row: '6'
+    note: Sample No. 6; composition is the Table 1 initial slag composition.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.6040525e-6'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        section: 2.3 Experimental Procedure
+        note: Printed oxygen partial pressure pO2 = 2.57 × 10^-11 atm; converted to Pa only.
+species:
+  CrO:
+    observations:
+    - observation_id: shi2024_table2_n1_cro_mole_fraction
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '1'
+        note: Table 2 sample No. 1, column CrO.
+      units: mole_fraction
+      quench_statement: &id001
+        text: After reaching equilibrium state, the crucible was taken out from the main furnace and water quenched
+          immediately to get the Cu–Cr alloy and slag for analysis.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 895
+          section: 2.3 Experimental Procedure
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '1'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '1'
+          species_as_printed: CrO
+          value_as_published: '0.00035563'
+          value: '0.00035563'
+          composition_mass_percent: &id003
+            CaO: '34.80'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.18'
+            MnO: '5.00'
+            CrO1.5: '0.02'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n2_cro_mole_fraction
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '2'
+        note: Table 2 sample No. 2, column CrO.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '2'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '2'
+          species_as_printed: CrO
+          value_as_published: '0.00059631'
+          value: '0.00059631'
+          composition_mass_percent: &id007
+            CaO: '34.80'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.15'
+            MnO: '5.00'
+            CrO1.5: '0.05'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n3_cro_mole_fraction
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '3'
+        note: Table 2 sample No. 3, column CrO.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '3'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '3'
+          species_as_printed: CrO
+          value_as_published: '0.0012434'
+          value: '0.0012434'
+          composition_mass_percent: &id010
+            CaO: '34.75'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.13'
+            MnO: '5.00'
+            CrO1.5: '0.12'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n4_cro_mole_fraction
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '4'
+        note: Table 2 sample No. 4, column CrO.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '4'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '4'
+          species_as_printed: CrO
+          value_as_published: '0.0018547'
+          value: '0.0018547'
+          composition_mass_percent: &id013
+            CaO: '34.70'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.10'
+            MnO: '5.00'
+            CrO1.5: '0.20'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n5_cro_mole_fraction
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '5'
+        note: Table 2 sample No. 5, column CrO.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '5'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '5'
+          species_as_printed: CrO
+          value_as_published: '0.0032208'
+          value: '0.0032208'
+          composition_mass_percent: &id016
+            CaO: '34.65'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.00'
+            MnO: '5.00'
+            CrO1.5: '0.35'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n6_cro_mole_fraction
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '6'
+        note: Table 2 sample No. 6, column CrO.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO
+        component_as_published: CrO
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '6'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '6'
+          species_as_printed: CrO
+          value_as_published: '0.0040383'
+          value: '0.0040383'
+          composition_mass_percent: &id019
+            CaO: '34.50'
+            CaF2: '5.00'
+            MgO: '10.00'
+            Al2O3: '10.00'
+            SiO2: '35.00'
+            MnO: '5.00'
+            CrO1.5: '0.50'
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table3_n1_cro_activity
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '1'
+        note: Table 3 sample No. 1, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id002
+      - shi2024_table2_n1_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id002
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: &id005
+            page: 3
+            pdf_page_index: 2
+            published_page: 895
+            section: 2.3 Experimental Procedure
+            note: The paper states pO2 = 2.57 × 10^-11 atm for the present work.
+        points:
+        - sample: '1'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '1'
+          species_as_printed: CrO
+          value_as_published: '0.0021415'
+          value: '0.0021415'
+          composition_mass_percent: *id003
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0021415'
+    - observation_id: shi2024_table3_n1_cro_activity_coefficient
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '1'
+        note: Table 3 sample No. 1, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id004
+      - shi2024_table2_n1_cro_mole_fraction
+      - shi2024_table3_n1_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id004
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '1'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '1'
+          species_as_printed: CrO
+          value_as_published: '6.0218'
+          value: '6.0218'
+          composition_mass_percent: *id003
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '6.0218'
+    - observation_id: shi2024_table3_n2_cro_activity
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '2'
+        note: Table 3 sample No. 2, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id006
+      - shi2024_table2_n2_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id006
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '2'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '2'
+          species_as_printed: CrO
+          value_as_published: '0.0023339'
+          value: '0.0023339'
+          composition_mass_percent: *id007
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0023339'
+    - observation_id: shi2024_table3_n2_cro_activity_coefficient
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '2'
+        note: Table 3 sample No. 2, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id008
+      - shi2024_table2_n2_cro_mole_fraction
+      - shi2024_table3_n2_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id008
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '2'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '2'
+          species_as_printed: CrO
+          value_as_published: '3.9139'
+          value: '3.9139'
+          composition_mass_percent: *id007
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '3.9139'
+    - observation_id: shi2024_table3_n3_cro_activity
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '3'
+        note: Table 3 sample No. 3, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id009
+      - shi2024_table2_n3_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id009
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '3'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '3'
+          species_as_printed: CrO
+          value_as_published: '0.0048069'
+          value: '0.0048069'
+          composition_mass_percent: *id010
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0048069'
+    - observation_id: shi2024_table3_n3_cro_activity_coefficient
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '3'
+        note: Table 3 sample No. 3, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id011
+      - shi2024_table2_n3_cro_mole_fraction
+      - shi2024_table3_n3_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id011
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '3'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '3'
+          species_as_printed: CrO
+          value_as_published: '3.8660'
+          value: '3.8660'
+          composition_mass_percent: *id010
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '3.8660'
+    - observation_id: shi2024_table3_n4_cro_activity
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '4'
+        note: Table 3 sample No. 4, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id012
+      - shi2024_table2_n4_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id012
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '4'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '4'
+          species_as_printed: CrO
+          value_as_published: '0.0060899'
+          value: '0.0060899'
+          composition_mass_percent: *id013
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0060899'
+    - observation_id: shi2024_table3_n4_cro_activity_coefficient
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '4'
+        note: Table 3 sample No. 4, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id014
+      - shi2024_table2_n4_cro_mole_fraction
+      - shi2024_table3_n4_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id014
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '4'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '4'
+          species_as_printed: CrO
+          value_as_published: '3.2835'
+          value: '3.2835'
+          composition_mass_percent: *id013
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '3.2835'
+    - observation_id: shi2024_table3_n5_cro_activity
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '5'
+        note: Table 3 sample No. 5, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id015
+      - shi2024_table2_n5_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id015
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '5'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '5'
+          species_as_printed: CrO
+          value_as_published: '0.011488'
+          value: '0.011488'
+          composition_mass_percent: *id016
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.011488'
+    - observation_id: shi2024_table3_n5_cro_activity_coefficient
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '5'
+        note: Table 3 sample No. 5, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id017
+      - shi2024_table2_n5_cro_mole_fraction
+      - shi2024_table3_n5_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id017
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '5'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '5'
+          species_as_printed: CrO
+          value_as_published: '3.5668'
+          value: '3.5668'
+          composition_mass_percent: *id016
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '3.5668'
+    - observation_id: shi2024_table3_n6_cro_activity
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '6'
+        note: Table 3 sample No. 6, CrO activity.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id018
+      - shi2024_table2_n6_cro_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id018
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '6'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '6'
+          species_as_printed: CrO
+          value_as_published: '0.012816'
+          value: '0.012816'
+          composition_mass_percent: *id019
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.012816'
+    - observation_id: shi2024_table3_n6_cro_activity_coefficient
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '6'
+        note: Table 3 sample No. 6, CrO activity_coefficient.
+      units: dimensionless
+      standard_state: pure liquid CrO(l), explicit in Eq. (8)
+      condensed_form:
+        state: liquid CrO(l)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id020
+      - shi2024_table2_n6_cro_mole_fraction
+      - shi2024_table3_n6_cro_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id020
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '6'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '6'
+          species_as_printed: CrO
+          value_as_published: '3.1736'
+          value: '3.1736'
+          composition_mass_percent: *id019
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '3.1736'
+    context:
+    - observation_id: shi2024_figure5_gamma_cro_deferred
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        figure: '5'
+      phase: liquid slag at 1823 K; immediate water quench
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: activity_coefficient
+        species: CrO
+        phase_as_printed: liquid slag at 1823 K; immediate water quench
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: XCrOx mole fraction
+          y: γCrO (right axis)
+        caption: The variation of γCrO and γCrO1.5 with XCrOx.
+        panel: none
+        series:
+        - label: γCrO, black right-pointing triangles
+          marker_count: 6
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+  CrO1.5:
+    observations:
+    - observation_id: shi2024_table2_n1_cro15_mole_fraction
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '1'
+        note: Table 2 sample No. 1, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '1'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '1'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00018353'
+          value: '0.00018353'
+          composition_mass_percent: *id003
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n2_cro15_mole_fraction
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '2'
+        note: Table 2 sample No. 2, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '2'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '2'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00013209'
+          value: '0.00013209'
+          composition_mass_percent: *id007
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n3_cro15_mole_fraction
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '3'
+        note: Table 2 sample No. 3, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '3'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '3'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00028697'
+          value: '0.00028697'
+          composition_mass_percent: *id010
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n4_cro15_mole_fraction
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '4'
+        note: Table 2 sample No. 4, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '4'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '4'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00013020'
+          value: '0.00013020'
+          composition_mass_percent: *id013
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n5_cro15_mole_fraction
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '5'
+        note: Table 2 sample No. 5, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '5'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '5'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00022581'
+          value: '0.00022581'
+          composition_mass_percent: *id016
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table2_n6_cro15_mole_fraction
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: equilibrium_phase_composition
+      phase: l
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        table: '2'
+        row: '6'
+        note: Table 2 sample No. 6, column CrO1.5.
+      units: mole_fraction
+      quench_statement: *id001
+      values:
+        quantity: equilibrium_phase_composition
+        formula: CrO1.5
+        component_as_published: CrO1.5
+        basis_as_published: Mole fraction of chromium oxide in slag after equilibrium; determined from ICP-OES and
+          chromium valence analysis.
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES of slag combined with wet-chemical chromium valence analysis.
+        points:
+        - sample: '6'
+          sample_material_as_published: slag after chemical equilibration and water quench
+          row_as_printed: '6'
+          species_as_printed: CrO1.5
+          value_as_published: '0.00029830'
+          value: '0.00029830'
+          composition_mass_percent: *id019
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+    - observation_id: shi2024_table3_n1_cro15_activity
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '1'
+        note: Table 3 sample No. 1, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id021
+      - shi2024_table2_n1_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id021
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '1'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '1'
+          species_as_printed: CrO1.5
+          value_as_published: '0.0076852'
+          value: '0.0076852'
+          composition_mass_percent: *id003
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0076852'
+    - observation_id: shi2024_table3_n1_cro15_activity_coefficient
+      experiment: shi2024_sample_1
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '1'
+        note: Table 3 sample No. 1, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id022
+      - shi2024_table2_n1_cro15_mole_fraction
+      - shi2024_table3_n1_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id022
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '1'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '1'
+          species_as_printed: CrO1.5
+          value_as_published: '41.875'
+          value: '41.875'
+          composition_mass_percent: *id003
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.18'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.02'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '1'
+                note: Initial composition for sample No. 1; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '41.875'
+    - observation_id: shi2024_table3_n2_cro15_activity
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '2'
+        note: Table 3 sample No. 2, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id023
+      - shi2024_table2_n2_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id023
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '2'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '2'
+          species_as_printed: CrO1.5
+          value_as_published: '0.0083755'
+          value: '0.0083755'
+          composition_mass_percent: *id007
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.0083755'
+    - observation_id: shi2024_table3_n2_cro15_activity_coefficient
+      experiment: shi2024_sample_2
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '2'
+        note: Table 3 sample No. 2, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id024
+      - shi2024_table2_n2_cro15_mole_fraction
+      - shi2024_table3_n2_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id024
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '2'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '2'
+          species_as_printed: CrO1.5
+          value_as_published: '63.410'
+          value: '63.410'
+          composition_mass_percent: *id007
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.80'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.15'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.05'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '2'
+                note: Initial composition for sample No. 2; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '63.410'
+    - observation_id: shi2024_table3_n3_cro15_activity
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '3'
+        note: Table 3 sample No. 3, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id025
+      - shi2024_table2_n3_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id025
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '3'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '3'
+          species_as_printed: CrO1.5
+          value_as_published: '0.017250'
+          value: '0.017250'
+          composition_mass_percent: *id010
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.017250'
+    - observation_id: shi2024_table3_n3_cro15_activity_coefficient
+      experiment: shi2024_sample_3
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '3'
+        note: Table 3 sample No. 3, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id026
+      - shi2024_table2_n3_cro15_mole_fraction
+      - shi2024_table3_n3_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id026
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '3'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '3'
+          species_as_printed: CrO1.5
+          value_as_published: '60.113'
+          value: '60.113'
+          composition_mass_percent: *id010
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.75'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.13'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.12'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '3'
+                note: Initial composition for sample No. 3; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '60.113'
+    - observation_id: shi2024_table3_n4_cro15_activity
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '4'
+        note: Table 3 sample No. 4, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id027
+      - shi2024_table2_n4_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id027
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '4'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '4'
+          species_as_printed: CrO1.5
+          value_as_published: '0.021855'
+          value: '0.021855'
+          composition_mass_percent: *id013
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.021855'
+    - observation_id: shi2024_table3_n4_cro15_activity_coefficient
+      experiment: shi2024_sample_4
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '4'
+        note: Table 3 sample No. 4, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id028
+      - shi2024_table2_n4_cro15_mole_fraction
+      - shi2024_table3_n4_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id028
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '4'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '4'
+          species_as_printed: CrO1.5
+          value_as_published: '167.85'
+          value: '167.85'
+          composition_mass_percent: *id013
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.70'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.10'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.20'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '4'
+                note: Initial composition for sample No. 4; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '167.85'
+    - observation_id: shi2024_table3_n5_cro15_activity
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '5'
+        note: Table 3 sample No. 5, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id029
+      - shi2024_table2_n5_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id029
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '5'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '5'
+          species_as_printed: CrO1.5
+          value_as_published: '0.041226'
+          value: '0.041226'
+          composition_mass_percent: *id016
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.041226'
+    - observation_id: shi2024_table3_n5_cro15_activity_coefficient
+      experiment: shi2024_sample_5
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '5'
+        note: Table 3 sample No. 5, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id030
+      - shi2024_table2_n5_cro15_mole_fraction
+      - shi2024_table3_n5_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id030
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '5'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '5'
+          species_as_printed: CrO1.5
+          value_as_published: '182.57'
+          value: '182.57'
+          composition_mass_percent: *id016
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.65'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '5'
+                note: Initial composition for sample No. 5; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '182.57'
+    - observation_id: shi2024_table3_n6_cro15_activity
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '6'
+        note: Table 3 sample No. 6, CrO1.5 activity.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id031
+      - shi2024_table2_n6_cro15_mole_fraction
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id031
+      quench_statement: *id001
+      values:
+        quantity: activity
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '6'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '6'
+          species_as_printed: CrO1.5
+          value_as_published: '0.045992'
+          value: '0.045992'
+          composition_mass_percent: *id019
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          activity: '0.045992'
+    - observation_id: shi2024_table3_n6_cro15_activity_coefficient
+      experiment: shi2024_sample_6
+      regime: quench_equilibration
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        table: '3'
+        row: '6'
+        note: Table 3 sample No. 6, CrO1.5 activity_coefficient.
+      units: dimensionless
+      standard_state: pure solid CrO1.5(s), explicit in Eq. (11)
+      condensed_form:
+        state: solid CrO1.5(s)
+        metastable: false
+        basis: explicit_author
+        note: Printed standard state in the chromium-oxide formation reaction.
+      derived_from: &id032
+      - shi2024_table2_n6_cro15_mole_fraction
+      - shi2024_table3_n6_cro15_activity
+      derivation:
+        relation: Table 3 value as printed; activities are calculated from the printed oxide formation reactions
+          and measured chromium concentrations; activity coefficients use γ = a/X (Eqs. (10), (13), (15), and (16)).
+        inputs: *id032
+      quench_statement: *id001
+      values:
+        quantity: activity_coefficient
+        formula: CrO1.5
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        oxygen_partial_pressure:
+          value: '2.57e-11'
+          units: atm
+          locator: *id005
+        points:
+        - sample: '6'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag, recovered by immediate water quench
+          row_as_printed: '6'
+          species_as_printed: CrO1.5
+          value_as_published: '154.18'
+          value: '154.18'
+          composition_mass_percent: *id019
+          T_K: '1823'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: 1 823 K applies to all chemical-equilibrium runs.
+            fO2_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2.6040525e-6'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                section: 2.3 Experimental Procedure
+                note: The paper prints oxygen partial pressure pO2 = 2.57 × 10^-11 atm; SI-converted to Pa only
+                  (1 atm = 101325 Pa), not derived from the gas ratio.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: published_initial_slag_mass_percent
+                  amount_basis: mass_percent
+                  components:
+                  - - CaO
+                    - '34.50'
+                  - - CaF2
+                    - '5.00'
+                  - - MgO
+                    - '10.00'
+                  - - Al2O3
+                    - '10.00'
+                  - - SiO2
+                    - '35.00'
+                  - - MnO
+                    - '5.00'
+                  - - CrO1.5
+                    - '0.50'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 895
+                table: '1'
+                row: '6'
+                note: Initial composition for sample No. 6; this is the starting slag composition, not a post-equilibrium
+                  bulk analysis.
+          gamma: '154.18'
+    context:
+    - observation_id: shi2024_table1_sample7_starting_composition_context
+      type: context_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        table: '1'
+        row: '7'
+      phase: starting slag mixture
+      units: mass%
+      values:
+        quantity_as_printed: initial slag batch composition
+        method_class: method_only
+        schema_gap: Starting-mixture recipe values have no matching stored composition quantity as a standalone
+          observation; candidate tokens equilibrium_phase_composition and residue_component_composition do not fit
+          this prepared batch recipe. Table 1 rows 1–6 are retained on their activity/composition observations.
+        components_as_printed:
+          CaO: '34.00'
+          CaF2: '5.00'
+          MgO: '10.00'
+          Al2O3: '10.00'
+          SiO2: '34.00'
+          MnO: '5.00'
+          CrO1.5: '2.00'
+        basicity_as_printed: 1 ± 0.01
+        reason_not_paired: The paper reports spinel in the 2 mass% initial CrO1.5 slag; Tables 2 and 3 report results
+          only for samples 1–6.
+    - observation_id: shi2024_figure3_morphology_deferred
+      type: figure_only
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 896
+        figure: '3'
+      phase: quenched slag samples
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: slag_morphology
+        species: CrO1.5
+        phase_as_printed: quenched slag samples
+        T_as_printed: not stated in figure
+        axes_as_printed: SEM micrographs; no numeric axes
+        caption: Morphology of slags.
+        panel: none
+        series:
+        - label: initial CrO1.5 = 2.00 mass%
+          marker_count: 0
+        - label: 0.50 mass%
+          marker_count: 0
+        - label: 0.35 mass%
+          marker_count: 0
+        - label: 0.20 mass%
+          marker_count: 0
+        - label: 0.12 mass%
+          marker_count: 0
+        - label: 0.05 mass%
+          marker_count: 0
+        - label: 0.02 mass%
+          marker_count: 0
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+    - observation_id: shi2024_figure5_gamma_cro15_deferred
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        figure: '5'
+      phase: liquid slag at 1823 K; immediate water quench
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: activity_coefficient
+        species: CrO1.5
+        phase_as_printed: liquid slag at 1823 K; immediate water quench
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: XCrOx mole fraction
+          y: γCrO1.5 (left axis)
+        caption: The variation of γCrO and γCrO1.5 with XCrOx.
+        panel: none
+        series:
+        - label: γCrO1.5, red circles
+          marker_count: 6
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+    - observation_id: shi2024_figure7_gamma_cro15_deferred
+      type: figure_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 899
+        figure: '7'
+      phase: liquid slag at 1823 K; immediate water quench
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: activity_coefficient
+        species: CrO1.5
+        phase_as_printed: liquid slag at 1823 K; immediate water quench
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: XCrOx mole fraction
+          y: γCrO1.5 (left axis)
+        caption: The variation of BO/Si and γCrO1.5 versus XCrO1.5.
+        panel: none
+        series:
+        - label: γCrO1.5, red circles
+          marker_count: 6
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+  Cr:
+    observations: []
+    context:
+    - observation_id: shi2024_figure1_apparatus_deferred
+      type: figure_only
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 894
+        figure: '1'
+      phase: Cu–Cr alloy and slag reaction apparatus
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: experimental apparatus schematic
+        species: Cr
+        phase_as_printed: Cu–Cr alloy and slag reaction apparatus
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed: schematic; no numeric axes
+        caption: Schematic diagram of the experimental apparatus.
+        panel: none
+        series: []
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+    - observation_id: shi2024_figure2_wet_chemistry_deferred
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        figure: '2'
+      phase: wet-chemical separation of CrO and CrO1.5
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: chromium valence analysis method
+        species: Cr
+        phase_as_printed: wet-chemical separation of CrO and CrO1.5
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed: process diagram; no numeric axes
+        caption: The process of wet chemical method for chromium valence analysis.
+        panel: none
+        series: []
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+    - observation_id: shi2024_figure4_cr3_fraction_deferred
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 897
+        figure: '4'
+      phase: quenched slag; measured melt was liquid at 1823 K
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: valence_ratio
+        species: Cr
+        phase_as_printed: quenched slag; measured melt was liquid at 1823 K
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: XCrOx mole fraction
+          y: Cr3+ / total chromium
+        caption: The ratio of Cr3+ to total chromium content.
+        panel: none
+        series:
+        - label: Cr3+ / total Cr
+          marker_count: 6
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+  SiO2:
+    observations: []
+    context:
+    - observation_id: shi2024_table1_basicity_context
+      type: context_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 895
+        table: '1'
+      units: dimensionless
+      values:
+        quantity_as_printed: basicity B
+        method_class: measured_reduced
+        schema_gap: No basicity quantity token; candidate tokens equilibrium_phase_composition and activity_coefficient
+          do not fit. B is calculated by Eq. (1), B=(mass% CaO + mass% MgO)/(mass% SiO2 + mass% Al2O3).
+        rows:
+        - sample: '1'
+          value_as_printed: 1 ± 0.01
+        - sample: '2'
+          value_as_printed: 1 ± 0.01
+        - sample: '3'
+          value_as_printed: 1 ± 0.01
+        - sample: '4'
+          value_as_printed: 1 ± 0.01
+        - sample: '5'
+          value_as_printed: 1 ± 0.01
+        - sample: '6'
+          value_as_printed: 1 ± 0.01
+        - sample: '7'
+          value_as_printed: 1 ± 0.01
+    - observation_id: shi2024_table4_qi_raman_characteristics_context
+      type: context_only
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 898
+        table: '4'
+      units: Raman shift cm^-1; dimensionless Si coefficient
+      values:
+        quantity_as_printed: Qᶦ unit Raman shifts and Si values
+        method_class: quoted_attributed
+        attribution: Wu et al. [40], as cited in Shi et al. (2024), Table 4.
+        schema_gap: No store quantity matches the Raman-shift intervals or reciprocal scattering coefficients for
+          silicate Qi units.
+        rows:
+        - unit: Q0, SiO4^4−
+          raman_shift_cm-1: 850–880
+          Si: '1'
+        - unit: Q1, Si2O7^6−
+          raman_shift_cm-1: 900–920
+          Si: '0.514'
+        - unit: Q2, Si2O6^4−
+          raman_shift_cm-1: 950–980
+          Si: '0.242'
+        - unit: Q3, Si2O5^2−
+          raman_shift_cm-1: 1050–1100
+          Si: '0.09'
+        - unit: Q4, SiO2
+          raman_shift_cm-1: 1060 and 1190
+          Si: '0.015'
+    - observation_id: shi2024_table5_raman_deconvolution_results_context
+      type: context_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 899
+        table: '5'
+      units: mole fractions of Qi units; BO/Si dimensionless
+      values:
+        quantity_as_printed: deconvoluted Raman Qi fractions and BO/Si
+        method_class: model_derived
+        schema_gap: Candidate tokens equilibrium_phase_composition, activity_coefficient and interaction_parameter
+          do not fit spectral Qi-unit fractions or BO/Si; derivation pending a corpus table asset (controller, t-1382).
+          Inputs logged to .agent-scratch/f25-tables/shi-2024-cr-activity-slag-polymerisation/table5.csv. XCrOx
+          is a rounded printed sum also represented by its typed Table 2 component fractions.
+        note: Qi fractions and BO/Si are derived by Gaussian deconvolution and Eqs. (17)–(19); raw Raman peak areas
+          are not tabulated and no numerical points from figures are transcribed.
+        rows:
+        - X_CrOx: '0.000539'
+          Q0: '0.352'
+          Q1: '0.480'
+          Q2: '0.168'
+          BO_per_Si: '1.175'
+        - X_CrOx: '0.000728'
+          Q0: '0.157'
+          Q1: '0.458'
+          Q2: '0.385'
+          BO_per_Si: '1.228'
+        - X_CrOx: '0.00153'
+          Q0: '0.373'
+          Q1: '0.383'
+          Q2: '0.244'
+          BO_per_Si: '1.299'
+        - X_CrOx: '0.00198'
+          Q0: '0.307'
+          Q1: '0.578'
+          Q2: '0.115'
+          BO_per_Si: '1.124'
+        - X_CrOx: '0.00345'
+          Q0: '0.348'
+          Q1: '0.652'
+          Q2: '0.000'
+          BO_per_Si: '0.785'
+        - X_CrOx: '0.00434'
+          Q0: '0.404'
+          Q1: '0.596'
+          Q2: '0.000'
+          BO_per_Si: '0.742'
+    - observation_id: shi2024_figure6_raman_deconvolution_deferred
+      type: figure_only
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 898
+        figure: '6'
+      phase: quenched slags representing liquid slag structure
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: Raman spectral deconvolution
+        species: SiO2
+        phase_as_printed: quenched slags representing liquid slag structure
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: Raman shift (cm−1)
+          y: intensity
+        caption: Deconvoluted Raman spectra of slags.
+        panel: six sample panels
+        series:
+        - label: 'panel a: Q0 fit'
+          marker_count: 0
+        - label: 'panel b: Q0 fit'
+          marker_count: 0
+        - label: 'panel c: Q0 fit'
+          marker_count: 0
+        - label: 'panel d: Q0 fit'
+          marker_count: 0
+        - label: 'panel e: Q0 fit'
+          marker_count: 0
+        - label: 'panel f: Q0 fit'
+          marker_count: 0
+        - label: 'panel a: Q1 fit'
+          marker_count: 0
+        - label: 'panel b: Q1 fit'
+          marker_count: 0
+        - label: 'panel c: Q1 fit'
+          marker_count: 0
+        - label: 'panel d: Q1 fit'
+          marker_count: 0
+        - label: 'panel e: Q1 fit'
+          marker_count: 0
+        - label: 'panel f: Q1 fit'
+          marker_count: 0
+        - label: 'panel a: Q2 fit'
+          marker_count: 0
+        - label: 'panel b: Q2 fit'
+          marker_count: 0
+        - label: 'panel c: Q2 fit'
+          marker_count: 0
+        - label: 'panel d: Q2 fit'
+          marker_count: 0
+        - label: 'panel e: Q2 fit'
+          marker_count: 0
+        - label: 'panel f: Q2 fit'
+          marker_count: 0
+        - label: 'panel a: original spectrum and fitting peak'
+          marker_count: 0
+        - label: 'panel b: original spectrum and fitting peak'
+          marker_count: 0
+        - label: 'panel c: original spectrum and fitting peak'
+          marker_count: 0
+        - label: 'panel d: original spectrum and fitting peak'
+          marker_count: 0
+        - label: 'panel e: original spectrum and fitting peak'
+          marker_count: 0
+        - label: 'panel f: original spectrum and fitting peak'
+          marker_count: 0
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass
+    - observation_id: shi2024_figure7_bo_si_deferred
+      type: figure_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 899
+        figure: '7'
+      phase: liquid slag structure inferred from quenched Raman spectra
+      units: as plotted; numeric points deferred
+      values:
+        method_class: figure_only
+        quantity: silicate network BO/Si
+        species: SiO2
+        phase_as_printed: liquid slag structure inferred from quenched Raman spectra
+        T_as_printed: 1823 K as stated for the experiments
+        axes_as_printed:
+          x: XCrOx mole fraction
+          y: BO/Si (right axis)
+        caption: The variation of BO/Si and γCrO1.5 versus XCrO1.5.
+        panel: none
+        series:
+        - label: BO/Si, black squares
+          marker_count: 6
+        attribution: Shi et al. (2024), present study.
+        digitisation: deferred to a figure pass

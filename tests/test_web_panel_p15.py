@@ -993,6 +993,29 @@ def test_p15_unqualified_silica_capture_is_flagged_not_product_glow() -> None:
     assert "flagged capture" not in ungated
 
 
+def test_p15_missing_stage_3_capture_is_unavailable_with_reason() -> None:
+    from simulator.three_product_report import classify_products
+
+    classification = classify_products(SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    ))
+    artifact = {
+        "timesteps": [{"hour": 1, "summary": {"campaign": "C2A"}, "ledger": {}}],
+        "terminal": {
+            "stage_purity": {},
+            "product_classification": classification,
+        },
+    }
+    stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
+
+    assert "silica capture unavailable" in stage
+    assert "stage_3_missing" in stage
+    assert "collection not implied" not in stage
+    assert "classification pending" not in stage
+
+
 def test_p15_flagged_silica_product_keeps_product_route_and_flag() -> None:
     stages = _stage_purity()
     stages["stage_3_sio_zone"] = {

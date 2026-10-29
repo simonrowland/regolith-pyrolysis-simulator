@@ -8,13 +8,13 @@ source:
   identifier: urn:nbn:de:hbz:5N-05707
   doi: null
 extraction:
-  method: RH-49 r2. Parent observation objects restored from 655f3db3. Merged r1 grids / blank-foil /
+  method: RH-49 r2. Parent observation objects restored from 655f3db3. Merged r1 grids / blank-foil /; validated in an internal review, 2026-09-06, hunts
     QMS-mass table / EMPA full grid split to new observation_ids. Abb. 5.23 re-digitised from 300 dpi
     pdftoppm with labelled-tick calibration (P2O5 Messung 4 on-chart 0.12 wt%; pts 5-6 absent). Official
     bonndoc OA PDF (pdftotext -layout + 150/300 dpi pdftoppm). T_K = T_C + 273.15 where converted.
   date: '2026-09-06'
   worker: hunt-RH-49-r2
-  provenance_path: docs-private/research/2026-09-06-hunts/RH-49/kems-035-sauerborn-2005/
+  provenance_path: raw/kems-035-sauerborn-2005/kems-035-sauerborn-2005.pdf
 review_status: draft
 fidelity_samples:
 - species: Na
@@ -438,7 +438,7 @@ species:
     - observation_id: sauerborn_2005_table21_lunar_soil_element_wt
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '2.1'
         page: 15
       T_range_K: null
@@ -535,7 +535,7 @@ species:
       experiment: jsc1-solar-series
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         figure: '2.2'
         page: 17
         paragraph: Kapitel 2.1.2
@@ -665,7 +665,7 @@ species:
       experiment: jsc1-solar-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.3'
         page: 79
       T_range_K:
@@ -817,7 +817,7 @@ species:
       experiment: jsc1-ms1
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.4'
         page: 85
       T_range_K:
@@ -1008,7 +1008,7 @@ species:
       experiment: oxide-reference-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.8'
         page: 104
       T_range_K:
@@ -1429,7 +1429,7 @@ species:
       experiment: jsc1-solar-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         figure: '5.1'
         page: 69
         note: Abb. 5.1–5.3 and MS QMS/IR time series
@@ -3869,7 +3869,7 @@ species:
       experiment: jsc1-ms5
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.6'
         page: 103
       T_range_K:
@@ -5173,7 +5173,7 @@ species:
       experiment: oxide-reference-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.1'
         page: 68
       T_range_K:
@@ -5292,7 +5292,7 @@ species:
       experiment: oxide-reference-series
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        source_path: text/kems-035-sauerborn-2005/ocr-repair/kems-035-sauerborn-2005.md
         table: '5.2'
         page: 73
       T_range_K:

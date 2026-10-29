@@ -16,10 +16,10 @@ source:
   doi: 10.1016/j.actaastro.2024.08.009
   year: 2024
 extraction:
-  method: born-digital pdftotext -layout + visual certification of Tables 1–2; MinerU figure-~ dumps rejected; no figure digitization
+  method: born-digital pdftotext -layout + visual certification of Tables 1–2; MinerU figure-~ dumps rejected; no figure digitization; validated in an internal review, 2026-08-27, ocr-repair
   date: '2026-08-27'
   worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/
+  provenance_path: raw/kems-036-sesko-2024/kems-036-sesko-2024.pdf
 review_status: draft
 fidelity_samples:
   - species: Na
@@ -92,8 +92,9 @@ experiments:
           Fe2O3: 12.20
           P2O5: 0.61
       locator:
-        page: 39
-        pdf_page_index: 54
+        page: 54
+        published_page: 39
+        pdf_page_index: 53
         table: '4.1'
         note: 'EAC-1 column; oxide wt% as printed; label EAC-1 (caption: EAC-1A numbers from [25]; column header EAC-1); experimental charge is EAC-1A; Total row 100.00 omitted; 0.00 cells retained as printed'
     initial_composition:
@@ -115,7 +116,7 @@ experiments:
           - [K2O, '0.009122504868']
           - [Fe2O3, '0.049734878127']
           - [P2O5, '0.002797615986']
-      locator: {page: 39, pdf_page_index: 54, table: '4.1', note: 'EAC-1 column as printed; normalized mole fractions derived from the complete oxide wt% map; printed zero components retained'}
+      locator: {page: 54, published_page: 39, pdf_page_index: 53, table: '4.1', note: 'EAC-1 column as printed; normalized mole fractions derived from the complete oxide wt% map; printed zero components retained'}
       method_class: calculated
       inference:
         relation: wt_pct_to_mole_fraction
@@ -173,7 +174,7 @@ species:
     - observation_id: sesko_2024_table1_eac1_simulant_composition
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         table: '1'
         page: 216
         paragraph: Regolith and regolith simulant geochemical compositions in % by weight
@@ -217,7 +218,7 @@ species:
     - observation_id: sesko_2024_table1_literature_feedstock_compositions
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         table: '1'
         page: 216
       T_range_K: null
@@ -247,7 +248,7 @@ species:
       experiment: solar-exposure-12
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         page: 221
         paragraph: experimental_results_deposit_edx
       T_range_K:
@@ -312,7 +313,7 @@ species:
     - observation_id: sesko_2024_fig6_16_figure_only_blocked
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         figure: '6'
         page: 219
         note: also Fig. 16 p. 223; MinerU ~ dumps rejected
@@ -336,7 +337,7 @@ species:
     - observation_id: sesko_2024_table2_factsage_and_literature_o2_yield
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         table: '2'
         page: 221
       T_range_K:
@@ -398,7 +399,7 @@ species:
       experiment: solar-exposure-12
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         page: 221
         paragraph: both deposit regions showed K concentrations ranging from 5 to 8 wt%
       T_range_K:
@@ -421,7 +422,7 @@ species:
       experiment: solar-exposure-12
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         page: 221
         figure: '15'
         paragraph: bottom brown layer has a higher concentration of iron
@@ -466,7 +467,7 @@ species:
       experiment: solar-exposure-12
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+        source_path: text/kems-036-sesko-2024/ocr-repair/kems-036-sesko-2024.md
         page: 221
         paragraph: Si ranging from 7 to 20 wt%
       T_range_K:

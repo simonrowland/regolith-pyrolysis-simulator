@@ -1,0 +1,5831 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kemori-1980-oxygen-liquid-copper.yaml
+observations:
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_oxygen_activity_coefficient_infinite_dilution::T=1573:row=this-work:h=fa403f047d9b
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: oxygen activity coefficient at infinite dilution
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.287'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=This work
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: oxygen activity coefficient at infinite dilution
+      locator:
+        page: 1
+        published_page: 275
+        pdf_page_index: 0
+        note: Abstract states infinite dilution in liquid copper.
+    oxygen_fugacity_Pa:
+      state:
+        tag: unknown
+        reason: not printed as an absolute oxygen fugacity for this coefficient
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=This work
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1373
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.122'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fruehan and Richardson [15]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1373
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Fruehan and Richardson [15]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Fruehan and Richardson [15]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1473
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.204'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Fruehan and Richardson [15]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1473
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Fruehan and Richardson [15]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Fruehan and Richardson [15]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1373
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.128'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacob and Jeffes [17]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1373
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Jacob and Jeffes [17]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1573
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.333'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacob and Jeffes [17]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1573
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Jacob and Jeffes [17]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1373
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kozuka et al. [14]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1373
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kozuka et al. [14]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kozuka et al. [14]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1423
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1423'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kozuka et al. [14]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1423
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kozuka et al. [14]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kozuka et al. [14]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1473
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.195'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kozuka et al. [14]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1473
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kozuka et al. [14]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kozuka et al. [14]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1373
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.115'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kulkarni [18]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1373
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kulkarni [18]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1473
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.195'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kulkarni [18]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1473
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kulkarni [18]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1573
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.286'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kulkarni [18]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1573
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Kulkarni [18]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_nanda_geiger_1408
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1408'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nanda and Geiger [16]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_nanda_geiger_1408
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Nanda and Geiger [16]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1408'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Nanda and Geiger [16]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_rickert_wagner_1418
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1418'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.145'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Rickert and Wagner [13]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_rickert_wagner_1418
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Rickert and Wagner [13]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1418'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Rickert and Wagner [13]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1373
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wilder [12]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1373
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Wilder [12]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Wilder [12]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1473
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.205'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wilder [12]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1473
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 5
+    published_page: 279
+    pdf_page_index: 4
+    table: '2'
+    note: row=Wilder [12]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        published_page: 279
+        pdf_page_index: 4
+        table: '2'
+        note: row=Wilder [12]
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-9.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '1.6'
+      as_printed: −(9.2 ± 1.6)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=Jacob and Jeffes [17]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-8.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=Jacob and Jeffes [17]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-7.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '1.2'
+      as_printed: −(7.4 ± 1.2)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=Jacob and Jeffes [17]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=Jacob and Jeffes [17]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=Jacob and Jeffes [17]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-8.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '2.3'
+      as_printed: −(8.2 ± 2.3)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-4.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-9.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '3.6'
+      as_printed: −(9.7 ± 3.6)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-7.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-10.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '1.6'
+      as_printed: −(10.7 ± 1.6)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=Kulkarni [18]
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=Kulkarni [18]
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-11.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      absolute: '0.9'
+      as_printed: −(11.8 ± 0.9)
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq3
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq3
+    note: row=This work
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq3
+        note: row=This work
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq3.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq4
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: point
+    point: '-6.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq4
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 6
+    published_page: 280
+    pdf_page_index: 5
+    table: '3'
+    equation: eq4
+    note: row=This work
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 6
+        published_page: 280
+        pdf_page_index: 5
+        table: '3'
+        equation: eq4
+        note: row=This work
+  derived_from:
+  - unknown:kemori-1980-oxygen-liquid-copper
+  derivation:
+    relation: First-order oxygen self-interaction coefficient fitted from the printed electrochemical data using Table 3 eq4.
+    inputs:
+    - unknown:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: dimensionless Wagner interaction parameter
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1508:h=49b5bbc4754b
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1508'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.77843'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1508'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.22157'
+          - - Cu2O
+            - '0.77843'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1523:h=424f3f297c52
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.75021'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.24979'
+          - - Cu2O
+            - '0.75021'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1543:h=5a8334aea4eb
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1543'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.73404'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1543'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.26596'
+          - - Cu2O
+            - '0.73404'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1558:h=6e49f11c34a8
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1558'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.66916'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1558'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.33084'
+          - - Cu2O
+            - '0.66916'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1573:h=7ecee5064e42
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.64593'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.35407'
+          - - Cu2O
+            - '0.64593'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1583:h=32414a2e9294
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1583'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.60419'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1583'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.39581'
+          - - Cu2O
+            - '0.60419'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1508:h=23e19f9e9850
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1508'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.12545'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1508'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.87455'
+          - - Cu2O
+            - '0.12545'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1523:h=6c2b47e356b9
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.13513'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.86487'
+          - - Cu2O
+            - '0.13513'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1543:h=0976e572cc58
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1543'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.15622'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1543'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.84378'
+          - - Cu2O
+            - '0.15622'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1558:h=7e73e0210c49
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1558'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.1783'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1558'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.8217'
+          - - Cu2O
+            - '0.1783'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1573:h=5e173d21edc5
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.19154'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.80846'
+          - - Cu2O
+            - '0.19154'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1583:h=5b765b4399a2
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1583'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.21658'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu2O
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1583'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.78342'
+          - - Cu2O
+            - '0.21658'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu2O
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1508:h=4d7bcbe6976b
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1508'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.22157'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1508'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.22157'
+          - - Cu2O
+            - '0.77843'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1523:h=e207b63d0315
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.24979'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.24979'
+          - - Cu2O
+            - '0.75021'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1543:h=7bbb3051d00e
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1543'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.26596'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1543'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.26596'
+          - - Cu2O
+            - '0.73404'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1558:h=8fe32f0b8864
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1558'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.33084'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1558'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.33084'
+          - - Cu2O
+            - '0.66916'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1573:h=af73c227fc4f
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.35407'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.35407'
+          - - Cu2O
+            - '0.64593'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1583:h=7b8629689291
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1583'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.39581'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1583'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.39581'
+          - - Cu2O
+            - '0.60419'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1508:h=e94bffe20282
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1508'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.87455'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1508'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.87455'
+          - - Cu2O
+            - '0.12545'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1523:h=669e6d31daf3
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.86487'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.86487'
+          - - Cu2O
+            - '0.13513'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1543:h=51cd0db61afb
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1543'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.84378'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1543'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.84378'
+          - - Cu2O
+            - '0.15622'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1558:h=cb7fe55d3716
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1558'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.8217'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1558'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.8217'
+          - - Cu2O
+            - '0.1783'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1573:h=24713fc83e9b
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.80846'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.80846'
+          - - Cu2O
+            - '0.19154'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []
+- observation_id: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1583:h=05822244e7f2
+  experiment_id: 10.2320/matertrans1960.21.275::kemori-1980-oxygen-liquid-copper
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole fraction in each Cu(l) or Cu2O(l) phase
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1583'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '0.78342'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kuxmann and Kurre [19]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kemori-1980-oxygen-liquid-copper
+  locator:
+    page: 9
+    published_page: 283
+    pdf_page_index: 8
+    table: '4'
+    note: column=X_Cu
+  read_from: pdf:kemori-1980-oxygen-liquid-copper
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1583'
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Cu
+            - '0.78342'
+          - - Cu2O
+            - '0.21658'
+          amount_basis: mole_fraction
+      locator:
+        page: 9
+        published_page: 283
+        pdf_page_index: 8
+        table: '4'
+        note: column=X_Cu
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kemori-1980-oxygen-liquid-copper
+    parameters: []
+    output_unit: mole fraction
+    references: []

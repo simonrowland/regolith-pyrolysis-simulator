@@ -645,6 +645,20 @@ def test_p11_unavailable_null_block_is_not_zero() -> None:
     assert "data-card=" not in html
 
 
+def test_p11_missing_stage_3_capture_is_unavailable_with_reason() -> None:
+    classification = classify_products(SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    ))
+    html = _render(_wrapped({"classification": classification, "markdown": ""}))
+    silica_card = _card(html, "silica")
+
+    assert 'data-field="class_total_kg" data-state="unavailable"' in silica_card
+    assert 'data-field="stage_3_capture_kg" data-state="unavailable"' in silica_card
+    assert "stage_3_missing" in silica_card
+
+
 def test_p11_does_not_read_p15_unwrapped_path() -> None:
     block, classification = _mars()
     block["pure_silica_glass"] = {

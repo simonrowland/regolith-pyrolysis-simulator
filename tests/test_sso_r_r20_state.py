@@ -269,7 +269,7 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
 
 
 @pytest.mark.nightly
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_default_lunar_redox_runaway_acceptance() -> None:
     from simulator.runner import PyrolysisRun
     from simulator.session import DecisionPolicy, drive_session
@@ -3102,6 +3102,7 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
         },
     )
     sim = _make_sim()
+    register_synthetic_gate_curve_producer(sim)
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1150.0
     sim.melt.p_total_mbar = 1.0
@@ -3130,7 +3131,6 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     monkeypatch.setattr(sim, "_compute_intrinsic_melt_fO2", fail_heuristic)
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 100.0)
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
-    register_synthetic_gate_curve_producer(sim)
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
         **write_gate_curve_memo_record(

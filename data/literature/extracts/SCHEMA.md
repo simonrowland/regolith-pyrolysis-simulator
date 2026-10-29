@@ -231,8 +231,9 @@ species:
 
 `model_derived` and `measured_reduced` observations require a derivation
 recording the stated method; the observation's required `locator` locates that
-method. They also require `derived_from`, except a `measured_reduced`
-derivation may declare that the source does not print the raw inputs:
+method. They also require `derived_from`, except that either evidence class may
+declare that the source does not print the raw inputs. A `measured_reduced`
+declaration needs its own source locator:
 
 ```yaml
 locator: {page: 164, section: '3.3'}
@@ -246,12 +247,39 @@ derivation:
 
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
-inputs.
+inputs. For `model_derived`, the derivation must also carry its method as a
+located `method` field whose value describes the printed calculation. Its
+locator identifies the printed equation and physical page, and `references`
+is a typed list naming at least one compiled reference used. For example:
+
+```yaml
+derivation:
+  relation: "author calculation using the printed equilibrium equation"
+  output_unit: Pa
+  method:
+    state: {tag: value, value: "Eqs. (7)–(9) calculate K_ref from unprinted ion-current ratios"}
+    locator:
+      page: 19
+      equation: "7–9"
+  references:
+    - "Gurvich K°(T)"
+    - "Mann cross-sections"
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator:
+      page: 19
+      equation: "7–9"
+      note: "The row-wise ion currents are not printed."
+```
 
 `raw_inputs` is a typed status with its own source locator. `not_printed` is
-valid only for `measured_reduced`, cannot appear with `derived_from`, and does
-not replace the required derivation method or locator. Model-derived rows
-always require `derived_from`.
+valid for `measured_reduced`, and for `model_derived` only when a nonempty
+method with an equation and physical-page locator and at least one named
+compiled reference is supplied. It cannot appear with derivation `inputs` or
+observation `derived_from`. A model-derived method locator does not replace
+the observation's required method locator. A located `not_printed` declaration
+that meets those conditions supplies lineage, so `derived_from` is not
+required. `printed_unresolved` does not supply lineage.
 
 `printed_unresolved` means every derivation input was printed prose and none
 of it resolves to a record id or asset. `inputs` is then empty. The verbatim
@@ -259,6 +287,35 @@ text stays on the conditional-field issue and the migration-queue entry. The
 status is located by the derivation's locator or the row's locator. It is not
 complete lineage. When some inputs resolve, those ids stay in `inputs` and
 `raw_inputs` stays absent.
+
+### Printed values that are not in the stored form
+
+- **Measured quantity printed:** store the authors' printed measured quantity
+  as `measured_tabulated`. Raw inputs with no scorable quantity (such as EMF
+  in mV) belong in species `context`; no `derived_from` is required. Example:
+  Kim 2004 float-glass EMF (`review/x-kim-2004-na2o-float-glass-emf` @
+  `0a6d0ac05`, landed).
+- **Printed log value:** retain the printed log cell as a sibling
+  `typed_refused` observation (`value_as_printed` string and locator); store
+  the linear value `a = 10^(log a)` as `measured_reduced`, with
+  `derived_from` naming that sibling, a `derivation.relation`, and uncertainty
+  propagated from printed precision (`ln(10) × 0.5 × 10^-d`). Examples: Pak
+  1989 (`review/x-pak-ito-fruehan-1989-na2o-activity` @ `9edde05bd`, landed);
+  Itoh 1984 (`review/x-itoh-yokokawa-1984-na-activity` @ `d9e7bcf84`, landed).
+- **Value relative to a reference melt:** refuse the absolute quantity while
+  recording it as a `typed_refused` observation carrying the printed relative
+  value, uncertainty, and reference-melt identity and normalisation verbatim.
+  Do not convert to an absolute value or invent a reference activity. Examples:
+  Asai 1982
+  (`review/x-asai-yokokawa-maekawa-1982-na-borate` @ `0fdec807a`, landed);
+  Borisov 2009 (`review/x-borisov-2009-alkali-gamma` @ `20c6bd12d`, landed).
+- **Condition printed only as a log:** keep the located printed log condition;
+  leave the identity's linear field (for example, `fO2_Pa`) unknown. Do not
+  convert a printed condition to fill an identity field.
+
+Open schema gaps: **t-1563** — lineage for raw inputs that cannot be
+observations, and a log-activity value form; **t-1565** — a residue
+component-ratio quantity (for example, K2O/Na2O mass ratio).
 
 Exactly one of:
 
@@ -282,6 +339,7 @@ Exactly one of:
 | `chloride_capacity` | Printed log10 chloride-capacity series with its defining equation |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
 | `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
+| `distribution_ratio` | Printed distribution ratio between coexisting phases, with its numerator and denominator phase/component convention stated on the row |
 
 The battery quantity token `equilibrium_phase_composition` uses
 `units: subtype_defined`: units and basis are those printed (for example,
@@ -290,6 +348,11 @@ basis as the quantity subtype. No conversion between composition bases is
 implicit. For gas-phase ratios, state numerator and denominator species in the
 printed basis and retain coexisting phases in `point_conditions`. Until an engine predicts this quantity, scoring retains the row and
 returns the typed `quantity_not_predicted` refusal.
+
+For `equilibrium_phase_composition` component amounts printed in mass ppm,
+store the value unchanged with subtype `element_ppm_by_mass`. Phase-assemblage
+engines report wt%; scoring converts the reference transiently using
+`wt_percent = ppm / 10^4` (1 ppm = 1e-6 mass fraction = 1e-4 wt%).
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
@@ -365,6 +428,15 @@ Rules:
 - Pointer / bound-not-point / competing-observation rows must carry explicit
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
+- A scalar `values` payload or `values.points[]` row for `activity` or
+  `activity_coefficient` may declare `printed_form: log10 | neg_log10 | ln`.
+  The selected scalar is converted to its linear activity; the migrated
+  observation provenance retains the printed number as `printed_value` and the
+  token as `printed_form`. A printed ± width on a base-10 log is retained in
+  `log10_dex`; for `ln`, divide the printed width by `ln(10)` to express it in
+  dex. The uncertainty width stays in log space. An unrecognized `printed_form`
+  is refused as a typed unavailable value and added to the migration queue; it
+  is never interpreted as one of the supported logarithms.
 
 #### Printed oxygen condition source
 
@@ -447,6 +519,26 @@ zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
+
+When the source PDF is absent from the corpus, a locator whose physical page
+could not be verified because no corpus PDF exists at either the extract's `source_id`
+or `source.corpus_source_id` may carry the typed verification field
+`page_verification: unverified_pdf_absent`. This is verification metadata, not a
+location key; the validator counts it as a notice and rejects it when either PDF exists.
+This typed reason is reported as a notice and exempts that locator from the
+`page == pdf_page_index + 1` check only while both corpus PDF paths are absent.
+
+For a table that continues from a captioned page onto a page containing cited
+data, set `table_caption_page` to the one-based physical page containing the
+caption/label. The locator's `page` and `pdf_page_index` identify the page
+containing the cited data, and `table_caption_page` must be an integer earlier
+than `page`. This verification metadata is not a location key. The label test
+checks the caption on `table_caption_page` and the cited data cell on `page`.
+
+For a continued table whose label appears on the immediately preceding
+physical page, set `table_continued: true`. The locator's `page` and
+`pdf_page_index` still identify the page containing the cited data; the label
+test checks the label on `page - 1` and the cited data cell on `page`.
 
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`

@@ -116,6 +116,8 @@ to `runs/pomeroy-2006.comparison.json`, with a concise Markdown report at
 `runs/pomeroy-2006.comparison.md`. Assumed recipe fields force
 `assumed-input`; absent pump-outlet or species surfaces produce typed
 unsupported statuses rather than substituted values.
+Battery residuals can carry the typed `fo2_mode` field; see the
+[residual serialization schema](battery/residual-schema.md).
 
 ---
 
@@ -127,7 +129,7 @@ returns the classified product ledger directly:
 ```python
 from simulator.three_product_runner import run
 ledger = run(feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=24)
-# The four CLAUDE.md §5 product classes:
+# The four product classes documented in docs/concepts.md:
 #   metals_plus_O2, pure_silica_glass, industrial_mixed_glass,
 #   refractory_ceramic_rump
 # plus the supporting breakdown:

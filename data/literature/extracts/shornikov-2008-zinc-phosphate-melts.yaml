@@ -1,0 +1,1280 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2008-zinc-phosphate-melts
+source:
+  citation: Shornikov, S. I. (2008). Thermodynamic properties of ZnO–P4O10 melts. Experiment in Geosciences, 15(1), 149–150.
+  year: 2008
+  corpus_asset: raw/shornikov-2008-zinc-phosphate-melts/shornikov-2008-zinc-phosphate-melts.pdf
+  corpus_sha256: cd42c3989fbb169d0bde1361ab52095e794f72128ca7999a40b8010d7f6532db
+extraction:
+  method: >-
+    mineru_table_draft emit of the printed Gibbs-energy table. The PDF has no text layer,
+    so every emitted cell was checked against the 600 dpi render of PDF page 1 (published
+    page 149). No cell was hand-corrected. Figure panels on published page 150 were
+    inspected on the same render and were not digitized.
+  date: '2026-10-20'
+  worker: t1372-w2-w6-t1
+review_status: draft
+fidelity_samples:
+  - species: ZnO
+    observable: gibbs_table
+    observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
+    field: value
+    value: '-215.458'
+    locator:
+      page: 1
+      published_page: 149
+      pdf_page_index: 0
+      table: '1'
+      note: Solid ZnO, 600 dpi render of published page 149.
+  - species: O2
+    observable: gibbs_table
+    observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
+    field: value
+    value: '0.000'
+    locator:
+      page: 1
+      published_page: 149
+      pdf_page_index: 0
+      table: '1'
+      note: Printed zero for gaseous O2, not an empty cell.
+  - species: P4O10
+    observable: gibbs_table
+    observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
+    field: value
+    value: '-1868.780'
+    locator:
+      page: 1
+      published_page: 149
+      pdf_page_index: 0
+      table: '1'
+      note: Gaseous P4O10, last gas-phase row.
+experiments:
+  - experiment_id: shornikov-2008-table-1300k
+    kind: thermodynamic_model
+    locator: {page: 1, pdf_page_index: 0, published_page: 149, table: '1'}
+    method: >-
+      The table caption says the Gibbs energies were calculated in the present study
+      according to data [1, 6-9]. Per-row parents are not printed.
+  - experiment_id: shornikov-2008-fig-calculated
+    kind: thermodynamic_model
+    locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+    method: >-
+      Lines 4, 5 and 6 are activities and oxide-formation Gibbs energies calculated
+      in the present study. The caption does not print discrete calculated points.
+  - experiment_id: shornikov-1996-2001-fig-dots
+    kind: literature
+    locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+    citation: >-
+      Shornikov, Shilov and Shultz (1996) and Shornikov (2001), references [6] and [7],
+      as named in the text that introduces the figure.
+    method: >-
+      Knudsen effusion mass spectrometry at 1300 K, cited. The dots are not measurements
+      of this 2008 article.
+skipped_empty_or_dash:
+  total: 30
+  tables:
+  - page: 1
+    table_index: 1
+    count: 30
+species:
+  ZnO:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'ZnO'
+        column_header: 'Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-215.458'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id001
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'ZnO'
+        column_header: 'Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-187.675'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: l
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id001
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'ZnO'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '110.942'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id002
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_fig_a_zno_curve_4
+      type: activity_coefficient
+      experiment: shornikov-2008-fig-calculated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 150
+        figure: '1'
+        note: Panel a, line 4. Continuous calculated lg a(ZnO) at 1300 K.
+      phase: l
+      units: dimensionless activity; ZnO mol% as printed
+      standard_state: >-
+        Figure caption, published page 150: activities of ZnO and P4O10 in the ZnO–P4O10
+        melts at 1300 K. The article does not state the reference phase. Reference phase
+        is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1300'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+      values:
+        quantity: activity
+        T_K: '1300'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth calculated curve has no discrete data markers; no numeric points are sampled.
+        component: ZnO
+        activity_basis_as_published: lg a_1300(ZnO)
+        curve_number: '4'
+        attribution: the present study
+    - observation_id: shornikov_2008_fig_a_zno_series_1
+      type: activity_coefficient
+      experiment: shornikov-1996-2001-fig-dots
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 150
+        figure: '1'
+        note: Panel a, filled triangles, legend symbol 1. Ten data triangles on the 600 dpi crop; the legend glyph is not a point.
+      phase: l
+      units: dimensionless activity; ZnO mol% as printed
+      standard_state: >-
+        Figure caption, published page 150: the dots are experimental activities of ZnO.
+        The article does not state the reference phase. Reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1300'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+        composition:
+          state: {tag: unknown, reason: 'Markers span composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+      values:
+        quantity: activity
+        T_K: '1300'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Caption assigns symbol 1 to experimental a(ZnO) from the cited KEMS work at 1300 K,
+          not a measurement of this article. Coordinates were not read.
+        component: ZnO
+        marker_census: 10
+        attribution: Shornikov, Shilov and Shultz (1996) and Shornikov (2001), references [6] and [7]
+  Zn:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r03_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'Zn'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-11.654'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id001
+  Zn2P4O12:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{2}P_{4}O_{12}$'
+        column_header: 'Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-2548.589'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id002
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r04_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{2}P_{4}O_{12}$'
+        column_header: 'Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-2563.101'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: l
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id002
+    context:
+    - observation_id: shornikov_2008_minimum_oxide_formation_gibbs
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 149
+        section: Results
+        figure: '1'
+        note: Prose on published page 149; the minimum is located on Fig. b, published page 150.
+      values:
+        quantity: minimum Gibbs energy of melt formation from oxides
+        method_class: quoted_attributed
+        temperature_K: 1300
+        composition: Zn2P4O12
+        mixing_energy_kJ_mol: -87.5
+        sentence_as_published: >-
+          The minimal value of the Gibbs energy of melt formation from oxides is about
+          −87.5 kJ/mole and its concentration corresponds to the Zn2P4O12 compound (Fig. b).
+        attribution: the present study
+        reference_phase: >-
+          Formation from oxides. The article does not state whether those oxides are pure
+          solid or pure liquid. Reference phase is not stated.
+  Zn4P4O14:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{4}P_{4}O_{14}$'
+        column_header: 'Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-3156.786'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id003
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{4}P_{4}O_{14}$'
+        column_header: 'Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-3157.417'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: l
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id003
+  O:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r05_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'O'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '168.116'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id003
+  Zn6P4O16:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{6}P_{4}O_{16}$'
+        column_header: 'Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-3711.910'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id004
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$Zn_{6}P_{4}O_{16}$'
+        column_header: 'Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-3706.140'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: l
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id004
+  O2:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r06_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$O_{2}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '0.000'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id004
+  P4O10:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{10}$'
+        column_header: 'Solid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1791.401'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: &id005
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{10}$'
+        column_header: 'Liquid phases $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1850.113'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: l
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id005
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r22_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{10}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1868.780'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+    - observation_id: shornikov_2008_fig_a_p4o10_curve_5
+      type: activity_coefficient
+      experiment: shornikov-2008-fig-calculated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 150
+        figure: '1'
+        note: Panel a, line 5. Continuous calculated lg a(P4O10) at 1300 K.
+      phase: l
+      units: dimensionless activity; ZnO mol% as printed
+      standard_state: >-
+        Figure caption, published page 150: activities of ZnO and P4O10. The article does
+        not state the reference phase. Reference phase is not stated. The introduction says
+        P4O10 in the liquid state is thermodynamically unstable; that sentence is not an
+        activity-standard declaration.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1300'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+      values:
+        quantity: activity
+        T_K: '1300'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth calculated curve has no discrete data markers; no numeric points are sampled.
+        component: P4O10
+        activity_basis_as_published: lg a_1300(P4O10)
+        curve_number: '5'
+        attribution: the present study
+    - observation_id: shornikov_2008_fig_a_p4o10_series_2
+      type: activity_coefficient
+      experiment: shornikov-1996-2001-fig-dots
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 150
+        figure: '1'
+        note: Panel a, open squares, legend symbol 2. Thirteen data squares on the 600 dpi crop; the legend glyph is not a point.
+      phase: l
+      units: dimensionless activity; ZnO mol% as printed
+      standard_state: >-
+        Figure caption, published page 150: the dots are experimental activities of P4O10.
+        The article does not state the reference phase. Reference phase is not stated.
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1300'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+        composition:
+          state: {tag: unknown, reason: 'Markers span composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 2, pdf_page_index: 1, published_page: 150, figure: '1'}
+      values:
+        quantity: activity
+        T_K: '1300'
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: >-
+          Caption assigns symbol 2 to experimental a(P4O10) from the cited KEMS work at 1300 K,
+          not a measurement of this article. Coordinates were not read.
+        component: P4O10
+        marker_census: 13
+        attribution: Shornikov, Shilov and Shultz (1996) and Shornikov (2001), references [6] and [7]
+    context:
+    - observation_id: shornikov_2008_p4o10_melting_enthalpy_input
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 149
+        section: Method
+      values:
+        quantity: melting enthalpy adopted as a model input
+        method_class: quoted_attributed
+        sentence_as_published: >-
+          We used a higher value of melting enthalpy of ΔmH (P4O10) = 68.286 kJ/mole in our
+          calculations compared to that adopted in [1].
+        attribution: adopted input; Glushko et al. [1] is the comparison, not a measurement of this article
+    - observation_id: shornikov_2008_p4o10_liquid_unstable
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 149
+        section: Introduction
+      values:
+        sentence_as_published: >-
+          {P4O10} in the liquid state is thermodynamically unstable. It takes polymer forms
+          that have low vapor pressure in comparison with monomer liquid [1]. Rhombic and
+          tetragonal modifications of tetraphosphorus decaoxide are stable at temperatures
+          higher than 600 K.
+        attribution: stated from reference [1]
+    - observation_id: shornikov_2008_fig_b_curve_6_and_series_3
+      type: thermodynamic_example
+      units: kJ/mol
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 150
+        figure: '1'
+        note: Panel b. Line 6 is the present-study calculation. Fourteen filled circles with error bars are symbol 3. The legend disk is not a point.
+      values:
+        quantity: Gibbs energy of melt formation from oxides
+        method_class: figure_only
+        admission_status: typed_refusal
+        temperature_K: 1300
+        reason: >-
+          Line 6 is a smooth calculated curve with no discrete markers. Symbol 3 is fourteen
+          filled circles with error bars, experimental values from the cited KEMS work, not
+          measurements of this article. Each centre is its own refused audit row. 600 dpi
+          page pixels, PDF page 2: (727, 3893) r=25.2; (995, 3885) r=26.0; (1047, 3833)
+          r=26.5 and (1071, 3834) r=27.1, separation 24.0 px; (1198, 3793) r=25.6 and
+          (1247, 3780) r=25.5, separation 50.7 px; (1431, 3827) r=25.6, (1464, 3867) r=25.9
+          and (1486, 3809) r=25.5, pairwise separations 51.9, 57.9 and 62.0 px; (1622, 3736)
+          r=26.0 and (1667, 3716) r=25.2, separation 49.2 px; (1711, 3660) r=26.0;
+          (1781, 3605) r=25.6; (1919, 3512) r=26.6. Pairs closer than one diameter (~52 px)
+          overlap and were not read. The legend disk at (1942, 4002) r=19.9 is a legend
+          glyph, not a point. No ΔfG was read. The printed minimum, about −87.5 kJ/mol at
+          Zn2P4O12, is stored as prose context.
+        reference_phase: >-
+          Formation from oxides. The article does not state the oxide reference phase.
+          Reference phase is not stated.
+        marker_census_series_3: 14
+  O3:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r07_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$O_{3}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '230.138'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator: *id005
+  P:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r08_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'P'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '163.188'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P2:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r09_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{2}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-15.613'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P3:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r10_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{3}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '48.956'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P4:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r11_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-62.412'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  PO:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r12_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: 'PO'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-122.406'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  PO2:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r13_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$PO_{2}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-280.302'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P2O3:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r14_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{2}O_{3}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-572.015'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P2O4:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r15_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{2}O_{4}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-689.417'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P2O5:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r16_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{2}O_{5}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-822.492'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P3O6:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r17_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{3}O_{6}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1207.738'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P4O6:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r18_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{6}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1044.550'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P4O7:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r19_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{7}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1320.239'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P4O8:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r20_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{8}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1524.268'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.
+  P4O9:
+    observations:
+    - observation_id: shornikov_2008_zinc_phosphate_melts_p001_t01_r21_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: '$P_{4}O_{9}$'
+        column_header: 'Vapor species $\Delta_{f}G^{\circ}_{1300}, kJ/mole$'
+        published_page: 149
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        T_K: '1300'
+        value: '-1709.567'
+        attribution: Table caption says the values were calculated in the present study according to data [1, 6-9]. Those parents are not published as per-row inputs, so derived_from and derivation are absent.
+      phase: g
+      per: mol_species
+      experiment: shornikov-2008-table-1300k
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1300'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 149
+            table: '1'
+            note: The 1300 K temperature is printed in the column heading and in the table caption.

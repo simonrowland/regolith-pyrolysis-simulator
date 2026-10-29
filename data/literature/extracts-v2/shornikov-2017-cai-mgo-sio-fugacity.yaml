@@ -1,0 +1,604 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml
+observations:
+- observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_cms_50cao_mgo_activity
+  experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: The paper does not state the activity reference phase (reference phase
+        not stated). It prints calculated oxide activities in the named melts at 2300 K. It does not name a pure-oxide standard,
+        a cell reference measurement, or the temperature of a reference measurement.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5'
+        - - MgO
+          - '0.2'
+        - - SiO2
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.61'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on a(MgO) = 0.61.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this abstract with the ideal associated solutions model cited as Shornikov (2009) [1].
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected
+    decided_by:
+      worker: t1372-w5
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
+          from the text on the 600 dpi page, not from the curve.; abstract=1134
+  notices: []
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+    note: Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read from
+      the text on the 600 dpi page, not from the curve.; abstract=1134
+  read_from: pdf:shornikov-2017-cai-mgo-sio-fugacity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
+          from the text on the 600 dpi page, not from the curve.; abstract=1134
+  derivation:
+    relation: Calculated in this abstract with the ideal associated solutions model. The abstract says that model is the semi-empirical
+      thermodynamic model of oxide evaporation from refractory melts developed in Shornikov (2009), cited as [1]. This abstract
+      does not print the input activities.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+- observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_cms_50cao_sio2_activity
+  experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: The paper does not state the activity reference phase (reference phase
+        not stated). It prints calculated oxide activities in the named melts at 2300 K. It does not name a pure-oxide standard,
+        a cell reference measurement, or the temperature of a reference measurement.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5'
+        - - MgO
+          - '0.2'
+        - - SiO2
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0032'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on a(SiO2) = 0.0032.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this abstract with the ideal associated solutions model cited as Shornikov (2009) [1].
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected
+    decided_by:
+      worker: t1372-w5
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  notices: []
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+    note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
+      from the text on the 600 dpi page, not from the curve.; abstract=1134
+  read_from: pdf:shornikov-2017-cai-mgo-sio-fugacity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  derivation:
+    relation: Calculated in this abstract with the ideal associated solutions model. The abstract says that model is the semi-empirical
+      thermodynamic model of oxide evaporation from refractory melts developed in Shornikov (2009), cited as [1]. This abstract
+      does not print the input activities.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: CaO–MgO–SiO2 at 50 mol% CaO
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+- observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_mgo_activity
+  experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: The paper does not state the activity reference phase (reference phase
+        not stated). It prints calculated oxide activities in the named melts at 2300 K. It does not name a pure-oxide standard,
+        a cell reference measurement, or the temperature of a reference measurement.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.5'
+        - - MgO
+          - '0.2'
+        - - SiO2
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.066'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on a(MgO) = 0.066.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this abstract with the ideal associated solutions model cited as Shornikov (2009) [1].
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected
+    decided_by:
+      worker: t1372-w5
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  notices: []
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+    note: Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b). Read
+      from the text on the 600 dpi page, not from the curve.; abstract=1134
+  read_from: pdf:shornikov-2017-cai-mgo-sio-fugacity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  derivation:
+    relation: Calculated in this abstract with the ideal associated solutions model. The abstract says that model is the semi-empirical
+      thermodynamic model of oxide evaporation from refractory melts developed in Shornikov (2009), cited as [1]. This abstract
+      does not print the input activities.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]
+- observation_id: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_sio2_activity
+  experiment_id: 6ef1ea6f1921ec80b413884cf49c067e399f1f249592431139f7c4ccb727130e::shornikov-2017-cai-mgo-sio-fugacity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: The paper does not state the activity reference phase (reference phase
+        not stated). It prints calculated oxide activities in the named melts at 2300 K. It does not name a pure-oxide standard,
+        a cell reference measurement, or the temperature of a reference measurement.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.5'
+        - - MgO
+          - '0.2'
+        - - SiO2
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed on a(SiO2) = 0.11.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this abstract with the ideal associated solutions model cited as Shornikov (2009) [1].
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected
+    decided_by:
+      worker: t1372-w5
+      date: '2026-10-20'
+      evidence:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  notices: []
+  source_id: shornikov-2017-cai-mgo-sio-fugacity
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+    note: Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b). Read
+      from the text on the 600 dpi page, not from the curve.; abstract=1134
+  read_from: pdf:shornikov-2017-cai-mgo-sio-fugacity
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
+          Read from the text on the 600 dpi page, not from the curve.; abstract=1134
+  derivation:
+    relation: Calculated in this abstract with the ideal associated solutions model. The abstract says that model is the semi-empirical
+      thermodynamic model of oxide evaporation from refractory melts developed in Shornikov (2009), cited as [1]. This abstract
+      does not print the input activities.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
+        note: The abstract prints the calculated activities in this paragraph but does not print the numeric input activities.
+    method:
+      state:
+        tag: value
+        value: The used thermodynamic model was based on the theory of ideal associated solutions and the experimental data
+          of oxide activities in melts of the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system found by Knudsen mass-spectrometric effusion
+          method in the temperature range of 1600–2500 K.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Thermodynamic model basis
+        equation: unnumbered method sentence
+        note: The abstract states the model method; no row-specific equation is printed.
+    references:
+    - Shornikov (2009), Herald Earth Sci. Dept. RAS, 27, 1–4, cited as [1]

@@ -135,6 +135,7 @@ observations:
               note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
                 visual reads at 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -186,6 +187,7 @@ observations:
           note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
             reads at 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_alumina_pO2_figure2::point:1
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-alumina-vacuum-heating-1500C
   identity:
@@ -319,6 +321,7 @@ observations:
               note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
                 visual reads at 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -370,6 +373,7 @@ observations:
           note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
             reads at 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_alumina_pO2_figure2::point:2
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-alumina-vacuum-heating-1500C
   identity:
@@ -503,6 +507,7 @@ observations:
               note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
                 visual reads at 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -554,6 +559,7 @@ observations:
           note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
             reads at 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_melting_point
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
   identity:
@@ -693,6 +699,7 @@ observations:
               figure: '2'
               section: Results
         output_unit: K
+        references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:0
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
   identity:
@@ -822,6 +829,7 @@ observations:
               section: Results
               note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -870,6 +878,7 @@ observations:
           section: Results
           note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:1
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
   identity:
@@ -999,6 +1008,7 @@ observations:
               section: Results
               note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1047,6 +1057,7 @@ observations:
           section: Results
           note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:2
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
   identity:
@@ -1176,6 +1187,7 @@ observations:
               section: Results
               note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1224,6 +1236,7 @@ observations:
           section: Results
           note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:3
   experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
   identity:
@@ -1353,6 +1366,7 @@ observations:
               section: Results
               note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1401,6 +1415,7 @@ observations:
           section: Results
           note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_abstract_oxygen_removed
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -1533,12 +1548,14 @@ observations:
               pdf_page_index: 0
               section: Abstract
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_mass_loss_1200C
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -1677,12 +1694,14 @@ observations:
               section: Results
               equation: '1'
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run01_figure2::point:0
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -1812,6 +1831,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1860,6 +1880,7 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run01_figure2::point:1
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -1989,6 +2010,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2037,6 +2059,7 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:0
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -2166,6 +2189,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2214,6 +2238,7 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:1
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -2343,6 +2368,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2391,6 +2417,7 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:2
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -2520,6 +2547,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2568,6 +2596,7 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:3
   experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
   identity:
@@ -2697,6 +2726,7 @@ observations:
               section: Results
               note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
         output_unit: K
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2745,3 +2775,4 @@ observations:
           section: Results
           note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
     output_unit: Pa
+    references: []

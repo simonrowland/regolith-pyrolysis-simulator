@@ -47,6 +47,113 @@ YAML12SafeLoader.add_implicit_resolver(
 )
 
 
+def _format_yaml_source_path(path: tuple[object, ...]) -> str:
+    result = ""
+    for part in path:
+        if isinstance(part, int):
+            result += f"[{part}]"
+        else:
+            result += f".{part}" if result else str(part)
+    return result
+
+
+def _walk_yaml_mapping_source_issues(
+    node: object,
+    loader: YAML12SafeLoader,
+    source: str,
+    path: tuple[object, ...] = (),
+) -> list[tuple[str, int, str]]:
+    """Find source-level flow-key loss and duplicate constructed mapping keys."""
+    issues: list[tuple[str, int, str]] = []
+    if isinstance(node, yaml.MappingNode):
+        constructed_keys: dict[object, yaml.Mark] = {}
+        merge_key_seen = False
+        for key_node, value_node in node.value:
+            if key_node.tag == "tag:yaml.org,2002:merge":
+                if merge_key_seen:
+                    issues.append(
+                        (
+                            "duplicate explicit merge key",
+                            key_node.start_mark.line + 1,
+                            f"{_format_yaml_source_path(path)}: <<",
+                        )
+                    )
+                merge_key_seen = True
+            else:
+                constructed_key = loader.construct_object(key_node, deep=True)
+                try:
+                    first_mark = constructed_keys.get(constructed_key)
+                except TypeError:
+                    first_mark = None
+                if first_mark is not None:
+                    issues.append(
+                        (
+                            "duplicate constructed mapping key",
+                            key_node.start_mark.line + 1,
+                            f"{_format_yaml_source_path(path)}: {key_node.value!r} "
+                            f"constructs as {constructed_key!r}; first at line "
+                            f"{first_mark.line + 1}",
+                        )
+                    )
+                else:
+                    try:
+                        constructed_keys[constructed_key] = key_node.start_mark
+                    except TypeError:
+                        pass
+
+            if (
+                node.flow_style
+                and isinstance(value_node, yaml.ScalarNode)
+                and value_node.tag == "tag:yaml.org,2002:null"
+                and value_node.value == ""
+                and ":"
+                not in source[
+                    key_node.end_mark.index : value_node.start_mark.index
+                ]
+            ):
+                issues.append(
+                    (
+                        "flow mapping key has no value indicator",
+                        key_node.start_mark.line + 1,
+                        f"{_format_yaml_source_path(path)}: {key_node.value!r}",
+                    )
+                )
+
+            issues.extend(
+                _walk_yaml_mapping_source_issues(
+                    value_node,
+                    loader,
+                    source,
+                    path + (key_node.value,),
+                )
+            )
+    elif isinstance(node, yaml.SequenceNode):
+        for index, value_node in enumerate(node.value):
+            issues.extend(
+                _walk_yaml_mapping_source_issues(
+                    value_node,
+                    loader,
+                    source,
+                    path + (index,),
+                )
+            )
+    return issues
+
+
+def yaml_mapping_source_issues(source: str) -> list[tuple[str, int, str]]:
+    """Return the shared source guard findings for one YAML document."""
+    loader = YAML12SafeLoader(source)
+    try:
+        source_tree = loader.get_single_node()
+        if source_tree is None:
+            return []
+        issues = _walk_yaml_mapping_source_issues(source_tree, loader, source)
+        loader.construct_document(source_tree)
+        return issues
+    finally:
+        loader.dispose()
+
+
 def load_cached_safe_yaml(
     payload: str | bytes,
     *,

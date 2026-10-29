@@ -121,6 +121,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
 from engines.engine_commissioning import assess_engine_commissioning
+from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerPool,
@@ -961,6 +962,10 @@ def _bootstrap_vaporock_worker(
     fresh-per-request on any mismatch. Hits after that prefix are reused
     without comparison. The integer 20 is a probe budget, not a grid proof.
     """
+    try:
+        _load_thermoengine_phaseobjc_library()
+    except (ImportError, OSError) as exc:
+        raise VapoRockCallError(exc) from exc
     module = None
     errors: list[str] = []
     for module_name in _IMPORT_CANDIDATES:
@@ -2170,6 +2175,13 @@ class VapoRockBackend(MeltBackend):
         method are caught and converted to that None/_last_error
         outcome. This method does not wrap ``warnings.warn``.
         """
+        try:
+            _load_thermoengine_phaseobjc_library()
+        except ImportError as exc:
+            self._last_error = (
+                'ThermoEngine Objective-C library unavailable: ' + str(exc)
+            )
+            return None
         errors: List[str] = []
         for module_name in _IMPORT_CANDIDATES:
             try:

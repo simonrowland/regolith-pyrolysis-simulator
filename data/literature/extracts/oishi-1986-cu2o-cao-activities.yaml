@@ -1,0 +1,2899 @@
+schema_version: literature_extract.v1
+source_id: oishi-1986-cu2o-cao-activities
+source:
+  citation: Oishi T, Kondo Y, Ono K (1986). A Thermodynamic Study of Cu2O-CaO Melts in Equilibrium with
+    Liquid Copper. Transactions of the Japan Institute of Metals 27(12):976-980.
+  doi: 10.2320/matertrans1960.27.976
+  year: 1986
+  corpus_sha256: 5c1563e16d0304ce6a9a60edf57bd51a9b6ef7455d57125ef7560690790cf06e
+extraction:
+  method: MinerU table draft emit; row conditions and phase compositions transcribed by hand.
+  date: '2026-10-20'
+  worker: fam26-1020
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 2
+    table_index: 1
+    count: 0
+species:
+  Cu:
+    observations:
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r03_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '3'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '1'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '90.32'
+        quench_statement: &id001
+          text: At the end of each experimental run, the oxide sample was withdrawn into an alumina tube
+            and quenched in water.
+          quench_direction: not_stated
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            section: Experimental
+        log_fO2:
+          value: '-3.48'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.48 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id002
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '1'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r04_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '4'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '2'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '88.20'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.52'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.52 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id003
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '2'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r05_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '5'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '3'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '86.06'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.56'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.56 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id004
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '3'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r06_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '6'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '4'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '85.53'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.62'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.62 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id005
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '4'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r07_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '7'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '5'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '83.59'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.70'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.70 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id006
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '5'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r08_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '8'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '6'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '82.93'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.66'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.66 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id007
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '6'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r09_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '9'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '7'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '81.93'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.77'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.77 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id008
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '7'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r10_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '10'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '8'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '80.94'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.74'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.74 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id009
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '8'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r11_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '11'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '9'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '79.73'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.76'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.76 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id010
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '9'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r12_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '12'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '10'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '79.50'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.84'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.84 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id011
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '10'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r13_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '13'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: '11'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '79.04'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.78'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.78 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id012
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '11'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r14_c04
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '14'
+        column_header: chemical analysis of oxide* mass% Cu
+        published_page: 977
+        row: 12**
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '78.34'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.81'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.81 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: &id013
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: 12**
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    context:
+    - observation_id: oishi_1986_table1_emf_column
+      type: context_record
+      locator:
+        page: 2
+        published_page: 977
+        pdf_page_index: 1
+        table: '1'
+        column: emf/mV
+      units: mV
+      candidate_quantities:
+      - electrode_potential
+      - electromotive_force
+      reason: The store has no token for cell emf; numeric emf readings are retained as printed in this
+        record.
+      values:
+        method_class: measured_direct
+        emf_mV_by_run_as_printed:
+        - '-247.3'
+        - '-244.2'
+        - '-240.9'
+        - '-236.3'
+        - '-230.2'
+        - '-232.8'
+        - '-224.5'
+        - '-227.0'
+        - '-225.5'
+        - '-219.1'
+        - '-223.3'
+        - '-221.1'
+    - observation_id: oishi_1986_table1_printed_oxygen_conditions
+      type: context_record
+      locator:
+        page: 2
+        published_page: 977
+        pdf_page_index: 1
+        table: '1'
+        column: log(pO2/p°)
+      units: log10(pO2/p°), dimensionless ratio
+      candidate_quantities:
+      - partial_pressure
+      reason: Printed log oxygen pressure is a condition, not a measured pressure point. The phase-composition
+        profile does not carry this reference-aware condition into identity; values.log_fO2 records each
+        row verbatim without conversion.
+      values:
+        method_class: measured_direct
+        reference_as_printed: p° = 101325 Pa = 1 atm
+        field: values.log_fO2 on each typed composition row
+  O:
+    observations:
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r03_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '3'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '1'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.61'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.48'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.48 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id002
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '1'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r04_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '4'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '2'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.01'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.52'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.52 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id003
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '2'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r05_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '5'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '3'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.67'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.56'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.56 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id004
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '3'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r06_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '6'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '4'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.32'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.62'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.62 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id005
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '4'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r07_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '7'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '5'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.08'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.70'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.70 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id006
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '5'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r08_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '8'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '6'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.26'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.66'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.66 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id007
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '6'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r09_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '9'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '7'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.88'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.77'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.77 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id008
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '7'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r10_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '10'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '8'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.95'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.74'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.74 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id009
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '8'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r11_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '11'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '9'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.10'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.76'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.76 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id010
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '9'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r12_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '12'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '10'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.70'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.84'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.84 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id011
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '10'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r13_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '13'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: '11'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.81'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.78'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.78 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id012
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '11'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r14_c05
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '14'
+        column_header: chemical analysis of oxide* mass% O
+        published_page: 977
+        row: 12**
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.63'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.81'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.81 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id013
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: 12**
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    context:
+    - observation_id: oishi_1986_figure2_oxygen_partial_pressure
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 978
+        pdf_page_index: 2
+        figure: '2'
+      units: as printed
+      phase_as_printed: Cu2O-CaO oxide melt in equilibrium with liquid copper
+      temperature_as_printed: 1573 K
+      axes_as_printed:
+        x: mass% CaO in oxide melt
+        y: (pO2/p°) × 10^4
+      caption: Relationship between oxygen partial pressure and mass% CaO in oxide melt at 1573 K.
+      panel: single
+      series:
+      - name: Table 1 experimental runs
+        marker: open circle
+        marker_count: 12
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: partial_pressure
+        method_class: measured_direct
+        reference_as_printed: p° = 101325 Pa = 1 atm
+    - observation_id: oishi_1986_figure3_oxygen_content_copper
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 978
+        pdf_page_index: 2
+        figure: '3'
+      units: as printed
+      phase_as_printed: liquid copper
+      temperature_as_printed: 1573 K
+      axes_as_printed:
+        x: mass% CaO in oxide melt
+        y: mass% O in liquid copper
+      caption: Variation of oxygen contents in liquid copper with CaO contents in oxide melt; calculated
+        using data from ref. (4).
+      panel: single
+      series:
+      - name: calculated oxygen contents
+        marker: open circle
+        marker_count: 12
+        method_class: model_derived
+        attribution: data from ref. (4)
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: equilibrium_phase_composition
+        method_class: model_derived
+        component_as_printed: O
+    - observation_id: oishi_1986_figure4_conjugation_lines
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 978
+        pdf_page_index: 2
+        figure: '4'
+      units: as printed
+      phase_as_printed: liquid copper and Cu2O-CaO oxide melt
+      temperature_as_printed: 1573 K
+      axes_as_printed:
+        x: mass% O
+        y: mass% CaO
+      caption: Conjugation lines of the two-phase region between liquid copper and Cu2O-CaO melt in the
+        Cu-O-CaO system at 1573 K.
+      panel: single
+      series:
+      - name: conjugation endpoints A-D
+        marker: open circle
+        marker_count: 4
+        method_class: measured_direct
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        assemblage_as_printed: liquid copper + Cu2O-CaO oxide melt
+    - observation_id: oishi_1986_figure5_oxide_activities
+      type: figure_record
+      locator:
+        page: 4
+        published_page: 979
+        pdf_page_index: 3
+        figure: '5'
+      units: as printed
+      phase_as_printed: oxide melt along line AB
+      temperature_as_printed: 1573 K
+      axes_as_printed:
+        x: mass% CaO
+        y: activity
+      caption: Changes in activities of Cu, Cu2O and CaO in oxide melt with CaO concentration at 1573
+        K.
+      panel: single
+      series:
+      - name: aCu
+        marker: open circle
+        marker_count: 12
+        method_class: model_derived
+      - name: aCu2O
+        marker: open square
+        marker_count: 12
+        method_class: model_derived
+      - name: aCaO
+        marker: line
+        marker_count: 0
+        method_class: model_derived
+      digitisation: deferred to a figure pass
+      numeric_points: none
+      values:
+        typed_quantity: activity
+        method_class: model_derived
+        reference_as_printed: Cu2O is stoichiometric liquid Cu2O; references for Cu and CaO are not stated.
+  CaO:
+    observations:
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r03_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '3'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '1'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.48'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.48 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id002
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '1'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r04_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '4'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '2'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '1.64'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.52'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.52 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id003
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '2'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r05_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '5'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '3'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '2.78'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.56'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.56 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id004
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '3'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r06_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '6'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '4'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '3.89'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.62'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.62 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id005
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '4'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r07_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '7'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '5'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '6.01'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.70'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.70 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id006
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '5'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r08_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '8'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '6'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '6.29'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.66'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.66 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id007
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '6'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r09_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '9'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '7'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '7.81'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.77'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.77 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id008
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '7'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r10_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '10'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '8'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '8.84'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.74'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.74 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id009
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '8'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r11_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '11'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '9'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '9.55'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.76'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.76 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id010
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '9'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r12_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '12'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '10'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.37'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.84'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.84 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id011
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '10'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r13_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '13'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: '11'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '10.85'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.78'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.78 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id012
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '11'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r14_c06
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '14'
+        column_header: chemical analysis of oxide* mass% CaO
+        published_page: 977
+        row: 12**
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '11.55'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.81'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.81 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id013
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: 12**
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+  MgO:
+    observations:
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r03_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '3'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '1'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.07'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.48'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.48 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id002
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '1'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '1'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r04_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '4'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '2'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.15'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.52'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.52 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id003
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '2'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '2'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r05_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '5'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '3'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.49'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.56'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.56 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id004
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '3'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '3'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r06_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '6'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '4'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.26'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.62'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.62 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id005
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '4'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '4'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r07_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '7'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '5'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.32'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.70'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.70 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id006
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '5'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '5'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r08_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '8'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '6'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.52'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.66'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.66 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id007
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '6'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '6'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r09_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '9'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '7'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.38'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.77'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.77 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id008
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '7'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '7'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r10_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '10'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '8'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.27'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.74'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.74 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id009
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '8'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '8'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r11_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '11'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '9'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.62'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.76'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.76 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id010
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '9'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '9'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r12_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '12'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '10'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.43'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.84'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.84 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id011
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '10'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '10'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r13_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '13'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: '11'
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.30'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.78'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.78 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id012
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: '11'
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: '11'
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+    - observation_id: oishi_1986_cu2o_cao_activities_p002_t01_r14_c07
+      type: equilibrium_phase_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: '14'
+        column_header: chemical analysis of oxide* mass% MgO
+        published_page: 977
+        row: 12**
+      units: mass%
+      mineru_flags: []
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        T_K: '1573'
+        value: '0.48'
+        quench_statement: *id001
+        log_fO2:
+          value: '-3.81'
+          units: log10(atm)
+          quote: log(pO2/p°) = -3.81 as printed; p° = 101325 Pa = 1 atm
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+      phase: l
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator: *id013
+        composition:
+          state:
+            tag: unknown
+            reason: sample composition is the measured output; the complete row is encoded by component
+              observations sharing this sample_id
+          locator:
+            page: 2
+            published_page: 977
+            pdf_page_index: 1
+            table: '1'
+            row: 12**
+            note: The four measured component values for this sample are typed as equilibrium_phase_composition
+              observations under this sample_id.
+      sample_id: 12**
+      regime: quench_equilibration
+      uncertainty:
+        note: Duplicate chemical analyses were averaged and corrected to 100%; no per-cell uncertainty
+          is printed.
+fidelity_samples:
+- path: species.Cu.observations[oishi_1986_cu2o_cao_activities_p002_t01_r03_c04].values.value
+  value: '90.32'
+  locator:
+    page: 2
+    published_page: 977
+    pdf_page_index: 1
+    table: '1'
+    row: '1'
+    column: Cu

@@ -39,7 +39,7 @@ from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.yield_disposition import OriginUnresolvedError
 from simulator.accounting.run_artifact import build_run_artifact
-from simulator.chemistry.kernel import ProviderUnavailableError
+from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
 from simulator.optimize.recipe import (
@@ -2344,7 +2344,7 @@ def test_status_with_mass_balance_invariant_refuses_completed_run_without_eviden
 # Nightly (2026-08-02 CI tiering): operator/decision path (~251 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_runner_records_operator_decision_in_shadow_trace():
     """When the simulator pauses for a decision mid-run, the runner
     auto-applies the recommendation and records an ``operator_decision``
@@ -3337,14 +3337,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
 
 
 @pytest.mark.parametrize(
-    ("backend_name", "expected_notice"),
-    (("alphamelts", True), ("thermoengine", True), ("internal-analytical", False)),
+    "backend_name", ("alphamelts", "thermoengine", "internal-analytical"),
 )
 def test_runner_provenance_flags_diagnostic_freeze_gate_authority(
     backend_name: str,
-    expected_notice: bool,
 ) -> None:
-    """Capability provenance works without starting an optional engine."""
+    """The declared gate is independent of the diagnostic melt backend."""
 
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -3361,19 +3359,16 @@ def test_runner_provenance_flags_diagnostic_freeze_gate_authority(
     engines_used = run_metadata["engines_used"]
     assert "notices" not in engines_used
 
-    notice = run_metadata.get("diagnostic_gate_authority_notice")
-    if expected_notice:
-        assert notice is not None
-        assert notice["intent"] == "gate_liquid_fraction"
-        assert notice["provider_id"] == "alphamelts-diagnostic"
-        assert notice["authority_scope"] == "dispatch_only"
-        assert notice["ledger_transition_authority"] is False
-        report = payload["product_classification"]
-        assert report["diagnostic_gate_authority_notice"] == notice
-        assert "Diagnostic freeze-gate authority" in report["markdown"]
-        assert "Reported numbers are unchanged." in report["markdown"]
-    else:
-        assert notice is None
-        assert "diagnostic_gate_authority_notice" not in payload[
-            "product_classification"
-        ]
+    assert run_metadata["liquid_fraction_provider"] == "magemin"
+    assert sim._chem_registry.authoritative_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is None
+    profile = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ).capability_profile()
+    assert profile.provider_id == "magemin-shadow"
+    assert not profile.may_emit_ledger_transition(ChemistryIntent.GATE_LIQUID_FRACTION)
+    assert "diagnostic_gate_authority_notice" not in run_metadata
+    report = payload["product_classification"]
+    assert "diagnostic_gate_authority_notice" not in report
+    assert "Diagnostic freeze-gate authority" not in report["markdown"]

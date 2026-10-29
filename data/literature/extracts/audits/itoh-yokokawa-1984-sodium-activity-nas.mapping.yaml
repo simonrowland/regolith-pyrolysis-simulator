@@ -1,0 +1,29 @@
+source_id: itoh-yokokawa-1984-sodium-activity-nas
+scope:
+  target: absolute Na2O activity on the pure-solid Na2O standard state
+  included:
+    locator: {page: 4, published_page: 882, equation: '5'}
+    printed_form: log10(alpha*_Na2O)
+    disposition: activity converted from printed log10 form
+    conversion: a_Na2O = 10^(-9.0) = 1e-9
+    method_class: measured_reduced
+    printed_log_input: typed-refusal support observation linked by derived_from
+    method: emf_cell
+    method_as_printed: concentration-cell electromotive-force measurement
+    uncertainty: >-
+      Rounding half-width propagated as a * ln(10) * 0.5 * 10^-1; confidence
+      level not stated.
+    identity_composition: values.composition_mol from the printed 0.33/0.67 coefficients in equation 3
+  excluded_tables:
+    - table: '1'
+      page: 2
+      caption: EMF values relative to 40Na2O·60SiO2; these are not absolute activities.
+    - table: '2'
+      page: 3
+      caption: Relative partial molar quantities at 1400 K relative to 40Na2O·60SiO2.
+      reason: Relative free energies are not the requested absolute activity values.
+  excluded_figures:
+    - figure: '1'
+      reason: Figure-only values are not digitized in this extraction wave.
+    - figure: '5'
+      reason: Figure-only values are not digitized in this extraction wave.
