@@ -259,7 +259,10 @@ def test_kelley_printed_thermochemistry_rows_migrate_with_cells_and_conditions()
         row["locator"]["table"]: row["values"]["reaction_as_printed"]
         for row in reaction_context
     } == expected_reactions
-    assert sum(len(row["values"]["runs"]) * 2 for row in reaction_context) == 60
+    # Printed runs per reaction table (each run prints two cells, so 20 cells per table).
+    assert {
+        row["locator"]["table"]: len(row["values"]["runs"]) for row in reaction_context
+    } == {"34": 10, "36": 10, "37": 10}
     assert all(row["units"] == "cal/mol" for row in reaction_context)
     assert all(row["values"]["pressure_as_printed"] == "1 atm. pressure" for row in reaction_context)
     assert all(row["values"]["schema_gap"] for row in reaction_context)
@@ -301,7 +304,6 @@ def test_kelley_printed_thermochemistry_rows_migrate_with_cells_and_conditions()
             for row in csv.DictReader(stream)
             if row["compare_status"] == "matched_context"
         ]
-    assert len(audited_context_cells) == 60
     assert {
         table: sum(row["table"] == table for row in audited_context_cells)
         for table in ("34", "36", "37")
