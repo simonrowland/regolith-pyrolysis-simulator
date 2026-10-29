@@ -7,7 +7,6 @@ import pytest
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
     REACTION_FAMILY_C3_NA,
-    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -31,16 +30,12 @@ def _dispatch_na(
     sim,
     *,
     cleaned_melt_kg: dict[str, float],
-    spent_residue_kg: dict[str, float] | None = None,
     reagent_available_kg: float = 30.0,
     temperature_C: float = 1150.0,
 ):
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": _kg_to_mol(cleaned_melt_kg),
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT: _kg_to_mol(
-                spent_residue_kg or {}
-            ),
             "process.metal_phase": {},
             "process.reagent_inventory": {},
         },
@@ -75,13 +70,11 @@ def test_na_activity_shift_uses_full_melt_mole_fraction(
     )
     concentrated = _dispatch_na(
         sim,
-        cleaned_melt_kg={"FeO": 10.0, "SiO2": 90.0},
-        spent_residue_kg={"Na2O": 1.0},
+        cleaned_melt_kg={"FeO": 10.0, "SiO2": 90.0, "Na2O": 1.0},
     )
     diluted = _dispatch_na(
         sim,
-        cleaned_melt_kg={"FeO": 10.0, "SiO2": 990.0},
-        spent_residue_kg={"Na2O": 1.0},
+        cleaned_melt_kg={"FeO": 10.0, "SiO2": 990.0, "Na2O": 1.0},
     )
 
     gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
