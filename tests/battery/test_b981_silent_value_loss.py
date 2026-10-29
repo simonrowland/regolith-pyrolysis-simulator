@@ -193,3 +193,33 @@ def test_kambayashi_table6_po_partial_pressures_migrate_with_sample_conditions()
             assert key in conditions
             assert conditions[key].state.is_value
             assert conditions[key].locator is not None
+
+
+def test_wu_reported_solidus_rows_migrate_temperature_and_composition_axis():
+    observations = _observations(
+        "kems-190-wu-1993.yaml",
+        "wu_1993_table3_reported_solidus_points",
+    )
+    expected = {
+        "41": "1768.15",
+        "45": "1738.15",
+        "47.5": "1713.15",
+        "54": "1683.15",
+        "70": "1591.15",
+        "80": "1549.15",
+    }
+    assert len(observations) == len(expected)
+    assert all(
+        observation.identity.quantity.value.value
+        == Quantity.TRANSITION_TEMPERATURE.value
+        and observation.value.kind is ValueKind.POINT
+        for observation in observations
+    )
+    for observation in observations:
+        conditions = observation.point_conditions or {}
+        composition = conditions["Fe2SiO4_wt_pct"]
+        assert composition.state.is_value
+        assert composition.locator is not None
+        assert observation.value.point == Decimal(
+            expected[str(composition.state.value)]
+        )
