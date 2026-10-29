@@ -3316,6 +3316,17 @@ class ExtractionMixin:
         cfg.update(dict(ovr))
         return cfg
 
+    def _c7_hold_temperature_C(self, cfg: dict) -> float:
+        setpoint_target, _ramp = self.campaign_mgr.get_temp_target(
+            CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            getattr(self.melt, 'campaign_hour', 0),
+            self.melt,
+        )
+        return self._c7_float(
+            cfg.get('hold_temp_C', cfg.get('default_hold_T_C')),
+            setpoint_target,
+        )
+
     @staticmethod
     def _c7_bool(value, default: bool = False) -> bool:
         if value is None:
@@ -3490,8 +3501,7 @@ class ExtractionMixin:
         cold_skull_safe = self._c7_float(
             cfg.get('c7_cold_skull_safe_stir_factor'), 6.0)
         applied_stir = min(clamped_stir, max(0.0, cold_skull_safe))
-        hold_temp_C = self._c7_float(
-            cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0)
+        hold_temp_C = self._c7_hold_temperature_C(cfg)
         hold_temp_K = hold_temp_C + 273.15
         p_total_raw = cfg.get('p_total_mbar')
         if p_total_raw is None:
@@ -3987,8 +3997,7 @@ class ExtractionMixin:
             'extent_fraction': extent_fraction,
             'allow_partial_extent': self._c7_bool(
                 cfg.get('allow_partial_extent'), True),
-            'hold_temp_C': self._c7_float(
-                cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0),
+            'hold_temp_C': self._c7_hold_temperature_C(cfg),
             'p_total_mbar': self._c7_float(p_total_raw, self.melt.p_total_mbar),
             'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
             'active_ca_condensation_route': self._c7_bool(

@@ -5466,7 +5466,7 @@ def test_feasible_earned_rump_ood_cache_rejection_warns_and_study_continues(
     assert "out_of_domain_provenance" in caplog.text
 
 
-@pytest.mark.timeout(150)
+@pytest.mark.cpu_budget(150)
 def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
     result = study.run(
         PROFILE,
@@ -5507,6 +5507,7 @@ def _all_slow_evaluator(
     return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
 
 
+@pytest.mark.cpu_budget(25)
 @pytest.mark.timeout(25)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.

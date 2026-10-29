@@ -5922,3 +5922,130 @@ def test_yakovleva_2022_table1_context_survives_migration(tmp_path):
         == "Analytical results are rounded and normalized to 100 wt %."
         for row in compositions
     )
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "1997jonesthermo",
+            "1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation",
+            'Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997.',
+        ),
+        (
+            "ammin-73-470-oneill-1988",
+            "ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit",
+            "JANAF thermochemical tables, Chase et al. (1982), values assessed primarily from Mah et al. (1967)",
+        ),
+        (
+            "arxiv-1602-00658-fegley-rock-steam-solubility",
+            "arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation",
+            "Palme and O'Neill (2014)",
+        ),
+        (
+            "berman-1988-internally-consistent-mineral-thermodynamic-data",
+            "berman-1988-internally-consistent-mineral-thermodynamic-data::berman1988_akermanite_delta_fG::T=298.15:h=fc5697a85fa6",
+            "Berman, R. G. (1988), Thermodynamic data for minerals, Journal of Petrology, 29(2), 445-522.",
+        ),
+        (
+            "burcat-third-millennium",
+            "burcat-third-millennium::burcat_2005_table1_C_gas",
+            'Burcat, A. & Ruscic, B. (2005), "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with Updates from Active Thermochemical Tables", ANL-05/20, TAE 960.',
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table3_bse_composition::rows:h=3547f3dd9048",
+            "Palme & O'Neill (2014)",
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table2_continental_crust_composition::rows:h=a57975b5d50a",
+            "Wedepohl (1995)",
+        ),
+        (
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii",
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions",
+            "Jarosewich (1990, table 5); Jarosewich (1990, table 2); Lodders (2003, table 1 and 3); Yanai et al. (1995); Ikeda and Takeda 1979; Kimura et al. 1979; Fujimaki et al. 1981; Nagahara 1981; Ikeda 1983; Kimura 1983; Ikeda (1983); Ikeda (1980); Hezel and Palme (2010); Ikeda (1982)",
+        ),
+        (
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_abstract_experimental_ranges",
+            'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical Geology 139, 21-38.',
+        ),
+        (
+            "itoh-hino-banya-1997-mg-deoxidation",
+            "itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters",
+            "Yavoiskii et al.; Nadif and Gatellier; Turkdogan; Inoue and Suito; Kulikov; Gorobetz (references 6–11)",
+        ),
+        (
+            "lpi-compendium-15013",
+            "lpi-compendium-15013::lpi_15013_table1_major_oxide_composition",
+            "Meyer, C. (2010), Lunar Sample Compendium entry 15013, Lunar and Planetary Institute/NASA.",
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "lpi-compendium-62231",
+            "lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446",
+            "Meyer, C. (2010), Lunar Sample Compendium: 62231 and 62241 Soils, Apollo 16 station 2.",
+        ),
+        (
+            "lpi-compendium-65701",
+            "lpi-compendium-65701::lpi_compendium_65701_chemical_composition_table::rows:h=1917b21f2ca4",
+            "Meyer, C. (2010), Lunar Sample Compendium: 65701, Lunar and Planetary Institute.",
+        ),
+        (
+            "pedley-marshall-1983-gaseous-monoxides",
+            "pedley-marshall-1983-gaseous-monoxides::pedley_marshall_1983_table_4_assessed_formation_enthalpies::rows:row=ago:h=66c3f8529598",
+            "Pedley, J. B. & Marshall, E. M. (1983). Thermochemical data for gaseous monoxides. J. Phys. Chem. Ref. Data 12, 967–1031",
+        ),
+        (
+            "robie-hemingway-wilson-1980-usgs-of-80-908",
+            "robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_ca2sio4_alpha_summary_29815_absent",
+            "Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report 80-908.",
+        ),
+        (
+            "ta-yamanaka-1997-metsoc",
+            "ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs",
+            "Rego et al. (1985), Metallurgical Transactions 16B:313-323; Chase et al. (1985), JANAF Thermochemical Tables, 3rd ed., p. 1577",
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-1",
+            "usgs-lunar-sourcebook-tab8-1::usgs_tab8_1_apollo11_mbas",
+            'Lunar Sourcebook, Chapter 8, Table A8.1, "Statistical data for concentrations of major elements" (TAB8_1R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-4",
+            "usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=6fb5a587202c",
+            'Lunar Sourcebook, Chapter 8, Table A8.4, "Statistical summary of the database for concentrations of frequently determined siderophile elements in mare basalts (MBAS) and in soils and regolith breccias (S&RB)" (TAB8_4R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "visscher-fegley-2013-debris-disks",
+            "visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions",
+            "Palme and O'Neill 2003; O'Neill 1991; Lodders 2000; Lodders and Fegley 2011; Warren and Kallemeyn 1990; Warren et al. 1995; Mittlefehldt et al. 2002; Ringwood 1960; Vdovykin 1970; Wiik 1972; Jarosewich 1990; Klock et al. 1998",
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity_second_batch(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity

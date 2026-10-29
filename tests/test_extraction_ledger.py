@@ -23,6 +23,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
@@ -42,15 +43,32 @@ from simulator.state import (
 from web.events import _completion_payload
 
 
-def _sim(feedstocks):
+def _sim(feedstocks, setpoints=None):
     backend = InternalAnalyticalBackend()
     backend.initialize({})
+    resolved_setpoints = {
+        "campaigns": {},
+        "chemistry_kernel": {"liquid_fraction_provider": "analytical"},
+    }
+    resolved_setpoints.update(setpoints or {})
     return PyrolysisSimulator(
         backend,
-        {"campaigns": {}, "chemistry_kernel": {"liquid_fraction_provider": "analytical"}},
+        resolved_setpoints,
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _campaign_pressure_setpoints(config_key: str) -> dict:
+    row = load_config_bundle().setpoints["campaigns"][config_key]
+    return {
+        "campaigns": {
+            config_key: {
+                key: row[key]
+                for key in ("pO2_mbar_default", "p_total_mbar_default")
+            }
+        }
+    }
 
 
 def _run_session_script(lines: list[str]):
@@ -300,7 +318,8 @@ def test_c2a_staged_rump_expectation_keeps_ca_and_al():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 40.0, "Al2O3": 60.0},
             }
-        }
+        },
+        setpoints=_campaign_pressure_setpoints("C2A_staged"),
     )
     sim.load_batch("oxide", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -320,7 +339,8 @@ def test_c6_rump_expectation_treats_thermited_al_as_target():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 90.0, "Al2O3": 10.0},
             }
-        }
+        },
+        setpoints=_campaign_pressure_setpoints("C6"),
     )
     sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Mg": 1000.0})
     sim.start_campaign(CampaignPhase.C6)
@@ -343,9 +363,10 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
                 "label": "Oxide",
                 "composition_wt_pct": {"CaO": 50.0, "SiO2": 50.0},
             }
-        }
+        },
+        setpoints=_campaign_pressure_setpoints("C5"),
     )
-    sim.setpoints["campaigns"]["C5"] = {"c5_targets": ["Ca"]}
+    sim.setpoints["campaigns"]["C5"]["c5_targets"] = ["Ca"]
     # Keep the original 10 kg CaO target and a silicate rump for the declared gate.
     sim.load_batch("oxide", mass_kg=20.0)
     _enable_c5_mre(sim, target_species="CaO", max_voltage_V=2.5)
