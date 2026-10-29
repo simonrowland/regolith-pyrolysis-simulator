@@ -649,3 +649,107 @@ def test_sossi_table3_log_k_star_cells_migrate_as_temperature_points():
         assert condition.state.value == temperature
         assert condition.locator is not None
         assert condition.locator.table == "3"
+
+
+def test_shilov_table4_atomic_oxygen_pressures_migrate_all_equilibrium_estimates():
+    observations = _observations(
+        "shilov-1998-sno-zno-p2o5-vaporization.yaml",
+        "shilov_1998_table4_atomic_oxygen_partial_pressures",
+    )
+    expected_pa = {
+        ("40.0", "(4)"): "5.8667175e-10",
+        ("40.0", "(8)"): "4.681215e-10",
+        ("40.0", "(9)"): "5.2385025e-10",
+        ("40.0", "(10)"): "5.02572e-10",
+        ("40.0", "(11)"): "3.28293e-10",
+        ("46.7", "(4)"): "4.1421925e-10",
+        ("46.7", "(8)"): "4.4886975e-10",
+        ("46.7", "(9)"): "4.316445e-10",
+        ("46.7", "(10)"): "4.3468425e-10",
+        ("46.7", "(11)"): "4.7116125e-10",
+        ("53.3", "(4)"): "4.33671e-10",
+        ("53.3", "(8)"): "4.9345275e-10",
+        ("53.3", "(9)"): "4.6305525e-10",
+        ("53.3", "(10)"): "4.70148e-10",
+        ("53.3", "(11)"): "3.627435e-10",
+        ("60.0", "(4)"): "4.8636e-10",
+        ("60.0", "(8)"): "5.4816825e-10",
+        ("60.0", "(9)"): "5.1574425e-10",
+        ("60.0", "(10)"): "5.2385025e-10",
+        ("60.0", "(11)"): "3.100545e-10",
+    }
+    assert len(observations) == len(expected_pa)
+    for observation in observations:
+        conditions = observation.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        composition = conditions["xSnO_mol_pct"]
+        equation = conditions["equilibrium_equation_as_printed"]
+        key = (str(composition.state.value.point), equation.state.value)
+        assert key in expected_pa
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        assert observation.identity.species.formula == "O"
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(expected_pa[key])
+        assert observation.identity.temperature_K.value == Decimal("1300.0")
+        for condition in (temperature, composition, equation):
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table == "4"
+        assert temperature.state.value == Decimal("1300.0")
+        assert composition.state.value.kind is ValueKind.POINT
+
+
+def test_shilov_table5_oxide_activities_migrate_with_method_conditions():
+    observations = _observations(
+        "shilov-1998-sno-zno-p2o5-vaporization.yaml",
+        "shilov_1998_table5_",
+    )
+    expected = {
+        ("SnO", "40.0", "single"): "1.42e-4",
+        ("SnO", "46.7", "single"): "2.39e-4",
+        ("SnO", "53.3", "single"): "2.64e-4",
+        ("SnO", "60.0", "single"): "2.69e-4",
+        ("SnO", "66.7", "single"): "3.46e-4",
+        ("ZnO", "0.0", "single"): "4.45e-3",
+        ("ZnO", "40.0", "single"): "4.11e-5",
+        ("ZnO", "46.7", "single"): "2.36e-5",
+        ("ZnO", "53.3", "single"): "1.46e-5",
+        ("ZnO", "60.0", "single"): "1.29e-5",
+        ("P2O5", "0.0", "equations 13 and 14"): "2.61e-4",
+        ("P2O5", "40.0", "equations 13 and 14"): "5.20e-8",
+        ("P2O5", "40.0", "equation 19"): "4.67e-8",
+        ("P2O5", "46.7", "equations 13 and 14"): "4.28e-8",
+        ("P2O5", "46.7", "equation 19"): "5.70e-8",
+        ("P2O5", "53.3", "equations 13 and 14"): "7.84e-8",
+        ("P2O5", "53.3", "equation 19"): "6.25e-8",
+        ("P2O5", "60.0", "equations 13 and 14"): "3.33e-7",
+        ("P2O5", "60.0", "equation 19"): "2.10e-7",
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        conditions = observation.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        composition = conditions["xSnO_mol_pct"]
+        formula = observation.identity.species.formula
+        method = (
+            conditions["calculation_method_as_printed"].state.value
+            if formula == "P2O5"
+            else "single"
+        )
+        key = (formula, str(composition.state.value.point), method)
+        assert key in expected
+        assert observation.identity.quantity.value is Quantity.ACTIVITY
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(expected[key])
+        assert observation.identity.temperature_K.value == Decimal("1300.0")
+        for condition in (temperature, composition):
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table == "5"
+        assert temperature.state.value == Decimal("1300.0")
+        assert composition.state.value.kind is ValueKind.POINT
+        if formula == "P2O5":
+            method_condition = conditions["calculation_method_as_printed"]
+            assert method_condition.state.is_value
+            assert method_condition.locator is not None
+            assert method_condition.locator.table == "5"
