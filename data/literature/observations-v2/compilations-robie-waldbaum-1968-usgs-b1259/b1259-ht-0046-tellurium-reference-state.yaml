@@ -12,10 +12,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -132,10 +132,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -252,10 +252,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -371,11 +371,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +438,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='24.402'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -491,11 +479,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -557,21 +546,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='12.118'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -611,11 +587,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -677,21 +654,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='24.250'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -731,11 +695,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -797,21 +762,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='24.700'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -851,11 +803,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -917,21 +870,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='25.145'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -971,11 +911,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1037,21 +978,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='25.590'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1091,11 +1019,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1157,21 +1086,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='26.040'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1211,11 +1127,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1277,21 +1194,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='26.485'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1331,11 +1235,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1397,21 +1302,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='26.930'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1451,11 +1343,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,21 +1410,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='27.380'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1562,7 +1442,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1452,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1682,7 +1562,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=tellurium-(reference-state):v=80301182fc
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=tellurium-(reference-state):v=80301182fc:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1572,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1802,7 +1682,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=tellurium-(reference-state):v=65bbff9bf1
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=tellurium-(reference-state):v=65bbff9bf1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -1812,10 +1692,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1922,7 +1802,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=tellurium-(reference-state):v=d33b13c02c
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=tellurium-(reference-state):v=d33b13c02c:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -1932,10 +1812,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2042,7 +1922,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=tellurium-(reference-state):v=58f986fba1
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=tellurium-(reference-state):v=58f986fba1:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -2052,10 +1932,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -2171,11 +2051,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2237,21 +2118,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='7.265'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2291,11 +2159,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2357,21 +2226,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='3.085'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2412,10 +2268,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2532,10 +2388,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2652,10 +2508,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2772,10 +2628,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2892,10 +2748,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3011,11 +2867,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3077,21 +2934,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='28.910'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3131,11 +2975,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3197,21 +3042,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='38.644'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3251,11 +3083,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3317,21 +3150,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='38.580'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3371,11 +3191,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3437,21 +3258,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='38.910'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3491,11 +3299,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3557,21 +3366,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='39.220'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3611,11 +3407,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3677,21 +3474,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='39.510'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3731,11 +3515,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3797,21 +3582,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='39.780'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3851,11 +3623,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3917,21 +3690,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='40.280'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3971,11 +3731,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4037,21 +3798,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='40.510'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4082,7 +3830,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=298.15:col=entropy:name=tellurium-(reference-state):v=37bb73cb79
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=298.15:col=entropy:name=tellurium-(reference-state):v=37bb73cb79:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -4092,10 +3840,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4202,7 +3950,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=400:col=entropy:name=tellurium-(reference-state):v=afe900f1e6
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=400:col=entropy:name=tellurium-(reference-state):v=afe900f1e6:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -4212,10 +3960,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4322,7 +4070,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=500:col=entropy:name=tellurium-(reference-state):v=be3174f404
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=500:col=entropy:name=tellurium-(reference-state):v=be3174f404:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -4332,10 +4080,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4442,7 +4190,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=600:col=entropy:name=tellurium-(reference-state):v=18b880b78d
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=600:col=entropy:name=tellurium-(reference-state):v=18b880b78d:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -4452,10 +4200,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4562,7 +4310,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=700:col=entropy:name=tellurium-(reference-state):v=5d9a3ffd84
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:S:shared:T=700:col=entropy:name=tellurium-(reference-state):v=5d9a3ffd84:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -4572,10 +4320,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -4691,11 +4439,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4757,21 +4506,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='23.900'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4811,11 +4547,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4877,21 +4614,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='18.120'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4932,10 +4656,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5052,10 +4776,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5172,10 +4896,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5199,10 +4923,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5334,10 +5058,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5361,10 +5085,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5496,10 +5220,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5523,10 +5247,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5657,11 +5381,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5768,11 +5493,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5795,11 +5521,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -5870,23 +5597,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -5930,11 +5642,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5957,11 +5670,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6032,23 +5746,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6092,11 +5791,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6119,11 +5819,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6194,23 +5895,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6254,11 +5940,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6281,11 +5968,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6356,23 +6044,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6416,11 +6089,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6443,11 +6117,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6518,23 +6193,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6578,11 +6238,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6605,11 +6266,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6680,23 +6342,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6740,11 +6387,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6767,11 +6415,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -6842,23 +6491,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6902,11 +6536,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6929,11 +6564,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -7004,23 +6640,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -7055,7 +6676,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -7065,10 +6686,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7092,10 +6713,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7217,7 +6838,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -7227,10 +6848,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7254,10 +6875,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7379,7 +7000,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -7389,10 +7010,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7416,10 +7037,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7541,7 +7162,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -7551,10 +7172,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7578,10 +7199,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7703,7 +7324,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -7713,10 +7334,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -7740,10 +7361,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -7874,11 +7495,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7986,10 +7608,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8013,10 +7635,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8148,10 +7770,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8175,10 +7797,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8310,10 +7932,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8337,10 +7959,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8472,10 +8094,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8499,10 +8121,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8634,10 +8256,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8661,10 +8283,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8795,11 +8417,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8906,11 +8529,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8933,11 +8557,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9008,23 +8633,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9068,11 +8678,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9095,11 +8706,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9170,23 +8782,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9230,11 +8827,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9257,11 +8855,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9332,23 +8931,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9392,11 +8976,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9419,11 +9004,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9494,23 +9080,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9554,11 +9125,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9581,11 +9153,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9656,23 +9229,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9716,11 +9274,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9743,11 +9302,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9818,23 +9378,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -9878,11 +9423,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9905,11 +9451,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -9980,23 +9527,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -10040,11 +9572,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10067,11 +9600,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -10142,23 +9676,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -10193,7 +9712,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -10203,10 +9722,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10230,10 +9749,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10355,7 +9874,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -10365,10 +9884,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10392,10 +9911,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10517,7 +10036,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -10527,10 +10046,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10554,10 +10073,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10679,7 +10198,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -10689,10 +10208,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10716,10 +10235,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10841,7 +10360,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=tellurium-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -10851,10 +10370,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -10878,10 +10397,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -11012,11 +10531,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11124,10 +10644,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11151,10 +10671,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11286,10 +10806,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11313,10 +10833,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11448,10 +10968,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11475,10 +10995,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11601,10 +11121,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11628,10 +11148,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11754,10 +11274,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11781,10 +11301,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11906,11 +11426,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1262 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12008,11 +11529,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1300 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12035,11 +11557,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1300 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12110,23 +11633,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12161,11 +11669,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1400 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12188,11 +11697,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1400 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12263,23 +11773,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12314,11 +11809,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1500 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12341,11 +11837,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1500 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12416,23 +11913,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12467,11 +11949,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1600 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12494,11 +11977,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1600 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12569,23 +12053,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12620,11 +12089,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1700 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12647,11 +12117,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1700 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12722,23 +12193,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12773,11 +12229,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1800 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12800,11 +12257,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1800 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -12875,23 +12333,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -12926,11 +12369,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1900 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12953,11 +12397,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 1900 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -13028,23 +12473,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -13079,11 +12509,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 2000 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13106,11 +12537,12 @@ observations:
         - species:
             formula: Te
             phase:
-              tag: value
-              value: g
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: unknown
+              reason: B1259 elemental reference-state identity is unresolved at 2000 K
+              rejection_kind: omitted
             charge:
               tag: value
               value: 0
@@ -13181,23 +12613,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 71
-        pdf_page_index: 77
-        table: b1259-ht-0046-tellurium-reference-state
-        note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
-          elemental_reference_state_tables=Te=B1259 reference-state table p.71/PDF p.77 (phase sentence says 1260 K; table
-          break 1262 K)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json
-        record: b1259-ht-0046-tellurium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -13223,7 +12640,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=tellurium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=tellurium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -13233,10 +12650,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13260,10 +12677,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13376,7 +12793,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=tellurium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=tellurium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -13386,10 +12803,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13413,10 +12830,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13529,7 +12946,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=tellurium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=tellurium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -13539,10 +12956,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13566,10 +12983,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13682,7 +13099,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=tellurium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=tellurium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -13692,10 +13109,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13719,10 +13136,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13835,7 +13252,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=tellurium-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=tellurium-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0046-tellurium-reference-state:tabulation
   identity:
     quantity:
@@ -13845,10 +13262,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -13872,10 +13289,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13997,11 +13414,12 @@ observations:
     species:
       formula: Te
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 723 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -14100,10 +13518,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -14127,10 +13545,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -14253,10 +13671,10 @@ observations:
       formula: Te
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -14280,10 +13698,10 @@ observations:
             formula: Te
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
