@@ -1609,7 +1609,7 @@ def _unverified_apparatus_notices(
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
-        and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and quantity is Quantity.ACTIVITY
         and author_reported_activity
         and typed_condensed_reference
     )
@@ -1619,7 +1619,7 @@ def _unverified_apparatus_notices(
     ):
         return ()
     comparison_activity = (
-        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        quantity is Quantity.ACTIVITY
         and author_reported_activity
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
@@ -1644,7 +1644,7 @@ def _unverified_apparatus_notices(
         and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
-        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        quantity is Quantity.ACTIVITY
         and author_reported_activity
         and _has_calibration_not_grounded(gates.checks)
     )

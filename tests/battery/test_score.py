@@ -4327,6 +4327,12 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
         review="reviewed",
     )
 
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+        return
+
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.score_eligible is False
@@ -4631,6 +4637,40 @@ def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
     assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
+def test_comparison_ratio_does_not_flag_unverified_activity_coefficient_regime() -> None:
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    experiment = F.kems_experiment(
+        orifice_area=Decimal("3.14e-7"),
+        clausing=Decimal("0.9"),
+        kn=None,
+        calibrated=True,
+    )
+    reference = replace(
+        F.observation(
+            "comparison-activity-coefficient-unverified-regime",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+    )
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
 @pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )
@@ -4662,6 +4702,20 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
         ),
     )
     gates = run_validity_gates(experiment, reference)
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        assert gates.passed is False
+        assert gates.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        residual, _ = _compile(
+            reference,
+            experiment,
+            _predict(Decimal("0.2"), identity),
+            review="reviewed",
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        return
+
     calibration_check = next(
         check for check in gates.checks if check.name == "kems_calibration"
     )
