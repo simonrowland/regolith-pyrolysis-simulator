@@ -23,6 +23,22 @@ extraction:
   date: '2026-10-28'
   worker: refr-figs
 review_status: draft
+fidelity_samples:
+- path: species.Ca.observations[shornikov_2025_fig1_typeA_Ca_digitized].values.points[0].pressure_atm
+  value: "4.5e-8"
+  locator:
+    figure: '1'
+    published_page: 120
+    pdf_page_index: 3
+    note: >-
+      A-Ca-01, filled circle, partial pressure of Ca on Fig. 1 panel A
+      (published p. 120). Crop pixel centres (790.90, 1419.47) and
+      (791.00, 1419.00); crop origin (400, 3650) on the 600 dpi render.
+      Panel A ticks: 1800 K at 377 px, 2000 K at 807 px, 2200 K at 1236.5 px,
+      2400 K at 1666 px, and 2600 K at 2095.5 px. Ordinate ticks: lg p of -5
+      at 487 px, -6 at 884 px, and -7 at 1281.5 px. The fit is
+      T_K = 0.46554932300556573*x_px + 1624.3948170359188 and
+      lg p = -0.002517306149736147*y_px - 3.7742818126082898.
 experiments:
   - experiment_id: shornikov-2025-efremovka-cai-kems
     kind: kems
@@ -67,7 +83,7 @@ species:
   Ca:
     observations:
     - observation_id: shornikov_2025_fig1_typeA_Ca_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'A'
@@ -110,7 +126,7 @@ species:
         note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
 
     - observation_id: shornikov_2025_fig1_typeB_Ca_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'B'
@@ -195,7 +211,7 @@ species:
   Mg:
     observations:
     - observation_id: shornikov_2025_fig1_typeA_Mg_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'A'
@@ -236,7 +252,7 @@ species:
         note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
 
     - observation_id: shornikov_2025_fig1_typeB_Mg_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'B'
@@ -279,7 +295,7 @@ species:
   Al:
     observations:
     - observation_id: shornikov_2025_fig1_typeA_Al_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'A'
@@ -318,7 +334,7 @@ species:
         note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
 
     - observation_id: shornikov_2025_fig1_typeB_Al_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'B'
@@ -361,7 +377,7 @@ species:
   SiO:
     observations:
     - observation_id: shornikov_2025_fig1_typeA_SiO_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'A'
@@ -406,7 +422,7 @@ species:
         note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
 
     - observation_id: shornikov_2025_fig1_typeB_SiO_digitized
-      type: psat_series
+      type: partial_pressure
       locator:
         figure: '1'
         panel: 'B'

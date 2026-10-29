@@ -35,7 +35,7 @@ SHORNIKOV_PINS = {
 STOLYAROVA_PINS = {
     "A-1-01": ("CaO", "1659.85", "0.99", "2327.00", "1312.00", "2326.63", "1311.40"),
     "E-1-01": ("Al2O3", "1659.85", "0.0013", "1969.00", "3062.00", "1968.76", "3062.20"),
-    "J-2-04": ("SiO2", "1464.85", "0.34", "3064.00", "1220.00", "3070.66", "1238.29"),
+    "J-2-04": ("SiO2", "1464.85", "0.31", "3064.00", "1220.00", "3070.66", "1238.29"),
 }
 
 
@@ -152,7 +152,7 @@ def test_refractory_figure_csvs_match_extracts_and_a_doubled_value_fails() -> No
 
     mutated_rows = deepcopy(stolyarova_rows)
     flagged = next(row for row in mutated_rows if row["point_id"] == "J-2-04")
-    flagged["stored_activity"] = "0.68"
+    flagged["stored_activity"] = "0.62"
     with pytest.raises(AssertionError):
         _assert_figure_reads(shornikov, shornikov_rows, stolyarova, mutated_rows)
 
