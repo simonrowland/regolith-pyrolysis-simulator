@@ -10926,6 +10926,7 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
         }:
             bound = _named_fraction_bound_selection(
                 payload, key, units, condition_ranges
@@ -18461,6 +18462,12 @@ class Migrator:
         for prose_item in lineage_errors:
             self._queue_printed_lineage(prose_item, **flag_kwargs)
         yield_key, yield_items = _yield_table_items(values)
+        has_non_yield_point_containers = any(
+            key != yield_key
+            and isinstance(values.get(key), list)
+            and values[key]
+            for key in ("points", "tests")
+        )
         if (
             yield_items is None
             and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -18572,6 +18579,7 @@ class Migrator:
             if (
                 self._count(source_key).observations_out > before
                 and q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+                and not has_non_yield_point_containers
             ):
                 return
         if (
@@ -18714,19 +18722,24 @@ class Migrator:
                 and printed_fit_rows
             ):
                 row_point_containers.append(("rows_as_printed", printed_fit_rows))
-            if yield_items is None:
-                point_items = values.get("points")
-                if isinstance(point_items, list) and point_items:
-                    row_point_containers.append(("points", point_items))
-                test_items = values.get("tests")
-                if isinstance(test_items, list) and test_items:
-                    row_point_containers.append(("tests", test_items))
+            for container_name in ("points", "tests"):
+                point_items = values.get(container_name)
+                if (
+                    container_name != yield_key
+                    and isinstance(point_items, list)
+                    and point_items
+                ):
+                    row_point_containers.append((container_name, point_items))
         if (
             exploded
-            and isinstance(values.get("series"), list)
+            and (
+                isinstance(values.get("series"), list)
+                or isinstance(values.get("tabulated_delta_fG_kJ_mol"), list)
+            )
             and not _parent_bound_categorical(value_sel)
         ):
             before = self._count(source_key).observations_out
+            children_carry_values = True
             for item in exploded:
                 # A series item's own derived_from names that row's parents.
                 # The parent observation's list remains the fallback when the
@@ -18765,7 +18778,7 @@ class Migrator:
                             stored_lineage=set(point_derived_from or ()),
                             queued=queued_prose,
                         )
-                self._emit_exploded_point(
+                child_carries_value = self._emit_exploded_point(
                     parent_id=obs_id,
                     item=item,
                     work=work,
@@ -18777,7 +18790,11 @@ class Migrator:
                     evidence=evidence,
                     admission=admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
-                    units=str(obs.get("units") or ""),
+                    units=str(
+                        item.get("units")
+                        or obs.get("units")
+                        or ""
+                    ),
                     read_from=read_from,
                     derived_from=point_derived_from,
                     source_derivation=point_source_derivation,
@@ -18797,17 +18814,28 @@ class Migrator:
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
                 )
-            if self._count(source_key).observations_out > before:
-                return
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["value"],
-                value_sel.reason
-                or "printed series had no numeric coordinate/value pairs; parent retained",
-                source=source_key,
-                observation_id=obs_id,
+                if not child_carries_value:
+                    children_carry_values = False
+            emitted_count = self._count(source_key).observations_out - before
+            all_children_emitted = emitted_count == len(exploded)
+            is_tabulated_delta_fg = isinstance(
+                values.get("tabulated_delta_fG_kJ_mol"), list
             )
+            if emitted_count and (
+                not is_tabulated_delta_fg
+                or (children_carry_values and all_children_emitted)
+            ):
+                return
+            if not all_children_emitted:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["value"],
+                    value_sel.reason
+                    or "printed series had no numeric coordinate/value pairs; parent retained",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
         elif row_point_containers and (
             not _parent_bound_categorical(value_sel)
             or any(name in {"points", "tests"} for name, _items in row_point_containers)
@@ -18864,47 +18892,21 @@ class Migrator:
                         point_value = select_declared_source(
                             q_token, str(obs.get("units") or ""), raw
                         )
-                        condition_fields = {
-                            "T",
-                            "T_K",
-                            "T_C",
-                            "Tmax_C",
-                            "temperature_K",
-                            "temperature_C",
-                            "locator",
-                            "composition_basis",
-                        }
-                        raw_range = raw.get("range")
-                        has_numeric_range = (
-                            q_token
-                            in {
-                                Quantity.DENSITY,
-                                Quantity.EVAPORATION_RATE,
-                                Quantity.MASS_LOSS_RATE,
-                            }
-                            and isinstance(raw_range, (list, tuple))
-                            and len(raw_range) >= 2
-                            and all(
-                                _as_dec_or_none(bound) is not None
-                                for bound in raw_range[:2]
+                        value_payload = raw.get("value")
+                        source_unavailable_reason = (
+                            raw.get("omitted_reason")
+                            or raw.get("unavailable_reason")
+                            or raw.get("reason")
+                            or (
+                                value_payload.get("unavailable_reason")
+                                if isinstance(value_payload, Mapping)
+                                else None
                             )
                         )
-                        has_numeric_value = (
-                            point_value.available
-                            or has_numeric_range
-                            or any(
-                                key not in condition_fields
-                                and not str(key).endswith("_as_printed")
-                                and not (
-                                    str(key).startswith("N_")
-                                    and raw.get("composition_basis")
-                                    == "mole_fraction"
-                                )
-                                and _numeric_field(raw, str(key)) is not None
-                                for key in raw
-                            )
-                        )
-                        if not has_numeric_value:
+                        if (
+                            not point_value.available
+                            and source_unavailable_reason not in (None, "")
+                        ):
                             point_locator = (
                                 locator_from_mapping(
                                     raw.get("locator"),
@@ -18912,16 +18914,22 @@ class Migrator:
                                 )
                                 or locator
                             )
+                            printed_value = (
+                                raw.get("value_as_published")
+                                or raw.get("value_as_printed")
+                            )
+                            reason = (
+                                source_unavailable_reason
+                                or point_value.reason
+                                or "point has no declared value; no observation emitted"
+                            )
+                            if printed_value not in (None, ""):
+                                reason = f"printed {printed_value!r}; {reason}"
                             self.result.add_queue(
                                 work.work_id,
                                 point_locator,
                                 ["value"],
-                                str(
-                                    raw.get("omitted_reason")
-                                    or raw.get("reason")
-                                    or point_value.reason
-                                    or "point has no numeric value; no observation emitted"
-                                ),
+                                str(reason),
                                 source=source_key,
                                 observation_id=(
                                     f"{obs_id}::point:{container_name}:{index}"
@@ -19480,7 +19488,7 @@ class Migrator:
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
-    ) -> None:
+    ) -> bool:
         raw_item = item.get("item")
         index = item.get("index", 0)
         row_method_class = (
@@ -20846,6 +20854,7 @@ class Migrator:
         children = self._exploded_children.setdefault(parent_id, [])
         if point_id not in children:
             children.append(point_id)
+        return emitted.kind is not ValueKind.UNAVAILABLE
 
     def _queue_unstated_derived_lineage(
         self,
