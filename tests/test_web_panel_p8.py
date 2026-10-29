@@ -241,6 +241,36 @@ def test_present_rollup_renders_emitted_depth_and_escapes() -> None:
     assert "<warning>" not in html
 
 
+def test_partial_product_allocations_render_status_and_exclusions() -> None:
+    artifact = _full_artifact()
+    allocation = artifact["terminal"]["run_metadata"][
+        "cost_rollup_diagnostic"
+    ]["product_costs"]["process.cleaned_melt:SiO2"]
+    allocation.update({
+        "status": "partial",
+        "flag": {"status": "partial", "total_basis": "lower_bound"},
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": "unbounded",
+        }],
+    })
+
+    products = _between(
+        _render_panel(artifact)["html"],
+        "<summary>Product allocations</summary>",
+        "<summary>Active inventory allocations</summary>",
+    )
+
+    assert "partial" in products
+    assert "lower_bound" in products
+    assert "Si" in products
+    assert "process.cleaned_melt" in products
+    assert "missing LJ row" in products
+    assert "unbounded" in products
+
+
 def test_absent_rollup_stays_pending() -> None:
     html = _render_panel({"header": {}, "terminal": {}})["html"]
 

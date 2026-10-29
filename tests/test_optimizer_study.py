@@ -3689,8 +3689,48 @@ def test_parallel_composition_target_stub_study_completes(
         seed=0,
     )
 
-    assert result.winner is not None
-    assert (tmp_path / "study" / "pareto.json").exists()
+    pareto_path = tmp_path / "study" / "pareto.json"
+    assert pareto_path.exists()
+    payload = json.loads(pareto_path.read_text())
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert payload["status"] == "completed-no-feasible-winner"
+    assert payload["winner_candidate_id"] is None
+    assert payload["pareto"] == []
+    assert result.records
+    assert all(record.feasible for record in result.records)
+
+    # t-1368 owns the missing SiO wall-pressure rail; until it lands, these
+    # candidates must remain unpriced and cannot restore a study winner.
+    for candidate in result.records:
+        summary = candidate.product_summary
+        assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+        refusal = summary["wall_deposit_refusal"]
+        authority = refusal["authority"]
+        assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+        assert "SiO" in authority["wall_saturation_pressure_refused_species"]
+        sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
+            "SiO"
+        ]
+        assert sio_refusals
+        assert all(
+            record["status"] == "refused"
+            for record in sio_refusals.values()
+        )
+
+        wall_authority = summary["wall_deposit_sticking_authority"]
+        fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
+        assert any(
+            record.get("alpha_s", 0.0) == pytest.approx(0.02)
+            and record.get("alpha_s_extrapolation_notice", {}).get(
+                "authority_level"
+            ) == "extrapolated"
+            and record["alpha_s_extrapolation_notice"].get(
+                "temperature_used_K"
+            ) == pytest.approx(1523.15)
+            for record in fe_records
+        )
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
@@ -6789,7 +6829,7 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

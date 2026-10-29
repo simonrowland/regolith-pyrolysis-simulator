@@ -37,6 +37,7 @@ from simulator.optimize.results_store import (
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
+    _serialize_objectives,
     _serialize_margins,
     grounded_result_feasible,
     reground_scored_result,
@@ -137,6 +138,32 @@ def _objectives(oxygen: float = 10.0, energy: float = 2.0) -> ObjectiveVector:
             ObjectiveValue("energy_kWh", "minimize", energy, "kWh", ordinal=1),
         )
     )
+
+
+def test_numeric_partial_objective_status_survives_result_serialization():
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    objectives = ObjectiveVector(
+        (ObjectiveValue("metals_total_kg", "maximize", 8.5, "kg"),),
+        evidence={
+            "metals_total_kg": {
+                "value_status": "partial",
+                "availability_flag": {"status": "partial"},
+                "excluded": excluded,
+                "total_basis": "lower_bound",
+            }
+        },
+    )
+
+    serialized = _serialize_objectives(objectives)[0]
+
+    assert serialized["value"] == 8.5
+    assert serialized["value_status"] == "partial"
+    assert serialized["evidence"]["excluded"] == excluded
 
 
 def _admissible_trace(payload: Mapping[str, object] | None = None) -> dict[str, object]:

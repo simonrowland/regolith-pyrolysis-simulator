@@ -30,6 +30,7 @@ from simulator.diagnostics import (
     coating_summary_with_grounded_authority,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -1475,6 +1476,10 @@ def _migrate_objective_values_v5(conn: sqlite3.Connection) -> None:
 
 
 def _objective_value_status(value: Any, evidence: Any) -> str:
+    if isinstance(evidence, Mapping):
+        evidence_status = evidence.get("value_status")
+        if evidence_status == "partial":
+            return "partial"
     if value is not None:
         return "available"
     if isinstance(evidence, Mapping):
@@ -1638,9 +1643,11 @@ def _coating_margin_grounded_authority(
             {},
             status_payload,
         )
-        if zero_deposit_authority.get(
-            "wall_saturation_pressure_refused_species"
-        ):
+        availability = wall_deposit_figure_availability(
+            has_positive_deposit=False,
+            authority=zero_deposit_authority,
+        )
+        if availability.status == "refused":
             return zero_deposit_authority
         return None
     wall_deposit = {species: 1.0 for species in deposited_species}

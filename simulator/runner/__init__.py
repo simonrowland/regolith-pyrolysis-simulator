@@ -101,6 +101,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     evaluate_vacuum_pyrolysis_comparison,
@@ -1572,13 +1573,14 @@ class PyrolysisRun:
             lambda: _json_safe(
                 {
                     **build_cost_rollup_diagnostic(
+                        sim=sim,
                         cost_ledger=sim.cost_ledger,
                         per_hour=execution.per_hour,
                         products_kg=sim.product_ledger(),
                         pumping_context=pumping_context_from_sim(
                             sim, execution.snapshots
                         ),
-                        snapshots=execution.snapshots,
+                        snapshots=tuple(sim.record.snapshots),
                     ),
                     "price_basis": (
                         "legacy_placeholder_awaiting_owner_ratification"
@@ -1748,6 +1750,7 @@ class PyrolysisRun:
                     existing_by_segment_species_kg=(
                         _nested_species_kg_from_segment_species(existing_before)
                     ),
+                    authority=execution.trace.wall_deposit_sticking_authority,
                 )
                 summary = final_summary
                 if not (
@@ -4086,10 +4089,25 @@ def _wall_fouling_report(
         and threshold_kg > 0.0
     )
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    authority = wall_deposit_sticking_authority_status(
+        wall_deposit_kg,
+        alpha_notice or {},
+    )
+    authoritative = bool(authority.get("authoritative_for_resinter", True))
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_wall_load_kg > 0.0,
+        authority=authority,
+    )
+    wall_deposit_unavailable = availability.status == "refused"
     campaigns_by_segment: dict[str, float | str] = {}
-    aggregate_campaigns_to_resinter: float | str = "infinite"
-    if total_wall_load_kg <= 0.0:
-        campaigns_to_resinter: float | str = "infinite"
+    campaigns_to_resinter: float | str | None
+    aggregate_campaigns_to_resinter: float | str | None = "infinite"
+    if wall_deposit_unavailable:
+        campaigns_to_resinter = None
+        aggregate_campaigns_to_resinter = None
+        verdict = "non-authoritative"
+    elif total_wall_load_kg <= 0.0:
+        campaigns_to_resinter = "infinite"
         verdict = "slow-fouling"
     elif not threshold_is_qualified:
         controlling_segment_load_kg = max(
@@ -4126,19 +4144,22 @@ def _wall_fouling_report(
             if campaigns_to_resinter < fast_n
             else "slow-fouling"
         )
-    authority = wall_deposit_sticking_authority_status(
-        wall_deposit_kg,
-        alpha_notice or {},
-    )
-    authoritative = bool(authority.get("authoritative_for_resinter", True))
-    nominal_verdict = verdict
-    if not authoritative:
+    nominal_verdict = None if wall_deposit_unavailable else verdict
+    if not authoritative and not wall_deposit_unavailable:
         verdict = "non-authoritative"
-    return {
+    report = {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
-        "dominant_species_wall_deposit_kg": _clean_report_float(dominant_kg),
-        "wall_deposit_kg_per_campaign": _clean_report_float(total_wall_load_kg),
+        "dominant_species_wall_deposit_kg": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(dominant_kg)
+        ),
+        "wall_deposit_kg_per_campaign": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(total_wall_load_kg)
+        ),
         "wall_deposit_basis": "total_wall_load_by_species",
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
@@ -4156,12 +4177,41 @@ def _wall_fouling_report(
         "nominal_verdict": nominal_verdict,
         "verdict": verdict,
     }
+    if availability.refusal is not None:
+        refusal = availability.refusal
+        refusal_authority = refusal["authority"]
+        report["refusal"] = {
+            "reason": (
+                "Zero wall deposition cannot be certified from "
+                "non-authoritative wall-routing evidence."
+            ),
+            "code": refusal_authority["code"],
+            "authoritative": refusal_authority["authoritative"],
+            "authoritative_for_deposit_mass": (
+                refusal_authority["authoritative_for_deposit_mass"]
+            ),
+            "authoritative_for_coating": (
+                refusal_authority["authoritative_for_coating"]
+            ),
+            "authoritative_for_resinter": (
+                refusal_authority["authoritative_for_resinter"]
+            ),
+            "severity": refusal_authority["severity"],
+            "output_status": refusal_authority["output_status"],
+            "refusal_events": refusal["refusal_events"],
+            "affected_species": refusal_authority.get(
+                "wall_saturation_pressure_refused_species", []
+            ),
+            "authority_detail_path": "fouling_rate.sticking_alpha_authority",
+        }
+    return report
 
 
 def _wall_fouling_lifespan_report(
     *,
     per_campaign_by_segment_species_kg: Mapping[str, Mapping[str, float]],
     existing_by_segment_species_kg: Mapping[str, Mapping[str, float]],
+    authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return INFO-only remaining-life projection from execution-local rates."""
 
@@ -4176,6 +4226,11 @@ def _wall_fouling_lifespan_report(
         for segment, species_kg in existing_by_segment_species_kg.items()
     }
     total_per_campaign = sum(per_segment.values())
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_per_campaign > 0.0,
+        authority=authority,
+    )
+    refused = availability.status == "refused"
     controlling_segment: str | None = None
     threshold = cfg.get("resinter_threshold_kg")
     threshold_kg = None if threshold is None else float(threshold)
@@ -4185,7 +4240,10 @@ def _wall_fouling_lifespan_report(
         and threshold_kg > 0.0
     )
     campaigns_by_segment: dict[str, float | str] = {}
-    if total_per_campaign <= 0.0:
+    if refused:
+        campaigns_to_resinter = None
+        nominal_verdict = None
+    elif total_per_campaign <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         nominal_verdict = "slow-fouling"
     elif threshold_qualified:
@@ -4224,12 +4282,14 @@ def _wall_fouling_lifespan_report(
             f"< {cfg['fast_fouling_campaign_threshold']}, else slow-fouling"
         )
 
-    return {
+    report = {
         "input_basis": "execution_local_committed_rate_per_campaign",
         "liner_material": cfg["liner_material"],
         "controlling_segment": controlling_segment,
-        "wall_deposit_kg_per_campaign": _clean_report_float(
-            total_per_campaign
+        "wall_deposit_kg_per_campaign": (
+            None
+            if refused
+            else _clean_report_float(total_per_campaign)
         ),
         "existing_wall_load_kg_by_segment": {
             key: _clean_report_float(value)
@@ -4256,6 +4316,9 @@ def _wall_fouling_lifespan_report(
         "verdict_authoritative": False,
         "authoritative_for_selection": False,
     }
+    if availability.refusal is not None:
+        report["refusal"] = availability.refusal
+    return report
 
 
 def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],

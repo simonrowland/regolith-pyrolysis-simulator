@@ -272,6 +272,133 @@ def test_p11_shows_engine_commissioning_next_to_unchanged_class_totals() -> None
     )
 
 
+def test_p11_renders_partial_product_flag_and_excluded_quantity() -> None:
+    block, classification = _lunar()
+    bucket = classification["metals_plus_O2"]
+    bucket.update({
+        "status": "partial",
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": 0.5617,
+            "upper_bound_basis": "conservative_ledger_bound",
+        }],
+        "flag": {
+            "status": "partial",
+            "authority": "unavailable",
+            "reason": "Si transport refused",
+        },
+    })
+    card = _card(_render(_wrapped(block)), "metals")
+    visible = _visible(card)
+    assert "partial" in visible
+    assert "Si via process.cleaned_melt" in visible
+    assert "up to 0.562 kg (conservative upper bound)" in visible
+
+
+def test_p11_rounds_conservative_bounds_outward_to_three_significant_digits() -> None:
+    block, classification = _lunar()
+    bucket = classification["metals_plus_O2"]
+    bucket.update({
+        "status": "partial",
+        "excluded": [
+            {
+                "species": "Si",
+                "account": "process.cleaned_melt",
+                "upper_bound_kg": 0.12000000000000001,
+            },
+            {
+                "species": "Al",
+                "account": "process.cleaned_melt",
+                "upper_bound_kg": 0.5617,
+            },
+            {
+                "species": "Mg",
+                "account": "process.cleaned_melt",
+                "upper_bound_kg": 0.562,
+            },
+            {
+                "species": "Ca",
+                "account": "process.cleaned_melt",
+                "upper_bound_kg": 1234.56,
+            },
+        ],
+        "flag": {
+            "status": "partial",
+            "authority": "unavailable",
+            "reason": "transport refused",
+        },
+    })
+
+    card = _card(_render(_wrapped(block)), "metals")
+    visible = _visible(card)
+
+    assert (
+        "Si via process.cleaned_melt (up to 0.121 kg (conservative upper bound))"
+        in visible
+    )
+    assert (
+        "Al via process.cleaned_melt (up to 0.562 kg (conservative upper bound))"
+        in visible
+    )
+    assert (
+        "Mg via process.cleaned_melt (up to 0.562 kg (conservative upper bound))"
+        in visible
+    )
+    assert (
+        "Ca via process.cleaned_melt (up to 1,240 kg (conservative upper bound))"
+        in visible
+    )
+
+
+def test_p11_renders_availability_flag_without_other_flag() -> None:
+    block, classification = _lunar()
+    bucket = classification["refractory_ceramic_rump"]
+    bucket["availability_flag"] = {
+        "status": "partial",
+        "reason": "Si transport refused",
+    }
+    bucket["excluded"] = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    bucket["estimated_contributions"] = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
+    card = _card(_render(_wrapped(block)), "rump")
+    visible = _visible(card)
+
+    assert "partial" in visible
+    assert "Si via process.cleaned_melt" in visible
+    assert "unbounded kg bound" in visible
+    assert "includes estimated transport for SiO" in visible
+
+
+def test_p11_renders_estimates_for_available_class_without_status_flag() -> None:
+    block, classification = _mars()
+    bucket = classification["metals_plus_O2"]
+    bucket["status"] = "available"
+    bucket.pop("flag", None)
+    bucket.pop("availability_flag", None)
+    bucket["excluded"] = []
+    bucket["estimated_contributions"] = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
+
+    visible = _visible(_card(_render(_wrapped(block)), "metals"))
+
+    assert "includes estimated transport for SiO" in visible
+
+
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
     block, classification = _mars()
     html = _render(_wrapped(block))
