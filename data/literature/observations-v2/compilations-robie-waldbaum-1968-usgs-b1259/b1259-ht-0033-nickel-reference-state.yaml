@@ -962,7 +962,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=5d41c78126:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=5d41c78126
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -971,11 +971,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1037,21 +1038,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='11.359'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1082,7 +1070,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=a8c8f73dd8:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1726:col=H_minus_H298:name=nickel-(reference-state):v=a8c8f73dd8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -1091,11 +1079,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1157,21 +1146,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='15.535'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1202,7 +1178,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=nickel-(reference-state):v=78e65b6c2f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=nickel-(reference-state):v=78e65b6c2f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -1212,10 +1188,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1322,7 +1298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=nickel-(reference-state):v=717c5b4b4b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=nickel-(reference-state):v=717c5b4b4b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -1332,10 +1308,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1442,7 +1418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=nickel-(reference-state):v=c4b8c1c835:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=nickel-(reference-state):v=c4b8c1c835
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -1452,10 +1428,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2042,7 +2018,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=631:col=H_minus_H298:name=nickel-(reference-state):v=13aee2b611:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:H_minus_H298:shared:T=631:col=H_minus_H298:name=nickel-(reference-state):v=13aee2b611
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -2051,11 +2027,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2117,21 +2094,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='2.423'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3482,7 +3446,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=74d6b9aa7e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=74d6b9aa7e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -3491,11 +3455,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3557,21 +3522,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='23.020'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3602,7 +3554,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=81a9b6d933:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1726:col=entropy:name=nickel-(reference-state):v=81a9b6d933
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -3611,11 +3563,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3677,21 +3630,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='20.600'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3722,7 +3662,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1800:col=entropy:name=nickel-(reference-state):v=dd09361c9b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1800:col=entropy:name=nickel-(reference-state):v=dd09361c9b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -3732,10 +3672,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3842,7 +3782,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1900:col=entropy:name=nickel-(reference-state):v=b15600eb24:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=1900:col=entropy:name=nickel-(reference-state):v=b15600eb24
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -3852,10 +3792,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3962,7 +3902,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=2000:col=entropy:name=nickel-(reference-state):v=83df054a57:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=2000:col=entropy:name=nickel-(reference-state):v=83df054a57
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -3972,10 +3912,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4562,7 +4502,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=631:col=entropy:name=nickel-(reference-state):v=803fb1fb90:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:S:shared:T=631:col=entropy:name=nickel-(reference-state):v=803fb1fb90
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -4571,11 +4511,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4637,21 +4578,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 58
-        pdf_page_index: 64
-        table: b1259-ht-0033-nickel-reference-state
-        note: as_published='12.500'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json
-        record: b1259-ht-0033-nickel-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -6338,7 +6266,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1726:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1726:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -6347,11 +6275,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6449,7 +6378,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -6459,10 +6388,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6486,10 +6415,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6611,7 +6540,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -6621,10 +6550,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6648,10 +6577,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6773,7 +6702,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -6783,10 +6712,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6810,10 +6739,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7583,7 +7512,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=631:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fG:from_the_elements:T=631:col=delta_f_G:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -7592,11 +7521,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9476,7 +9406,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1726:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1726:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -9485,11 +9415,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9587,7 +9518,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -9597,10 +9528,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9624,10 +9555,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9749,7 +9680,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -9759,10 +9690,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9786,10 +9717,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9911,7 +9842,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -9921,10 +9852,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9948,10 +9879,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10721,7 +10652,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=631:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:delta_fH:from_the_elements:T=631:col=delta_f_H:name=nickel-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -10730,11 +10661,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12542,7 +12474,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1726:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1726:col=log_Kf:name=nickel-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -12551,11 +12483,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1726 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12644,7 +12577,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=nickel-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -12654,10 +12587,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12681,10 +12614,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12797,7 +12730,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=nickel-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -12807,10 +12740,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12834,10 +12767,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12950,7 +12883,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=nickel-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -12960,10 +12893,10 @@ observations:
       formula: Ni
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12987,10 +12920,10 @@ observations:
             formula: Ni
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13715,7 +13648,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=631:col=log_Kf:name=nickel-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:log10_Kf:from_the_elements:T=631:col=log_Kf:name=nickel-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0033-nickel-reference-state:tabulation
   identity:
     quantity:
@@ -13724,11 +13657,12 @@ observations:
     species:
       formula: Ni
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 631 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0

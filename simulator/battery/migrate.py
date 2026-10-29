@@ -218,6 +218,12 @@ OBSERVATIONS_V2_DIR = LITERATURE / "observations-v2"
 BATTERY_DIR = REPO_ROOT / "data" / "battery"
 
 
+def iter_work_store_paths(directory: Path) -> list[Path]:
+    """Return all works YAML paths, including the alias registry."""
+
+    return sorted(directory.glob("*.yaml"))
+
+
 def iter_observation_store_paths(
     directory: Path,
     pattern: str = "*.yaml",
@@ -2893,7 +2899,7 @@ def load_migrated_store(
     experiments: dict[str, Experiment] = {}
     observations: dict[str, Observation] = {}
     works_dir = root / "data" / "literature" / "works"
-    for path in sorted(works_dir.glob("*.yaml")):
+    for path in iter_work_store_paths(works_dir):
         if path.name == "ALIASES.yaml":
             continue
         doc = load_yaml(path)
@@ -23665,7 +23671,7 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
 
     live_work_files = {work_filename(wid) for wid in live_work_ids}
     live_work_files.add("ALIASES.yaml")
-    for path in works_dir.glob("*.yaml"):
+    for path in iter_work_store_paths(works_dir):
         if path.name not in live_work_files:
             path.unlink()
 
