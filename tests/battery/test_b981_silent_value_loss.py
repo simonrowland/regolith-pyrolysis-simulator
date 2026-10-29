@@ -486,3 +486,41 @@ def test_janaf_mixed_units_recover_298k_formation_gibbs_values():
         assert condition.state.value.kind is ValueKind.POINT
         assert condition.state.value.point == Decimal("298.15")
         assert condition.locator is not None
+
+
+def test_steurer_table10_exact_pressure_cells_migrate_with_temperature():
+    observations = _observations(
+        "steurer-1992-vapor-phase-pyrolysis.yaml",
+        "steurer_1992_table10_mixture_psat",
+    )
+    expected = {
+        ("O2", Decimal("2000.0")): Decimal("0.32"),
+        ("O2", Decimal("2500.0")): Decimal("150"),
+        ("O2", Decimal("3000.0")): Decimal("8100"),
+        ("AlO", Decimal("3000.0")): Decimal("1.8"),
+        ("AlO2", Decimal("3000.0")): Decimal("5.8"),
+        ("SiO", Decimal("2000.0")): Decimal("0.65"),
+        ("SiO", Decimal("2500.0")): Decimal("300"),
+        ("SiO", Decimal("3000.0")): Decimal("16000"),
+        ("SiO2", Decimal("2500.0")): Decimal("14"),
+        ("SiO2", Decimal("3000.0")): Decimal("1100"),
+        ("TiO", Decimal("2500.0")): Decimal("0.1"),
+        ("TiO", Decimal("3000.0")): Decimal("10"),
+        ("TiO2", Decimal("3000.0")): Decimal("1.3"),
+        ("FeO", Decimal("2000.0")): Decimal("0.1"),
+        ("FeO", Decimal("2500.0")): Decimal("20"),
+        ("FeO", Decimal("3000.0")): Decimal("590"),
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        key = (observation.identity.species.formula, observation.identity.temperature_K.value)
+        assert key in expected
+        assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected[key]
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == key[1]
+        assert temperature.locator is not None
+        assert temperature.locator.table == "10"
