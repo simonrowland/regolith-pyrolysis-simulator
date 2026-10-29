@@ -20,7 +20,121 @@ extraction:
     stored. The readings are not converted, because the schema has
     no quantity token for dimensionless ΔfG/RT. Other curves remain figure-only. Axis
     calibration and raw pixel reads are in
-    crown4-1018-figure-read-audit.md.
+    crown4-1018-figure-read-audit.md. Figure 2 tick fits and legend glyphs
+    are recorded under figure_axis_calibration. Stored activity rows are unchanged.
+  figure_axis_calibration:
+    figure: '2'
+    published_page: 327
+    pdf_page_index: 5
+    native_image_px: [1300, 2000]
+    page_pixel_dpi: 600
+    native_image_ppi: 72
+    tick_y: darkness-weighted centroid of the horizontal tick stroke on the native scan
+    tick_x: vertical stub just below the axis on the native scan
+    y_mapping: linear
+    y_equation: 'log10(activity) = intercept + slope_per_native_px * y_native'
+    x_mapping: linear
+    x_equation: 'mole_percent_SiO2 = intercept + slope_per_native_px * x_native'
+    residual_px: '(printed_value - fitted_value) / slope_per_native_px'
+    glyph_width_native_px:
+      a: 15
+      b: 16
+      c: 15
+    read_uncertainty: half the legend glyph width of that panel in data units
+    pinned_read:
+      audit_read_id: shornikov_2001_f2_mgo_ma_s_2050k-03
+      curve_as_printed: '1'
+      glyph: filled upward triangles
+      panel: a
+    legend:
+      - curves: ['1', '4', '7']
+        glyph: filled upward triangles
+        series: this study
+        digitized: true
+      - curves: ['2', '5', '8']
+        glyph: filled squares
+        series: comparative
+        digitized: false
+      - curves: ['3', '6', '9']
+        glyph: filled inverted triangles
+        series: comparative
+        digitized: false
+    panels:
+      a:
+        y:
+          quantity: log10_activity
+          intercept: 1.05305046
+          slope_per_native_px: -0.01260856
+          residual_rms_px: 0.4659
+          ticks:
+            - {label: 0, y_native: 83.031, residual_px: 0.488}
+            - {label: -1, y_native: 163.459, residual_px: -0.629}
+            - {label: -2, y_native: 241.938, residual_px: 0.203}
+            - {label: -3, y_native: 321.935, residual_px: -0.483}
+            - {label: -4, y_native: 400.342, residual_px: 0.421}
+        x:
+          quantity: mole_percent_SiO2
+          intercept: -75.31948593
+          slope_per_native_px: 0.18508528
+          residual_rms_px: 0.5640
+          ticks:
+            - {label: 0, x_native: 406.073, residual_px: 0.872}
+            - {label: 20, x_native: 515.52, residual_px: -0.517}
+            - {label: 40, x_native: 623.55, residual_px: -0.489}
+            - {label: 60, x_native: 731.40, residual_px: -0.280}
+            - {label: 80, x_native: 839.46, residual_px: -0.282}
+            - {label: 100, x_native: 946.54, residual_px: 0.696}
+      b:
+        y:
+          quantity: log10_activity
+          intercept: 4.48250747
+          slope_per_native_px: -0.00789955
+          residual_rms_px: 0.5782
+          ticks:
+            - {label: 0, y_native: 567.851, residual_px: -0.413}
+            - {label: -1, y_native: 693.210, residual_px: 0.818}
+            - {label: -2, y_native: 821.022, residual_px: -0.405}
+        x:
+          quantity: mole_percent_SiO2
+          intercept: -74.85926690
+          slope_per_native_px: 0.18499807
+          residual_rms_px: 0.1717
+          ticks:
+            - {label: 0, x_native: 404.552, residual_px: 0.097}
+            - {label: 20, x_native: 512.61, residual_px: 0.148}
+            - {label: 40, x_native: 621.21, residual_px: -0.343}
+            - {label: 60, x_native: 728.97, residual_px: 0.007}
+            - {label: 80, x_native: 837.15, residual_px: -0.064}
+            - {label: 100, x_native: 945.04, residual_px: 0.155}
+      c:
+        y:
+          quantity: log10_activity
+          intercept: 9.85786125
+          slope_per_native_px: -0.00934056
+          residual_rms_px: 0.4939
+          ticks:
+            - {label: 0, y_native: 1055.908, residual_px: -0.526}
+            - {label: -1, y_native: 1161.847, residual_px: 0.595}
+            - {label: -2, y_native: 1269.122, residual_px: 0.380}
+            - {label: -3, y_native: 1377.010, residual_px: -0.448}
+        x:
+          quantity: mole_percent_SiO2
+          intercept: -75.64679893
+          slope_per_native_px: 0.18572976
+          residual_rms_px: 0.3885
+          ticks:
+            - {label: 0, x_native: 406.660, residual_px: 0.635}
+            - {label: 20, x_native: 515.49, residual_px: -0.512}
+            - {label: 40, x_native: 622.91, residual_px: -0.248}
+            - {label: 60, x_native: 730.48, residual_px: -0.135}
+            - {label: 80, x_native: 838.15, residual_px: -0.122}
+            - {label: 100, x_native: 945.33, residual_px: 0.382}
+    disagreement_with_crown4_audit: >-
+      Panel a log 0 was placed at native y 85 in crown4-1018-figure-read-audit.md.
+      The tick-stroke centroid is y 83.031. On the stored MgO centres the shift
+      is at most 0.013 dex and inside half a marker width. MinerU curve tables
+      were not used. Existing read_uncertainty_dex values stay the crown4
+      centre-to-centre half-difference and are not rewritten as half a marker width.
 review_status: draft
 fidelity_samples:
 - species: MgO
