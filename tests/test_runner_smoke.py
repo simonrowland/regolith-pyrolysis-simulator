@@ -2555,7 +2555,9 @@ def test_runner_envelopes_poisoned_hour_error_loudly(
     if compute_timeout:
         assert observed_errors[0] is failure
         assert sim._poisoned_hour is None
-        assert "liquidus_scan" in payload["error_message"]
+        refusal_diagnostic = payload["run_metadata"]["refusal_diagnostic"]
+        assert refusal_diagnostic["reason"] == "engine_compute_timeout"
+        assert refusal_diagnostic["budget"]["budget"] == "liquidus_scan"
         return
 
     assert "RuntimeError: post-MRE runner abort" in payload["error_message"]
