@@ -339,7 +339,10 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
             assert reservoir["headspace_ledger_pO2_bar"] == 0.0
             assert reservoir["exchange_o2_mol"] == 0.0
             assert reservoir["exchange_unbacked_o2_mol"] == 0.0
-            assert reservoir["exchange_direction"] == "none:below_threshold"
+            # Same-hour thermite provenance follows the base exchange result.
+            assert reservoir["exchange_direction"].split("|")[0] == (
+                "none:below_threshold"
+            )
             assert not reservoir["exchange_clamped"]
             assert all(
                 transition.name not in {
