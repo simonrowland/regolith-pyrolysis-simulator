@@ -19874,7 +19874,11 @@ class Migrator:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(point_composition_refusal)
             )
-        elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+        elif (
+            malformed_composition_amount is None
+            and q_token_point is Quantity.P_PARTIAL
+            and point_oxide_map
+        ):
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
