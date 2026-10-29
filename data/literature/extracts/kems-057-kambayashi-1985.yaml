@@ -2698,20 +2698,35 @@ species:
       regime: janaf_extrapolation
       units: atm as published
       values:
-        quantity: saturation_pressure
+        quantity: vapor_pressure
         method_class: model_derived
         model_or_data_source: JANAF Thermochemical Tables NSRDS-NBS (1971), Suppl. (1974); P4O10(s) standard
           free energy tabulated to 1500 K, extrapolated to 1643-1663 K
         points:
         - T_C: 1370
           T_K: 1643.0
-          P_sat_atm: 700.0
+          pressure_atm: 700.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1643.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
         - T_C: 1380
           T_K: 1653.0
-          P_sat_atm: 709.0
+          pressure_atm: 709.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1653.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
         - T_C: 1390
           T_K: 1663.0
-          P_sat_atm: 719.0
+          pressure_atm: 719.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1663.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
       uncertainty:
         note: extrapolation of JANAF P4O10(s) beyond 1500 K; no numeric +/- printed
   Fe:

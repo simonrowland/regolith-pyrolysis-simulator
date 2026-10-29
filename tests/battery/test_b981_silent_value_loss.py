@@ -233,6 +233,28 @@ def test_kambayashi_henry_activity_coefficients_migrate_by_temperature():
             assert condition.locator is not None
 
 
+def test_kambayashi_janaf_p4o10_saturation_pressures_migrate_with_temperature():
+    observations = _observations(
+        "kems-057-kambayashi-1985.yaml",
+        "kambayashi_1985_p4o10_sat_janaf_extrapolated",
+    )
+    expected_pa = {
+        Decimal("1643.0"): Decimal("70927500"),
+        Decimal("1653.0"): Decimal("71839425"),
+        Decimal("1663.0"): Decimal("72852675"),
+    }
+    assert len(observations) == len(expected_pa)
+    for observation in observations:
+        temperature = observation.identity.temperature_K.value
+        assert observation.identity.quantity.value.value == Quantity.P_SAT.value
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected_pa[temperature]
+        condition = (observation.point_conditions or {})["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == temperature
+        assert condition.locator is not None
+
+
 def test_wu_reported_solidus_rows_migrate_temperature_and_composition_axis():
     observations = _observations(
         "kems-190-wu-1993.yaml",
