@@ -143,15 +143,20 @@ def test_table_ia_per_cell_uncertainties_migrate_with_source_unit_and_locator(
         )
         assert band.band is not None
         assert band.band.unit == "dimensionless"
+        if series_id == "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation":
+            assert abs(
+                band.band.value - Decimal("0.04139268515822504")
+            ) < Decimal("1e-18")
 
     mutated = deepcopy(document)
     mutated_series = _series_by_id(
         mutated,
         "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
     )
-    _point_at_fraction(mutated_series, "0.50").pop("sigma")
+    mutated_point = _point_at_fraction(mutated_series, "0.50")
+    mutated_point["sigma"] *= 10
     mutated_result = _migrate_real_extract(
-        tmp_path / "without-one-width", EXTRACT_NAME, extract_doc=mutated
+        tmp_path / "ten-times-sigma", EXTRACT_NAME, extract_doc=mutated
     )
     mutated_observation = _migrated_point(
         mutated_result,
@@ -164,7 +169,10 @@ def test_table_ia_per_cell_uncertainties_migrate_with_source_unit_and_locator(
         mutated_observation.value.point,
         source_observation=mutated_observation,
     )
-    assert mutated_band.band is None
+    assert mutated_band.band is not None
+    assert abs(
+        mutated_band.band.value - Decimal("0.04139268515822504")
+    ) >= Decimal("1e-18")
 
 
 def test_printed_caosio2_melt_phase_maps_on_all_59_observations(
