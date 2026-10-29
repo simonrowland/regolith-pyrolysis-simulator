@@ -539,6 +539,28 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+      derivation:
+        relation: The authors recomputed epsilon_P^Si using Fruehan's Fe-Si iron activity value in equations (7)-(8); the paper reports 12.6 +/- 0.6.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 53
+            pdf_page_index: 3
+            equation: '7'
+            section: 1. The Fe-P-Si System
+            note: The numerical Fe activity from Fruehan is not printed in this paper.
+        method:
+          state: {tag: value, value: Interaction parameter from the activity-coefficient relation using Fruehan's Fe-Si activity value}
+          locator:
+            page: 4
+            published_page: 53
+            pdf_page_index: 3
+            equation: '8'
+            section: 1. The Fe-P-Si System
+        references:
+        - R. J. Fruehan, Metallurgical Transactions 1 (1970), 865, ref. 4
       experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
