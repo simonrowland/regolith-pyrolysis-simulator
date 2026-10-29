@@ -385,7 +385,7 @@ species:
           name: anorthite
           lithology_as_printed: anorthite
           figure: '1'
-          oxides_wt_pct:
+          oxides_wt_pct: &markova_sample_1_source_wt_pct
             SiO2: 42.86
             TiO2: 0.05
             Al2O3: 36.63
@@ -396,11 +396,24 @@ species:
             Na2O: 0.55
             K2O: 0.06
           sum_wt_pct: 100.05
+          point_condition_composition: &markova_sample_1_initial_condition
+            state:
+              tag: value
+              value:
+                basis: printed_oxide_wt_pct
+                amount_basis: mass_percent
+                components: *markova_sample_1_source_wt_pct
+            proxy_flag: initial_charge_only
+            locator:
+              published_page: 461
+              pdf_page_index: 2
+              table: 'unnumbered'
+              note: Initial sample 1 composition from the printed table.
         - sample_number: 2
           name: anorthositic_gabbro
           lithology_as_printed: anorthositic gabbro
           figure: '2'
-          oxides_wt_pct:
+          oxides_wt_pct: &markova_sample_2_source_wt_pct
             SiO2: 42.73
             TiO2: 0.05
             Al2O3: 26.72
@@ -411,11 +424,24 @@ species:
             Na2O: 1.26
             K2O: 0.11
           sum_wt_pct: 99.16
+          point_condition_composition: &markova_sample_2_initial_condition
+            state:
+              tag: value
+              value:
+                basis: printed_oxide_wt_pct
+                amount_basis: mass_percent
+                components: *markova_sample_2_source_wt_pct
+            proxy_flag: initial_charge_only
+            locator:
+              published_page: 461
+              pdf_page_index: 2
+              table: 'unnumbered'
+              note: Initial sample 2 composition from the printed table.
         - sample_number: 3
           name: apollo16_68415_40
           lithology_as_printed: Apollo-16 high-alumina basalt 68415,40
           figure: '3'
-          oxides_wt_pct:
+          oxides_wt_pct: &markova_sample_3_source_wt_pct
             SiO2: 45.40
             TiO2: 0.32
             Al2O3: 28.63
@@ -426,11 +452,24 @@ species:
             Na2O: 0.41
             K2O: 0.06
           sum_wt_pct: 99.96
+          point_condition_composition: &markova_sample_3_initial_condition
+            state:
+              tag: value
+              value:
+                basis: printed_oxide_wt_pct
+                amount_basis: mass_percent
+                components: *markova_sample_3_source_wt_pct
+            proxy_flag: initial_charge_only
+            locator:
+              published_page: 461
+              pdf_page_index: 2
+              table: 'unnumbered'
+              note: Initial sample 3 composition from the printed table.
         - sample_number: 4
           name: troctolite
           lithology_as_printed: troctolite
           figure: '4'
-          oxides_wt_pct:
+          oxides_wt_pct: &markova_sample_4_source_wt_pct
             SiO2: 44.16
             TiO2: 0.13
             Al2O3: 20.29
@@ -441,6 +480,19 @@ species:
             Na2O: 0.71
             K2O: 0.08
           sum_wt_pct: 100.72
+          point_condition_composition: &markova_sample_4_initial_condition
+            state:
+              tag: value
+              value:
+                basis: printed_oxide_wt_pct
+                amount_basis: mass_percent
+                components: *markova_sample_4_source_wt_pct
+            proxy_flag: initial_charge_only
+            locator:
+              published_page: 461
+              pdf_page_index: 2
+              table: 'unnumbered'
+              note: Initial sample 4 composition from the printed table.
         sample_1_anorthite_SiO2_wt_pct: 42.86
         sample_1_anorthite_TiO2_wt_pct: 0.05
         sample_1_anorthite_Al2O3_wt_pct: 36.63
@@ -727,14 +779,6 @@ species:
           note: Fig. 2 x-axis residual gives a larger 31.7 C bound; the row uncertainty uses the maximum across its figures.
       values:
         quantity: partial_pressure
-        composition_role:
-          value: initial_charge_only
-          locator: {published_page: 461, pdf_page_index: 2, table: unnumbered, note: table title; p. 460 Technique and Results}
-          quote: Table. The compositions of initial samples
-          note: >-
-            p. 460: "Fig.1,2,3,4 demonstrate the partial pressures of the components
-            in the vapor over residual melts" and "Full vaporization has been reached
-            in all experiments." Point maps are the initial sample columns.
         gas_species: Fe(g)
         method_class: figure_only
         admission_status: admitted
@@ -859,8 +903,10 @@ species:
           P: 0.00019702846
           log10_P_i_Torr_as_digitized: -3.7055
           pixel_coordinates: {x: 833, y: 2096}
-          composition_wt_pct: &markova_sample_1_composition_wt_pct {SiO2: 42.86, TiO2: 0.05, Al2O3: 36.63, FeO: 0.55, MnO: 0.00, MgO: 0.11, CaO: 19.16, Na2O: 0.55, K2O: 0.06}
+          composition_wt_pct: *markova_sample_1_source_wt_pct
           composition_sum_wt_pct: 100.05
+          point_conditions:
+            composition: *markova_sample_1_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [833, 2096], T_C: 1837.13, log10_P_i_Torr: -3.7055}
             independent_repeat: {pixel_coordinates: [834, 2096], T_C: 1838.85, log10_P_i_Torr: -3.7055}
@@ -876,8 +922,10 @@ species:
           P: 0.003574428
           log10_P_i_Torr_as_digitized: -2.4468
           pixel_coordinates: {x: 2078, y: 1988}
-          composition_wt_pct: &markova_sample_2_composition_wt_pct {SiO2: 42.73, TiO2: 0.05, Al2O3: 26.72, FeO: 5.54, MnO: 0.09, MgO: 8.27, CaO: 14.31, Na2O: 1.26, K2O: 0.11}
+          composition_wt_pct: *markova_sample_2_source_wt_pct
           composition_sum_wt_pct: 99.16
+          point_conditions:
+            composition: *markova_sample_2_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -890,8 +938,10 @@ species:
           P: 0.006833581
           log10_P_i_Torr_as_digitized: -2.1654
           pixel_coordinates: {x: 2121, y: 1956}
-          composition_wt_pct: *markova_sample_2_composition_wt_pct
+          composition_wt_pct: *markova_sample_2_source_wt_pct
           composition_sum_wt_pct: 99.16
+          point_conditions:
+            composition: *markova_sample_2_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -904,8 +954,10 @@ species:
           P: 0.00064221918
           log10_P_i_Torr_as_digitized: -3.1923
           pixel_coordinates: {x: 707, y: 3049}
-          composition_wt_pct: &markova_sample_3_composition_wt_pct {SiO2: 45.40, TiO2: 0.32, Al2O3: 28.63, FeO: 4.25, MnO: 0.06, MgO: 4.38, CaO: 16.39, Na2O: 0.41, K2O: 0.06}
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [707, 3049], T_C: 1616.41, log10_P_i_Torr: -3.1923}
             independent_repeat: {pixel_coordinates: [709, 3048], T_C: 1619.67, log10_P_i_Torr: -3.1840}
@@ -921,8 +973,10 @@ species:
           P: 0.001080024
           log10_P_i_Torr_as_digitized: -2.9666
           pixel_coordinates: {x: 742, y: 3022}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -935,8 +989,10 @@ species:
           P: 0.001080024
           log10_P_i_Torr_as_digitized: -2.9666
           pixel_coordinates: {x: 800, y: 3022}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -949,8 +1005,10 @@ species:
           P: 0.003044737
           log10_P_i_Torr_as_digitized: -2.5165
           pixel_coordinates: {x: 1935, y: 2980}
-          composition_wt_pct: &markova_sample_4_composition_wt_pct {SiO2: 44.16, TiO2: 0.13, Al2O3: 20.29, FeO: 8.84, MnO: 0.14, MgO: 15.58, CaO: 10.79, Na2O: 0.71, K2O: 0.08}
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -963,8 +1021,10 @@ species:
           P: 0.003166332
           log10_P_i_Torr_as_digitized: -2.4994
           pixel_coordinates: {x: 1970, y: 2978}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -977,8 +1037,10 @@ species:
           P: 0.003851142
           log10_P_i_Torr_as_digitized: -2.4144
           pixel_coordinates: {x: 2018, y: 2968}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1078,14 +1140,6 @@ species:
           note: Fig. 2 x-axis residual gives the maximum 31.7 C bound; the plotted-point uncertainty uses that bound.
       values:
         quantity: partial_pressure
-        composition_role:
-          value: initial_charge_only
-          locator: {published_page: 461, pdf_page_index: 2, table: unnumbered, note: table title; p. 460 Technique and Results}
-          quote: Table. The compositions of initial samples
-          note: >-
-            p. 460: "Fig.1,2,3,4 demonstrate the partial pressures of the components
-            in the vapor over residual melts" and "Full vaporization has been reached
-            in all experiments." Point maps are the initial sample columns.
         gas_species: Mg(g)
         method_class: figure_only
         admission_status: admitted
@@ -1127,8 +1181,10 @@ species:
           P: 0.01958805
           log10_P_i_Torr_as_digitized: -1.7080
           pixel_coordinates: {x: 2229, y: 1904}
-          composition_wt_pct: *markova_sample_2_composition_wt_pct
+          composition_wt_pct: *markova_sample_2_source_wt_pct
           composition_sum_wt_pct: 99.16
+          point_conditions:
+            composition: *markova_sample_2_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1141,8 +1197,10 @@ species:
           P: 0.008538743
           log10_P_i_Torr_as_digitized: -2.0686
           pixel_coordinates: {x: 2218, y: 1945}
-          composition_wt_pct: *markova_sample_2_composition_wt_pct
+          composition_wt_pct: *markova_sample_2_source_wt_pct
           composition_sum_wt_pct: 99.16
+          point_conditions:
+            composition: *markova_sample_2_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [2218, 1945], T_C: 1887.88, log10_P_i_Torr: -2.0686}
             independent_repeat: {pixel_coordinates: [2220, 1946], T_C: 1891.52, log10_P_i_Torr: -2.0774}
@@ -1158,8 +1216,10 @@ species:
           P: 0.004466344
           log10_P_i_Torr_as_digitized: -2.3500
           pixel_coordinates: {x: 2281, y: 1977}
-          composition_wt_pct: *markova_sample_2_composition_wt_pct
+          composition_wt_pct: *markova_sample_2_source_wt_pct
           composition_sum_wt_pct: 99.16
+          point_conditions:
+            composition: *markova_sample_2_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1172,8 +1232,10 @@ species:
           P: 0.00051965015
           log10_P_i_Torr_as_digitized: -3.2843
           pixel_coordinates: {x: 831, y: 3060}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [831, 3060], T_C: 1818.42, log10_P_i_Torr: -3.2843}
             independent_repeat: {pixel_coordinates: [833, 3059], T_C: 1821.68, log10_P_i_Torr: -3.2759}
@@ -1189,8 +1251,10 @@ species:
           P: 0.001816282
           log10_P_i_Torr_as_digitized: -2.7408
           pixel_coordinates: {x: 860, y: 2995}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1203,8 +1267,10 @@ species:
           P: 0.00199981
           log10_P_i_Torr_as_digitized: -2.6990
           pixel_coordinates: {x: 895, y: 2990}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1217,8 +1283,10 @@ species:
           P: 0.01222602
           log10_P_i_Torr_as_digitized: -1.9127
           pixel_coordinates: {x: 2117, y: 2909}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1231,8 +1299,10 @@ species:
           P: 0.00947855
           log10_P_i_Torr_as_digitized: -2.0233
           pixel_coordinates: {x: 2165, y: 2922}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1245,8 +1315,10 @@ species:
           P: 0.008937828
           log10_P_i_Torr_as_digitized: -2.0488
           pixel_coordinates: {x: 2185, y: 2925}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1526,14 +1598,6 @@ species:
           note: Fig. 3 x-axis residual gives the maximum 25.2 C bound; the plotted-point uncertainty uses that bound.
       values:
         quantity: partial_pressure
-        composition_role:
-          value: initial_charge_only
-          locator: {published_page: 461, pdf_page_index: 2, table: unnumbered, note: table title; p. 460 Technique and Results}
-          quote: Table. The compositions of initial samples
-          note: >-
-            p. 460: "Fig.1,2,3,4 demonstrate the partial pressures of the components
-            in the vapor over residual melts" and "Full vaporization has been reached
-            in all experiments." Point maps are the initial sample columns.
         gas_species: FeO(g)
         method_class: figure_only
         admission_status: admitted
@@ -1574,8 +1638,10 @@ species:
           P: 0.000004221176
           log10_P_i_Torr_as_digitized: -5.3746
           pixel_coordinates: {x: 720, y: 3310}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1588,8 +1654,10 @@ species:
           P: 0.0000096596455
           log10_P_i_Torr_as_digitized: -5.0150
           pixel_coordinates: {x: 826, y: 3267}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [826, 3267], T_C: 1810.28, log10_P_i_Torr: -5.0150}
             independent_repeat: {pixel_coordinates: [828, 3268], T_C: 1813.54, log10_P_i_Torr: -5.0234}
@@ -1605,8 +1673,10 @@ species:
           P: 0.000007667042
           log10_P_i_Torr_as_digitized: -5.1154
           pixel_coordinates: {x: 872, y: 3279}
-          composition_wt_pct: *markova_sample_3_composition_wt_pct
+          composition_wt_pct: *markova_sample_3_source_wt_pct
           composition_sum_wt_pct: 99.96
+          point_conditions:
+            composition: *markova_sample_3_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1619,8 +1689,10 @@ species:
           P: 0.000006382729
           log10_P_i_Torr_as_digitized: -5.1950
           pixel_coordinates: {x: 1922, y: 3295}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1633,8 +1705,10 @@ species:
           P: 0.0000067688726
           log10_P_i_Torr_as_digitized: -5.1695
           pixel_coordinates: {x: 1976, y: 3292}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           digitization_readings:
             first: {pixel_coordinates: [1976, 3292], T_C: 1574.01, log10_P_i_Torr: -5.1695}
             independent_repeat: {pixel_coordinates: [1975, 3293], T_C: 1572.30, log10_P_i_Torr: -5.1780}
@@ -1650,8 +1724,10 @@ species:
           P: 0.00001217911
           log10_P_i_Torr_as_digitized: -4.9144
           pixel_coordinates: {x: 2016, y: 3262}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
@@ -1664,8 +1740,10 @@ species:
           P: 0.00001148433
           log10_P_i_Torr_as_digitized: -4.9399
           pixel_coordinates: {x: 2042, y: 3265}
-          composition_wt_pct: *markova_sample_4_composition_wt_pct
+          composition_wt_pct: *markova_sample_4_source_wt_pct
           composition_sum_wt_pct: 100.72
+          point_conditions:
+            composition: *markova_sample_4_initial_condition
           locator:
             published_page: 461
             pdf_page_index: 2
