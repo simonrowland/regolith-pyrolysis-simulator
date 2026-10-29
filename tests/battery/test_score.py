@@ -15944,6 +15944,32 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             )
             for row in allibert_cao_rows
         )
+        unprinted_cao_references = {
+            "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h= "
+            + suffix
+            for suffix in (
+                "089e4f903141",
+                "0a68381c8d07",
+                "3816d169fbf5",
+                "803c6b10f6a7",
+                "98d5192921f6",
+                "b3b06405be2e",
+                "d5945aa87c1c",
+            )
+        }
+        affected_cao_rows = [
+            row
+            for row in allibert_cao_rows
+            if row.reference in unprinted_cao_references
+        ]
+        assert {row.reference for row in affected_cao_rows} == unprinted_cao_references
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+            and "fusion_source_reference_phase_unprinted"
+            in row.refusal.detail.get("secondary_reasons", ())
+            for row in affected_cao_rows
+        )
         assert len(allibert_alumina_rows) == 8
         for row in allibert_alumina_rows:
             polymorph = (
