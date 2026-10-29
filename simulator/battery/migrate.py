@@ -9827,7 +9827,7 @@ def _convert_compilation_amount(
             "kj/mole",
             "kjpermol",
             "kjmol^-1",
-            "kjmol−1casio3",
+            "kj/molcasio3",
         }:
             return amount, "identity:kJ_per_mol"
     return None

@@ -306,3 +306,26 @@ def test_nanjo_second_law_vaporization_enthalpies_migrate_in_kj_per_mol():
         assert conditions["gas_species"].locator is not None
         assert conditions["temperature_K"].state.is_unknown
         assert conditions["temperature_K"].locator is not None
+
+
+def test_adamkovicova_prior_fusion_enthalpies_convert_in_kj_per_mol():
+    observations = _observations(
+        "adamkovicova-1980-casio3-heat-of-fusion.yaml",
+        "adamkovicova_1980_prior_heat_fusion_",
+    )
+    expected = {
+        "adamkovicova_1980_prior_heat_fusion_56_1_quote": Decimal("56.1"),
+        "adamkovicova_1980_prior_heat_fusion_50_1_quote": Decimal("50.1"),
+        "adamkovicova_1980_prior_heat_fusion_59_0_quote": Decimal("59.0"),
+        "adamkovicova_1980_prior_heat_fusion_68_2_quote": Decimal("68.2"),
+        "adamkovicova_1980_prior_heat_fusion_27_6_quote": Decimal("27.6"),
+        "adamkovicova_1980_prior_heat_fusion_82_9_quote": Decimal("82.9"),
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected[observation.observation_id.split("::")[-1]]
+        assert observation.identity.quantity.value is Quantity.ENTHALPY_OF_FUSION
+        assert observation.identity.temperature_K.is_unknown
+        temperature = (observation.point_conditions or {})["temperature_K"]
+        assert temperature.state.is_unknown and temperature.locator is not None
