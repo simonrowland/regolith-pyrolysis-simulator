@@ -1,0 +1,117 @@
+source_id: kems-028-yakovlev-1984
+source:
+  citation: 'Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), The vaporization peculiarities of CAI inclusions in chondrites: experimental data, Lunar and Planetary Science XV, 945–946.'
+extraction:
+  method: MinerU table draft and pdftotext-layout were compared; the 600 dpi page render resolved the I/1 OCR ambiguity in the Murchison cells and confirmed all row-to-column assignments.
+  date: '2026-10-29'
+  worker: w1028cond2-yak84cond
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    printed_table: none
+    published_page: 946
+    title_as_printed: Po2 pressure in the vapor during vaporization of high-temperature residues of Murchison and Efremovka CAI inclusions.
+    disposition: hand_transcribed_from_render
+    type: psat_series
+    quantity: partial_pressure
+    species: O2(g)
+    phase: high_T_residual_Murchison_and_Efremovka_CAI
+    unit: torr
+    method_class: model_derived
+    rows: [2, 3, 4, 5, 6, 7, 8]
+    body_rows: 7
+    numeric_pressure_cells: 11
+    blank_pressure_cells: 10
+    columns:
+      temperature: column 1, printed header T°C
+      Murchison: column 2
+      Efremovka_type_A: column 3
+      Efremovka_type_B: column 4
+    conditions:
+      temperature: Printed in column 1 as °C and converted by the existing T_C migration path.
+      composition: Sample names are printed but no numerical bulk oxide analysis is printed; typed unknown.
+      total_pressure_Pa: No experimental total or ambient pressure is printed; typed unknown.
+      fO2: Table p(O2) values are calculated outputs, not an independently specified experimental oxygen condition; typed unknown.
+      apparatus: Knudsen effusion cell is stated on page 945; orifice dimensions are not stated.
+    table_layout_check: 7 temperature rows and all three sample-pressure columns were checked against the render; 11 filled pressure cells and 10 blank cells were retained.
+    render_verified:
+      - {row: 2, column: 1, text: '2020'}
+      - {row: 3, column: 1, text: '2072'}
+      - {row: 4, column: 1, text: '2130'}
+      - {row: 5, column: 1, text: '2180'}
+      - {row: 6, column: 1, text: '2205'}
+      - {row: 7, column: 1, text: '2267'}
+      - {row: 8, column: 1, text: '2348'}
+      - {row: 2, column: 2, text: '1.4×10^-6'}
+      - {row: 3, column: 2, text: '1.6×10^-6'}
+      - {row: 4, column: 2, text: '1.5×10^-6'}
+      - {row: 4, column: 3, text: '2.0×10^-5'}
+      - {row: 4, column: 4, text: '3.4×10^-4'}
+      - {row: 5, column: 3, text: '4.7×10^-6'}
+      - {row: 6, column: 3, text: '3.6×10^-6'}
+      - {row: 6, column: 4, text: '2.8×10^-4'}
+      - {row: 7, column: 3, text: '5.5×10^-5'}
+      - {row: 7, column: 4, text: '4.1×10^-5'}
+      - {row: 8, column: 4, text: '1.9×10^-4'}
+    notes:
+      - The table QA numeric agreement is 0.100 (18 numeric mismatches); both machine reads are too noisy to certify any cell, so all 18 stored numeric cells were checked against the render.
+      - MinerU and pdftotext render the three Murchison pressure exponents with typewriter I; the page image confirms numeral 1. The render also resolves type-A cell 4.I as 4.1.
+      - The table has no printed number. Observation locators therefore use the published page and zero-based PDF page index only.
+      - Table values are calculated by the authors using AlO=Al+O and O2=2O; no other observations are assigned as derivation parents.
+figures:
+  - figure: '1'
+    published_page: 946
+    pdf_page_index: 1
+    legend_form: Inline species labels beside each curve; no separate legend block.
+    marker_bindings:
+      - species: SiO(g)
+        marker: open circle
+        evidence: Inline SiO label beside the open-circle curve.
+      - species: Mg(g)
+        marker: open square
+        evidence: Inline Mg label beside the open-square curve.
+      - species: Ca(g)
+        marker: filled square
+        evidence: Inline Ca label beside the filled-square curve.
+      - species: Al(g)
+        marker: open triangle
+        evidence: Inline Al label beside the open-triangle curve.
+    digitized_species: [SiO, Mg, Ca, Al]
+    render_dpi: 600
+    stored_points: 28
+    audit: Each stored point is assigned by the printed inline species label and matching marker glyph; the companion figure CSV stores two pixel-center reads and axis fits for every plotted point.
+  - figure: '2'
+    published_page: 946
+    pdf_page_index: 1
+    legend_form: Inline species labels beside each curve; no separate legend block.
+    marker_bindings:
+      - species: SiO(g)
+        marker: open circle
+        evidence: Inline SiO label beside the open-circle curve.
+      - species: Mg(g)
+        marker: open square
+        evidence: Inline Mg label beside the open-square curve.
+      - species: Ca(g)
+        marker: filled square
+        evidence: Inline Ca label beside the filled-square curve.
+      - species: Al(g)
+        marker: open triangle
+        evidence: Inline Al label beside the open-triangle curve.
+    digitized_species: [SiO, Mg, Ca, Al]
+    render_dpi: 600
+    stored_points: 41
+    audit: Each stored point is assigned by the printed inline species label and matching marker glyph; the companion figure CSV stores two pixel-center reads and axis fits for every plotted point.
+schema_gaps:
+  - observation_ids:
+      - yakovlev_1984_CAI_Al_suboxide_fraction
+      - yakovlev_1984_CAI_Al2O_in_suboxide_fraction
+    printed_quantity: ratio of combined AlO and Al2O partial pressures to total aluminium pressure
+    quantity_label: Al_suboxide_pressure_fraction
+    reason: No closed quantity token represents this gas-pressure ratio. Keep the descriptive quantity label so the migrator returns quantity unknown.
+    code_review:
+      - simulator/battery/enums.py::Quantity has p_partial, equilibrium_phase_composition and distribution_ratio but no gas partial-pressure fraction quantity.
+      - simulator/battery/migrate.py::QUANTITY_ALIASES has no exact alias; simulator/battery/migrate.py::TYPE_QUANTITY maps psat_series to p_sat, so the explicit descriptive label prevents that non-exact fallback.
+      - simulator/battery/enums.py::PHASE_BASIS_TOKENS and simulator/battery/enums.py::PhaseRole cover phase-composition basis and melt/glass roles, not a ratio among gas partial pressures.
+      - tools/validate_literature_extracts.py::OBSERVATION_TYPES admits equilibrium_phase_composition; data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml uses it for composition within a phase, not this gas-pressure ratio.
+    migrated_status: Both values remain quantity-unknown and are refused; no nearby token is substituted.
