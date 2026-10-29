@@ -18892,10 +18892,16 @@ class Migrator:
                         point_value = select_declared_source(
                             q_token, str(obs.get("units") or ""), raw
                         )
+                        value_payload = raw.get("value")
                         source_unavailable_reason = (
                             raw.get("omitted_reason")
                             or raw.get("unavailable_reason")
                             or raw.get("reason")
+                            or (
+                                value_payload.get("unavailable_reason")
+                                if isinstance(value_payload, Mapping)
+                                else None
+                            )
                         )
                         if (
                             not point_value.available

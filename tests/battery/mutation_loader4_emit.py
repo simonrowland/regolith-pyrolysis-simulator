@@ -89,6 +89,13 @@ _expect_red(
     test_name="test_real_nonyield_points_do_not_emit_generic_unavailable_rows",
 )
 _expect_red(
+    method_name="_migrate_extract_observation",
+    needle='value_payload.get("unavailable_reason")',
+    replacement="None",
+    test_name="test_isolated_migration_preserves_species_temperature_conditions_and_scored_values",
+    test_path="tests/test_leister_1999_fe_v_redox_2000c_extract.py",
+)
+_expect_red(
     method_name="_selection_from_named_field",
     needle='''            Quantity.O2_YIELD,
             Quantity.VALENCE_RATIO,
