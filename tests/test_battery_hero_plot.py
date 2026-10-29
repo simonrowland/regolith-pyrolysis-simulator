@@ -149,6 +149,12 @@ def _score_file(path: Path) -> None:
     path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
 
 
+def test_openimcc_sp_is_a_primary_battery_hero_engine() -> None:
+    assert "openimcc-sp" in hero_plot.HERO_PRIMARY_ENGINES
+    colors = _hero_engine_colors(("openimcc", "openimcc-sp"))
+    assert colors["openimcc"] != colors["openimcc-sp"]
+
+
 def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     _score_file(residuals)

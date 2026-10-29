@@ -2638,7 +2638,7 @@ def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
         has_own_engine_solved_oxygen_balance,
     )
 
-    assert IMCC_ENGINES == frozenset({Engine.OPENIMCC})
+    assert IMCC_ENGINES == frozenset({Engine.OPENIMCC, Engine.OPENIMCC_SP})
     assert has_own_engine_solved_oxygen_balance(Engine.OPENIMCC, (solved,))
     assert not has_own_engine_solved_oxygen_balance(Engine.ALPHAMELTS, (solved,))
     for engine in (Engine.ALPHAMELTS, Engine.VAPOROCK):
