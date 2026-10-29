@@ -3834,16 +3834,19 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     refresh = "run scripts/battery_validate_store.py after a scratch migrate"
     assert report_path.is_file(), f"missing store validation record; {refresh}"
     record = json.loads(report_path.read_text(encoding="utf-8"))
-    from simulator.battery.score import derive_store_stamp
+    from simulator.battery.store_validation import _migrated_store_content_sha256
 
-    assert record.get("store_stamp") == derive_store_stamp(REPO_ROOT), (
+    assert record.get("store_content_sha256") == _migrated_store_content_sha256(
+        REPO_ROOT
+    ), (
         f"stale store validation record; {refresh}"
     )
     assert record.get("forbidden_shape_count") == 0, record
 
 
 def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_shape(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import subprocess
 
@@ -3907,6 +3910,7 @@ def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_sh
     first_record = json.loads(first_bytes)
     assert set(first_record) == {
         "store_stamp",
+        "store_content_sha256",
         "hard_issue_counts_by_shape",
         "forbidden_shape_count",
     }
@@ -3932,17 +3936,14 @@ def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_sh
     assert output_path.read_bytes() == first_bytes
 
     # A content edit without regenerating the record must make the cheap
-    # migrated-store check report stale data, even when git-derived metadata
-    # and the validation counts have not changed.
-    store_path.write_bytes(
-        store_path.read_bytes() + b"\n# changed without regenerating validation\n"
-    )
+    # migrated-store check report stale data, even though git-derived metadata
+    # and the record's validation counts have not changed.
+    observations[1]["experiment_id"] = "missing-fixture-experiment"
+    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
     monkeypatch.setitem(globals(), "REPO_ROOT", root)
     with pytest.raises(AssertionError, match="stale store validation record"):
         test_validate_corpus_zero_hard_issues_on_migrated_store()
 
-    observations[1]["experiment_id"] = "missing-fixture-experiment"
-    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
     mutated = run_script()
     assert mutated.returncode == 1, mutated.stderr
     mutated_record = json.loads(output_path.read_text(encoding="utf-8"))

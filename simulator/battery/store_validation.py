@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections import Counter
 from pathlib import Path
 
 import yaml
 
 from simulator.battery.enums import AdmissionStatus, NoticeKind
-from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    iter_observation_store_paths,
+    load_migrated_store,
+)
 from simulator.battery.score import derive_store_stamp
 from simulator.battery.validate import ValidationIssue, validate_corpus
 
@@ -25,6 +30,35 @@ def _issue_shape(issue: ValidationIssue) -> str:
     """Group hard issues by reason and their final field name."""
 
     return f"{issue.reason.value}:{issue.path.rsplit('.', 1)[-1]}"
+
+
+def _migrated_store_content_sha256(root: Path | None = None) -> str:
+    """Hash the relative paths and bytes loaded from the persisted store."""
+
+    root = root or REPO_ROOT
+    works_dir = root / "data" / "literature" / "works"
+    literature_dir = root / "data" / "literature"
+    paths = [
+        path
+        for path in sorted(works_dir.glob("*.yaml"))
+        if path.name != "ALIASES.yaml"
+    ]
+    for directory_name in ("extracts-v2", "observations-v2"):
+        paths.extend(
+            iter_observation_store_paths(literature_dir / directory_name)
+        )
+    paths.sort(key=lambda path: path.relative_to(root).as_posix())
+
+    digest = hashlib.sha256()
+    for path in paths:
+        relative_path = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(len(relative_path).to_bytes(8, "big"))
+        digest.update(relative_path)
+        digest.update(path.stat().st_size.to_bytes(8, "big"))
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+    return digest.hexdigest()
 
 
 def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
@@ -95,6 +129,7 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
     assert extracts_v2.is_dir() or obs_dir.is_dir()
     return {
         "store_stamp": derive_store_stamp(root),
+        "store_content_sha256": _migrated_store_content_sha256(root),
         "hard_issue_counts_by_shape": dict(sorted(hard_issue_counts.items())),
         "forbidden_shape_count": forbidden_shape_count,
     }
