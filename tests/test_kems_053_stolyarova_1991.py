@@ -195,4 +195,18 @@ def test_printed_caosio2_melt_phase_maps_on_all_59_observations(
         and observation.identity.species.phase.value is Phase.L
         for observation in phase_observations
     )
+    phase_locators = {
+        (
+            observation.locator.page,
+            observation.locator.table,
+            observation.locator.figure,
+        )
+        for observation in phase_observations
+        if observation.locator is not None
+    }
+    assert {
+        (2, "IIa", None),
+        (2, "IIb", None),
+        (4, None, "3"),
+    } <= phase_locators
 
