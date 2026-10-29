@@ -145,7 +145,7 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         assert dict(observation.identity.composition.value.components)["SiO2"] == Decimal(
             "0.3379238246485715130851197644"
         )
-        assert experiment.sample.mass_kg.state.value == Decimal("0.0001")
+        assert experiment.sample.mass_kg.state.value.point == Decimal("0.0001")
         bench = migrated.benches[experiment.bench_id]
         assert bench.apparatus_family.state.value == "vacuum furnace"
         assert bench.cell_material_and_liner.state.value == "high-purity graphite crucible"
