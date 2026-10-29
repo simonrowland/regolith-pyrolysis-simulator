@@ -34,72 +34,135 @@ _NON_VAPOUR_QUANTITIES = {
     "free_evap_sio2_loss_with_vf",
 }
 _CONDENSED_ACTIVITY_MARKERS = ("condensed_component", "condensed_phase")
-_PHASE_CHANGED_EXTRACTS = (
-    "bencze-yazhenskikh-2016.yaml",
-    "kems-003-pound-1972.yaml",
-    "kems-008-schaefer-fegley-2004.yaml",
-    "kems-012-sossi-2019.yaml",
-    "kems-025-markova-1983.yaml",
-    "kems-028-yakovlev-1984.yaml",
-    "kems-029-yakovlev-shornikov-2011.yaml",
-    "kems-047-turkdogan-1984-isij.yaml",
-    "kems-053-stolyarova-1991.yaml",
-    "kems-058-ohara-1987.yaml",
-    "kems-093-piacente-1975.yaml",
-    "kems-114-nichols-1995.yaml",
-    "kems-133-costa-2017.yaml",
-    "ta-yamanaka-1997-metsoc.yaml",
-    "tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml",
-)
-_GAS_ROWS_WITHOUT_CONDENSED_FORM = {
-    ("bencze-yazhenskikh-2016.yaml", "bencze_2016_table_s2_na_selected_means"): "silicate_melt",
+_EXPECTED_SYSTEM_CLASS_BY_OBSERVATION = {
     ("bencze-yazhenskikh-2016.yaml", "bencze_2016_table_s1_k_all_subsamples"): "silicate_melt",
+    ("bencze-yazhenskikh-2016.yaml", "bencze_2016_table_s1_na_all_subsamples"): "silicate_melt",
     ("bencze-yazhenskikh-2016.yaml", "bencze_2016_table_s2_k_selected_means"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_na_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_k_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_li_logKstar_table3_Li_g_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_rb_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_cu_logKstar_table3_quoted_20260906"): "silicate_melt",
+    ("bencze-yazhenskikh-2016.yaml", "bencze_2016_table_s2_na_selected_means"): "silicate_melt",
+    ("kems-003-pound-1972.yaml", "pound_1972_ag_solid_alpha_wessel_mp"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_b_mp_alpha_burns"): "silicate_melt",
+    ("kems-003-pound-1972.yaml", "pound_1972_be_solid_alpha_holden"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_c_graphite_alpha_marshall_norton"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_cr_solid_alpha_mccabe"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_pt_condensation_alpha_chupka_1500k"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_rh_condensation_alpha_chupka_1500k"): "pure_element_condensed",
+    ("kems-003-pound-1972.yaml", "pound_1972_w_condensation_alpha_chupka_2200k"): "pure_element_condensed",
+    ("kems-008-schaefer-fegley-2004.yaml", "schaefer_fegley_2004_sio_alpha_s_survey"): "silicate_melt",
     ("kems-012-sossi-2019.yaml", "sossi_2019_ag_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_zn_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_ge_logKstar_table3_quoted_20260906"): "silicate_melt",
     ("kems-012-sossi-2019.yaml", "sossi_2019_cd_logKstar_table3_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_cu_logKstar_table3_quoted_20260906"): "silicate_melt",
     ("kems-012-sossi-2019.yaml", "sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_ge_logKstar_table3_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_k_logKstar_table3_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_li_logKstar_table3_Li_g_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_na_logKstar_table3_quoted_20260906"): "silicate_melt",
     ("kems-012-sossi-2019.yaml", "sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906"): "silicate_melt",
     ("kems-012-sossi-2019.yaml", "sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906"): "silicate_melt",
-    ("kems-012-sossi-2019.yaml", "sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_rb_logKstar_table3_quoted_20260906"): "silicate_melt",
+    ("kems-012-sossi-2019.yaml", "sossi_2019_zn_logKstar_table3_quoted_20260906"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_al2o2_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_al2o_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_al_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_alo_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_ca_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_cao_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_fe_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_feo_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_k_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_mg_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_mgo_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_na_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_o2_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_o_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_po2_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_po_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_sio_psat_figs_figure_only"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_tio2_detected_not_tabulated"): "silicate_melt",
+    ("kems-025-markova-1983.yaml", "markova_1983_tio_psat_figs_figure_only"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_Po2_table_calculated"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig1_Murchison_Al_digitized"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig1_Murchison_Ca_digitized"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig1_Murchison_Mg_digitized"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig1_Murchison_SiO_digitized"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig1_murchison_psat_figure_only"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_fig2_CAI_psat_figure_only"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Al_max_2100C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Ca_1825C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Ca_max_1950_2025C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_FeO_top_1650C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Fe_max_1450_1725C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Fe_troilite_1050C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_Mg_max_1750_1825C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_SiO_Mg_max_1750_1825C"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_murchison_TiO_gt_TiO2_at_Ca_max"): "silicate_melt",
+    ("kems-028-yakovlev-1984.yaml", "yakovlev_1984_sulfur_900_1000C"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_Al_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_Ca_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_Fe_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_K_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_Mg_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_Na_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_SiO_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig1_TiO_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_Al_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_Ca_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_Fe_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_Mg_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_SiO_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "kems_029_fig2_TiO_psat_digitized"): "silicate_melt",
+    ("kems-029-yakovlev-shornikov-2011.yaml", "yakovlev_shornikov_2011_Po2_table_bar_calculated"): "silicate_melt",
+    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_COS_calculated_p"): "silicate_melt",
+    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_CS_calculated_p"): "silicate_melt",
+    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_S2_calculated_p"): "silicate_melt",
     ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_SiO_calculated_p"): "silicate_melt",
     ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_SiS_calculated_p"): "silicate_melt",
-    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_S2_calculated_p"): "silicate_melt",
-    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_CS_calculated_p"): "silicate_melt",
-    ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table1_COS_calculated_p"): "silicate_melt",
     ("kems-047-turkdogan-1984-isij.yaml", "turkdogan_1984_table2_K_calculated_p"): "silicate_melt",
     ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"): "silicate_melt",
     ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_cao_partial_pressure_1993k_complete_evaporation"): "silicate_melt",
-    ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation"): "silicate_melt",
-    ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"): "silicate_melt",
     ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_o2_pressure_fig4"): "silicate_melt",
+    ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"): "silicate_melt",
+    ("kems-053-stolyarova-1991.yaml", "stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation"): "silicate_melt",
+    ("kems-058-ohara-1987.yaml", "ohara_1987_p2_table1_partial_pressure"): "molten_metal",
+    ("kems-058-ohara-1987.yaml", "ohara_1987_po2_table1_partial_pressure"): "molten_metal",
+    ("kems-058-ohara-1987.yaml", "ohara_1987_table1_partial_pressures_1643k"): "molten_metal",
     ("kems-093-piacente-1975.yaml", "piacente_1975_fe_cc_eq2"): "solid_solution_silicate",
-    ("kems-093-piacente-1975.yaml", "piacente_1975_sio_cc_eq2"): "solid_solution_silicate",
     ("kems-093-piacente-1975.yaml", "piacente_1975_mg_cc_eq2"): "solid_solution_silicate",
     ("kems-093-piacente-1975.yaml", "piacente_1975_o2_cc_eq3"): "solid_solution_silicate",
+    ("kems-093-piacente-1975.yaml", "piacente_1975_sio_cc_eq2"): "solid_solution_silicate",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fe_detected_kems"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fe_detected_kems_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_mg_IT_figure_only"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_mg_IT_figure_only_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_mg_slope_second_law"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_mg_slope_second_law_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio2_IT_figure_only"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio2_IT_figure_only_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio2_slope_second_law"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio2_slope_second_law_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio_IT_figure_only"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio_IT_figure_only_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio_slope_second_law"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_fig1_sio_slope_second_law_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_o2_abundant_not_quantitative"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_o2_abundant_not_quantitative_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_o_abundant_not_quantitative"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_o_abundant_not_quantitative_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_sio2_detected_kems"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_sio2_detected_kems_quoted"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_sio_detected_kems"): "silicate_melt",
+    ("kems-114-nichols-1995.yaml", "nichols_1995_sio_detected_kems_quoted"): "silicate_melt",
     ("kems-133-costa-2017.yaml", "costa_2017_fig6_mg_psat_figure_only"): "solid_solution_silicate",
-    ("kems-133-costa-2017.yaml", "costa_2017_fig6_sio_psat_figure_only"): "solid_solution_silicate",
     ("kems-133-costa-2017.yaml", "costa_2017_fig6_o2_psat_figure_only"): "solid_solution_silicate",
     ("kems-133-costa-2017.yaml", "costa_2017_fig6_o_psat_figure_only"): "solid_solution_silicate",
+    ("kems-133-costa-2017.yaml", "costa_2017_fig6_sio_psat_figure_only"): "solid_solution_silicate",
     ("ta-yamanaka-1997-metsoc.yaml", "yamanaka_1997_na_measured_evaporation_mass_fit"): "silicate_melt",
     ("tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml", "tachibana_1998_forsterite_hkl_flux_equation"): "silicate_melt",
 }
-_UNCLASSIFIED_GAS_ROWS_WITH_CONDENSED_FORM = {
-    ("kems-003-pound-1972.yaml", "pound_1972_k_liquid_alpha_neumann"),
-    ("kems-008-schaefer-fegley-2004.yaml", "schaefer_fegley_2004_mg_forsterite_alpha_s_survey"),
-    ("kems-058-ohara-1987.yaml", "ohara_1987_table1_ion_current_ratios_1643k"),
-}
-
 
 def _mapping(node: object) -> dict[str, object]:
     if not isinstance(node, MappingNode):
@@ -267,37 +330,31 @@ def test_vapour_species_quantity_phase_matches_measured_quantity() -> None:
 
 def test_vapour_phase_relabels_preserve_observation_system_class() -> None:
     extract_root = REPO_ROOT / "data/literature/extracts"
-    seen_expected_rows: set[tuple[str, str]] = set()
-    for extract_name in _PHASE_CHANGED_EXTRACTS:
+    observations_by_extract: dict[
+        str, dict[str, tuple[str, dict[str, object]]]
+    ] = {}
+    for extract_name in sorted(
+        {key[0] for key in _EXPECTED_SYSTEM_CLASS_BY_OBSERVATION}
+    ):
         document = yaml.safe_load((extract_root / extract_name).read_text(encoding="utf-8"))
-        for species_id, block in (document.get("species") or {}).items():
-            for row in (block.get("observations") or []):
-                if not isinstance(row, dict):
-                    continue
-                key = (extract_name, str(row.get("observation_id")))
-                values = row.get("values") or {}
-                has_condensed_form = row.get("condensed_form") or values.get(
-                    "condensed_form"
-                )
-                phase = row.get("phase")
-                if phase != "gas" and key not in _GAS_ROWS_WITHOUT_CONDENSED_FORM:
-                    continue
-                system_class = observation_system_class(
-                    SimpleNamespace(
-                        species_id=species_id,
-                        values=values,
-                        phase=phase,
-                        regime=row.get("regime"),
-                        standard_state=row.get("standard_state"),
-                    )
-                )
-                if key in _GAS_ROWS_WITHOUT_CONDENSED_FORM:
-                    assert system_class == _GAS_ROWS_WITHOUT_CONDENSED_FORM[key], key
-                    assert not has_condensed_form, key
-                    seen_expected_rows.add(key)
-                elif phase == "gas" and has_condensed_form:
-                    if key in _UNCLASSIFIED_GAS_ROWS_WITH_CONDENSED_FORM:
-                        assert system_class is None, key
-                    else:
-                        assert system_class is not None, key
-    assert seen_expected_rows == set(_GAS_ROWS_WITHOUT_CONDENSED_FORM)
+        observations_by_extract[extract_name] = {
+            str(row["observation_id"]): (species_id, row)
+            for species_id, block in (document.get("species") or {}).items()
+            for row in (block.get("observations") or [])
+            if isinstance(row, dict) and row.get("observation_id")
+        }
+
+    for (extract_name, observation_id), expected_class in (
+        _EXPECTED_SYSTEM_CLASS_BY_OBSERVATION.items()
+    ):
+        species_id, row = observations_by_extract[extract_name][observation_id]
+        system_class = observation_system_class(
+            SimpleNamespace(
+                species_id=species_id,
+                values=row.get("values") or {},
+                phase=row.get("phase"),
+                regime=row.get("regime"),
+                standard_state=row.get("standard_state"),
+            )
+        )
+        assert system_class == expected_class, (extract_name, observation_id)
