@@ -3909,7 +3909,6 @@ def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_sh
     assert first_bytes.endswith(b"\n")
     first_record = json.loads(first_bytes)
     assert set(first_record) == {
-        "store_stamp",
         "store_content_sha256",
         "hard_issue_counts_by_shape",
         "forbidden_shape_count",
@@ -3935,12 +3934,55 @@ def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_sh
     assert second.returncode == 0, second.stderr
     assert output_path.read_bytes() == first_bytes
 
+    # Generate the record from new store bytes, then commit those same bytes.
+    # The committed record must stay fresh and remain a fixed point.
+    store_path.write_bytes(store_path.read_bytes() + b"\n# committed fixture edit\n")
+    edited = run_script()
+    assert edited.returncode == 0, edited.stderr
+    committed_bytes = output_path.read_bytes()
+    assert committed_bytes != first_bytes
+    subprocess.run(
+        [*git, "add", str(store_path.relative_to(root))],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [
+            *git,
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.org",
+            "commit",
+            "-m",
+            "commit validated store content",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    monkeypatch.setitem(globals(), "REPO_ROOT", root)
+    test_validate_corpus_zero_hard_issues_on_migrated_store()
+    committed = run_script()
+    assert committed.returncode == 0, committed.stderr
+    assert output_path.read_bytes() == committed_bytes
+
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    assert aliases_path.is_file()
+    aliases_path.write_bytes(
+        aliases_path.read_bytes() + b"\n# changed without regenerating validation\n"
+    )
+    with pytest.raises(AssertionError, match="stale store validation record"):
+        test_validate_corpus_zero_hard_issues_on_migrated_store()
+    alias_refresh = run_script()
+    assert alias_refresh.returncode == 0, alias_refresh.stderr
+    test_validate_corpus_zero_hard_issues_on_migrated_store()
+
     # A content edit without regenerating the record must make the cheap
-    # migrated-store check report stale data, even though git-derived metadata
-    # and the record's validation counts have not changed.
+    # migrated-store check report stale data.
     observations[1]["experiment_id"] = "missing-fixture-experiment"
     store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
-    monkeypatch.setitem(globals(), "REPO_ROOT", root)
     with pytest.raises(AssertionError, match="stale store validation record"):
         test_validate_corpus_zero_hard_issues_on_migrated_store()
 

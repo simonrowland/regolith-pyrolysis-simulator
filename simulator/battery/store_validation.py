@@ -12,9 +12,9 @@ from simulator.battery.enums import AdmissionStatus, NoticeKind
 from simulator.battery.migrate import (
     REPO_ROOT,
     iter_observation_store_paths,
+    iter_work_store_paths,
     load_migrated_store,
 )
-from simulator.battery.score import derive_store_stamp
 from simulator.battery.validate import ValidationIssue, validate_corpus
 
 _ALLOWED_HARD_ISSUE_PATH_SUFFIXES = (
@@ -38,11 +38,7 @@ def _migrated_store_content_sha256(root: Path | None = None) -> str:
     root = root or REPO_ROOT
     works_dir = root / "data" / "literature" / "works"
     literature_dir = root / "data" / "literature"
-    paths = [
-        path
-        for path in sorted(works_dir.glob("*.yaml"))
-        if path.name != "ALIASES.yaml"
-    ]
+    paths = iter_work_store_paths(works_dir)
     for directory_name in ("extracts-v2", "observations-v2"):
         paths.extend(
             iter_observation_store_paths(literature_dir / directory_name)
@@ -101,7 +97,7 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
         if experiment.equipment_context_id is not None
     )
     context_rows = {}
-    for work_path in works_dir.glob("*.yaml"):
+    for work_path in iter_work_store_paths(works_dir):
         source = work_path.read_text(encoding="utf-8")
         if not any(context_id in source for context_id in referenced_context_ids):
             continue
@@ -128,7 +124,6 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
     assert report_path.is_file()
     assert extracts_v2.is_dir() or obs_dir.is_dir()
     return {
-        "store_stamp": derive_store_stamp(root),
         "store_content_sha256": _migrated_store_content_sha256(root),
         "hard_issue_counts_by_shape": dict(sorted(hard_issue_counts.items())),
         "forbidden_shape_count": forbidden_shape_count,
