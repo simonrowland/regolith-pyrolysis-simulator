@@ -19242,10 +19242,25 @@ species:
         reaction: LiO0.5(l) = Li(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1673.15:
-            log10_K_star: -5.36
-            N_points_at_T: 2
+        points:
+        - T_K: 1673.15
+          log10_K_star: -5.36
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
         gas_species: Li(g)
     - observation_id: sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906
       standard_state:
@@ -19299,10 +19314,25 @@ species:
         reaction: LiO0.5(l) + ¼O2 = LiO(g)
         n_electrons: -1
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1673.15:
-            log10_K_star: -3.39
-            N_points_at_T: 2
+        points:
+        - T_K: 1673.15
+          log10_K_star: -3.39
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
         gas_species: LiO(g)
     - observation_id: sossi_2019_li_table5_experimental_Li_g_quoted_20260906
       supersedes: sossi_2019_li_table5_experimental_Li_g
@@ -19572,19 +19602,79 @@ species:
         reaction: RbO0.5(l) = Rb(g) + ¼O2
         n_electrons: 1
         t0_min: 14.4
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -4.15
-            N_points_at_T: 1
-          1673.15:
-            log10_K_star: -3.12
-            N_points_at_T: 3
-          1773.15:
-            log10_K_star: -2.63
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.26
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -4.15
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -3.12
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -2.63
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.26
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: Rb(g)
     - observation_id: sossi_2019_rb_table5_experimental_quoted_20260906
       supersedes: sossi_2019_rb_table5_experimental
@@ -19867,19 +19957,79 @@ species:
         reaction: CuO0.5(l) = Cu(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -4.09
-            N_points_at_T: 3
-          1673.15:
-            log10_K_star: -3.7
-            N_points_at_T: 3
-          1773.15:
-            log10_K_star: -3.13
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.9
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -4.09
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -3.7
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -3.13
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.9
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: Cu(g)
     - observation_id: sossi_2019_cu_table5_experimental_quoted_20260906
       supersedes: sossi_2019_cu_table5_experimental
@@ -20061,10 +20211,25 @@ species:
         reaction: AgO0.5(l) = Ag(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -2.23
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -2.23
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
         gas_species: Ag(g)
   Zn:
     observations:
@@ -20299,19 +20464,79 @@ species:
         reaction: ZnO(l) = Zn(g) + ½O2
         n_electrons: 2
         t0_min: 9.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -5.06
-            N_points_at_T: 3
-          1673.15:
-            log10_K_star: -3.96
-            N_points_at_T: 4
-          1773.15:
-            log10_K_star: -2.92
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.57
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -5.06
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -3.96
+          N_points_at_T: 4
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -2.92
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.57
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: Zn(g)
     - observation_id: sossi_2019_zn_table5_experimental_quoted_20260906
       supersedes: sossi_2019_zn_table5_experimental
@@ -20593,19 +20818,79 @@ species:
         reaction: GeO2(l) = GeO(g) + ½O2
         n_electrons: 2
         t0_min: 10.4
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -5.04
-            N_points_at_T: 3
-          1673.15:
-            log10_K_star: -3.7
-            N_points_at_T: 4
-          1773.15:
-            log10_K_star: -2.71
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.29
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -5.04
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -3.7
+          N_points_at_T: 4
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -2.71
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.29
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: GeO(g)
     - observation_id: sossi_2019_ge_table5_experimental_quoted_20260906
       supersedes: sossi_2019_ge_table5_experimental
@@ -20784,10 +21069,25 @@ species:
         reaction: CdO(l) = Cd(g) + ½O2
         n_electrons: 2
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -2.48
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -2.48
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
         gas_species: Cd(g)
   Ga:
     observations:
@@ -21107,16 +21407,61 @@ species:
         reaction: GaO1.5(l) = Ga(g) + ¾O2
         n_electrons: 3
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1673.15:
-            log10_K_star: -9.92
-            N_points_at_T: 3
-          1773.15:
-            log10_K_star: -8.42
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -7.76
-            N_points_at_T: 1
+        points:
+        - T_K: 1673.15
+          log10_K_star: -9.92
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -8.42
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -7.76
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: Ga(g)
     - observation_id: sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906
       standard_state:
@@ -21184,16 +21529,61 @@ species:
         reaction: GaO1.5(l) = GaO(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1673.15:
-            log10_K_star: -5.1
-            N_points_at_T: 3
-          1773.15:
-            log10_K_star: -4.45
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -4.16
-            N_points_at_T: 1
+        points:
+        - T_K: 1673.15
+          log10_K_star: -5.1
+          N_points_at_T: 3
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -4.45
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -4.16
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: GaO(g)
     - observation_id: sossi_2019_ga_table5_experimental_Ga_g_quoted_20260906
       supersedes: sossi_2019_ga_table5_experimental_Ga_g
@@ -21531,13 +21921,43 @@ species:
         reaction: PbO(l) = PbO(g)
         n_electrons: 0
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -2.9
-            N_points_at_T: 2
-          1673.15:
-            log10_K_star: -2.0
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -2.9
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -2.0
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
         gas_species: PbO(g)
     - observation_id: sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906
       standard_state:
@@ -21591,13 +22011,43 @@ species:
         reaction: PbO(l) = Pb(g) + ½O2
         n_electrons: 2
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -4.47
-            N_points_at_T: 2
-          1673.15:
-            log10_K_star: -3.49
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -4.47
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -3.49
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
         gas_species: Pb(g)
     - observation_id: sossi_2019_pb_table5_experimental_PbO_g_quoted_20260906
       supersedes: sossi_2019_pb_table5_experimental_PbO_g
@@ -21971,19 +22421,79 @@ species:
         reaction: MoO3(l) = MoO3(g)
         n_electrons: 0
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -4.67
-            N_points_at_T: 1
-          1673.15:
-            log10_K_star: -4.34
-            N_points_at_T: 2
-          1773.15:
-            log10_K_star: -3.64
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -3.41
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -4.67
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -4.34
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -3.64
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -3.41
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: MoO3(g)
     - observation_id: sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906
       standard_state:
@@ -22051,19 +22561,79 @@ species:
         reaction: MoO  2(l) + ½O  2 = MoO 3(g)
         n_electrons: -2
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1573.15:
-            log10_K_star: -2.87
-            N_points_at_T: 1
-          1673.15:
-            log10_K_star: -2.86
-            N_points_at_T: 2
-          1773.15:
-            log10_K_star: -2.48
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.39
-            N_points_at_T: 1
+        points:
+        - T_K: 1573.15
+          log10_K_star: -2.87
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1573.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1573.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1573.15 K.
+        - T_K: 1673.15
+          log10_K_star: -2.86
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -2.48
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.39
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: MoO 3(g)
     - observation_id: sossi_2019_mo_table5_experimental_MoO3_quoted_20260906
       supersedes: sossi_2019_mo_table5_experimental_MoO3
@@ -22320,16 +22890,61 @@ species:
         reaction: CrO(l) + ½O2 = CrO2(g)
         n_electrons: -2
         t0_min: 0.0
-        log10_K_star_by_T_K:
-          1673.15:
-            log10_K_star: -2.7
-            N_points_at_T: 1
-          1773.15:
-            log10_K_star: -2.4
-            N_points_at_T: 2
-          1823.15:
-            log10_K_star: -2.29
-            N_points_at_T: 1
+        points:
+        - T_K: 1673.15
+          log10_K_star: -2.7
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1673.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1673.15 K.
+        - T_K: 1773.15
+          log10_K_star: -2.4
+          N_points_at_T: 2
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1773.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1773.15 K.
+        - T_K: 1823.15
+          log10_K_star: -2.29
+          N_points_at_T: 1
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            note: Table 3 log K-star cell at 1823.15 K.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1823.15'
+              locator:
+                source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+                page: 56
+                table: '3'
+                note: Table 3 column 1823.15 K.
         gas_species: CrO2(g)
     - observation_id: sossi_2019_cr_table5_experimental_CrO_ox_quoted_20260906
       supersedes: sossi_2019_cr_table5_experimental_CrO_ox

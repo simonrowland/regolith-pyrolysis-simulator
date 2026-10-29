@@ -580,3 +580,72 @@ def test_fegley_table1_silicate_gas_pressures_migrate_with_conditions():
         condensed_phase = point_conditions["condensed_phase_as_printed"]
         assert condensed_phase.state.value == expected_condition[3]
         assert condensed_phase.locator is not None
+
+
+def test_sossi_table3_log_k_star_cells_migrate_as_temperature_points():
+    observations = [
+        observation
+        for observation in _observations(
+            "kems-012-sossi-2019.yaml", "quoted_20260906"
+        )
+        if "_logKstar_table3_" in observation.observation_id
+        and "_na_logKstar_table3_" not in observation.observation_id
+        and "_k_logKstar_table3_" not in observation.observation_id
+    ]
+    expected = {
+        ("sossi_2019_ag_logKstar_table3_quoted_20260906", "1573.15"): "-2.23",
+        ("sossi_2019_cd_logKstar_table3_quoted_20260906", "1573.15"): "-2.48",
+        ("sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906", "1673.15"): "-2.7",
+        ("sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906", "1773.15"): "-2.4",
+        ("sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906", "1823.15"): "-2.29",
+        ("sossi_2019_cu_logKstar_table3_quoted_20260906", "1573.15"): "-4.09",
+        ("sossi_2019_cu_logKstar_table3_quoted_20260906", "1673.15"): "-3.7",
+        ("sossi_2019_cu_logKstar_table3_quoted_20260906", "1773.15"): "-3.13",
+        ("sossi_2019_cu_logKstar_table3_quoted_20260906", "1823.15"): "-2.9",
+        ("sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906", "1673.15"): "-5.1",
+        ("sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906", "1773.15"): "-4.45",
+        ("sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906", "1823.15"): "-4.16",
+        ("sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906", "1673.15"): "-9.92",
+        ("sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906", "1773.15"): "-8.42",
+        ("sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906", "1823.15"): "-7.76",
+        ("sossi_2019_ge_logKstar_table3_quoted_20260906", "1573.15"): "-5.04",
+        ("sossi_2019_ge_logKstar_table3_quoted_20260906", "1673.15"): "-3.7",
+        ("sossi_2019_ge_logKstar_table3_quoted_20260906", "1773.15"): "-2.71",
+        ("sossi_2019_ge_logKstar_table3_quoted_20260906", "1823.15"): "-2.29",
+        ("sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906", "1673.15"): "-3.39",
+        ("sossi_2019_li_logKstar_table3_Li_g_quoted_20260906", "1673.15"): "-5.36",
+        ("sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906", "1573.15"): "-2.87",
+        ("sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906", "1673.15"): "-2.86",
+        ("sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906", "1773.15"): "-2.48",
+        ("sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906", "1823.15"): "-2.39",
+        ("sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906", "1573.15"): "-4.67",
+        ("sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906", "1673.15"): "-4.34",
+        ("sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906", "1773.15"): "-3.64",
+        ("sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906", "1823.15"): "-3.41",
+        ("sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906", "1573.15"): "-2.9",
+        ("sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906", "1673.15"): "-2.0",
+        ("sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906", "1573.15"): "-4.47",
+        ("sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906", "1673.15"): "-3.49",
+        ("sossi_2019_rb_logKstar_table3_quoted_20260906", "1573.15"): "-4.15",
+        ("sossi_2019_rb_logKstar_table3_quoted_20260906", "1673.15"): "-3.12",
+        ("sossi_2019_rb_logKstar_table3_quoted_20260906", "1773.15"): "-2.63",
+        ("sossi_2019_rb_logKstar_table3_quoted_20260906", "1823.15"): "-2.26",
+        ("sossi_2019_zn_logKstar_table3_quoted_20260906", "1573.15"): "-5.06",
+        ("sossi_2019_zn_logKstar_table3_quoted_20260906", "1673.15"): "-3.96",
+        ("sossi_2019_zn_logKstar_table3_quoted_20260906", "1773.15"): "-2.92",
+        ("sossi_2019_zn_logKstar_table3_quoted_20260906", "1823.15"): "-2.57",
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        root_id = observation.observation_id.split("::", 1)[1].split("::T=", 1)[0]
+        temperature = observation.identity.temperature_K.value
+        key = (root_id, str(temperature))
+        assert key in expected
+        assert observation.identity.quantity.value.value == Quantity.LOG10_K_STAR.value
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(expected[key])
+        condition = (observation.point_conditions or {})["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == temperature
+        assert condition.locator is not None
+        assert condition.locator.table == "3"
