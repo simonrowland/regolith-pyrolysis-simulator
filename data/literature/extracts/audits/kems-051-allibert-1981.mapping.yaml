@@ -1,0 +1,64 @@
+source_id: kems-051-allibert-1981
+source:
+  citation: Allibert et al. (1981), Journal of the American Ceramic Society 64(5), 307–314.
+  corpus_asset: raw/kems-051-allibert-1981/kems-051-allibert-1981.pdf
+extraction:
+  method: >-
+    Existing Table II points were checked against the born-digital pdftotext layout, MinerU cell draft, and the page 309 render.
+    Every numeric cell was render-verified because MinerU flagged the composition marker row and its two empty activity cells.
+  date: '2026-10-29'
+  worker: w1029cmas2-allib81
+review_status: draft
+table_audit:
+  printed_numeric_rows: 8
+  printed_body_lines: 9
+  extra_line: CaO + melt is the phase marker immediately above the 80 mol% CaO row.
+  per_column_alignment:
+    composition: column 1; left column headed Composition of melt (mol%CaO)
+    CaO_activity: column 2; centered under a_CaO*
+    Al2O3_activity: column 3; right column under a_Al2O3
+  cell_audit: audits/kems-051-allibert-1981-table-ii-cells.csv
+  mineru_compare: audits/kems-051-allibert-1981-table-ii-mineru-compare.csv
+tables:
+  - page: 3
+    published_page: 309
+    table_index: 2
+    printed_table: II
+    caption: Activity Data Obtained by Mass Spectrometry at 2060 K
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless activity
+    evidence_class: quoted_attributed
+    evidence_reason: >-
+      The authors' activities are reduced from KEMS ion-intensity ratios using Eqs. 1–2, 3–8, but the input intensities are
+      not tabulated and cannot be stored as observations; d-110 therefore requires quoted_attributed. This is not a gate
+      workaround: the reported values remain attributed outputs of the authors' KEMS experiment.
+    compare_note: >-
+      mineru_table_draft compare reports numeric mismatches because tools/mineru_table_draft.py::_phase_matches_column
+      accepts prose phase labels but not the required PHASE_MAP token l. All 24 stored numeric cells were checked against
+      the page 309 render and match; see the cell audit.
+    phase: l
+    regime: kems_effusion_ion_comparison
+    experiment: allibert-1981-mo-kems
+    temperature: {as_printed: '2060', unit: K}
+    composition:
+      column: 1
+      unit: mol% CaO
+      complement: Al2O3 = 100 − CaO, for the printed binary CaO–Al2O3 melt
+    values:
+      - column: 2
+        species: CaO
+        standard_state_as_printed: solid CaO
+      - column: 3
+        species: Al2O3
+        standard_state_as_printed: solid Al2O3; pure α-Al2O3 reference cell
+  - page: 3
+    printed_table: II
+    nonnumeric_row:
+      text: CaO + melt
+      meaning: two-phase marker carried onto the following 80 mol% CaO row
+      render_verified: true
+    caveat:
+      species: Al2O3
+      text: 'A critical evaluation of these mass-spectrometric data in the light of emf measurements reported in the next section and the other data reported in the literature (Section IV) also indicate that the activities of CaO obtained in this study are more reliable than the values for Al2O3.'
+      locator: {published_page: 309, pdf_page_index: 2, section: II. Mass-Spectrometric Measurements}
