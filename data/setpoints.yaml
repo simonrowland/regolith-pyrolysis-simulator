@@ -1140,11 +1140,24 @@ condensation_train:
 
     stage_4_alkali_mg_cyclone:
       label: "Alkali / Mg Cyclone Separator"
-      temp_range_C: [350, 700]
+      # Owner ruling d-137 (2026-10-29): Na collector wall 250 C. Equal
+      # endpoints are the wall the capture law uses. Mg, C7 Ca, and MRE
+      # Mg/Na stay on this stage. K moves to stage_4b_k_trap. The nested
+      # condensation_temperatures_C block is the old routing label, not
+      # this wall. Provisional on b-588 (interface pO2) and b-599 (alkali
+      # carrier). Below the Na Antoine band (924-1118 K): predict-and-flag.
+      temp_range_C: [250, 250]
       condensation_temperatures_C:
         Mg: [500, 650]
         Na: [450, 550]
         K: [400, 500]
+
+    stage_4b_k_trap:
+      label: "K Cold Trap"
+      # Sub-stage of 4. route() visits it after the Na collector and before
+      # stage 5. Wall 40 C is below the K Antoine band (679-1033 K):
+      # predict-and-flag. Provisional on b-588 and b-599.
+      temp_range_C: [40, 40]
 
     stage_5_vortex_dust_filter:
       label: "Vortex Dust Filter"
@@ -1184,13 +1197,15 @@ condenser_geometry:
     fe_stage1: 20.866981427604056
     cr_stage2: 4.5
     sio_stage3: 6.0
-    alkali_stage4: 5.0
+    alkali_stage4: 4.5093900542703675
+    k_stage4b: 5.658842421045168
     terminal: 2.0
   stage_area_ratio_sources:
     fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
-    alkali_stage4: "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge"
+    alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.
