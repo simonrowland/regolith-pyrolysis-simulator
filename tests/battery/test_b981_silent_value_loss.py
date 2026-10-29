@@ -394,7 +394,8 @@ def test_shilov_table4_molecular_oxygen_pressures_use_printed_scale_and_conditio
         assert temperature.state.value == Decimal("1300.0")
         assert temperature.locator is not None
         assert composition.state.is_value and composition.locator is not None
-        assert observation.value.point == expected[composition.state.value]
+        assert composition.state.value.kind is ValueKind.POINT
+        assert observation.value.point == expected[composition.state.value.point]
 
 
 def test_ohara_p4o10_saturation_pressure_migrates_with_janaf_conditions():
@@ -414,3 +415,48 @@ def test_ohara_p4o10_saturation_pressure_migrates_with_janaf_conditions():
     assert temperature.state.is_value
     assert temperature.state.value == Decimal("1643.0")
     assert temperature.locator is not None
+
+
+def test_fegley_table4_hydroxide_pressures_migrate_with_conditions():
+    observations = _observations(
+        "fegley-2016-rock-steam-solubility.yaml",
+        "fegley_2016_table4_hydroxide_partial_pressures",
+    )
+    expected = {
+        ("SiH4O4", Decimal("1000")): Decimal("2.9e3"),
+        ("SiH4O4", Decimal("1500")): Decimal("2.0e4"),
+        ("SiH4O4", Decimal("2000")): Decimal("5.9e4"),
+        ("MgH2O2", Decimal("1000")): Decimal("2.0e-5"),
+        ("MgH2O2", Decimal("1500")): Decimal("2.7"),
+        ("MgH2O2", Decimal("2000")): Decimal("1.0e3"),
+        ("FeH2O2", Decimal("1000")): Decimal("0.15"),
+        ("FeH2O2", Decimal("1500")): Decimal("3.5e2"),
+        ("FeH2O2", Decimal("2000")): Decimal("1.1e4"),
+        ("CaH2O2", Decimal("1000")): Decimal("1.7e-5"),
+        ("CaH2O2", Decimal("1500")): Decimal("12"),
+        ("CaH2O2", Decimal("2000")): Decimal("4.0e3"),
+        ("AlH3O3", Decimal("1000")): Decimal("0.023"),
+        ("AlH3O3", Decimal("1500")): Decimal("50"),
+        ("AlH3O3", Decimal("2000")): Decimal("2.4e3"),
+        ("NiH2O2", Decimal("1000")): Decimal("0.013"),
+        ("NiH2O2", Decimal("1500")): Decimal("1.6e2"),
+        ("NiH2O2", Decimal("2000")): Decimal("1.9e4"),
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        key = (observation.identity.species.formula, observation.identity.temperature_K.value)
+        assert key in expected
+        assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected[key]
+        conditions = observation.point_conditions or {}
+        total_pressure = conditions["total_pressure_Pa"]
+        assert total_pressure.state.is_value
+        assert total_pressure.state.value.kind is ValueKind.POINT
+        assert total_pressure.state.value.point == Decimal("22064000")
+        assert total_pressure.locator is not None
+        temperature = conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == key[1]
+        assert temperature.locator is not None

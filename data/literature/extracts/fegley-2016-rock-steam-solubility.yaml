@@ -75,20 +75,32 @@ species:
       type: psat_series
       locator: {pdf_page_index: 122, table: '4'}
       T_range_K: [1000.0, 2000.0]
-      phase: pure_oxide_in_steam
+      phase: gas
       regime: thermochemical_equilibrium_model
       units: bar as printed; total steam pressure 220.64 bar
       values:
         quantity: partial_pressure
         method_class: model_derived
         model: IVTAN chemical-equilibrium calculations
-        rows:
-        - {gas_species: Si(OH)4, P_1000K_bar: 0.029, P_1500K_bar: 0.20, P_2000K_bar: 0.59}
-        - {gas_species: Mg(OH)2, P_1000K_bar: 2.0e-10, P_1500K_bar: 2.7e-5, P_2000K_bar: 0.010}
-        - {gas_species: Fe(OH)2, P_1000K_bar: 1.5e-6, P_1500K_bar: 3.5e-3, P_2000K_bar: 0.11}
-        - {gas_species: Ca(OH)2, P_1000K_bar: 1.7e-10, P_1500K_bar: 1.2e-4, P_2000K_bar: 0.040}
-        - {gas_species: Al(OH)3, P_1000K_bar: 2.3e-7, P_1500K_bar: 5.0e-4, P_2000K_bar: 0.024}
-        - {gas_species: Ni(OH)2, P_1000K_bar: 1.3e-7, P_1500K_bar: 1.6e-3, P_2000K_bar: 0.19}
+        points:
+        - {species_as_printed: SiH4O4, gas_species_as_printed: Si(OH)4, T_K: 1000, p_bar: 0.029, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: SiH4O4, gas_species_as_printed: Si(OH)4, T_K: 1500, p_bar: 0.20, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: SiH4O4, gas_species_as_printed: Si(OH)4, T_K: 2000, p_bar: 0.59, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: MgH2O2, gas_species_as_printed: Mg(OH)2, T_K: 1000, p_bar: 2.0e-10, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: MgH2O2, gas_species_as_printed: Mg(OH)2, T_K: 1500, p_bar: 2.7e-5, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: MgH2O2, gas_species_as_printed: Mg(OH)2, T_K: 2000, p_bar: 0.010, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: FeH2O2, gas_species_as_printed: Fe(OH)2, T_K: 1000, p_bar: 1.5e-6, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: FeH2O2, gas_species_as_printed: Fe(OH)2, T_K: 1500, p_bar: 3.5e-3, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: FeH2O2, gas_species_as_printed: Fe(OH)2, T_K: 2000, p_bar: 0.11, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: CaH2O2, gas_species_as_printed: Ca(OH)2, T_K: 1000, p_bar: 1.7e-10, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: CaH2O2, gas_species_as_printed: Ca(OH)2, T_K: 1500, p_bar: 1.2e-4, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: CaH2O2, gas_species_as_printed: Ca(OH)2, T_K: 2000, p_bar: 0.040, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: AlH3O3, gas_species_as_printed: Al(OH)3, T_K: 1000, p_bar: 2.3e-7, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: AlH3O3, gas_species_as_printed: Al(OH)3, T_K: 1500, p_bar: 5.0e-4, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: AlH3O3, gas_species_as_printed: Al(OH)3, T_K: 2000, p_bar: 0.024, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: NiH2O2, gas_species_as_printed: Ni(OH)2, T_K: 1000, p_bar: 1.3e-7, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: NiH2O2, gas_species_as_printed: Ni(OH)2, T_K: 1500, p_bar: 1.6e-3, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
+        - {species_as_printed: NiH2O2, gas_species_as_printed: Ni(OH)2, T_K: 2000, p_bar: 0.19, locator: {pdf_page_index: 122, table: '4'}, point_conditions: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '22064000'}}, locator: {pdf_page_index: 122, table: '4'}}}}
   Mg:
     observations:
     - observation_id: fegley_2016_table3_bse_composition
