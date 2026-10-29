@@ -146,11 +146,16 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
         row["observation_id"]: row
         for row in document["species"]["SiO2"]["observations"]
     }
+    rock_12065_experiment_id = next(
+        experiment_id
+        for experiment_id in result.experiments
+        if experiment_id.endswith("::experiment::kushiro-1971-rock-12065-45")
+    )
     for observation_id in estimate_ids:
         source_row = source_rows[observation_id]
         _assert_rock_12065_estimate_binding(source_row)
         migrated = by_id[observation_id]
-        assert migrated.experiment_id == "kushiro-1971-rock-12065-45"
+        assert migrated.experiment_id == rock_12065_experiment_id
         assert migrated.evidence.class_.is_value
         assert migrated.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
         assert migrated.identity.composition is not None
