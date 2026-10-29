@@ -1235,7 +1235,7 @@ def test_wt_percent_derivation_ignores_printed_totals() -> None:
 
 
 def test_nested_and_flat_composition_maps_skip_mass_loss_conditions() -> None:
-    components = {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    components = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
     assert _initial_oxide_map_from_values(
         {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}}
     ) == components
@@ -1245,7 +1245,7 @@ def test_nested_and_flat_composition_maps_skip_mass_loss_conditions() -> None:
 
 
 def test_declared_map_skips_sample_codes_flags_and_condition_fields() -> None:
-    components = {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    components = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
 
     assert _initial_oxide_map_from_values(
         {
@@ -1437,7 +1437,7 @@ def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
             "points": [
                 {
                     "composition_wt_pct": {
-                        "SiO2": Decimal("50"),
+                        "SiO2": Decimal("60"),
                         "MgO": Decimal("40"),
                     },
                     "T_C": Decimal("0"),
@@ -2966,6 +2966,13 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         if observation["values"].get("quantity") == "residue_composition_vs_time"
     }
     for panel, charge in charges.items():
+        assert sum(charge.values(), Decimal("0")) == {
+            "VI": Decimal("100.01"),
+            "V": Decimal("100.00"),
+        }[panel]
+        assert migrate_module._percent_composition_closure_error(
+            charge, "mass"
+        ) is None
         series = source_values[panel]["series"]
         panel_rows = [
             row
@@ -2984,6 +2991,7 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
             )
             assert _printed_wt_map(row) == expected
 
+    refused_residue_rows = {}
     for panel in charges:
         for row in residue.values():
             if not row["experiment_id"].endswith(f"::{panel}"):
@@ -3003,15 +3011,35 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 for oxide in charges[panel]
             }
             assert _printed_wt_map(row) == expected
-            composition = _state_value(
-                (row.get("point_conditions") or {}).get("composition")
+            composition_entry = (
+                (row.get("point_conditions") or {}).get("composition") or {}
             )
-            assert composition["amount_basis"] == "mole_fraction"
-            actual_moles = {
-                oxide: as_decimal(amount)
-                for oxide, amount in composition["components"]
-            }
-            assert actual_moles == dict(wt_pct_to_mole_fraction(expected).components)
+            composition_state = composition_entry.get("state") or {}
+            converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+                expected
+            )
+            if refusal is not None:
+                assert converted is None
+                assert composition_state["tag"] == "unknown"
+                assert composition_state["reason"] == refusal
+                refused_residue_rows[(panel, temperature_c)] = sum(
+                    expected.values(), Decimal("0")
+                )
+            else:
+                assert converted is not None
+                composition = _state_value(
+                    (row.get("point_conditions") or {}).get("composition")
+                )
+                assert composition["amount_basis"] == "mole_fraction"
+                actual_moles = {
+                    oxide: as_decimal(amount)
+                    for oxide, amount in composition["components"]
+                }
+                assert actual_moles == dict(converted.components)
+    assert refused_residue_rows == {
+        ("VI", Decimal("1883")): Decimal("91.43"),
+        ("VI", Decimal("1960")): Decimal("95.01"),
+    }
 
     for panel, charge in charges.items():
         panel_rows = [
@@ -3679,12 +3707,13 @@ def test_mass_percent_parser_behavior_is_pinned(components) -> None:
     ) is None
 
 
-def test_mass_percent_conversion_behavior_is_pinned() -> None:
+def test_nonclosing_mass_percent_conversion_is_refused() -> None:
     payload = {
         "amount_basis": "mass_percent",
         "components": [["SiO2", "45"], ["MgO", "45"]],
     }
-    composition = migrate_module._composition_from_plain(payload)
-    assert composition.as_map() == migrate_module.wt_pct_to_mole_fraction(
-        {"SiO2": Decimal("45"), "MgO": Decimal("45")}
-    ).as_map()
+    with pytest.raises(
+        ValueError,
+        match="mass-percent composition does not close to 100 \\(sum=90\\)",
+    ):
+        migrate_module._composition_from_plain(payload)
