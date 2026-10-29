@@ -7699,6 +7699,42 @@ def _pressure_isolated_capture_budget_kg(
     return max(0.0, min(rate_kg_hr, rate_kg_hr - remaining_kg))
 
 
+def _first_order_capture_efficiency(
+    exposure: float,
+    *,
+    equilibrium_fraction: float = 1.0,
+) -> float:
+    """Own the first-order depletion law shared by stage capture callers.
+
+    The live flow path supplies ``exposure = J_in * A / n_dot_in`` and its
+    wall-equilibrium ceiling. The pressure-isolated fallback supplies its
+    already dimensionless ``residence_s / tau_s`` exposure with a unit ceiling.
+    Both belong here because both describe first-order depletion of the same
+    vapor supply; callers only resolve their physical exposure and ceiling.
+    """
+    if not math.isfinite(float(exposure)):
+        raise ValueError('capture exposure must be finite')
+    if not math.isfinite(float(equilibrium_fraction)):
+        raise ValueError('capture equilibrium fraction must be finite')
+    x = max(0.0, float(exposure))
+    f_eq = max(0.0, min(1.0, float(equilibrium_fraction)))
+    if x == 0.0 or f_eq == 0.0:
+        return 0.0
+
+    # Premise: deposition flux follows the local partial pressure, which
+    # follows remaining molar flow. With an equilibrium floor n_eq, its
+    # supersaturation obeys d(n_dot - n_eq)/dA =
+    # -(J_in / (f_eq * n_dot_in)) * (n_dot - n_eq). Integrating from
+    # inlet to area A gives ln((n_dot - n_eq)/(f_eq*n_dot_in)) =
+    # -J_in*A/(f_eq*n_dot_in), hence eta =
+    # f_eq * (1 - exp(-J_in*A/(f_eq*n_dot_in))).
+    # Unit check: J_in [mol m^-2 s^-1] * A [m^2] / n_dot_in [mol s^-1]
+    # is dimensionless. Limits: at small x, eta approaches J_in*A/n_dot_in;
+    # at large area, eta approaches f_eq.
+    eta = f_eq * (1.0 - math.exp(-x / f_eq))
+    return max(0.0, min(f_eq, eta))
+
+
 def _pressure_isolated_stage_efficiency(
     stage: CondensationStage,
     T_cond_C: float,
@@ -7724,13 +7760,11 @@ def _pressure_isolated_stage_efficiency(
         CAPTURE_BUDGET_REGULARIZER_FLOOR,
     )
     # Premise: alpha_s and normalized_drive are dimensionless. Algebra:
-    # tau_s = t_ref_s / (alpha_s * normalized_drive). Unit check:
-    # s / 1 = s, so residence_s / tau_s is dimensionless. Sanity:
-    # colder stages or higher sticking shorten tau; the explicit
-    # one-second t_ref_s is surfaced as an uncertified numerical regularizer.
+    # tau_s = t_ref_s / (alpha_s * normalized_drive), so residence_s/tau_s
+    # is dimensionless. This legacy fallback keeps its numerical regularizer
+    # but delegates the first-order depletion law to the shared owner above.
     tau_s = CAPTURE_BUDGET_REGULARIZER_TIME_S / (alpha_s * normalized_drive)
-    eta = 1.0 - math.exp(-residence_s / tau_s)
-    return max(0.0, min(1.0, eta))
+    return _first_order_capture_efficiency(residence_s / tau_s)
 
 
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
