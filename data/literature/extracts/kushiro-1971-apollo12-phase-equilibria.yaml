@@ -144,7 +144,110 @@ species:
     - observation_id: kushiro_1971_mixture_a_chromite_first_appearance_bracket
       type: transition_point
       regime: quench_equilibration
-      experiment: kushiro-1971-mixture-a
+      experiment: kushiro-1971-rock-12065-45
+      phase: l
+      locator: &id032
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance
+        phase_appearance_as_printed: chromite in rock 12065
+        temperature_as_printed: between 1200° and 1170°C
+        method_class: authors_estimate
+        sentence_as_printed: >-
+          The results of the 1 atm quenching experiments on mixture A indicate that chromite in rock 12065 would have begun to crystallize at temperatures between 1200° and 1170°C and pigeonite near 1170°C.
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+            note: Rock 12065,45 composition is not printed in this paper.
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source does not print oxygen fugacity for rock 12065.
+          locator: *id032
+    - observation_id: kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-rock-12065-45
+      phase: l
+      locator: *id032
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance
+        phase_appearance_as_printed: pigeonite in rock 12065
+        T_C: 1170
+        approximate: true
+        method_class: authors_estimate
+        sentence_as_printed: >-
+          The results of the 1 atm quenching experiments on mixture A indicate that chromite in rock 12065 would have begun to crystallize at temperatures between 1200° and 1170°C and pigeonite near 1170°C.
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+            note: Rock 12065,45 composition is not printed in this paper.
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source does not print oxygen fugacity for rock 12065.
+          locator: *id032
+    - observation_id: kushiro_1971_mixture_b_augite_plagioclase_first_appearance
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
       phase: l
       locator: &id001
         page: 12
@@ -154,130 +257,7 @@ species:
       units: °C
       values:
         quantity: transition_temperature
-        property_kind: first_appearance
-        phase_appearance_as_printed: chromite in rock 12065
-        temperature_as_printed: between 1200° and 1170°C
-        method_class: measured_direct
-      point_conditions:
-        composition:
-          state:
-            tag: value
-            value:
-              SiO2_wt_pct: '47.1'
-              Al2O3_wt_pct: '9.9'
-              TiO2_wt_pct: '3.1'
-              Cr2O3_wt_pct: '0.6'
-              FeO_wt_pct: '20.5'
-              MnO_wt_pct: '0.26'
-              MgO_wt_pct: '8.0'
-              CaO_wt_pct: '10.2'
-              Na2O_wt_pct: '0.28'
-              K2O_wt_pct: '0.06'
-          locator:
-            page: 10
-            published_page: 490
-            pdf_page_index: 9
-            table: '3'
-            note: Mixture A starting composition; Table 3 column 1.
-        oxygen_partial_pressure:
-          value: 10^-13
-          units: atm
-          state:
-            tag: value
-            value: 10^-13
-          locator:
-            page: 12
-            published_page: 492
-            pdf_page_index: 11
-            figure: '6'
-            note: The figure caption states the 1 atm quenching experiments were made at 10^-13 atm PO2.
-        total_pressure_Pa:
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 12
-            published_page: 492
-            pdf_page_index: 11
-            section: Experiments and Their Application
-            note: The sentence identifies this as a result of the 1 atm quenching experiments; converted from printed 1 atm.
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
-          locator: *id001
-    - observation_id: kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170
-      type: transition_point
-      regime: quench_equilibration
-      experiment: kushiro-1971-mixture-a
-      phase: l
-      locator: *id001
-      units: °C
-      values:
-        quantity: transition_temperature
-        property_kind: first_appearance
-        phase_appearance_as_printed: pigeonite in rock 12065
-        T_C: 1170
-        approximate: true
-        method_class: measured_direct
-      point_conditions:
-        composition:
-          state:
-            tag: value
-            value:
-              SiO2_wt_pct: '47.1'
-              Al2O3_wt_pct: '9.9'
-              TiO2_wt_pct: '3.1'
-              Cr2O3_wt_pct: '0.6'
-              FeO_wt_pct: '20.5'
-              MnO_wt_pct: '0.26'
-              MgO_wt_pct: '8.0'
-              CaO_wt_pct: '10.2'
-              Na2O_wt_pct: '0.28'
-              K2O_wt_pct: '0.06'
-          locator:
-            page: 10
-            published_page: 490
-            pdf_page_index: 9
-            table: '3'
-            note: Mixture A starting composition; Table 3 column 1.
-        oxygen_partial_pressure:
-          value: 10^-13
-          units: atm
-          state:
-            tag: value
-            value: 10^-13
-          locator:
-            page: 12
-            published_page: 492
-            pdf_page_index: 11
-            figure: '6'
-            note: The figure caption states the 1 atm quenching experiments were made at 10^-13 atm PO2.
-        total_pressure_Pa:
-          state:
-            tag: value
-            value: '101325'
-          locator:
-            page: 12
-            published_page: 492
-            pdf_page_index: 11
-            section: Experiments and Their Application
-            note: The source describes this as a result of the 1 atm quenching experiments; converted from printed 1 atm.
-        fO2_Pa:
-          state:
-            tag: unknown
-            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
-          locator: *id001
-    - observation_id: kushiro_1971_mixture_b_augite_plagioclase_first_appearance
-      type: transition_point
-      regime: quench_equilibration
-      experiment: kushiro-1971-mixture-b
-      phase: l
-      locator: *id001
-      units: °C
-      values:
-        quantity: transition_temperature
-        property_kind: first_appearance
+        property_kind: first_appearance_augite_and_plagioclase
         phase_appearance_as_printed: augite and plagioclase in
         method_class: measured_direct
         T_C: 1130
@@ -305,14 +285,26 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: &id033
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     - observation_id: kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance
       type: transition_point
       regime: quench_equilibration
@@ -322,7 +314,7 @@ species:
       units: °C
       values:
         quantity: transition_temperature
-        property_kind: first_appearance
+        property_kind: first_appearance_ca_poor_pyroxene
         phase_appearance_as_printed: Ca-poor pyroxene in
         method_class: measured_direct
         T_C: 1210
@@ -349,14 +341,21 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     - observation_id: kushiro_1971_mixture_b_chromite_liquidus
       type: transition_point
       regime: quench_equilibration
@@ -404,14 +403,21 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     - observation_id: kushiro_1971_mixture_b_ilmenite_first_appearance
       type: transition_point
       regime: quench_equilibration
@@ -421,7 +427,7 @@ species:
       units: °C
       values:
         quantity: transition_temperature
-        property_kind: first_appearance
+        property_kind: first_appearance_ilmenite
         phase_appearance_as_printed: ilmenite in
         method_class: measured_direct
         T_C: 1100
@@ -449,14 +455,21 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     - observation_id: kushiro_1971_mixture_b_olivine_first_appearance
       type: transition_point
       regime: quench_equilibration
@@ -466,7 +479,7 @@ species:
       units: °C
       values:
         quantity: transition_temperature
-        property_kind: first_appearance
+        property_kind: first_appearance_olivine
         phase_appearance_as_printed: olivine in
         method_class: measured_direct
         T_C: 1280
@@ -493,14 +506,21 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     - observation_id: kushiro_1971_mixture_b_solidus
       type: transition_point
       regime: quench_equilibration
@@ -549,14 +569,21 @@ species:
             note: Mixture B starting composition; Table 3 column 2.
         total_pressure_Pa:
           state:
-            tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state pressure.
-          locator: *id001
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
         fO2_Pa:
           state:
             tag: unknown
-            reason: The prose summarizing these mixture B transition temperatures does not state oxygen fugacity or oxygen partial pressure.
-          locator: *id001
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
     context:
     - observation_id: kushiro_1971_table3_starting_material_compositions
       type: table_record

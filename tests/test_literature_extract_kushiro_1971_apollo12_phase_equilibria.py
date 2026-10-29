@@ -4,9 +4,10 @@ from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
@@ -15,10 +16,49 @@ from tools.validate_literature_extracts import (
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml"
+ROCK_12065_QUOTE = (
+    "The results of the 1 atm quenching experiments on mixture A indicate that "
+    "chromite in rock 12065 would have begun to crystallize at temperatures "
+    "between 1200° and 1170°C and pigeonite near 1170°C."
+)
 
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def _assert_rock_12065_estimate_binding(row: dict) -> None:
+    assert row["experiment"] == "kushiro-1971-rock-12065-45"
+    assert row["values"]["method_class"] == "authors_estimate"
+    assert row["values"]["sentence_as_printed"] == ROCK_12065_QUOTE
+    assert (row["locator"]["page"], row["locator"]["published_page"]) == (13, 493)
+    assert row["point_conditions"]["composition"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    for condition in ("oxygen_partial_pressure", "total_pressure_Pa", "fO2_Pa"):
+        assert row["point_conditions"][condition]["state"]["tag"] == "unknown"
+
+
+def _assert_mixture_b_source_conditions(row: dict) -> None:
+    conditions = row["point_conditions"]
+    assert conditions["total_pressure_Pa"]["state"] == {
+        "tag": "value",
+        "value": "101325",
+    }
+    assert conditions["oxygen_partial_pressure"]["state"] == {
+        "tag": "value",
+        "value": "10^-13",
+    }
+    assert conditions["oxygen_partial_pressure"]["units"] == "atm"
+    assert conditions["fO2_Pa"]["state"]["tag"] == "unknown"
+    locator = conditions["total_pressure_Pa"]["locator"]
+    assert (locator["page"], locator["published_page"], locator["table"]) == (
+        11,
+        491,
+        "4",
+    )
+    assert conditions["oxygen_partial_pressure"]["locator"] == locator
 
 
 def test_extract_validates_and_render_pins_detect_mutation() -> None:
@@ -73,7 +113,16 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
         "kushiro_1971_mixture_b_augite_plagioclase_first_appearance": "1130",
         "kushiro_1971_mixture_b_ilmenite_first_appearance": "1100",
         "kushiro_1971_mixture_b_solidus": "1070",
-        "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170": "1170",
+    }
+    # The identity subtype names the printed phase event so distinct first
+    # appearances at one composition and pressure remain distinct transitions.
+    expected_subtypes = {
+        "kushiro_1971_mixture_b_chromite_liquidus": "liquidus",
+        "kushiro_1971_mixture_b_olivine_first_appearance": "first_appearance_olivine",
+        "kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance": "first_appearance_ca_poor_pyroxene",
+        "kushiro_1971_mixture_b_augite_plagioclase_first_appearance": "first_appearance_augite_and_plagioclase",
+        "kushiro_1971_mixture_b_ilmenite_first_appearance": "first_appearance_ilmenite",
+        "kushiro_1971_mixture_b_solidus": "solidus",
     }
     for observation_id, temperature_c in expected_temperatures.items():
         row = by_id[observation_id]
@@ -86,12 +135,58 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
         assert temperature.locator.page == 12
         assert temperature.locator.published_page == 492
         assert row.identity.species.phase.value.value == "l"
+        assert row.identity.subtype is not None and row.identity.subtype.is_value
+        assert row.identity.subtype.value == expected_subtypes[observation_id]
 
-    mixture_a_onset = by_id[
-        "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170"
-    ]
-    assert mixture_a_onset.point_conditions["oxygen_partial_pressure"].state.is_value
-    assert mixture_a_onset.point_conditions["oxygen_partial_pressure"].state.value == "10^-13"
+    estimate_ids = (
+        "kushiro_1971_mixture_a_chromite_first_appearance_bracket",
+        "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170",
+    )
+    source_rows = {
+        row["observation_id"]: row
+        for row in document["species"]["SiO2"]["observations"]
+    }
+    for observation_id in estimate_ids:
+        source_row = source_rows[observation_id]
+        _assert_rock_12065_estimate_binding(source_row)
+        migrated = by_id[observation_id]
+        assert migrated.experiment_id == "kushiro-1971-rock-12065-45"
+        assert migrated.evidence.class_.is_value
+        assert migrated.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+        assert migrated.identity.composition is not None
+        assert migrated.identity.composition.is_unknown
+        assert migrated.identity.total_pressure_Pa is not None
+        assert migrated.identity.total_pressure_Pa.is_unknown
+        assert migrated.point_conditions["composition"].state.is_unknown
+        assert migrated.point_conditions["oxygen_partial_pressure"].state.is_unknown
+        assert migrated.point_conditions["fO2_Pa"].state.is_unknown
+        assert migrated.locator is not None
+        assert (migrated.locator.page, migrated.locator.published_page) == (13, 493)
+
+    pigeonite = by_id["kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170"]
+    assert pigeonite.value.kind is ValueKind.POINT
+    assert pigeonite.point_conditions["temperature_K"].state.value == Decimal("1443.15")
+    assert source_rows["kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170"]["values"]["approximate"] is True
+
+    # Mutations of the reviewed bindings are rejected by the focused pins.
+    for key, value in (
+        ("experiment", "kushiro-1971-mixture-a"),
+        ("method_class", "measured_direct"),
+    ):
+        mutated = deepcopy(source_rows[estimate_ids[1]])
+        if key == "method_class":
+            mutated["values"][key] = value
+        else:
+            mutated[key] = value
+        with pytest.raises(AssertionError):
+            _assert_rock_12065_estimate_binding(mutated)
+    mutated = deepcopy(source_rows[estimate_ids[1]])
+    mutated["point_conditions"]["composition"]["state"] = {
+        "tag": "value",
+        "value": {"SiO2_wt_pct": "47.1"},
+    }
+    with pytest.raises(AssertionError):
+        _assert_rock_12065_estimate_binding(mutated)
 
     mixture_b_row = by_id["kushiro_1971_mixture_b_chromite_liquidus"]
     expected_mixture_b = {
@@ -121,15 +216,32 @@ def test_isolated_migration_maps_compositions_temperatures_and_unknown_condition
     assert mixture_b_initial.locator.published_page == 490
     assert mixture_b_initial.locator.table == "3"
 
-    # The prose does not assign pressure or oxygen conditions to these six mixture-B transitions.
-    for observation_id in expected_temperatures:
-        if "mixture_b" not in observation_id:
-            continue
+    mixture_b_ids = [key for key in expected_temperatures if "mixture_b" in key]
+    assert len(mixture_b_ids) == 6
+    for observation_id in mixture_b_ids:
         row = by_id[observation_id]
         assert row.identity.total_pressure_Pa is not None
-        assert row.identity.total_pressure_Pa.is_unknown
-        assert "total_pressure_Pa" not in row.point_conditions
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        pressure = row.point_conditions["total_pressure_Pa"]
+        assert pressure.state.is_value
+        assert pressure.state.value == Decimal("101325")
+        assert pressure.locator is not None
+        assert (pressure.locator.page, pressure.locator.published_page, pressure.locator.table) == (11, 491, "4")
+        oxygen = row.point_conditions["oxygen_partial_pressure"]
+        assert oxygen.state.is_value
+        assert oxygen.state.value == "10^-13"
+        assert oxygen.locator == pressure.locator
         assert row.point_conditions["fO2_Pa"].state.is_unknown
+
+    for observation_id in mixture_b_ids:
+        source_row = source_rows[observation_id]
+        _assert_mixture_b_source_conditions(source_row)
+        for condition in ("total_pressure_Pa", "oxygen_partial_pressure"):
+            mutated = deepcopy(source_row)
+            del mutated["point_conditions"][condition]
+            with pytest.raises((AssertionError, KeyError)):
+                _assert_mixture_b_source_conditions(mutated)
 
     bracket = by_id["kushiro_1971_mixture_a_chromite_first_appearance_bracket"]
     assert bracket.identity.quantity.is_value
@@ -210,4 +322,22 @@ def test_rendered_table_and_prose_locators_are_preserved() -> None:
         if item["observation_id"] == "kushiro_1971_mixture_a_chromite_first_appearance_bracket"
     )
     assert interval["values"]["temperature_as_printed"] == "between 1200° and 1170°C"
-    assert interval["locator"]["page"] == 12
+    assert interval["experiment"] == "kushiro-1971-rock-12065-45"
+    assert interval["values"]["method_class"] == "authors_estimate"
+    assert (interval["locator"]["page"], interval["locator"]["published_page"]) == (13, 493)
+    assert interval["values"]["sentence_as_printed"] == ROCK_12065_QUOTE
+    assert interval["point_conditions"]["composition"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+
+    pigeonite = next(
+        item
+        for item in document["species"]["SiO2"]["observations"]
+        if item["observation_id"] == "kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170"
+    )
+    assert pigeonite["experiment"] == "kushiro-1971-rock-12065-45"
+    assert pigeonite["values"]["method_class"] == "authors_estimate"
+    assert pigeonite["values"]["approximate"] is True
+    assert (pigeonite["locator"]["page"], pigeonite["locator"]["published_page"]) == (13, 493)
+    assert pigeonite["values"]["sentence_as_printed"] == ROCK_12065_QUOTE
