@@ -86,6 +86,15 @@ def test_all_table_observations_migrate_with_species_composition_and_temperature
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION: 27,
         Quantity.TRANSITION_TEMPERATURE: 26,
     }
+    expected_inventory_by_sample = {
+        "Mg#43": {"FeO": Decimal("38.78"), "MgO": Decimal("29.17"), "SiO2": Decimal("32.05")},
+        "Mg#76": {"FeO": Decimal("16.23"), "MgO": Decimal("50.66"), "SiO2": Decimal("33.11")},
+        "Mg#83": {"FeO": Decimal("11.59"), "MgO": Decimal("55.30"), "SiO2": Decimal("33.11")},
+    }
+    expected_mole_fractions_by_sample = {
+        sample: {oxide: amount / Decimal("100") for oxide, amount in amounts.items()}
+        for sample, amounts in expected_inventory_by_sample.items()
+    }
 
     for observation in observations:
         source_id = observation.observation_id.rsplit("::", 1)[-1]
@@ -103,10 +112,20 @@ def test_all_table_observations_migrate_with_species_composition_and_temperature
             else:
                 assert composition.state.is_value
                 raw_composition = source["point_conditions"]["composition"]["state"]["value"]
+                expected_inventory = expected_inventory_by_sample[sample]
                 assert composition.state.value.amount_basis.value == raw_composition["amount_basis"]
-                assert dict(composition.state.value.components) == {
+                assert composition.state.value.amount_basis.value == "mol_inventory"
+                inventory = dict(composition.state.value.components)
+                assert inventory == expected_inventory
+                assert inventory == {
                     oxide: Decimal(value) for oxide, value in raw_composition["components"]
                 }
+                assert sum(inventory.values()) == Decimal("100")
+                normalized = {
+                    oxide: amount / sum(inventory.values())
+                    for oxide, amount in inventory.items()
+                }
+                assert normalized == expected_mole_fractions_by_sample[sample]
                 assert observation.identity.composition.is_not_applicable
             assert observation.point_conditions["sample_id"].locator.pdf_page_index == 8
         else:
