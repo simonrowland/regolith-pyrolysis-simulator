@@ -286,6 +286,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
             _faraday_reduced_extent,
+            _mre_inventory_capped_extent,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
@@ -827,14 +828,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 )
             uncapped_moles_reduced, kg_oxide_reduced = extent
 
-            # Cap at melt availability. Re-derive mol from the capped
-            # kg to keep mol-native bookkeeping consistent with the
-            # legacy path (which capped kg first then re-derived mol).
             available_kg = composition_kg.get(oxide, 0.0)
-            if available_kg < kg_oxide_reduced:
-                any_capped = True
-            kg_oxide_reduced = min(kg_oxide_reduced, available_kg)
-            moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
+            moles_reduced, kg_oxide_reduced, species_capped = (
+                _mre_inventory_capped_extent(
+                    kg_oxide_reduced, available_kg, M_oxide_gmol,
+                )
+            )
+            any_capped = any_capped or species_capped
             species_cap_ratio = 0.0
             if uncapped_moles_reduced > 0.0:
                 uncapped_ratio = moles_reduced / uncapped_moles_reduced

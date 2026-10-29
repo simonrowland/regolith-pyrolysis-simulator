@@ -326,6 +326,17 @@ def _faraday_reduced_extent(
     return uncapped_moles, oxide_kg
 
 
+def _mre_inventory_capped_extent(
+    uncapped_kg: float,
+    available_kg: float,
+    oxide_molar_mass_gmol: float,
+) -> tuple[float, float, bool]:
+    """Share the existing kg-first cap between both MRE execution paths."""
+    reduced_kg = min(uncapped_kg, available_kg)
+    reduced_mol = reduced_kg * 1000.0 / oxide_molar_mass_gmol
+    return reduced_mol, reduced_kg, available_kg < uncapped_kg
+
+
 class MREElectrolysisRefusal(RuntimeError):
     """Typed terminal refusal for a classified MRE physics limitation.
 
@@ -1098,12 +1109,13 @@ class ElectrolysisModel:
                 return _without_mre_quantities(result)
             uncapped_moles_reduced, kg_oxide_reduced = extent
 
-            # Don't reduce more than available
             available = melt_state.composition_kg.get(oxide, 0.0)
-            if available < kg_oxide_reduced:
-                any_capped = True
-            kg_oxide_reduced = min(kg_oxide_reduced, available)
-            moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
+            moles_reduced, kg_oxide_reduced, species_capped = (
+                _mre_inventory_capped_extent(
+                    kg_oxide_reduced, available, M_oxide_gmol,
+                )
+            )
+            any_capped = any_capped or species_capped
             species_cap_ratio = 0.0
             if uncapped_moles_reduced > 0.0:
                 species_cap_ratio = min(1.0, moles_reduced / uncapped_moles_reduced)
