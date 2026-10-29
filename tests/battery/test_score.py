@@ -16176,6 +16176,79 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
 
 
+def test_ms2000_admitted_alkali_activities_score_with_liquid_sample_phase(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.validity import comparison_method_cell_constant_cancels
+
+    _migrate_real_extract(
+        tmp_path,
+        "kems-ms2000-044.yaml",
+        write=True,
+        use_repository_index_row=True,
+    )
+    context = load_score_context(
+        tmp_path / "tree",
+        sources=("kems-ms2000-044",),
+    )
+    alkali_rows = {
+        observation.observation_id: observation
+        for observation in context.observations.values()
+        if observation.source_id == "kems-ms2000-044"
+        and isinstance(observation.identity, Identity)
+        and quantity_token(observation.identity) is Quantity.ACTIVITY
+        and observation.identity.species.formula in {"Na2O", "K2O"}
+        and observation.admission.status is AdmissionStatus.ADMITTED
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    }
+    assert len(alkali_rows) == 24
+    assert Counter(
+        context.observations[key].identity.species.formula for key in alkali_rows
+    ) == {"Na2O": 12, "K2O": 12}
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+        and comparison_method_cell_constant_cancels(observation.provenance)
+        for observation in alkali_rows.values()
+    )
+
+    def predict_same_activity(engine, point, *, handles, experiment):
+        return EnginePrediction(
+            engine=engine,
+            channel=score_mod.ENGINE_CHANNELS[engine],
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="test:reported-activity",
+            ),
+            value=point.value.point,
+            unit=QUANTITY_UNITS[Quantity.ACTIVITY],
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=point.identity,
+        )
+
+    experiment = context.experiments[
+        next(iter(alkali_rows.values())).experiment_id
+    ]
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        work_id=experiment.work_id,
+        rail=Rail.MELT_ACTIVITY,
+        predict=predict_same_activity,
+    )
+    scored_rows = [row for row in residuals if row.reference in alkali_rows]
+    assert {row.reference for row in scored_rows} == set(alkali_rows)
+    assert all(row.numeric is not None and row.refusal is None for row in scored_rows)
+    assert all(
+        any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in row.notices)
+        for row in scored_rows
+    )
+
+
 def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Path) -> None:
     """Printed 'CaO + melt' is the two-phase marker. The scorer does not stamp it liquid."""
 
