@@ -8,13 +8,15 @@ load heavyweight native dependencies inside the killable child only.
 from __future__ import annotations
 
 import atexit
+import builtins
 import faulthandler
 import math
 import multiprocessing
 import os
-import signal
 import queue
+import signal
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -138,6 +140,31 @@ def _mark_engine_compute_refusal(
     exc.diagnostic = diagnostic
 
 
+def _is_engine_environment_failure(failure: BaseException | str) -> bool:
+    """Recognize launch failures through local and serialized engine errors."""
+    if getattr(failure, 'failure_disposition', None) == 'environment':
+        return True
+    if isinstance(failure, BaseException):
+        kind = (
+            getattr(failure, 'exception_type', None)
+            or getattr(failure, 'exc_name', None)
+            or type(failure).__name__
+        )
+    else:
+        kind = str(failure)
+    kind = kind.partition(':')[0].strip()
+    exception_type = getattr(builtins, kind, None) or getattr(
+        subprocess, kind, None
+    )
+    return (
+        isinstance(exception_type, type)
+        and issubclass(
+            exception_type,
+            (OSError, MemoryError, subprocess.SubprocessError),
+        )
+    )
+
+
 def _is_engine_compute_refusal(exc: BaseException) -> bool:
     """Recognize compute timeouts and explicitly classified engine failures."""
     diagnostics = getattr(exc, 'diagnostic', None)
@@ -165,6 +192,7 @@ def _is_engine_compute_refusal(exc: BaseException) -> bool:
         getattr(exc, 'terminal_refusal', False)
         or getattr(exc, 'reason_code', None) == 'engine_compute_timeout'
         or getattr(exc, 'failure_disposition', None) == 'environment'
+        or _is_engine_environment_failure(exc)
         or isinstance(exc, TimeoutError)
         or type(exc).__name__ == 'TimeoutExpired'
     ):

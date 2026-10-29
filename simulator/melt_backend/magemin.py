@@ -135,6 +135,7 @@ from simulator.engine_pool import (
     EngineWorkerTimeout,
     EngineWorkerUnavailable,
     WarmEngineWorker,
+    _is_engine_environment_failure,
     _is_engine_compute_refusal,
     _mark_engine_compute_refusal,
 )
@@ -379,6 +380,18 @@ class _MAGEMinDeclaredInputError(_MAGEMinEngineCallError):
 
 class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
+
+
+def _magemin_remote_failure_kind(exc: EngineWorkerRemoteError) -> str:
+    """Recover the original type from a serialized MAGEMin call error."""
+    if exc.exc_name in {
+        _MAGEMinEngineCallError.__name__,
+        _MAGEMinEngineLifecycleError.__name__,
+    }:
+        exception_type, separator, _message = exc.detail.partition(': ')
+        if separator:
+            return exception_type
+    return exc.exc_name
 
 
 def _admit_magemin_call_scalars(
@@ -1422,11 +1435,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     size=pool_size,
                 )
             except EngineWorkerRemoteError as exc:
+                failure_kind = _magemin_remote_failure_kind(exc)
                 if (
                     exc.failure_disposition == 'environment'
-                    or exc.exc_name in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES
+                    or failure_kind in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES
+                    or _is_engine_environment_failure(failure_kind)
                 ):
-                    _mark_engine_compute_refusal(exc, exc.exc_name)
+                    _mark_engine_compute_refusal(exc, failure_kind)
                     raise
                 self._warn(
                     'MAGEMin warm pool failed to initialize: '
@@ -2931,6 +2946,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         type(exc).__name__, str(exc)
                     ) from exc
                 except EngineWorkerRemoteError as exc:
+                    failure_kind = _magemin_remote_failure_kind(exc)
                     if exc.exc_name in (
                         _MAGEMinEngineCallError.__name__,
                         _MAGEMinEngineLifecycleError.__name__,
@@ -2941,6 +2957,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         if not separator:
                             exception_type = exc.exc_name
                             engine_message = exc.detail
+                        failure_disposition = exc.failure_disposition
+                        if (
+                            failure_disposition == 'environment'
+                            or failure_kind
+                            in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES
+                            or _is_engine_environment_failure(failure_kind)
+                        ):
+                            failure_disposition = 'environment'
                         error_type = (
                             _MAGEMinEngineLifecycleError
                             if exc.exc_name
@@ -2950,15 +2974,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         raise error_type(
                             exception_type,
                             engine_message,
-                            failure_disposition=exc.failure_disposition,
+                            failure_disposition=failure_disposition,
                         ) from exc
 
                     if (
                         exc.failure_disposition == 'environment'
-                        or exc.exc_name
-                        in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES
+                        or failure_kind in _MAGEMIN_COMPUTE_TIMEOUT_EXCEPTION_TYPES
+                        or _is_engine_environment_failure(failure_kind)
                     ):
-                        _mark_engine_compute_refusal(exc, exc.exc_name)
+                        _mark_engine_compute_refusal(exc, failure_kind)
                         raise
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
@@ -3806,9 +3830,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             _mark_engine_compute_refusal(exc, type(exc).__name__)
             raise
         except OSError as exc:
-            raise PurePhaseAccessError(
-                f'MAGEMin binary could not be executed: {exc}'
-            ) from exc
+            _mark_engine_compute_refusal(exc, type(exc).__name__)
+            raise
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
             raise PurePhaseAccessError(

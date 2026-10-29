@@ -31,6 +31,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
 )
 from simulator.engine_pool import (
+    _is_engine_environment_failure,
     _is_engine_compute_refusal,
     _mark_engine_compute_refusal,
 )
@@ -90,6 +91,45 @@ class EvaporationFluxRefusal(ProviderUnavailableError):
         self.reason = str(reason)
         self.diagnostic = copy.deepcopy(dict(diagnostic))
         super().__init__(self.reason)
+
+
+def _raise_engine_compute_refusal_from_gate_diagnostic(
+    diagnostic: Mapping[str, Any],
+) -> None:
+    from simulator.reduced_real_determinism import gate_curve_provider_timed_out
+
+    failure_kind = (
+        diagnostic.get('backend_failure_exception')
+        or diagnostic.get('exception_class')
+    )
+    if not (
+        gate_curve_provider_timed_out(diagnostic)
+        or diagnostic.get('backend_failure_disposition') == 'environment'
+        or diagnostic.get('terminal_refusal') is True
+        or (
+            failure_kind is not None
+            and _is_engine_environment_failure(str(failure_kind))
+        )
+    ):
+        return
+    timeout_kind = (
+        diagnostic.get('timeout_kind')
+        or diagnostic.get('backend_failure_exception')
+        or diagnostic.get('exception_class')
+        or 'engine_compute_timeout'
+    )
+    refusal_diagnostic = {
+        'reason': 'engine_compute_timeout',
+        'reason_code': 'engine_compute_timeout',
+        'terminal_refusal': True,
+        'timeout_kind': str(timeout_kind),
+        'provider_diagnostic': dict(diagnostic),
+    }
+    refusal = EvaporationFluxRefusal(
+        'engine_compute_timeout', refusal_diagnostic
+    )
+    _mark_engine_compute_refusal(refusal, str(timeout_kind))
+    raise refusal
 
 
 def evaporation_flux_refusal_from_configuration_error(
@@ -2792,29 +2832,7 @@ class EvaporationMixin:
                 or 'unavailable'
             )
             warnings = list(getattr(result, 'warnings', ()) or ())
-        if (
-            gate_curve_provider_timed_out(diagnostic)
-            or diagnostic.get('backend_failure_disposition') == 'environment'
-            or diagnostic.get('terminal_refusal') is True
-        ):
-            timeout_kind = (
-                diagnostic.get('timeout_kind')
-                or diagnostic.get('backend_failure_exception')
-                or diagnostic.get('exception_class')
-                or 'engine_compute_timeout'
-            )
-            refusal = EvaporationFluxRefusal(
-                'engine_compute_timeout',
-                {
-                    'reason': 'engine_compute_timeout',
-                    'reason_code': 'engine_compute_timeout',
-                    'terminal_refusal': True,
-                    'timeout_kind': str(timeout_kind),
-                    'provider_diagnostic': diagnostic,
-                },
-            )
-            _mark_engine_compute_refusal(refusal, str(timeout_kind))
-            raise refusal
+        _raise_engine_compute_refusal_from_gate_diagnostic(diagnostic)
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
@@ -3017,6 +3035,9 @@ class EvaporationMixin:
                     fe_redox_policy='intrinsic',
                 )
         except ProviderUnavailableError as exc:
+            if _is_engine_compute_refusal(exc):
+                _mark_engine_compute_refusal(exc)
+                raise
             record_gate_curve_provider_outcome(
                 self,
                 GateCurveProviderOutcome.FAILED,
@@ -3038,6 +3059,7 @@ class EvaporationMixin:
             status,
             diagnostic,
         )
+        _raise_engine_compute_refusal_from_gate_diagnostic(diagnostic)
         record_gate_curve_provider_outcome(self, status_outcome)
         if status != 'ok':
             reasons.append(f'kernel liquidus unavailable: status={status}')
