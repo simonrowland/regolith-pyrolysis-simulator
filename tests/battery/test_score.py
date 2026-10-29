@@ -16242,7 +16242,10 @@ def test_ms2000_admitted_alkali_activities_score_with_liquid_sample_phase(
     )
     scored_rows = [row for row in residuals if row.reference in alkali_rows]
     assert {row.reference for row in scored_rows} == set(alkali_rows)
-    assert all(row.numeric is not None and row.refusal is None for row in scored_rows)
+    assert all(
+        row.numeric is not None and row.status is ResidualStatus.NO_BAND
+        for row in scored_rows
+    )
     assert all(
         any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in row.notices)
         for row in scored_rows
