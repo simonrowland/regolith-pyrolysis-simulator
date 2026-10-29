@@ -78,6 +78,13 @@ def _is_vapour_measurement(row: dict[str, object], values: dict[str, object]) ->
     if not isinstance(quantity, ScalarNode):
         return False
     name = quantity.value.strip().casefold().replace("-", "_")
+    if name in {"activity", "activity_coefficient"} and any(
+        _has_value(owner.get("condensed_component"))
+        for owner in (values, row)
+    ):
+        # Ostrovski Table 4 activities belong to condensed SiO2; gas_species
+        # identifies the vapor-pressure terms used to derive them.
+        return False
     # These quantities describe condensed samples, reference-gas fixtures, or
     # thermochemical/model records; gas_species is context in those rows.
     return name not in _NON_VAPOUR_QUANTITIES
