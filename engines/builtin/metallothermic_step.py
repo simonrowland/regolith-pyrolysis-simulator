@@ -163,7 +163,12 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
+# Retain the existing export for C5 residue transfers and provider/S4 tests;
+# spent reductant residue is not part of the physical melt account basis.
+from simulator.account_ids import (
+    MELT_RESIDENT_ACCOUNTS,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
