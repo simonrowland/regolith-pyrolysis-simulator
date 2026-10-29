@@ -19849,8 +19849,7 @@ class Migrator:
                     detail=malformed_composition_amount,
                 )
             )
-            ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
-        elif point_catalogue is not None:
+        if point_catalogue is not None:
             ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
@@ -19947,11 +19946,7 @@ class Migrator:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(point_composition_refusal)
             )
-        elif (
-            malformed_composition_amount is None
-            and q_token_point is Quantity.P_PARTIAL
-            and point_oxide_map
-        ):
+        elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
@@ -20789,6 +20784,11 @@ class Migrator:
                 origin=point_id,
             )
         )
+        if malformed_composition_amount is not None:
+            identity = replace(
+                identity,
+                composition=State.unknown(malformed_composition_amount),
+            )
         parent_hold_notice = _hold_reason_notice(
             parent_reason,
             quantity=q_token_point,
