@@ -12,7 +12,11 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import lru_cache
+from itertools import product
 from typing import Any
+
+from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.formulas import resolve_species_formula
 
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
@@ -234,6 +238,162 @@ MELT_OXIDE_CATIONS_PER_FORMULA = {
     "NiO": 1.0,
     "CoO": 1.0,
 }
+
+
+@dataclass(frozen=True)
+class _MeltVaporActivityRefusal:
+    reason: str
+    endmember: str
+    target_vapor_species: str
+    target_oxide: str
+    missing_conversion: str
+
+    def diagnostic_reason(self) -> str:
+        return (
+            f"{self.reason}: endmember={self.endmember}; "
+            f"target_vapor_species={self.target_vapor_species}; "
+            f"missing_conversion={self.missing_conversion}"
+        )
+
+
+@lru_cache(maxsize=None)
+def _activity_formula_atoms(
+    formula: str,
+) -> tuple[tuple[str, float], ...]:
+    """Parse oxide and MELTS endmember labels into their atom counts."""
+    text = str(formula).strip().strip("\"'")
+    if text.endswith("_Liq"):
+        text = text[:-4]
+    try:
+        atoms = dict(resolve_species_formula(text).atoms)
+    except UnknownSpeciesError:
+        # ThermoEngine uses decimal subscripts such as Si0.5. The token cover
+        # below is exact for these ungrouped MELTS labels.
+        tokens = list(re.finditer(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?", text))
+        if not tokens or "".join(token.group(0) for token in tokens) != text:
+            return ()
+        atoms = {}
+        for token in tokens:
+            element = token.group(1)
+            count = float(token.group(2) or 1.0)
+            atoms[element] = atoms.get(element, 0.0) + count
+    return tuple(sorted((str(element), float(count)) for element, count in atoms.items()))
+
+
+@lru_cache(maxsize=None)
+def _melt_endmember_oxide_components(
+    endmember: str,
+) -> tuple[tuple[str, float], ...]:
+    """Return an exact MELTS-oxide atom balance for an endmember formula.
+
+    Premise: use the atom balance only to identify which oxide component(s)
+    an endmember activity represents; coefficients never scale activities.
+    Algebra: solve the MELTS oxide formula vectors against the endmember
+    vector and accept only a unique reconstruction of every element. Each
+    coefficient is mol oxide component / mol endmember and is dimensionless.
+    Sanity: MgCr2O4 = 1 MgO + 1 Cr2O3 and
+    MnSi0.5O2 = 1 MnO + 0.5 SiO2; H2O has no MELTS oxide balance.
+    """
+    atoms = dict(_activity_formula_atoms(str(endmember)))
+    if not atoms or float(atoms.get("O", 0.0)) <= 0.0:
+        return ()
+    cations = tuple(sorted(element for element in atoms if element != "O"))
+    oxide_atoms = {
+        oxide: dict(_activity_formula_atoms(oxide))
+        for oxide in MELT_OXIDE_CATIONS_PER_FORMULA
+    }
+    choices: list[list[tuple[str, float]]] = []
+    for cation in cations:
+        candidates: list[tuple[str, float]] = []
+        for oxide, component_atoms in oxide_atoms.items():
+            component_cations = {
+                element for element in component_atoms if element != "O"
+            }
+            if component_cations != {cation}:
+                continue
+            coefficient = atoms[cation] / component_atoms[cation]
+            candidates.append((oxide, coefficient))
+        if not candidates:
+            return ()
+        choices.append(candidates)
+
+    decompositions: list[dict[str, float]] = []
+    for combination in product(*choices):
+        reconstructed: dict[str, float] = {}
+        coefficients: dict[str, float] = {}
+        for oxide, coefficient in combination:
+            coefficients[oxide] = coefficients.get(oxide, 0.0) + coefficient
+            for element, count in oxide_atoms[oxide].items():
+                reconstructed[element] = (
+                    reconstructed.get(element, 0.0) + coefficient * count
+                )
+        if set(reconstructed) != set(atoms):
+            continue
+        if all(
+            math.isclose(
+                reconstructed[element],
+                atoms[element],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            for element in atoms
+        ):
+            decompositions.append(coefficients)
+    if len(decompositions) != 1:
+        return ()
+    return tuple(sorted(decompositions[0].items()))
+
+
+def _resolve_melt_activity_for_vapor_species(
+    target_vapor_species: str,
+    target_oxide: str,
+    activities: Mapping[str, object],
+) -> float | _MeltVaporActivityRefusal | None:
+    """Use a direct MELTS component activity or refuse endmember conversion.
+
+    Endmember activities have component standard states, so atom-balance
+    coefficients cannot convert them into a pure-oxide activity. That needs
+    formation-reaction thermochemistry on the matching liquid standard state.
+    """
+    direct_keys = tuple(dict.fromkeys((target_vapor_species, target_oxide)))
+    for key in direct_keys:
+        if key not in activities:
+            continue
+        try:
+            activity = float(activities[key])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(activity):
+            return activity
+
+    for raw_endmember, raw_activity in activities.items():
+        endmember = str(raw_endmember)
+        if endmember in direct_keys:
+            continue
+        try:
+            activity = float(raw_activity)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(activity):
+            continue
+        components = dict(_melt_endmember_oxide_components(endmember))
+        if target_oxide not in components:
+            continue
+        reaction = " + ".join(
+            f"{coefficient:g} {oxide}"
+            for oxide, coefficient in _melt_endmember_oxide_components(endmember)
+        )
+        return _MeltVaporActivityRefusal(
+            reason="endmember_activity_not_oxide_activity",
+            endmember=endmember,
+            target_vapor_species=target_vapor_species,
+            target_oxide=target_oxide,
+            missing_conversion=(
+                f"{reaction} = {endmember} requires a liquid-standard "
+                "formation dG_r and co-component activities"
+            ),
+        )
+    return None
 
 
 @dataclass(frozen=True)

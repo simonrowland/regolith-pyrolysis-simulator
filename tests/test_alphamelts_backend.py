@@ -31,6 +31,10 @@ import simulator.engine_pool as engine_worker_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.melt_activity import (
+    _MeltVaporActivityRefusal,
+    _melt_endmember_oxide_components,
+)
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
@@ -58,7 +62,6 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     VaporPressureActivityRefusal,
     _cleanup_alphamelts_subprocess,
-    _oxide_component_stoichiometry,
     _run_alphamelts_subprocess,
     AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
@@ -6540,10 +6543,10 @@ def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
     assert label_map['Ca3(PO4)2']['oxide_activity'] is None
 
 
-def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
-    # The Antoine fallback projects endmember activities onto their oxide
-    # components, while the equilibrium/flux payload preserves the engine's
-    # original endmember namespace for provenance.
+def test_endmember_activity_labels_refuse_antoine_without_mutating_payload():
+    # The Antoine fallback refuses an endmember without its liquid-standard
+    # conversion, while the equilibrium/flux payload preserves the engine's
+    # original activity namespace for provenance.
     from simulator.vapour_rail.batch import (
         FluxEligible,
         PressureValue,
@@ -6565,7 +6568,7 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         vapor_pressures_source={'Na': 'alphamelts_python_api'},
     )
     assert 'Na2O' not in result.activity_coefficients
-    projected_pressures = backend._activities_times_antoine(
+    projection = backend._activities_times_antoine_or_fail(
         1600.0,
         result.activity_coefficients,
         {'Na2O': 5.0},
@@ -6574,10 +6577,15 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         # (the raise on absence is the fail-loud caller-bug guard; production
         # callers thread it per the b-139 fix).
         pO2_bar=1.0e-9,
+        context='test endmember conversion refusal',
     )
-    assert projected_pressures['Na'] > 0.0
-    assert projected_pressures['Si'] > 0.0
-    assert projected_pressures['SiO'] > 0.0
+    assert isinstance(projection, VaporPressureActivityRefusal)
+    assert projection.reason.startswith(
+        'endmember_activity_not_oxide_activity'
+    )
+    assert 'endmember=Na2SiO3' in projection.reason
+    assert 'target_vapor_species=Na' in projection.reason
+    assert 'missing_conversion=' in projection.reason
 
     captured: dict[str, object] = {}
     na_answer = VapourAnswer(
@@ -8972,18 +8980,13 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     backend = AlphaMELTSBackend()
     activities = {
         'Al2O3': 0.0218,
-        'Ca3(PO4)2': 0.001,
-        'CaSiO3': 0.124,
-        'CoSi0.5O2': 0.001,
-        'Fe2O3': 0.01,
-        'Fe2SiO4': 0.139,
-        'H2O': 0.001,
-        'KAlSiO4': 0.00229,
-        'Mg2SiO4': 0.0676,
-        'MgCr2O4': 0.00584,
-        'MnSi0.5O2': 0.00371,
-        'Na2SiO3': 9.57e-5,
-        'NiSi0.5O2': 0.001,
+        'CaO': 0.124,
+        'Cr2O3': 0.00584,
+        'FeO': 0.278,
+        'K2O': 0.001145,
+        'MgO': 0.1352,
+        'MnO': 0.00371,
+        'Na2O': 9.57e-5,
         'SiO2': 0.443,
         'TiO2': 0.0253,
     }
@@ -9025,8 +9028,8 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     )
     # Independent JANAF Mg-010 pin (Chase 1998, rows 1400-2000 K):
     # 2 Mg(g) + O2 -> 2 MgO(s), dG = -1463.2445 + 0.411822143*T
-    # kJ/mol O2. At 1873.15 K, K = exp(dG*1000/(R*T)); with
-    # a_MgO = 2*0.0676 and pO2/P° = 1e-9, mass action gives
+    # kJ/mol O2. At 1873.15 K, K = exp(dG*1000/(R*T)); with the direct
+    # a_MgO = 0.1352 and pO2/P° = 1e-9, mass action gives
     # p_Mg = 100000*sqrt(K*a_MgO**2/1e-9) = 0.0965708 Pa for
     # R = 8.314462618 J/(mol K). Allow the owner's rounded R = 8.31446.
     assert pressures['Mg'] == pytest.approx(0.0965708, rel=1e-5)
@@ -9035,7 +9038,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         9.57e-5
     )
     assert backend._activity_for_vapor_species('K', activities) == pytest.approx(
-        0.5 * 0.00229
+        0.001145
     )
     assert backend._activity_for_vapor_species('Cr', activities) == pytest.approx(
         0.00584
@@ -9044,10 +9047,10 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         0.00371
     )
     assert backend._activity_for_vapor_species('Mg', activities) == pytest.approx(
-        2.0 * 0.0676
+        0.1352
     )
     assert backend._activity_for_vapor_species('Fe', activities) == pytest.approx(
-        2.0 * 0.139
+        0.278
     )
     assert backend._antoine_precursor_species_missing_activity(
         comp_wt,
@@ -9056,54 +9059,94 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     ) == []
 
 
-def test_thermoengine_endmember_oxide_projection_is_stoichiometric():
-    assert dict(_oxide_component_stoichiometry('Na2SiO3')) == {
+def test_melt_activity_owner_recognizes_endmember_oxide_components():
+    assert dict(_melt_endmember_oxide_components('Na2SiO3')) == {
         'Na2O': 1.0,
         'SiO2': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('KAlSiO4')) == {
+    assert dict(_melt_endmember_oxide_components('KAlSiO4')) == {
         'Al2O3': 0.5,
         'K2O': 0.5,
         'SiO2': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('MgCr2O4')) == {
+    assert dict(_melt_endmember_oxide_components('MgCr2O4')) == {
         'Cr2O3': 1.0,
         'MgO': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('MnSi0.5O2')) == {
+    assert dict(_melt_endmember_oxide_components('MnSi0.5O2')) == {
         'MnO': 1.0,
         'SiO2': 0.5,
     }
-    assert _oxide_component_stoichiometry('H2O') == ()
+    assert _melt_endmember_oxide_components('H2O') == ()
 
 
-def test_endmember_projection_never_sums_multiple_activity_carriers():
+def test_endmember_vapor_lookup_refuses_unconverted_carriers():
     backend = AlphaMELTSBackend()
-    assert backend._activity_for_vapor_species(
+    mg_refusal = backend._activity_for_vapor_species(
         'Mg',
         {'Mg2SiO4': 0.1, 'MgCr2O4': 0.2},
-    ) == pytest.approx(0.2)
-    assert backend._activity_for_vapor_species(
+    )
+    assert isinstance(mg_refusal, _MeltVaporActivityRefusal)
+    assert mg_refusal.reason == 'endmember_activity_not_oxide_activity'
+    assert mg_refusal.endmember == 'Mg2SiO4'
+    assert isinstance(backend._activity_for_vapor_species(
         'Na',
         {'Na2SiO3': 0.1, 'NaAlSiO4': 0.2},
-    ) is None
+    ), _MeltVaporActivityRefusal)
 
 
-def test_t162_legacy_endmember_vapor_lookup_numeric_pin():
-    """Pin the pre-conversion values before changing the vapor bridge."""
+def test_t162_endmember_vapor_lookup_refuses_missing_liquid_conversion():
     backend = AlphaMELTSBackend()
     activities = {'Mg2SiO4': 0.5}
 
-    # These are the exact current bridge outputs, not physical expectations.
-    assert backend._activity_for_vapor_species('Mg', activities).hex() == (
-        '0x1.0000000000000p+0'
+    resolution = backend._activity_for_vapor_species('Mg', activities)
+    assert isinstance(resolution, _MeltVaporActivityRefusal)
+    assert resolution.reason == 'endmember_activity_not_oxide_activity'
+    assert resolution.endmember == 'Mg2SiO4'
+    assert resolution.target_vapor_species == 'Mg'
+    assert resolution.target_oxide == 'MgO'
+    assert '2 MgO + 1 SiO2 = Mg2SiO4' in resolution.missing_conversion
+    suffixed = backend._activity_for_vapor_species(
+        'Mg', {'Mg2SiO4_Liq': 0.5}
     )
-    assert backend._activity_for_vapor_species('Si', activities).hex() == (
-        '0x1.0000000000000p-1'
+    assert isinstance(suffixed, _MeltVaporActivityRefusal)
+    assert suffixed.reason == resolution.reason
+    assert suffixed.target_vapor_species == resolution.target_vapor_species
+    assert suffixed.target_oxide == resolution.target_oxide
+    assert suffixed.endmember == 'Mg2SiO4_Liq'
+
+    projection = backend._activities_times_antoine_or_fail(
+        1600.0,
+        activities,
+        {'MgO': 100.0},
+        pO2_bar=1.0e-9,
+        context='test missing endmember conversion',
     )
-    assert backend._activity_for_vapor_species('SiO', activities).hex() == (
-        '0x1.0000000000000p-1'
+    assert isinstance(projection, VaporPressureActivityRefusal)
+    assert projection.missing_precursor_species == ('Mg',)
+    assert projection.reason.startswith('endmember_activity_not_oxide_activity')
+    assert 'endmember=Mg2SiO4' in projection.reason
+    assert 'target_vapor_species=Mg' in projection.reason
+    assert 'missing_conversion=' in projection.reason
+
+
+def test_t162_direct_melt_component_activities_remain_valid_vapor_inputs():
+    backend = AlphaMELTSBackend()
+    activities = {'MgO': 0.23, 'SiO2': 0.41}
+
+    assert backend._activity_for_vapor_species('Mg', activities) == pytest.approx(
+        0.23
     )
+    assert backend._activity_for_vapor_species('Si', activities) == pytest.approx(
+        0.41
+    )
+    assert backend._activity_for_vapor_species('SiO', activities) == pytest.approx(
+        0.41
+    )
+
+    assert backend._activity_for_vapor_species(
+        'SiO', {'SiO2_Liq': 0.41, 'Mg2SiO4': 0.5}
+    ) == pytest.approx(0.41)
 
 
 def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
