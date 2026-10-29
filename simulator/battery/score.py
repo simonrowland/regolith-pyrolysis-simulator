@@ -8419,6 +8419,7 @@ def predict_with_engine(
             isolated=isolated,
             experiment=experiment,
             bench=bench,
+            fo2_mode=fo2_mode,
         )
 
     provided_handles = handles or {}
@@ -8431,6 +8432,7 @@ def predict_with_engine(
             isolated=isolated,
             experiment=experiment,
             bench=bench,
+            fo2_mode=fo2_mode,
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -8452,6 +8454,7 @@ def _predict_with_engine(
     isolated: bool | None = None,
     experiment: Experiment | None = None,
     bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
