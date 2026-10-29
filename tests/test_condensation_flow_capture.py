@@ -78,9 +78,13 @@ def test_flow_capture_uses_hourly_rate_and_not_residence(monkeypatch):
     long_residence = _stage3_efficiency(
         monkeypatch, **common, rate_mol_s=1.0, residence_s=8.0,
     )
+    zero_residence = _stage3_efficiency(
+        monkeypatch, **common, rate_mol_s=1.0, residence_s=0.0,
+    )
     assert one_mol_s > 0.0
     assert two_mol_s / one_mol_s == pytest.approx(0.5, rel=1e-8)
     assert long_residence == pytest.approx(one_mol_s, rel=1e-8, abs=0.0)
+    assert zero_residence == pytest.approx(one_mol_s, rel=1e-8, abs=0.0)
 
 
 def test_flow_capture_matches_hand_computed_stage_value(monkeypatch):

@@ -744,6 +744,7 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
         * 10.0
+        * 3600.0
     )
 
     def efficiency(area_m2: float) -> float:
@@ -757,11 +758,11 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
             alpha_s_value=1.0,
         )
 
-    assert efficiency(0.25) == pytest.approx(0.05)
-    assert efficiency(1.0) == pytest.approx(0.2)
+    assert efficiency(0.25) == pytest.approx(0.048770575499285984)
+    assert efficiency(1.0) == pytest.approx(0.18126924692201818)
 
 
-def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
+def test_missing_stage_area_prevents_flow_capture(monkeypatch):
     model = CondensationModel(CondensationTrain.create_default())
     stage = next(item for item in model.train.stages if item.stage_number == 3)
     monkeypatch.setattr(
@@ -783,6 +784,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
         * 10.0
+        * 3600.0
     )
 
     missing_area_efficiency = model._condensation_efficiency(
@@ -804,7 +806,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     )
 
     assert missing_area_efficiency == pytest.approx(0.0)
-    assert configured_area_efficiency == pytest.approx(0.2)
+    assert configured_area_efficiency == pytest.approx(0.18126924692201818)
 
 
 # ---------------------------------------------------------------------------

@@ -48,17 +48,14 @@ by a gate valve after devolatilisation.
 
 Key physics:
     Live stage efficiency averages 33 series-resistance deposition-flux
-    samples over the stage temperature band, then computes:             [COND-1]
-        n_capture = J_band * A_stage * t_res
-        η_stage = clip(n_capture / n_available, 0, 1)
-    Premise: J_band is mol m^-2 s^-1. Unit check:
-    (mol m^-2 s^-1)(m^2)(s) = mol, and mol/mol makes η dimensionless.
-    Sanity: no configured stage area means no physical capture area, so
-    η_stage = 0; enough area or residence time saturates at η_stage = 1.
-
-    A separate total-capture regularizer uses
-    ``1 - exp(-t_res / tau_s)``. It allocates a capture budget and is not
-    the live per-stage flux efficiency above.
+    samples over the stage temperature band and applies the shared first-order
+    capture law to ``J_band * A_stage / n_dot_in``. Here
+    ``n_dot_in = rate_kg_hr / (M * 3600)`` is the inlet molar flow in mol/s.
+    Its equilibrium ceiling is the band's existing wall ``f_eq`` / backstop.
+    The pressure-isolated capture-budget fallback uses the same law with its
+    existing dimensionless ``residence_s / tau_s`` exposure and unit ceiling.
+    There is one owner for first-order depletion; callers resolve only their
+    physical exposure and ceiling.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
     Default Stage 1 window is 1100-1400°C; Stage 3 is 900-1200°C
@@ -4394,13 +4391,13 @@ class CondensationModel:
         Reactive wall products use the product-P_sat floor in the shared
         driving-pressure helper instead of the vapor species' Antoine P_sat.
 
-        Chunk A keeps the existing stage residence-time surrogate for
-        geometry and integrates the H-K-L driving force across the actual
-        stage T-band. Chunk C replaces the constant regime factor with
-        pressure/Knudsen coupling.
+        The H-K-L driving force is integrated across the stage T-band. Live
+        flow-through capture uses the inlet molar flow and does not scale with
+        the residence-time table; the pressure-isolated fallback retains its
+        explicit residence-time regularizer.
 
-        VR-11 / B3: the finite early-zero exits (non-positive residence
-        or alpha, nonpositive local pressure,
+        VR-11 / B3: the finite early-zero exits (nonpositive alpha or local
+        pressure,
         nonpositive reference flux) mint typed pass-through outcomes
         into ``efficiency_outcomes`` (when provided) rather than
         returning a silent 0.0 with no consumer channel. Non-finite
@@ -4431,7 +4428,7 @@ class CondensationModel:
         if not math.isfinite(float(alpha_s_value)):
             raise ValueError('alpha_s_value must be finite')
 
-        if residence_s <= 0.0 or alpha_s_value <= 0.0:
+        if alpha_s_value <= 0.0:
             return _mint_zero(
                 'zero_residence_or_alpha',
                 residence_s=float(residence_s),
@@ -4564,6 +4561,7 @@ class CondensationModel:
             lo_C, hi_C = hi_C, lo_C
 
         band_flux_mol_m2_s = 0.0
+        band_zero_saturation_flux_mol_m2_s = 0.0
         width_C = hi_C - lo_C
         spec = (
             alpha_record.get('alpha_s_coefficient_spec')
@@ -4609,6 +4607,13 @@ class CondensationModel:
             )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             rate_diagnostic: dict[str, Any] = {}
+            reactive_product_backstop = (
+                _reactive_product_backstop_authorized(species)
+                and T_surface_C <= T_cond_C
+            )
+            stable_condensation_product_backstop = (
+                _stable_condensation_product_backstop_authorized(species)
+            )
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, sample_alpha_s,
                 pipe_diameter_m=self.pipe_diameter_m,
@@ -4630,14 +4635,11 @@ class CondensationModel:
                 # reaction term is rejected as a wall pressure.  The
                 # temperature gate preserves colder downstream carryover
                 # without admitting hotter upstream stages.
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and T_surface_C <= T_cond_C
-                ),
+                reactive_product_backstop=reactive_product_backstop,
                 # Stable product class (CrO2 today) materializes the declared
                 # irreversible oxide route instead of reversible pure-species Psat.
                 stable_condensation_product_backstop=(
-                    _stable_condensation_product_backstop_authorized(species)
+                    stable_condensation_product_backstop
                 ),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -4651,7 +4653,43 @@ class CondensationModel:
                     "wall saturation-pressure refusal produced positive flux"
                 )
             band_flux_mol_m2_s += flux
+            wall_psat_pa = rate_diagnostic.get('wall_saturation_pressure_pa')
+            if wall_psat_pa is None:
+                sample_equilibrium_fraction = 1.0 if flux > 0.0 else 0.0
+            else:
+                wall_psat_pa = _deposition_finite_scalar(
+                    'wall_saturation_pressure_pa', wall_psat_pa,
+                )
+                # A reactive-product backstop sets product Psat to zero
+                # when the vapor Psat is at or above the incoming pressure.
+                if reactive_product_backstop and wall_psat_pa >= P_local_pa:
+                    wall_psat_pa = 0.0
+                sample_equilibrium_fraction = max(
+                    0.0,
+                    min(1.0, (P_local_pa - wall_psat_pa) / P_local_pa),
+                )
+            if sample_equilibrium_fraction > 0.0:
+                band_zero_saturation_flux_mol_m2_s += (
+                    max(0.0, flux) / sample_equilibrium_fraction
+                )
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
+        band_zero_saturation_flux_mol_m2_s /= HKL_BAND_SAMPLES
+        if (
+            not math.isfinite(band_flux_mol_m2_s)
+            or not math.isfinite(band_zero_saturation_flux_mol_m2_s)
+        ):
+            raise ValueError(
+                f'condensation efficiency for {species} in stage '
+                f'{int(getattr(stage, "stage_number", -1))} is not finite'
+            )
+        # Each sample has J_i = K_i * p_in * f_eq_i. The ratio of band flux
+        # to its zero-saturation flux gives the single equilibrium ceiling
+        # for the band-averaged first-order depletion law.
+        band_equilibrium_fraction = (
+            max(0.0, band_flux_mol_m2_s)
+            / band_zero_saturation_flux_mol_m2_s
+            if band_zero_saturation_flux_mol_m2_s > 0.0 else 0.0
+        )
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
                 max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
@@ -4674,53 +4712,32 @@ class CondensationModel:
                 or molar_mass_kg_mol <= 0.0
             ):
                 return 0.0
-            available_mol = available_kg / molar_mass_kg_mol
-            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
-            # baffle area and residence time gives capturable mol:
-            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
-            # makes eta dimensionless and lets configured Stage-3 area affect
-            # capture without inventing an area-normalized rate constant.
-            capturable_mol = (
+            # ``available_kg`` is the hourly inlet supply rate (route passes
+            # ``remaining_kg``), so convert it to mol/s before forming the
+            # dimensionless plug-flow exposure. Residence time cancels from
+            # the steady-flow balance and does not enter this expression.
+            available_mol_s = available_kg / (molar_mass_kg_mol * 3600.0)
+            exposure = (
                 max(0.0, band_flux_mol_m2_s)
                 * stage_area_m2
-                * residence_s
+                / available_mol_s
             )
-            eta = capturable_mol / available_mol
         else:
-            # Premise: ``band_flux_fraction = flux / reference_flux`` is
-            # dimensionless. Algebra requires capturable mol =
-            # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
-            # eta = capturable_mol / available_mol. Unit check: without a
-            # configured area there is no m^2 term, so treating the ratio as
-            # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
-            # rather than create synthetic capture.
-            eta = 0.0
-        if not math.isfinite(eta):
+            # No configured physical area means zero exposure, so leave the
+            # vapor un-baffled rather than invent an area-normalized rate.
+            exposure = 0.0
+            band_equilibrium_fraction = 1.0
+        if not math.isfinite(exposure):
             raise ValueError(
                 f'condensation efficiency for {species} in stage '
                 f'{int(getattr(stage, "stage_number", -1))} is not finite'
             )
-        # Supply-limited capture: band flux * area * time can exceed available
-        # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
-        eta_uncapped = float(eta)
-        eta = max(0.0, min(1.0, eta))
-        supply_limited = eta_uncapped > 1.0
+        eta = _first_order_capture_efficiency(
+            exposure,
+            equilibrium_fraction=band_equilibrium_fraction,
+        )
         if domain_outcome is not None:
             domain_outcome['eta'] = eta
-            if supply_limited:
-                domain_outcome['capture_supply_limited'] = True
-                domain_outcome['eta_uncapped'] = eta_uncapped
-        if supply_limited and efficiency_outcomes is not None:
-            efficiency_outcomes.append(
-                {
-                    'status': 'capture_supply_limited',
-                    'reason': 'capture_supply_limited',
-                    'species': species,
-                    'stage_number': int(getattr(stage, 'stage_number', -1)),
-                    'eta': eta,
-                    'eta_uncapped': eta_uncapped,
-                }
-            )
         return eta
 
 

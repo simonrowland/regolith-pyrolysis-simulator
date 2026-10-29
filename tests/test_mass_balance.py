@@ -809,20 +809,3 @@ def test_stage0_products_omit_sulfate_mutation_proof():
     assert products.get("MgSO4") == pytest.approx(3.0)
     # Counterfactual omit would yield empty products.
     assert products != {}
-
-
-def test_condensation_eta_clip_surfaces_capture_supply_limited_notice():
-    """Unit-level: when uncapped eta > 1 the clip path stamps the notice."""
-    # Mirror the live clip algebra from CondensationTrain._condensation_efficiency.
-    eta_uncapped = 2.5
-    eta = max(0.0, min(1.0, eta_uncapped))
-    domain_outcome = {}
-    if eta_uncapped > 1.0:
-        domain_outcome["capture_supply_limited"] = True
-        domain_outcome["eta_uncapped"] = eta_uncapped
-    domain_outcome["eta"] = eta
-    assert eta == pytest.approx(1.0)
-    assert domain_outcome["capture_supply_limited"] is True
-    # Mutation proof: without the notice flag auditors only see eta=1.
-    mutant = {"eta": eta}
-    assert "capture_supply_limited" not in mutant

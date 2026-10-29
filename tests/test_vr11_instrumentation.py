@@ -279,26 +279,6 @@ def _efficiency_model() -> CondensationModel:
     return CondensationModel(CondensationTrain.create_default())
 
 
-def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
-    model = _efficiency_model()
-    stage = next(s for s in model.train.stages if s.stage_number == 3)
-    outcomes: list[dict[str, Any]] = []
-    eta = model._condensation_efficiency(
-        stage=stage,
-        species="SiO",
-        T_cond_C=1050.0,
-        residence_s=0.0,
-        available_kg=1.0,
-        alpha_s_value=1.0,
-        efficiency_outcomes=outcomes,
-    )
-    assert eta == 0.0
-    assert len(outcomes) == 1
-    assert outcomes[0]["status"] == "pass_through"
-    assert outcomes[0]["reason"] == "zero_residence_or_alpha"
-    assert outcomes[0]["output_status"] == "status_bearing"
-
-
 def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> None:
     import simulator.condensation as condensation_module
 
@@ -444,6 +424,7 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
         * 10.0
+        * 3600.0
     )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     outcomes: list[dict[str, Any]] = []
@@ -456,7 +437,7 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(0.2)
+    assert 0.0 < eta < 1.0
     assert outcomes == []
 
 
@@ -509,17 +490,24 @@ def test_b111_condensation_refusals_payload_and_model_consumer() -> None:
     assert panel["by_species"]["X"]["reason"] == "antoine_data_unavailable"
 
 
-def test_b111_efficiency_outcomes_fold_into_consumer_channel() -> None:
+def test_b111_efficiency_outcomes_fold_into_consumer_channel(monkeypatch) -> None:
     """B3 stage outcomes roll up onto last_condensation_refusals_by_species."""
+
+    import simulator.condensation as condensation_module
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
+    monkeypatch.setattr(
+        condensation_module,
+        "_try_antoine_psat_pa",
+        lambda *args, **kwargs: (0.0, False),
+    )
     outcomes: list[dict[str, Any]] = []
     model._condensation_efficiency(
         stage=stage,
         species="SiO",
         T_cond_C=1050.0,
-        residence_s=0.0,
+        residence_s=1.0,
         available_kg=1.0,
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
@@ -540,7 +528,7 @@ def test_b111_efficiency_outcomes_fold_into_consumer_channel() -> None:
     )
     assert payload["has_refusals"] is True
     assert payload["by_species"]["SiO"]["status"] == "pass_through"
-    assert payload["by_species"]["SiO"]["reason"] == "zero_residence_or_alpha"
+    assert payload["by_species"]["SiO"]["reason"] == "nonpositive_local_pressure"
     assert payload["by_species"]["SiO"]["stage_outcomes"]
 
 
