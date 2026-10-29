@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2366
+  sources: 2367
   by_stage:
     located: 208
-    inbox: 1358
-    in_progress: 190
+    inbox: 1357
+    in_progress: 192
     ingested_partial: 147
     ingested_complete: 136
     wired: 0
@@ -22,8 +22,9 @@ anti_loss:
     count: 0
     ids: []
   corpus_unpushed:
-    count: 19
+    count: 20
     ids:
+    - 195d28c0e683be9355c88777ef9da26ec52a05bb
     - 97aec1a0cb7e1bc06d1590aac6b2d87c0061b298
     - 397b7f796003345dd917cd3bfbf9a39f553be7d7
     - 6ec36f8713e0dc0f344ea4793d657ec48d1a0277
@@ -45,7 +46,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 334
+      count: 336
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -113,6 +114,7 @@ anti_loss:
       - costa-2025-ree-cmas-glass-melt-thermochemistry
       - cottrell-2009-iron-xanes
       - dachs-geiger-2006-pyrope-grossular
+      - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
       - darken-gurry-1946-iron-oxygen-ii
       - day-2020-trinitite-volatility
       - de-abreu-2024-li2o-sio2-thermochemistry
@@ -244,6 +246,7 @@ anti_loss:
       - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
       - neubert-2025-vanadium-slag-evaporation
       - neuman-2026-levitation-k-isotopes
+      - niggli-1913-silica-alkali-carbonate-equilibria
       - ohta-1996-cao-mgo-al2o3-activities
       - ohta-suito-1995-mno-activity-slags
       - oishi-1986-cu2o-cao-activities
@@ -382,7 +385,7 @@ anti_loss:
       - zhang-2024-alkali-evaporation-ti-thesis
       - zhinkina-2024-ce-gd-kems-poster
     corpus_only:
-      count: 62
+      count: 61
       ids:
       - 1997jonesthermo-jones-1997
       - allen-1994-reduction-lunar-mare-soil
@@ -408,7 +411,6 @@ anti_loss:
       - kems-215-schneider-1980-nbsir-80-2183
       - kems-216-schneider-1981-nbsir-81-2252
       - kems-217-hastie-plante-1981-nbsir-81-2293
-      - kushiro-1971-apollo12-phase-equilibria
       - liao-zhao-2023-metals-cmas-phase-eq-review
       - lpi-compendium-14163
       - mendybaev-2019-cai-evaporation-kinetics
@@ -447,7 +449,7 @@ anti_loss:
       - yang-2025-na2o-cao-silica-thermodynamics
       - yu-hewins-1997-lpsc28-1613
     byte_mismatch:
-      count: 334
+      count: 335
       ids:
       - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       - adamkovicova-1980-casio3-heat-of-fusion
@@ -600,6 +602,7 @@ anti_loss:
       - kems-218-schneider-1981-nbsir-81-2306
       - kems-ms2000-044
       - kume-2000-cao-activities
+      - kushiro-1971-apollo12-phase-equilibria
       - lamoreaux-hildenbrand-1984
       - lamoreaux-hildenbrand-hildenbrand-1987
       - le-losq-2023-alkali-aluminosilicate-glasses
@@ -7228,15 +7231,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/PAGE-MAP-AND-RENDER-PARITY.json
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/SOURCE.md
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/original-issue-191-1-2.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20884,7 +20884,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/kushiro-1971-apollo12-phase-equilibria.yaml
+    - data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -26231,13 +26231,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: niggli-1913-silica-alkali-carbonate-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/niggli-1913-silica-alkali-carbonate-equilibria/SOURCE.md
-    - raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27925,6 +27924,17 @@ sources:
     artefacts:
     - raw/phreeqc-sit-thermochimie-12a-database/SOURCE.md
     - raw/phreeqc-sit-thermochimie-12a-database/phreeqc-sit-thermochimie-12a-database.dat
+    reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: phreeqc-thermoddem-1-10-2020-database
+  stage: inbox
+  evidence:
+    decided_by: inbox
+    artefacts:
+    - raw/phreeqc-thermoddem-1-10-2020-database/SOURCE.md
+    - raw/phreeqc-thermoddem-1-10-2020-database/phreeqc-thermoddem-1-10-2020-database.dat
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
