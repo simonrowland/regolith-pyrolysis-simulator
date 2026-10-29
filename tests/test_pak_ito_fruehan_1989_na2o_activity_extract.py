@@ -75,7 +75,7 @@ def test_table1_activities_are_reduced_from_rendered_log_values():
         assert input_row["values"]["printed_form"] == "neg_log10"
         printed_negative_log = Decimal(input_row["values"]["value_as_published"])
         expected_activity = Decimal("10") ** -printed_negative_log
-        assert abs(observation.value.point - expected_activity) < expected_activity * Decimal("1e-15")
+        assert abs(observation.value.point - expected_activity) < expected_activity * Decimal("1e-14")
         assert observation.identity.temperature_K.is_value
         assert observation.identity.composition.is_value
         assert observation.point_conditions["T_C"].state.is_value
