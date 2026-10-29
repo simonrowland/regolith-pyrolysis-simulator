@@ -170,6 +170,13 @@ from simulator.feedstock_composition import (
 # This is a text-resolution tolerance, not a fit to an equilibrium result.
 _MAGEMIN_FO2_TOL_DEX = 2.0e-5
 
+# MAGEMinApp's QFM tutorial uses O=3 wt% as an example, warns that this is
+# insufficient for a +5 buffer offset, and fixes it with O=10 wt%. This is a
+# solver-only reservoir: it is added to the CLI vector, never to feedstock O.
+# Source: MAGEMinApp QFM tutorial, buffer offset section:
+# https://computationalthermodynamics.github.io/MAGEMin_C.jl/v1.8.5/MAGEMinApp/PD_tutorials
+_MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT = 10.0
+
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
 # 2.0 -> 15.0 s. The 2.0 s wall was calibrated for an uncontended slot-free
@@ -2445,7 +2452,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         fO2_log: float,
     ) -> str:
         """Return a bounded record of the exact timed-out MAGEMin request."""
-        args, buffer_name, buffer_n, _buffer_warnings = (
+        args, buffer_name, buffer_n, _buffer_warnings, buffer_o_reservoir = (
             self._build_magemin_subprocess_args(
                 bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
@@ -2457,6 +2464,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'composition_mol': composition_mol or {},
             'composition_wt_pct': bulk_projection.composition_wt_pct,
             'projected_bulk_vector_wt_pct': bulk_projection.vector,
+            'magemin_buffer_oxygen_reservoir_wt_pct': buffer_o_reservoir,
             'oxide_names': bulk_projection.order,
             'temperature_C': temperature_C,
             'pressure_bar': pressure_bar,
@@ -2997,7 +3005,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
-    ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
+    ) -> Tuple[List[str], str, float, Tuple[str, ...], float]:
         """Build the canonical MAGEMin argv and resolved buffer values."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
@@ -3006,6 +3014,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
+        buffer_o_reservoir = (
+            _MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT
+            if buffer_name in self._BUFFER_CHOICES and 'O' in bulk_projection.order
+            else 0.0
+        )
+        bulk_vector = list(bulk_projection.vector)
+        if buffer_o_reservoir > 0.0:
+            bulk_vector[bulk_projection.order.index('O')] += buffer_o_reservoir
         args = [
             str(binary_path),
             '--Verb=0',
@@ -3014,12 +3030,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(
-                f'{value:.6f}' for value in bulk_projection.vector
+                f'{value:.6f}' for value in bulk_vector
             ),
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
-        return args, buffer_name, buffer_n, tuple(buffer_warnings)
+        return (
+            args, buffer_name, buffer_n, tuple(buffer_warnings),
+            buffer_o_reservoir,
+        )
 
     def _call_magemin_subprocess(
         self,
@@ -3050,7 +3069,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
         """
-        args, buffer_name, buffer_n, buffer_warnings = (
+        args, buffer_name, buffer_n, buffer_warnings, buffer_o_reservoir = (
             self._build_magemin_subprocess_args(
                 bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
@@ -3151,6 +3170,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         operating_point_diagnostics.update({
             'applied_fO2_buffer': buffer_name,
             'applied_fO2_buffer_n': float(f'{buffer_n:.6f}'),
+            'magemin_feedstock_oxygen_wt_pct': (
+                bulk_projection.composition_wt_pct.get('O', 0.0)
+            ),
+            'magemin_buffer_oxygen_reservoir_wt_pct': buffer_o_reservoir,
+            'magemin_cli_oxygen_wt_pct': (
+                bulk_projection.composition_wt_pct.get('O', 0.0)
+                + buffer_o_reservoir
+            ),
         })
         if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + 273.15):
             operating_point_diagnostics['qfm_reference_notice'] = {
@@ -3278,10 +3305,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         feot, excess_o = iron_oxide_feot_oxygen_wt_pct(composition_wt_pct)
+        iron_oxide_excess_o = excess_o
         feot += source.pop('FeOt', 0.0)
         excess_o += source.pop('O', 0.0)
         merged: List[str] = []
-        if feo > 0.0:
+        if feo > 0.0 and iron_oxide_excess_o > 0.0:
             merged.append('FeO->FeOt+O')
         if fe2o3 > 0.0:
             merged.append('Fe2O3->FeOt+O')

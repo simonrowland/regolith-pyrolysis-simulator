@@ -22,6 +22,17 @@ _C5 = dict(zip(MAGEMinBackend._IG_BULK_ORDER, (
 _BASALT = dict(zip(MAGEMinBackend._IG_BULK_ORDER, (
     49, 14, 11, 9, 11, 0.8, 2.5, 1.5, 2, 0.2, 0,
 )))
+_FERROUS = {
+    'SiO2': 49.0,
+    'Al2O3': 14.0,
+    'CaO': 11.0,
+    'MgO': 9.0,
+    'FeO': 11.0,
+    'K2O': 0.8,
+    'Na2O': 2.5,
+    'TiO2': 1.5,
+    'Cr2O3': 0.2,
+}
 
 
 @pytest.fixture
@@ -75,25 +86,124 @@ def test_live_absolute_target_uses_independent_native_readback(
         assert any('out_of_certified_band' in warning for warning in result.warnings)
 
 
+def test_live_ferrous_only_bulk_uses_separate_buffer_oxygen_reservoir(live_backend):
+    feedstock_projection = live_backend._build_db_bulk_projection(_FERROUS)
+    assert feedstock_projection.composition_wt_pct['FeOt'] == 11.0
+    assert feedstock_projection.composition_wt_pct.get('O', 0.0) == 0.0
+
+    result = live_backend.equilibrate(
+        1200.0,
+        composition_kg={'SiO2': 1.0},
+        projected_oxide_wt_pct=_FERROUS,
+        fO2_log=-9.0,
+        pressure_bar=0.05,
+    )
+
+    diagnostics = result.diagnostics
+    assert diagnostics['buffer_phase_present'] is True
+    assert diagnostics['solved_fO2_log'] == pytest.approx(
+        -9.0, abs=magemin_module._MAGEMIN_FO2_TOL_DEX,
+    )
+    assert diagnostics['authoritative_for_requested_conditions'] is True
+    assert diagnostics['magemin_feedstock_oxygen_wt_pct'] == 0.0
+    assert diagnostics['magemin_buffer_oxygen_reservoir_wt_pct'] == pytest.approx(
+        magemin_module._MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT,
+    )
+    assert diagnostics['magemin_cli_oxygen_wt_pct'] == pytest.approx(
+        magemin_module._MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT,
+    )
+
+
+def test_live_buffer_reservoir_size_does_not_move_gate_or_silicate_assemblage(
+    live_backend, monkeypatch,
+):
+    base_reservoir = magemin_module._MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT
+    run = live_backend._call_magemin_subprocess
+    signatures = []
+    observed_calls = []
+
+    def record(**kwargs):
+        raw = run(**kwargs)
+        observed_calls.append(raw['operating_point_diagnostics'])
+        return raw
+
+    monkeypatch.setattr(live_backend, '_call_magemin_subprocess', record)
+    for scale in (0.5, 1.0, 2.0):
+        observed_calls.clear()
+        reservoir_wt_pct = base_reservoir * scale
+        monkeypatch.setattr(
+            magemin_module,
+            '_MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT',
+            reservoir_wt_pct,
+        )
+        gate = live_backend.find_liquidus_solidus(
+            composition_kg={'SiO2': 1.0},
+            projected_oxide_wt_pct=_FERROUS,
+            fO2_log=-9.0,
+            pressure_bar=0.05,
+            min_T_C=400.0,
+            max_T_C=2200.0,
+            scan_step_C=50.0,
+            tolerance_C=2.0,
+        )
+        assert gate.solidus_T_C is not None, gate.warnings
+        assert gate.liquidus_T_C is not None, gate.warnings
+
+        at_solidus = live_backend.equilibrate(
+            gate.solidus_T_C,
+            composition_kg={'SiO2': 1.0},
+            projected_oxide_wt_pct=_FERROUS,
+            fO2_log=-9.0,
+            pressure_bar=0.05,
+        )
+        signatures.append((
+            gate.solidus_T_C,
+            gate.liquidus_T_C,
+            tuple(sorted(at_solidus.phases_present)),
+        ))
+        assert observed_calls
+        assert all(call['buffer_phase_present'] for call in observed_calls)
+        assert all(
+            call['solved_fO2_log'] == pytest.approx(
+                -9.0, abs=magemin_module._MAGEMIN_FO2_TOL_DEX,
+            )
+            for call in observed_calls
+        )
+        assert all(
+            call['magemin_buffer_oxygen_reservoir_wt_pct']
+            == pytest.approx(reservoir_wt_pct)
+            for call in observed_calls
+        )
+
+    reference = signatures[1]
+    for solidus, liquidus, phases in signatures:
+        assert solidus == pytest.approx(reference[0], abs=2.0)
+        assert liquidus == pytest.approx(reference[1], abs=2.0)
+        assert phases == reference[2]
+
+
 @pytest.mark.parametrize('requested', [-8.0, -12.0])
-def test_live_c5_buffer_loss_is_numerical_failure(live_backend, requested):
+def test_live_c5_buffer_reservoir_honours_requested_fO2(live_backend, requested):
     result = _solve(live_backend, _C5, requested)
-    assert result.status == 'not_converged'
-    assert result.diagnostics['buffer_phase_present'] is False
-    assert result.diagnostics['solved_fO2_log'] is None
-    assert result.diagnostics['authoritative_for_requested_conditions'] is False
-    assert result.diagnostics['backend_failure_disposition'] == 'numerical'
+    assert result.status == 'ok'
+    assert result.diagnostics['buffer_phase_present'] is True
+    assert result.diagnostics['solved_fO2_log'] == pytest.approx(
+        requested, abs=magemin_module._MAGEMIN_FO2_TOL_DEX,
+    )
+    assert result.diagnostics['authoritative_for_requested_conditions'] is True
+    assert result.diagnostics['magemin_cli_oxygen_wt_pct'] == pytest.approx(
+        result.diagnostics['magemin_feedstock_oxygen_wt_pct']
+        + result.diagnostics['magemin_buffer_oxygen_reservoir_wt_pct'],
+    )
 
 
-def test_live_liquid_control_keeps_finite_native_value(live_backend):
+def test_live_liquid_control_is_corrected_to_requested_native_value(live_backend):
     result = _solve(live_backend, _C5, -2.0)
-    assert result.diagnostics['solved_fO2_log'] == pytest.approx(-5.467, abs=0.01)
-    assert result.diagnostics['authoritative_for_requested_conditions'] is False
-    notice = result.diagnostics['fO2_control_notice']
-    assert notice['requested_fO2_log'] == -2.0
-    assert notice['native_fO2_log'] == result.diagnostics['solved_fO2_log']
-    assert notice['delta_log10'] == pytest.approx(notice['native_fO2_log'] + 2.0)
-    assert result.status != 'ok'
+    assert result.diagnostics['solved_fO2_log'] == pytest.approx(
+        -2.0, abs=magemin_module._MAGEMIN_FO2_TOL_DEX,
+    )
+    assert result.diagnostics['authoritative_for_requested_conditions'] is True
+    assert result.status == 'ok'
 
 
 @pytest.mark.parametrize('native', [None, 'nan', '-inf', '-8.5'])

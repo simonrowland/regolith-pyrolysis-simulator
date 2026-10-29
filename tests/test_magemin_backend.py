@@ -2465,9 +2465,10 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert mp.vector[mp.order.index("MnO")] == pytest.approx(0.4)
     assert "Cr2O3" not in mp.composition_wt_pct
     assert mp.dropped_components == ("Cr2O3",)
-    assert mp.merged_components == ("FeO->FeOt+O",)
+    # FeO-only input has no excess oxygen to describe as an FeO->FeOt+O fold.
+    assert mp.merged_components == ()
     assert any("Cr2O3" in warning for warning in mp.warnings)
-    assert any("FeO->FeOt+O" in warning for warning in mp.warnings)
+    assert not any("FeO->FeOt+O" in warning for warning in mp.warnings)
 
     igad = backend._build_db_bulk_projection(composition, database="igad")
     assert "H2O" not in igad.order
@@ -2522,7 +2523,7 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         {'SiO2': 60.0, 'MgO': 40.0},
     )
 
-    args, buffer_name, buffer_n, _warnings = (
+    args, buffer_name, buffer_n, _warnings, buffer_o_reservoir = (
         backend._build_magemin_subprocess_args(
             bulk_projection=projection,
             temperature_C=1234.5,
@@ -2538,11 +2539,12 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         '--Temp=1234.500000',
         '--Pres=10.000000',
         '--sys_in=wt',
-        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
+        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,10.000000,0.000000,0.000000',
         '--buffer=nno',
         '--buffer_n=0.000000',
     ]
     assert (buffer_name, buffer_n) == ('nno', 0.0)
+    assert buffer_o_reservoir == pytest.approx(10.0)
 
 
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
@@ -3385,23 +3387,23 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
-        temperature_C=temperature_C,
-        fO2_log=fO2_log,
+    direct_args, _buffer_name, _buffer_n, _warnings, _reservoir = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+        )
     )
     buffer_n = result.diagnostics['applied_fO2_buffer_n']
     direct_args = [
-        str(_LIVE_MAGEMIN_BINARY.resolve()),
-        "--Verb=1",
-        "--db=ig",
-        f"--Temp={temperature_C:.6f}",
-        f"--Pres={pressure_kbar:.6f}",
-        "--sys_in=wt",
-        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
-        f"--buffer={buffer_name}",
-        f"--buffer_n={buffer_n:.6f}",
-        "--out_matlab=1",
+        '--Verb=1' if arg == '--Verb=0' else (
+            f'--buffer_n={buffer_n:.6f}'
+            if arg.startswith('--buffer_n=') else arg
+        )
+        for arg in direct_args
     ]
+    direct_args.append('--out_matlab=1')
     with tempfile.TemporaryDirectory() as tmpdir:
         completed = subprocess.run(
             direct_args,
@@ -3731,13 +3733,11 @@ def test_magemin_live_buffer_n_sign_and_magnitude_round_trip():
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
 def test_magemin_live_adapter_path_fO2_changes_shadow_response():
-    """Requested fO2 must move the MAGEMin shadow response.
+    """Explicit feedstock O lets the MAGEMin shadow respond to requested fO2.
 
-    This intentionally drives the production adapter path
-    (``_build_ig_bulk_vector`` + ``_resolve_buffer``). P3-F real-binary probes
-    showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero; the
-    adapter takes O only from the owner's explicit Fe2O3 decomposition or
-    an explicit O input, preserving the prepared oxide inventory.
+    This low-level real-binary probe uses the feedstock projection and buffer
+    resolver directly. Production subprocess calls separately add and diagnose
+    the solver-only oxygen reservoir in ``test_magemin_fo2_readback.py``.
     """
     binary = _LIVE_MAGEMIN_BINARY
     reduced = _run_magemin_adapter_buffer_probe(binary, fO2_log=-12.0)
