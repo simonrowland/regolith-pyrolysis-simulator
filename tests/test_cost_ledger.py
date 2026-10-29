@@ -255,8 +255,15 @@ def test_furnace_flux_tracks_absolute_temperature_times_time():
     assert cool == pytest.approx((1000.0 + 273.15) * 2.0)
     assert hot > cool
     assert ELECTRICAL_USD_PER_KWH.value == 0.15
+    assert ELECTRICAL_USD_PER_KWH.to_json()["status"] == "owner-ratified"
     assert THERMAL_USD_PER_FLUX_H.value == 1.0
-    assert len(owner_ratify_cost_placeholders()) == 5
+    assert len(owner_ratify_cost_placeholders()) == 4
+
+
+def test_electricity_price_is_owner_ratified_not_a_placeholder():
+    assert ELECTRICAL_USD_PER_KWH.value == 0.15
+    assert ELECTRICAL_USD_PER_KWH.to_json()["status"] == "owner-ratified"
+    assert ELECTRICAL_USD_PER_KWH not in owner_ratify_cost_placeholders()
 
 
 def test_cost_rollup_leaves_run_input_unallocated_when_no_product_mass():

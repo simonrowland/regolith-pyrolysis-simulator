@@ -4168,11 +4168,11 @@ def _ledger_get(resource: str, **params):
     try:
         from web.events import read_ledger_api_for_client
         return jsonify(read_ledger_api_for_client(client_id, resource, **params))
-    except LookupError as exc:
-        return _json_error(str(exc), 404)
     except KeyError as exc:
         identifier = exc.args[0] if exc.args else ''
         return _json_error(f'unknown ledger {resource}: {identifier}', 404)
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
     except (TypeError, ValueError) as exc:
         return _json_error(str(exc), 400)
 
