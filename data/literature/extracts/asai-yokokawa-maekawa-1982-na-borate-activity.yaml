@@ -1,0 +1,2178 @@
+schema_version: literature_extract.v1
+source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+source:
+  citation: Asai, K., Yokokawa, T. & Maekawa, T. (1982). Na2O activity in Na2O–B2O3–Al2O3 melts. Nippon Kagaku Kaishi
+    1982(6), 1005–1009.
+  year: 1982
+extraction:
+  method: Table 2 machine-text transcription, render checked; Table 2 relative ΔG retained and activity typed-refused
+    per ruling
+  date: '2026-10-27'
+  worker: codex-resume-21280-1793143602
+review_status: draft
+fidelity_samples:
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p4
+  field: relative_delta_G_Na2O_kJ_mol
+  value: '-1.1'
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0
+  field: relative_delta_G_Na2O_kJ_mol
+  value: '-24.9'
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0
+  field: relative_delta_G_Na2O_kJ_mol
+  value: '-59.6'
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0
+  field: relative_delta_G_Na2O_kJ_mol
+  value: '-117.3'
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_1p0
+  field: relative_delta_G_Na2O_kJ_mol
+  value: '-144.6'
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+species:
+  Na2O:
+    observations:
+    - observation_id: asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p4
+      type: activity_coefficient
+      locator: &id001
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 2 B2O3 + 0.4 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.294117647'
+              - - B2O3
+                - '0.588235294'
+              - - Al2O3
+                - '0.117647059'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id001
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id001
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.294117647'
+          B2O3: '0.588235294'
+          Al2O3: '0.117647059'
+        relative_delta_G_Na2O_kJ_mol: '-1.1'
+        relative_delta_G_uncertainty_kJ_mol: '0.2'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.4 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p6
+      type: activity_coefficient
+      locator: &id002
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 2 B2O3 + 0.6 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id002
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.277777778'
+              - - B2O3
+                - '0.555555556'
+              - - Al2O3
+                - '0.166666667'
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.277777778'
+          B2O3: '0.555555556'
+          Al2O3: '0.166666667'
+        relative_delta_G_Na2O_kJ_mol: '-10.9'
+        relative_delta_G_uncertainty_kJ_mol: '0.9'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.6 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p8
+      type: activity_coefficient
+      locator: &id003
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 2 B2O3 + 0.8 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.263157895'
+              - - B2O3
+                - '0.526315789'
+              - - Al2O3
+                - '0.210526316'
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id003
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id003
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.263157895'
+          B2O3: '0.526315789'
+          Al2O3: '0.210526316'
+        relative_delta_G_Na2O_kJ_mol: '-21.1'
+        relative_delta_G_uncertainty_kJ_mol: '0.3'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.8 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_1p0
+      type: activity_coefficient
+      locator: &id004
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 2 B2O3 + 1.0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id004
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.250000000'
+              - - B2O3
+                - '0.500000000'
+              - - Al2O3
+                - '0.250000000'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id004
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id004
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.250000000'
+          B2O3: '0.500000000'
+          Al2O3: '0.250000000'
+        relative_delta_G_Na2O_kJ_mol: '-25.1'
+        relative_delta_G_uncertainty_kJ_mol: '0.5'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 1.0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0
+      type: activity_coefficient
+      locator: &id005
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.250000000'
+              - - B2O3
+                - '0.750000000'
+              - - Al2O3
+                - '0.000000000'
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id005
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id005
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.250000000'
+          B2O3: '0.750000000'
+          Al2O3: '0.000000000'
+        relative_delta_G_Na2O_kJ_mol: '-24.9'
+        relative_delta_G_uncertainty_kJ_mol: '0.7'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p2
+      type: activity_coefficient
+      locator: &id006
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.2 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.238095238'
+              - - B2O3
+                - '0.714285714'
+              - - Al2O3
+                - '0.047619048'
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id006
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id006
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.238095238'
+          B2O3: '0.714285714'
+          Al2O3: '0.047619048'
+        relative_delta_G_Na2O_kJ_mol: '-31.5'
+        relative_delta_G_uncertainty_kJ_mol: '0.6'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.2 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p4
+      type: activity_coefficient
+      locator: &id007
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.4 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.227272727'
+              - - B2O3
+                - '0.681818182'
+              - - Al2O3
+                - '0.090909091'
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id007
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id007
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.227272727'
+          B2O3: '0.681818182'
+          Al2O3: '0.090909091'
+        relative_delta_G_Na2O_kJ_mol: '-36.1'
+        relative_delta_G_uncertainty_kJ_mol: '0.3'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.4 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p5
+      type: activity_coefficient
+      locator: &id008
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.5 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.222222222'
+              - - B2O3
+                - '0.666666667'
+              - - Al2O3
+                - '0.111111111'
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id008
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id008
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.222222222'
+          B2O3: '0.666666667'
+          Al2O3: '0.111111111'
+        relative_delta_G_Na2O_kJ_mol: '-41.9'
+        relative_delta_G_uncertainty_kJ_mol: '1.5'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.5 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p6
+      type: activity_coefficient
+      locator: &id009
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.6 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.217391304'
+              - - B2O3
+                - '0.652173913'
+              - - Al2O3
+                - '0.130434783'
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id009
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id009
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.217391304'
+          B2O3: '0.652173913'
+          Al2O3: '0.130434783'
+        relative_delta_G_Na2O_kJ_mol: '-43.6'
+        relative_delta_G_uncertainty_kJ_mol: '1.2'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.6 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p8
+      type: activity_coefficient
+      locator: &id010
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.8 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.208333333'
+              - - B2O3
+                - '0.625000000'
+              - - Al2O3
+                - '0.166666667'
+          locator: *id010
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id010
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id010
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.208333333'
+          B2O3: '0.625000000'
+          Al2O3: '0.166666667'
+        relative_delta_G_Na2O_kJ_mol: '-54.4'
+        relative_delta_G_uncertainty_kJ_mol: '0.5'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.8 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p9
+      type: activity_coefficient
+      locator: &id011
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 0.9 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.204081633'
+              - - B2O3
+                - '0.612244898'
+              - - Al2O3
+                - '0.183673469'
+          locator: *id011
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id011
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id011
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.204081633'
+          B2O3: '0.612244898'
+          Al2O3: '0.183673469'
+        relative_delta_G_Na2O_kJ_mol: '-56.3'
+        relative_delta_G_uncertainty_kJ_mol: '0.6'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.9 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_1p0
+      type: activity_coefficient
+      locator: &id012
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 3 B2O3 + 1.0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.200000000'
+              - - B2O3
+                - '0.600000000'
+              - - Al2O3
+                - '0.200000000'
+          locator: *id012
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id012
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id012
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.200000000'
+          B2O3: '0.600000000'
+          Al2O3: '0.200000000'
+        relative_delta_G_Na2O_kJ_mol: '-59.6'
+        relative_delta_G_uncertainty_kJ_mol: '1.1'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 1.0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0
+      type: activity_coefficient
+      locator: &id013
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.200000000'
+              - - B2O3
+                - '0.800000000'
+              - - Al2O3
+                - '0.000000000'
+          locator: *id013
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id013
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id013
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.200000000'
+          B2O3: '0.800000000'
+          Al2O3: '0.000000000'
+        relative_delta_G_Na2O_kJ_mol: '-59.6'
+        relative_delta_G_uncertainty_kJ_mol: '0.4'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p25
+      type: activity_coefficient
+      locator: &id014
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0.25 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.190476190'
+              - - B2O3
+                - '0.761904762'
+              - - Al2O3
+                - '0.047619048'
+          locator: *id014
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id014
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.190476190'
+          B2O3: '0.761904762'
+          Al2O3: '0.047619048'
+        relative_delta_G_Na2O_kJ_mol: '-60.8'
+        relative_delta_G_uncertainty_kJ_mol: '0.5'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.25 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p375
+      type: activity_coefficient
+      locator: &id015
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0.375 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.186046512'
+              - - B2O3
+                - '0.744186047'
+              - - Al2O3
+                - '0.069767442'
+          locator: *id015
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id015
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id015
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.186046512'
+          B2O3: '0.744186047'
+          Al2O3: '0.069767442'
+        relative_delta_G_Na2O_kJ_mol: '-67.8'
+        relative_delta_G_uncertainty_kJ_mol: '0.4'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.375 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p5
+      type: activity_coefficient
+      locator: &id016
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0.5 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.181818182'
+              - - B2O3
+                - '0.727272727'
+              - - Al2O3
+                - '0.090909091'
+          locator: *id016
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id016
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.181818182'
+          B2O3: '0.727272727'
+          Al2O3: '0.090909091'
+        relative_delta_G_Na2O_kJ_mol: '-67.8'
+        relative_delta_G_uncertainty_kJ_mol: '0.4'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.5 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p7
+      type: activity_coefficient
+      locator: &id017
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0.7 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.175438596'
+              - - B2O3
+                - '0.701754386'
+              - - Al2O3
+                - '0.122807018'
+          locator: *id017
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id017
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id017
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.175438596'
+          B2O3: '0.701754386'
+          Al2O3: '0.122807018'
+        relative_delta_G_Na2O_kJ_mol: '-71.6'
+        relative_delta_G_uncertainty_kJ_mol: '1.7'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.7 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p9
+      type: activity_coefficient
+      locator: &id018
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 0.9 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.169491525'
+              - - B2O3
+                - '0.677966102'
+              - - Al2O3
+                - '0.152542373'
+          locator: *id018
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id018
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id018
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.169491525'
+          B2O3: '0.677966102'
+          Al2O3: '0.152542373'
+        relative_delta_G_Na2O_kJ_mol: '-79.9'
+        relative_delta_G_uncertainty_kJ_mol: '0.8'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.9 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_1p0
+      type: activity_coefficient
+      locator: &id019
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 4 B2O3 + 1.0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.166666667'
+              - - B2O3
+                - '0.666666667'
+              - - Al2O3
+                - '0.166666667'
+          locator: *id019
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id019
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id019
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.166666667'
+          B2O3: '0.666666667'
+          Al2O3: '0.166666667'
+        relative_delta_G_Na2O_kJ_mol: '-78.9'
+        relative_delta_G_uncertainty_kJ_mol: '0.2'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 1.0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0
+      type: activity_coefficient
+      locator: &id020
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.100000000'
+              - - B2O3
+                - '0.900000000'
+              - - Al2O3
+                - '0.000000000'
+          locator: *id020
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id020
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id020
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.100000000'
+          B2O3: '0.900000000'
+          Al2O3: '0.000000000'
+        relative_delta_G_Na2O_kJ_mol: '-99.2'
+        relative_delta_G_uncertainty_kJ_mol: '1.5'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p2
+      type: activity_coefficient
+      locator: &id021
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 0.2 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.098039216'
+              - - B2O3
+                - '0.882352941'
+              - - Al2O3
+                - '0.019607843'
+          locator: *id021
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id021
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id021
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.098039216'
+          B2O3: '0.882352941'
+          Al2O3: '0.019607843'
+        relative_delta_G_Na2O_kJ_mol: '-96.7'
+        relative_delta_G_uncertainty_kJ_mol: '1.0'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.2 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p4
+      type: activity_coefficient
+      locator: &id022
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 0.4 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.096153846'
+              - - B2O3
+                - '0.865384615'
+              - - Al2O3
+                - '0.038461538'
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id022
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id022
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.096153846'
+          B2O3: '0.865384615'
+          Al2O3: '0.038461538'
+        relative_delta_G_Na2O_kJ_mol: '-106.6'
+        relative_delta_G_uncertainty_kJ_mol: '1.4'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.4 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p6
+      type: activity_coefficient
+      locator: &id023
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 0.6 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.094339623'
+              - - B2O3
+                - '0.849056604'
+              - - Al2O3
+                - '0.056603774'
+          locator: *id023
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id023
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id023
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.094339623'
+          B2O3: '0.849056604'
+          Al2O3: '0.056603774'
+        relative_delta_G_Na2O_kJ_mol: '-110.0'
+        relative_delta_G_uncertainty_kJ_mol: '0.6'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.6 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p8
+      type: activity_coefficient
+      locator: &id024
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 0.8 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.092592593'
+              - - B2O3
+                - '0.833333333'
+              - - Al2O3
+                - '0.074074074'
+          locator: *id024
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id024
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id024
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.092592593'
+          B2O3: '0.833333333'
+          Al2O3: '0.074074074'
+        relative_delta_G_Na2O_kJ_mol: '-119.0'
+        relative_delta_G_uncertainty_kJ_mol: '0.7'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.8 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_1p0
+      type: activity_coefficient
+      locator: &id025
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 9 B2O3 + 1.0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id025
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.090909091'
+              - - B2O3
+                - '0.818181818'
+              - - Al2O3
+                - '0.090909091'
+          locator: *id025
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id025
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id025
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.090909091'
+          B2O3: '0.818181818'
+          Al2O3: '0.090909091'
+        relative_delta_G_Na2O_kJ_mol: '-128.0'
+        relative_delta_G_uncertainty_kJ_mol: '1.2'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 1.0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0
+      type: activity_coefficient
+      locator: &id026
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.062500000'
+              - - B2O3
+                - '0.937500000'
+              - - Al2O3
+                - '0.000000000'
+          locator: *id026
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id026
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id026
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.062500000'
+          B2O3: '0.937500000'
+          Al2O3: '0.000000000'
+        relative_delta_G_Na2O_kJ_mol: '-117.3'
+        relative_delta_G_uncertainty_kJ_mol: '0.2'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p2
+      type: activity_coefficient
+      locator: &id027
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0.2 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id027
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.061728395'
+              - - B2O3
+                - '0.925925926'
+              - - Al2O3
+                - '0.012345679'
+          locator: *id027
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id027
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id027
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.061728395'
+          B2O3: '0.925925926'
+          Al2O3: '0.012345679'
+        relative_delta_G_Na2O_kJ_mol: '-118.4'
+        relative_delta_G_uncertainty_kJ_mol: '0.8'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.2 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p3
+      type: activity_coefficient
+      locator: &id028
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0.3 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.061349693'
+              - - B2O3
+                - '0.920245399'
+              - - Al2O3
+                - '0.018404908'
+          locator: *id028
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id028
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id028
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.061349693'
+          B2O3: '0.920245399'
+          Al2O3: '0.018404908'
+        relative_delta_G_Na2O_kJ_mol: '-122.4'
+        relative_delta_G_uncertainty_kJ_mol: '1.1'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.3 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p4
+      type: activity_coefficient
+      locator: &id029
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0.4 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id029
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.060975610'
+              - - B2O3
+                - '0.914634146'
+              - - Al2O3
+                - '0.024390244'
+          locator: *id029
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id029
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id029
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.060975610'
+          B2O3: '0.914634146'
+          Al2O3: '0.024390244'
+        relative_delta_G_Na2O_kJ_mol: '-127.4'
+        relative_delta_G_uncertainty_kJ_mol: '0.8'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.4 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p6
+      type: activity_coefficient
+      locator: &id030
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0.6 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.060240964'
+              - - B2O3
+                - '0.903614458'
+              - - Al2O3
+                - '0.036144578'
+          locator: *id030
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id030
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id030
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.060240964'
+          B2O3: '0.903614458'
+          Al2O3: '0.036144578'
+        relative_delta_G_Na2O_kJ_mol: '-126.4'
+        relative_delta_G_uncertainty_kJ_mol: '0.7'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.6 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p8
+      type: activity_coefficient
+      locator: &id031
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 0.8 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id031
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.059523810'
+              - - B2O3
+                - '0.892857143'
+              - - Al2O3
+                - '0.047619048'
+          locator: *id031
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id031
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id031
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.059523810'
+          B2O3: '0.892857143'
+          Al2O3: '0.047619048'
+        relative_delta_G_Na2O_kJ_mol: '-134.5'
+        relative_delta_G_uncertainty_kJ_mol: '1.1'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.8 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.
+    - observation_id: asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_1p0
+      type: activity_coefficient
+      locator: &id032
+        page: 4
+        published_page: 1008
+        pdf_page_index: 3
+        table: '2'
+        row_label: Na2O + 15 B2O3 + 1.0 Al2O3
+      phase: l
+      T_K: 1173
+      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      regime: emf_concentration_cell
+      units: kJ·mol−1 as printed for relative ΔG(Na2O)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1173
+          locator: *id032
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_formula_amounts_normalized_to_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.058823529'
+              - - B2O3
+                - '0.882352941'
+              - - Al2O3
+                - '0.058823529'
+          locator: *id032
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id032
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id032
+      values:
+        quantity: activity
+        admission_status: typed_refusal
+        reason: reference-melt absolute activity not printed
+        schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
+          this extract schema.
+        candidate_quantity_as_printed: relative partial molar Gibbs energy of Na2O
+        composition_mol_basis: printed_formula_amounts_normalized_to_mole_fraction
+        composition_mol:
+          Na2O: '0.058823529'
+          B2O3: '0.882352941'
+          Al2O3: '0.058823529'
+        relative_delta_G_Na2O_kJ_mol: '-144.6'
+        relative_delta_G_uncertainty_kJ_mol: '0.4'
+        uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
+        reference_state_as_printed: Na2O·2B2O3 melt
+        composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 1.0 Al2O3
+        method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
+        method_locator:
+          page: 2
+          published_page: 1006
+          section: 2. Experimental
+        note: ΔG and its printed uncertainty are retained as published; no activity conversion is made.

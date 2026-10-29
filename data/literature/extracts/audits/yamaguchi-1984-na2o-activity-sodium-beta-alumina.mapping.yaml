@@ -1,0 +1,59 @@
+source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
+tables:
+  - printed_table: '1'
+    locator: {page: 3, published_page: 45}
+    printed_body_rows: 7
+    columns:
+      X_Na2O: composition coordinate, printed mole fraction
+      '10^4 K A': fitted inverse-temperature coefficient
+      '10^4 K delta_A': coefficient uncertainty
+      B: fitted intercept
+      delta_B: intercept uncertainty
+    fitted_relation: '-log a_Na2O = A/T + B'
+    units_as_printed: '10^4 K for A and delta_A; dimensionless B and delta_B'
+    species: Na2O
+    phase: l
+    method_class: quoted_attributed
+    disposition: typed_refused
+    schema_gap: >-
+      The closed activity-fit quantity represents activity-coefficient fits,
+      but Table 1 fits -log activity. There is no schema token for this fitted
+      log-activity relation, so the seven coefficient rows are not migrated as
+      melt_activity observations.
+    conditions:
+      temperature: fit against 1/T; no row-specific temperature point is printed
+      composition: binary Na2O-P2O5; X_Na2O as printed in each table row
+      fO2: not stated for each coefficient row
+      total_pressure: not stated
+    audit: >-
+      All table numeric cells were compared with pdftotext and checked on the
+      page 3 render because MinerU table QA reported zero numeric agreement.
+observations:
+  - observation_id: yamaguchi_1984_abstract_na2o_activity_1573k
+    printed_quantity: absolute Na2O activity relative to pure liquid Na2O
+    species: Na2O
+    phase: l
+    units_as_printed: dimensionless activity
+    conditions:
+      temperature_K: '1573'
+      composition: binary Na2O-P2O5; X_Na2O='0.5'
+      fO2: not stated for this point
+      total_pressure: not stated
+    method_class: quoted_attributed
+    evidence_reason: >-
+      The authors reduce measured EMF through the printed Nernst relation and
+      reference-melt activity calibration; the point inputs are shown only in
+      figures and are not stored, so the abstract summary is retained as
+      quoted_attributed.
+    locators:
+      value: {page: 1, published_page: 43, section: Abstract}
+      reduction: {page: 2, published_page: 44, equation: '1'}
+    source_reads:
+      - pdftotext-layout and MinerU markdown agree on 'about 10^-13', X_Na2O=0.5, and 1573 K
+      - render of PDF page 1 confirms the abstract digits, sign, exponent, composition, and temperature
+      - render of PDF page 2 confirms equation (1), the cell's EMF relation
+    table_row_count: 1 measured activity point in the abstract
+    excluded_rows:
+      - Table 1: 7 fitted coefficient rows; typed-refused for the schema gap above
+      - Figures 2-8: plotted EMF/activity values are figure-read candidates and were not digitized
+      - MinerU chart-block range tables: ignored as invented plot readings

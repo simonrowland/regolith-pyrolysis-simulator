@@ -1,0 +1,70 @@
+source_id: tsukihashi-1985-na-silicate-mn-p-nitrogen
+source_input_order:
+  - MinerU HTML table blocks and markdown
+  - pdftotext-layout
+  - page renders for all table cells and flagged or ambiguous conditions
+tables:
+  - table_key: p002-t01
+    locator: {page: 2, table: '1'}
+    printed_caption: The distribution of phosphorus, manganese and vanadium between practical slag and carbon-saturated iron after equilibration.
+    printed_row_count: 2
+    render_verified: true
+    render_page: 2
+    rows:
+      - printed_row: Before equilibration
+        columns: [FeO, Fe2O3, Na2O, Na2CO3, V2O5, SiO2, P2O5, MnO, P_ratio, Mn_ratio, V_ratio]
+        extraction: initial practical-slag analysis retained in table context; ratio cells are printed dashes, not zero.
+      - printed_row: After equilibration
+        columns: [FeO, Fe2O3, Na2O, Na2CO3, V2O5, SiO2, P2O5, MnO, P_ratio, Mn_ratio, V_ratio]
+        extraction: >-
+          Full row retained in table context. P_ratio and Mn_ratio become distribution_ratio observations;
+          ratio basis is wt_percent; V_ratio is retained in context and outside this task's scope.
+    observation_mapping:
+      phase: liquid slag against carbon-saturated iron
+      units: dimensionless distribution ratio; numerator and denominator are both printed as wt% concentrations
+      temperature: printed T_C=1200 °C; Figures 1 and 6 identify the practical-slag point
+      atmosphere_and_pressure: printed CO at 1 atm in a graphite crucible; source locator PDF page 3
+      oxygen_pressure: identity fO2 unknown; context retains prose 6.00e-18 atm and figure annotation 8.42e-18 atm
+      evidence_class: measured_direct; authors' own chemical assays and Table 1 ratios
+    column_map:
+      FeO: composition_wt_pct.FeO
+      Fe2O3: composition_wt_pct.Fe2O3
+      Na2O: composition_wt_pct.Na2O
+      Na2CO3: context_only; an em dash after equilibration remains not_printed.
+      V2O5: composition_wt_pct.V2O5
+      SiO2: composition_wt_pct.SiO2
+      P2O5: composition_wt_pct.P2O5
+      MnO: composition_wt_pct.MnO
+      P_ratio: species.P.observations.tsukihashi_1985_table1_p_distribution.values.distribution_ratio
+      Mn_ratio: species.Mn.observations.tsukihashi_1985_table1_mn_distribution.values.distribution_ratio
+      V_ratio: context_only; not in the requested P/Mn/N scope.
+  - table_key: p008-t02
+    locator: {page: 8, section: Appendix}
+    printed_label: not printed; Appendix table of interaction parameters
+    printed_row_count: 3
+    render_verified: true
+    render_page: 8
+    column_map:
+      element: row label
+      gamma0_1600C: quoted alloy input
+      epsilon_C_X_dilute: quoted alloy input
+      epsilon_C_X_at_aC: quoted alloy input
+      epsilon_X_C_at_Csatd: derived alloy interaction parameter
+      epsilon_X_C_average: derived alloy interaction parameter
+      gamma_X_1600C: author-derived alloy activity coefficient
+      gamma_X_1200C: author-derived alloy activity coefficient
+    extraction: >-
+      All three rows retained in context and transcribed in printed form. These concern solutes in carbon-saturated
+      iron, not Na2O, MnO or P2O5 slag activity; gamma Mn is retained as relevant alloy context. The printed input
+      citations are preserved. The authors' calculated alloy coefficients remain context because their full external
+      input rows are not stored; no model-derived observation or lineage to absent inputs is asserted.
+cell_audit: tsukihashi-1985-na-silicate-mn-p-nitrogen.audit.tsv
+mineru_table_qa:
+  pdf_page_2:
+    numeric_agreement: 0.000
+    flags: em_dash_minus=4; non_numeric_in_numeric_column=4
+    resolution: 18 numeric and 4 dash body cells (22 total); pdftotext has no table-cell readings, so the render confirms every cell and row/column assignment.
+  pdf_page_8:
+    numeric_agreement: 0.605
+    flags: latex=13; numeric_mismatch=15
+    resolution: all 21 numeric body cells and row/column assignments confirmed from render; the render resolves pdftotext's prose 0.524 as table gamma_Mn=0.514 at 1200 °C.

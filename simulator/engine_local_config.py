@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ctypes
 import hashlib
 import json
 import logging
@@ -1008,41 +1009,71 @@ def resolve_magemin_binary_path(explicit: Any = None) -> Path | None:
 
 def setup_thermoengine_dylib_path() -> Path:
     config = load_config()
-    dylib_dir = (
-        config.paths.thermoengine_dylib_dir.expanduser()
-        if config is not None and config.paths.thermoengine_dylib_dir is not None
+    dylib_names = thermoengine_artifact_names(load_engine_lock())
+    candidates: list[Path] = []
+    configured_dir = (
+        config.paths.thermoengine_dylib_dir
+        if config is not None
         else None
     )
-    if dylib_dir is None:
-        home_lib = Path.home() / "lib"
-        if home_lib.is_dir():
-            dylib_dir = home_lib
-    if dylib_dir is None or not dylib_dir.is_dir():
-        raise ImportError(
-            "ThermoEngine dylibs not found: configure "
-            f"{config_path()} [paths].thermoengine_dylib_dir "
-            "or run install-engines.py"
+    if configured_dir is not None:
+        candidates.append(configured_dir.expanduser())
+    candidates.append(Path.home() / "lib")
+    for variable in ("DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH"):
+        candidates.extend(
+            Path(entry).expanduser()
+            for entry in os.environ.get(variable, "").split(os.pathsep)
+            if entry
         )
-    dylib_names = thermoengine_artifact_names(load_engine_lock())
 
-    missing = [
-        name
-        for name in dylib_names
-        if not (dylib_dir / name).is_file()
-    ]
-    if missing:
+    dylib_dir = next(
+        (
+            candidate
+            for candidate in dict.fromkeys(candidates)
+            if candidate.is_dir()
+            and all((candidate / name).is_file() for name in dylib_names)
+        ),
+        None,
+    )
+    if dylib_dir is None:
+        missing = ", ".join(dylib_names)
         raise ImportError(
-            "ThermoEngine dylibs missing in "
-            f"{dylib_dir}: {', '.join(missing)}. "
-            "Run install-engines.py to build and stage them."
+            "ThermoEngine dylibs missing: "
+            f"{missing}. Configure {config_path()} "
+            "[paths].thermoengine_dylib_dir, provide them under $HOME/lib, "
+            "or add their directory to DYLD_LIBRARY_PATH or "
+            "DYLD_FALLBACK_LIBRARY_PATH."
         )
 
     existing = os.environ.get("DYLD_FALLBACK_LIBRARY_PATH", "")
-    parts = [str(dylib_dir)]
-    if existing:
-        parts.append(existing)
-    os.environ["DYLD_FALLBACK_LIBRARY_PATH"] = ":".join(parts)
+    parts = [str(dylib_dir), *(entry for entry in existing.split(os.pathsep) if entry)]
+    os.environ["DYLD_FALLBACK_LIBRARY_PATH"] = os.pathsep.join(parts)
     return dylib_dir
+
+
+def _load_thermoengine_phaseobjc_library() -> Path:
+    dylib_dir = setup_thermoengine_dylib_path()
+    library_name = next(
+        (
+            Path(name).name
+            for name in thermoengine_artifact_names(load_engine_lock())
+            if Path(name).name.startswith("libphaseobjc.")
+        ),
+        None,
+    )
+    if library_name is None:
+        raise ImportError(
+            "ThermoEngine engine lock does not declare its phaseobjc library"
+        )
+    library_path = dylib_dir / library_name
+    try:
+        ctypes.CDLL(str(library_path))
+    except OSError as exc:
+        raise ImportError(
+            "ThermoEngine Objective-C library could not be loaded from "
+            f"{library_path}: {exc}"
+        ) from exc
+    return library_path
 
 
 def render_toml(config: EngineLocalConfig) -> str:
