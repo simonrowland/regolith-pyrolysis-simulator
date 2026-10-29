@@ -3,7 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Phase, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 
@@ -395,3 +395,22 @@ def test_shilov_table4_molecular_oxygen_pressures_use_printed_scale_and_conditio
         assert temperature.locator is not None
         assert composition.state.is_value and composition.locator is not None
         assert observation.value.point == expected[composition.state.value]
+
+
+def test_ohara_p4o10_saturation_pressure_migrates_with_janaf_conditions():
+    observations = _observations(
+        "kems-058-ohara-1987.yaml",
+        "ohara_1987_p4o10_sat_janaf_1643k",
+    )
+    assert len(observations) == 1
+    observation = observations[0]
+    assert observation.identity.quantity.value.value == Quantity.P_SAT.value
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("70927500")
+    assert observation.identity.temperature_K.value == Decimal("1643.0")
+    assert observation.identity.species.formula == "P4O10"
+    assert observation.identity.species.phase.value is Phase.G
+    temperature = observation.point_conditions["temperature_K"]
+    assert temperature.state.is_value
+    assert temperature.state.value == Decimal("1643.0")
+    assert temperature.locator is not None
