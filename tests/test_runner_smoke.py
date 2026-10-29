@@ -162,6 +162,17 @@ def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
     assert class_total > 0.0
 
 
+def test_default_lunar_c0_fe_evaporation_baseline_pin():
+    payload = _run_scenario(SCENARIOS[0])
+
+    evaporated_fe_kg = sum(
+        float(entry["vapor_species_kg_hr"].get("Fe", 0.0))
+        for entry in payload["per_hour_summary"]
+    )
+
+    assert evaporated_fe_kg == pytest.approx(0.257950173988228, abs=1.0e-12)
+
+
 def test_product_classifier_fixed_composition_anchor() -> None:
     """Hand-specified products land in classes knowable from their species."""
 
