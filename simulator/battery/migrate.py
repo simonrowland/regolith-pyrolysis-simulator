@@ -86,6 +86,7 @@ from simulator.battery.enums import (
     PHASE_COMPOSITION_QUANTITIES,
     PHASE_ROW_QUANTITIES,
     PRINTED_CAPACITY_QUANTITIES,
+    VAPORIZATION_ENTHALPIES,
     PerBasis,
     Phase,
     PhaseRole,
@@ -9413,6 +9414,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "estimate_from_glass_Cp_only",
         "value",
     ),
+    Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: ("present_work_kcal_mol",),
     Quantity.ENTROPY_OF_FUSION: (
         "delta_S_fus_J_mol-1_K-1",
         "delta_S_fusion_J_mol_K",
@@ -9744,7 +9746,7 @@ def _convert_compilation_amount(
         Quantity.DELTA_FH,
         Quantity.DELTA_FG,
         Quantity.ENTHALPY_OF_FUSION,
-    }
+    } or quantity in VAPORIZATION_ENTHALPIES
     heat = quantity in {Quantity.CP, Quantity.S, Quantity.ENTROPY_OF_FUSION}
     if not energy and not heat:
         return amount, "as_published"

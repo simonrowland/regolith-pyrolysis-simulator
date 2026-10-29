@@ -267,3 +267,42 @@ def test_yamada_interaction_parameters_migrate_with_solute_and_temperature():
         assert (solute.state.value, temperature.state.value) == expected[
             observation.value.point
         ]
+
+
+def test_nanjo_second_law_vaporization_enthalpies_migrate_in_kj_per_mol():
+    observations = _observations(
+        "kems-188-nanjo-1976.yaml",
+        "nanjo_1976_table1_second_law_deltaHvap",
+    )
+    expected = {
+        ("Se(g)", Decimal("82.8432")),
+        ("Se2(g)", Decimal("105.8552")),
+        ("Se3(g)", Decimal("73.6384")),
+        ("Se4(g)", Decimal("55.6472")),
+        ("Se5(g)", Decimal("57.7392")),
+        ("Te(g)", Decimal("120.4992")),
+        ("Te2(g)", Decimal("119.6624")),
+        ("Te3(g)", Decimal("57.7392")),
+    }
+    assert len(observations) == 8
+    assert {
+        (
+            observation.point_conditions["gas_species"].state.value,
+            observation.value.point,
+        )
+        for observation in observations
+    } == expected
+    for observation in observations:
+        assert observation.value.kind is ValueKind.POINT
+        assert (
+            observation.identity.quantity.value
+            is Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW
+        )
+        assert observation.identity.temperature_K.is_unknown
+        assert observation.locator is not None
+        assert observation.locator.table == "1"
+        conditions = observation.point_conditions or {}
+        assert conditions["gas_species"].state.is_value
+        assert conditions["gas_species"].locator is not None
+        assert conditions["temperature_K"].state.is_unknown
+        assert conditions["temperature_K"].locator is not None
