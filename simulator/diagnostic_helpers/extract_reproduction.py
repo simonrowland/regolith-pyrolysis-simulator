@@ -2263,7 +2263,8 @@ def _pressure_standard_state_kind(obs: AdoptedObservation) -> str | None:
 # oxide-condensed carrier* surface. Class axis (DECOMPOSITION §0.2 / B1):
 # "interfacial transformation required", not atomicity. Pure-element and
 # molten-metal α measure congruent metal evaporation; they are not evidence
-# for melt α (rail Fe 0.02 from oxide melt vs congruent metals near 1).
+# for melt α (the rail loads the α = 1 upper bound; McCabe's 0.9 solid-Fe
+# measurement is fenced from the melt system).
 RAIL_COMPARABLE_SYSTEM_CLASSES = frozenset(
     {
         "silicate_melt",
