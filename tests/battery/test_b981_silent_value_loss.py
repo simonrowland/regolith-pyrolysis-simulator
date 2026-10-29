@@ -524,3 +524,59 @@ def test_steurer_table10_exact_pressure_cells_migrate_with_temperature():
         assert temperature.state.value == key[1]
         assert temperature.locator is not None
         assert temperature.locator.table == "10"
+
+
+def test_fegley_table1_silicate_gas_pressures_migrate_with_conditions():
+    observations = _observations(
+        "fegley-2016-rock-steam-solubility.yaml",
+        "fegley_2016_table1_si_bearing_gas_partial_pressures",
+    )
+    conditions = {
+        "A": (Decimal("2000"), Decimal("4"), "steam", "liquid silica"),
+        "B": (Decimal("1573"), Decimal("100000"), "90% steam - 10% O2", "cristobalite"),
+        "C": (Decimal("1500"), Decimal("27000000"), "steam", "cristobalite"),
+        "D": (Decimal("2000"), Decimal("110000000"), "75% steam - 25% CO2", "liquid silica"),
+    }
+    printed_bar = {
+        "SiO": ("8.6e-6", "1.6e-13", "4.4e-14", "2.9e-8"),
+        "SiO2": ("6.9e-7", "6.4e-11", "7.6e-12", "6.9e-7"),
+        "SiHO2": ("3.4e-11", "6.7e-15", "1.9e-14", "1.3e-8"),
+        "SiH2O3": ("3.3e-11", "5.9e-9", "4.9e-7", "1.5e-3"),
+        "SiH4O4": ("3.9e-15", "4.1e-6", "3e-1", "8.25"),
+        "Si2H6O7": ("7.5e-26", "2e-11", "5.4e-4", "7.2e-3"),
+    }
+    expected = {}
+    for species, pressures in printed_bar.items():
+        for label, pressure in zip("ABCD", pressures, strict=True):
+            expected[(species, label)] = Decimal(pressure) * Decimal("100000")
+    assert len(observations) == len(expected)
+    for observation in observations:
+        point_conditions = observation.point_conditions or {}
+        gas = point_conditions["sweep_gas_as_printed"]
+        label = next(
+            condition_label
+            for condition_label, condition in conditions.items()
+            if gas.state.value == condition[2]
+            and observation.identity.temperature_K.value == condition[0]
+        )
+        expected_condition = conditions[label]
+        key = (observation.identity.species.formula, label)
+        assert key in expected
+        assert observation.identity.quantity.value.value == Quantity.P_PARTIAL.value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected[key]
+        temperature = point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == expected_condition[0]
+        assert temperature.locator is not None
+        assert temperature.locator.table == "1"
+        total_pressure = point_conditions["total_pressure_Pa"]
+        assert total_pressure.state.is_value
+        assert total_pressure.state.value.kind is ValueKind.POINT
+        assert total_pressure.state.value.point == expected_condition[1]
+        assert total_pressure.locator is not None
+        assert total_pressure.locator.table == "1"
+        condensed_phase = point_conditions["condensed_phase_as_printed"]
+        assert condensed_phase.state.value == expected_condition[3]
+        assert condensed_phase.locator is not None
