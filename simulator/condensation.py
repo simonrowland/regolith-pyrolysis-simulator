@@ -1374,7 +1374,15 @@ def _alpha_s_evaluation(
             raise ValueError(
                 f'alpha_s({species}): malformed uncertainty_envelope'
             )
+        extrapolated = not (valid_low <= T_K <= valid_high)
         value = A * math.exp(-B / T_K)
+        raw_value = value
+        if species == 'Fe' and extrapolated:
+            # b-808: extend the published Fe fit, rather than holding a band
+            # edge. Alpha is a probability: its high-T limit A > 1 is capped
+            # at unity. Its positive low-T tail can underflow numerically;
+            # nextafter keeps (0,1] without claiming a measured zero.
+            value = min(1.0, max(math.nextafter(0.0, 1.0), value))
         if not math.isfinite(value) or value > 1.0:
             raise ValueError(f'alpha_s({species}): evaluated value outside [0, 1]')
         if value <= 0.0:
@@ -1386,7 +1394,6 @@ def _alpha_s_evaluation(
                 f'0.0 at {T_K:g} K (domain floor {valid_low:g} K); '
                 'out-of-domain, not a non-sticking measurement'
             )
-        extrapolated = not (valid_low <= T_K <= valid_high)
         result = {
             'species': str(species),
             'alpha_s': value,
@@ -1404,8 +1411,12 @@ def _alpha_s_evaluation(
             'alpha_s_cite': cite,
             'alpha_s_status': status,
         }
-        if T_K > valid_high:
-            result['alpha_s_temperature_above_valid_range'] = True
+        if T_K > valid_high or (species == 'Fe' and extrapolated):
+            result[
+                'alpha_s_temperature_above_valid_range'
+                if T_K > valid_high
+                else 'alpha_s_temperature_below_valid_range'
+            ] = True
             result['alpha_s_extrapolation_warning'] = (
                 _alpha_s_extrapolation_warning(
                     species,
@@ -1415,6 +1426,13 @@ def _alpha_s_evaluation(
                     valid_high,
                 )
             )
+        if species == 'Fe' and extrapolated:
+            result.update({
+                'alpha_s_raw_arrhenius': raw_value,
+                'alpha_s_extrapolation_method': 'bounded_arrhenius',
+                'alpha_s_authority_level': 'extrapolated',
+                'alpha_s_extrapolation_reason': 'temperature_outside_certified_band',
+            })
         return value, result
 
     try:

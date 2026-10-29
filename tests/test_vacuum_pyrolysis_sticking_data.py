@@ -73,10 +73,8 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
         if isinstance(value, dict):
             assert value["form"] == "arrhenius", species
             assert value["status"] in {"CITED", "UNCERTIFIED"}, species
-            assert value["valid_range_K"] == [1000, 1800], species
-            assert value["uncertainty_envelope"] == pytest.approx(
-                [0.003, 0.067]
-            )
+            assert value["valid_range_K"] == row["temperature_range_K"], species
+            assert value["uncertainty_envelope"] == pytest.approx(row["envelope"])
             assert value["cite"], species
         else:
             assert 0.0 <= float(value) <= 1.0, species
@@ -103,29 +101,6 @@ def test_fe_stage_one_capture_uses_the_condensation_fit_at_its_midpoint():
     assert record["alpha_s"] == pytest.approx(0.878170956)
     assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert record["citation_status"] == "CITED"
-
-
-def test_fe_wall_below_condensation_band_holds_and_flags_the_lower_edge():
-    record = condensation._wall_alpha_record("Fe", T_K=1200.0)
-
-    assert record["alpha_s"] == pytest.approx(0.83)
-    assert record["alpha_s_extrapolated"] is True
-    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
-    assert record["alpha_s_uncertainty_envelope"] == pytest.approx([0.5, 1.0])
-    assert record["uncertainty_flag"] == (
-        "pure-Fe interface; first Fe layer on an oxide liner is unsourced"
-    )
-    assert record["alpha_s_domain_status"] == "out_of_domain"
-    assert record["output_status"] == "status_bearing"
-
-
-def test_fe_wall_above_condensation_band_holds_the_upper_edge():
-    record = condensation._wall_alpha_record("Fe", T_K=1700.0)
-    spec = _load_sticking_data()["species"]["Fe"]["condensation"]["value"]
-
-    assert record["alpha_s"] == pytest.approx(spec["edge_hold_values"][1])
-    assert record["alpha_s_extrapolated"] is True
-    assert record["alpha_s_temperature_above_valid_range"] is True
 
 
 def test_fe_root_value_and_default_alpha_resolver_remain_the_evaporation_proxy():
@@ -309,8 +284,49 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
     )
 
 
-def test_non_sio_sticking_alpha_s_keeps_scalar_value():
-    assert condensation.alpha_s("Fe", 1500.0, {}) == pytest.approx(0.02)
+def test_fe_stage_one_uses_reviewed_metal_condensation_fit():
+    # Reviewed b-878 pin; Tachibana et al. 2001, LPSC #1767, p. 2 Fig. 1.
+    stage = next(s for s in CondensationTrain.create_default().stages if s.stage_number == 1)
+    record = condensation._stage_alpha_record(stage, "Fe")
+    assert record["alpha_s"] == pytest.approx(0.878170956)
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["citation_status"] == "CITED"
+    assert record["output_status"] == "status_bearing"
+    assert "supersaturation-regime transfer is inferred" in record["uncertainty_flag"]
+
+
+@pytest.mark.parametrize("temperature", [1.0, 1200.0, 1700.0, 3000.0])
+def test_fe_extrapolation_keeps_published_trend_and_probability_bounds(temperature):
+    record = condensation._wall_alpha_record("Fe", T_K=temperature)
+    assert 0.0 < record["alpha_s"] <= 1.0
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert record["alpha_s_authority_level"] == "extrapolated"
+    assert record["alpha_s_extrapolation_reason"] == "temperature_outside_certified_band"
+    assert record["output_status"] == "status_bearing"
+    assert record["alpha_s_authoritative_at_temperature"] is False
+    if temperature == 3000.0:
+        assert record["alpha_s"] == 1.0
+        assert record["alpha_s_raw_arrhenius"] > 1.0
+    elif temperature == 1200.0:
+        assert record["alpha_s"] < condensation.alpha_s("Fe", 1443.0, {})
+    elif temperature == 1700.0:
+        assert record["alpha_s"] > condensation.alpha_s("Fe", 1633.0, {})
+
+
+@pytest.mark.parametrize("missing", ["A", "B", "valid_range_K", "cite", "status"])
+def test_fe_extrapolation_does_not_bypass_spec_validation(missing):
+    spec = dict(_load_sticking_data()["species"]["Fe"]["condensation"]["value"])
+    spec.pop(missing)
+    with pytest.raises(ValueError):
+        condensation.alpha_s("Fe", 1200.0, {"coefficient_spec": spec})
+
+
+def test_explicit_fe_evaporation_coefficient_is_independent_of_sticking():
+    assert condensation.alpha_s(
+        "Fe", 1500.0, {"coefficient_spec": 0.02}
+    ) == pytest.approx(0.02)
 
 
 def test_malformed_sticking_coefficient_spec_fails_loud():

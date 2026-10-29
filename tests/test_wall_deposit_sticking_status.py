@@ -648,7 +648,7 @@ def test_null_wall_liner_alpha_falls_back_to_grounded_sidecar() -> None:
 
 
 
-def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
+def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     route, authority = _route_wall_deposit_authority(
         "Fe",
         materials=_materials_with_stage_alpha(
@@ -665,10 +665,14 @@ def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
 
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # The source is cited, but transfer to this collector is an inference
+    # even at the stage's in-band temperature; that stronger limitation wins.
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
     assert "capture_budget" not in provenance
+    assert provenance["stage_1"]["alpha_s_domain_status"] == "in_domain"
+    assert provenance["stage_1"]["output_status"] == "status_bearing"
 
 
 def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
@@ -693,7 +697,8 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert extrapolated
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -808,12 +813,12 @@ def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():
 
 
 @pytest.mark.parametrize(
-    ("temperature_K", "expected_authoritative"),
-    ((1750.0, True), (1800.1, False)),
+    ("temperature_K", "in_range"),
+    ((1523.15, True), (1633.1, False)),
 )
-def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
+def test_fe_collector_inference_is_non_authoritative_inside_and_above_band(
     temperature_K: float,
-    expected_authoritative: bool,
+    in_range: bool,
 ) -> None:
     record = condensation_module._alpha_record(
         species="Fe",
@@ -838,11 +843,11 @@ def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
         notice,
     )
 
-    assert authority["authoritative_for_deposit_mass"] is (
-        expected_authoritative
-    )
-    if expected_authoritative:
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert record["citation_status"] == "CITED"
+    if in_range:
         assert record["alpha_s_domain_status"] == "in_domain"
+        assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     else:
         assert record["alpha_s_domain_status"] == "out_of_domain"
         assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
@@ -883,7 +888,8 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
 
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
-    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert cumulative["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
 @pytest.mark.parametrize(
@@ -1189,7 +1195,7 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 
