@@ -513,6 +513,20 @@ def melt_activity_requests(
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
         if engine == "magemin" and inputs.activity_quantity != "activity":
+            if (
+                inputs.activity_quantity == "activity_coefficient"
+                and state.endmember.formula == "FeO"
+                and phase_token(state.endmember) is Phase.L
+            ):
+                _reports_formula, engine_side = _engine_reports_formula(
+                    engine, state.endmember.formula,
+                )
+                results.append(_not_applicable(
+                    provenance,
+                    engine,
+                    (_reference_gap(state, engine_side),),
+                ))
+                continue
             results.append(_not_applicable(provenance, engine))
             continue
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":

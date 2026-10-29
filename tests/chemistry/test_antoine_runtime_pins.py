@@ -12,9 +12,11 @@ from engines.builtin.melt_effect_adjustment import (
 )
 from engines.builtin.vapor_pressure import _reconstructed_anchor_pressure_Pa
 from simulator import volatile_properties
+from simulator.campaigns import CampaignManager
 from simulator.chemistry.ellingham_graph import _antoine_reference_pressure_Pa
 from simulator.chemistry.langmuir_knudsen import pseudo_antoine_p_eq_pa
 from simulator.condensation import _antoine_psat_pa
+from simulator.config import load_config_bundle
 from simulator.extraction import ExtractionMixin
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     _analytical_vapor_pressures_from_activities,
@@ -29,6 +31,7 @@ from simulator.vapour_rail.catalog import (
     ValidationStatus,
     _ReferencePressureModel,
 )
+from simulator.state import CampaignPhase
 
 
 def test_survey_antoine_sample_is_pinned_as_float_hex():
@@ -251,7 +254,17 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
 
     class FakeExtraction(ExtractionMixin):
         def __init__(self):
+            source_row = load_config_bundle().setpoints["campaigns"]["C7"]
+            self.setpoints = {
+                "campaigns": {
+                    "C7": {
+                        "default_hold_T_C": source_row["default_hold_T_C"]
+                    }
+                }
+            }
             self.melt = SimpleNamespace(
+                campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
+                campaign_hour=0,
                 stir_state=SimpleNamespace(axial=1.0),
                 stir_factor=1.0,
                 p_total_mbar=0.05,
@@ -265,7 +278,7 @@ def test_c7_ca_partial_antoine_block_is_omitted_with_notice(monkeypatch):
                     }
                 }
             }
-            self.setpoints = {}
+            self.campaign_mgr = CampaignManager(self.setpoints)
             self.overhead = SimpleNamespace(headspace_temperature_K=0.0)
             self.overhead_model = SimpleNamespace(pipe_diameter_m=0.12)
 

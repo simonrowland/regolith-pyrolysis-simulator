@@ -418,7 +418,7 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 # re-run the fixture for a lone unmarked consumer.
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(5400)
+@pytest.mark.cpu_budget(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_transitions(
     full_builtin_provider_run,
 ):

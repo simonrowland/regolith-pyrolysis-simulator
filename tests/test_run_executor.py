@@ -1093,6 +1093,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # Recorded on parent 5672e61d9 by the non-binding fallback probe:
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
+    # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
     expected_rates = {
         "Al": 1.776974630811854e-10,
         "AlO": 2.622990526227972e-10,
@@ -1110,6 +1111,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "Na": 5.142690508092712e-03,
         "Na2": 3.013634463408095e-08,
         "Na2O_gas": 3.0031933641137976e-11,
+        "Si": 1.2046947950628297e-10,
         "SiO": 7.769179203709372e-09,
         "SiO2_gas": 4.598894711291365e-06,
         "TiO": 2.8635316467141483e-09,

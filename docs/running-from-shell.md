@@ -129,7 +129,7 @@ returns the classified product ledger directly:
 ```python
 from simulator.three_product_runner import run
 ledger = run(feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=24)
-# The four CLAUDE.md §5 product classes:
+# The four product classes documented in docs/concepts.md:
 #   metals_plus_O2, pure_silica_glass, industrial_mixed_glass,
 #   refractory_ceramic_rump
 # plus the supporting breakdown:

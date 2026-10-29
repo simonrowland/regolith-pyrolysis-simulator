@@ -103,6 +103,7 @@
         }
       }
     },
+    "liquid_fraction_provider": "magemin",
     "kernel_commit_sha": "goal-18-fixture",
     "campaigns_elapsed": 0.6,
     "backend_status": "unavailable",
@@ -222,52 +223,6 @@
       "last_hour": 12,
       "count": 12,
       "calibration_status": "out_of_range"
-    },
-    "composition_projected_liquidus_notice": {
-      "kind": "composition_projected",
-      "reason": "composition_projected",
-      "authority": "extrapolated",
-      "notices": [
-        {
-          "kind": "composition_projected",
-          "reason": "composition_projected",
-          "authority": "extrapolated",
-          "certified_band": {
-            "min_T_C": 1200.0,
-            "max_T_C": 1630.0,
-            "source": "REF-001 Kress91 1200-1630 C calibration band"
-          },
-          "dropped_components": [
-            {
-              "component": "NiO",
-              "mass_fraction": 0.020301671141521784
-            }
-          ],
-          "bounds_source": "kress91_liquid_calibration_floor",
-          "projected_bounds": "invalid",
-          "projection_certified_band": {
-            "engine": "magemin",
-            "database": "ig",
-            "bulk_components": [
-              "SiO2",
-              "Al2O3",
-              "CaO",
-              "MgO",
-              "FeOt",
-              "K2O",
-              "Na2O",
-              "TiO2",
-              "O",
-              "Cr2O3",
-              "H2O"
-            ]
-          },
-          "floor_T_C": 1200.0,
-          "temperature_band_case": "below_1200C_extrapolation",
-          "temperature_band_status": "extrapolation_below_calibration_floor",
-          "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor"
-        }
-      ]
     },
     "evidence_class": "internal-analytical",
     "runtime_status": "unavailable",
@@ -618,14 +573,6 @@
       "warnings": [],
       "owner_ratify_placeholders": [
         {
-          "name": "electrical_usd_per_kWh",
-          "value": 0.15,
-          "units": "USD/kWh",
-          "source_tag": "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity to Ultimate Customers by End-Use Sector, accessed 2026-07-12, https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_06_a; owner bootstrap margin",
-          "ticket": "COST-PARAM-ELECTRICAL-KWH",
-          "status": "owner-ratify-placeholder"
-        },
-        {
           "name": "thermal_usd_per_flux_h",
           "value": 1.0,
           "units": "USD/(K*h)",
@@ -658,7 +605,7 @@
           "status": "owner-ratify-placeholder"
         }
       ],
-      "owner_ratify_placeholder_count": 5,
+      "owner_ratify_placeholder_count": 4,
       "pumping_diagnostic": {
         "schema_version": "pumping-cost-rollup-v1",
         "status": "no_rows",
@@ -2449,28 +2396,61 @@
         "metals_kg": {},
         "metals_total_kg": 0.0,
         "O2_kg": 0.0,
-        "O2_partition_kg": {},
-        "class_total_kg": 0.0
+        "O2_partition_kg": {
+          "stored": 0.0,
+          "vented": 0.0,
+          "captured": 0.0,
+          "total": 0.0,
+          "stage0_stored": 0.0,
+          "melt_offgas_stored": 0.0,
+          "mre_anode_stored": 0.0,
+          "cistern_liquid_stored": 0.0,
+          "melt_offgas_vented": 0.0,
+          "melt_offgas_captured": 0.0,
+          "stage0_o2_vented_with_offgas": 0.0,
+          "stage0_o2_recovered_stored": 0.0,
+          "stage0_o2_bound_into_melt_redox": 0.0
+        },
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "ingots_metals": {
         "species_kg": {},
-        "class_total_kg": 0.0
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "oxygen": {
         "O2_kg": 0.0,
-        "partition_kg": {},
-        "class_total_kg": 0.0
+        "partition_kg": {
+          "stored": 0.0,
+          "vented": 0.0,
+          "captured": 0.0,
+          "total": 0.0,
+          "stage0_stored": 0.0,
+          "melt_offgas_stored": 0.0,
+          "mre_anode_stored": 0.0,
+          "cistern_liquid_stored": 0.0,
+          "melt_offgas_vented": 0.0,
+          "melt_offgas_captured": 0.0,
+          "stage0_o2_vented_with_offgas": 0.0,
+          "stage0_o2_recovered_stored": 0.0,
+          "stage0_o2_bound_into_melt_redox": 0.0
+        },
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "pure_silica_glass": {
         "stage_3_capture_kg": 0.0,
         "stage_3_kg_by_species": {},
-        "class_total_kg": 0.0
+        "class_total_kg": 0.0,
+        "estimated_contributions": []
       },
       "glass": {
         "species_kg": {},
         "class_total_kg": 0.0,
         "pure_silica_glass_kg": 0.0,
-        "industrial_mixed_glass_kg": 0.0
+        "industrial_mixed_glass_kg": 0.0,
+        "estimated_contributions": []
       },
       "industrial_mixed_glass": {
         "mixed_melt_residual_kg": 0.0,
@@ -2488,7 +2468,8 @@
           "N2": 1.9950124688279303,
           "organic_tar": 8.302949899423007
         },
-        "class_total_kg": 185.1770686969132
+        "class_total_kg": 185.1770686969132,
+        "estimated_contributions": []
       },
       "process_inventory_spent_reductant": {
         "kg_by_species": {},
@@ -2528,7 +2509,8 @@
           "ree_enrichment_factor": null,
           "derivation": "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
         },
-        "class_total_kg": 229.8441294934647
+        "class_total_kg": 229.8441294934647,
+        "estimated_contributions": []
       },
       "unclassified": {
         "kg_by_species": {
@@ -16742,6 +16724,177 @@
         "source_hour": 1,
         "source_campaign_hour": 1
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 0,
+              "failure_temperature_C": 35.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -17077,6 +17230,177 @@
         "source_campaign": "C2B",
         "source_hour": 2,
         "source_campaign_hour": 2
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 1,
+              "failure_temperature_C": 45.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -17414,6 +17738,177 @@
         "source_hour": 3,
         "source_campaign_hour": 3
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 2,
+              "failure_temperature_C": 55.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -17749,6 +18244,177 @@
         "source_campaign": "C2B",
         "source_hour": 4,
         "source_campaign_hour": 4
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 3,
+              "failure_temperature_C": 65.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -18086,6 +18752,177 @@
         "source_hour": 5,
         "source_campaign_hour": 5
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 4,
+              "failure_temperature_C": 75.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -18421,6 +19258,177 @@
         "source_campaign": "C2B",
         "source_hour": 6,
         "source_campaign_hour": 6
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 5,
+              "failure_temperature_C": 85.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -18758,6 +19766,177 @@
         "source_hour": 7,
         "source_campaign_hour": 7
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 6,
+              "failure_temperature_C": 95.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -19093,6 +20272,177 @@
         "source_campaign": "C2B",
         "source_hour": 8,
         "source_campaign_hour": 8
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 7,
+              "failure_temperature_C": 105.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -19430,6 +20780,177 @@
         "source_hour": 9,
         "source_campaign_hour": 9
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 8,
+              "failure_temperature_C": 115.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -19766,6 +21287,177 @@
         "source_hour": 10,
         "source_campaign_hour": 10
       },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 9,
+              "failure_temperature_C": 125.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
+      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -20101,6 +21793,177 @@
         "source_campaign": "C2B",
         "source_hour": 11,
         "source_campaign_hour": 11
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 10,
+              "failure_temperature_C": 135.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -23880,6 +25743,177 @@
         "source_campaign": "C2B",
         "source_hour": 12,
         "source_campaign_hour": 12
+      },
+      "oxygen_reservoir": {
+        "exchange_o2_mol": 0.0,
+        "exchange_unbacked_o2_mol": 0.0,
+        "exchange_direction": "none:no_melt_redox_capacity",
+        "exchange_clamped": false,
+        "liquid_fraction_gate": {
+          "provider": "magemin",
+          "redox": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001,
+            "gate_provider_refusal": {
+              "provider": "magemin",
+              "reason": "composition_projected",
+              "outcome": "numerical_failure",
+              "provider_diagnostic": {
+                "liquidus_T_K": null,
+                "liquidus_T_C": null,
+                "solidus_T_C": null,
+                "phases_present": [],
+                "phase_modes_wt_pct": {},
+                "liquid_composition_wt_pct": {},
+                "phase_masses_kg": {},
+                "liquid_fraction": null,
+                "mode": "subprocess",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "backend_status": "out_of_domain",
+                "backend_warnings": [
+                  "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                  "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                  "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                  "composition_projected bulk has no projected liquidus; status=not_converged"
+                ],
+                "backend_diagnostics": {
+                  "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "backend": "MAGEMin",
+                    "projected_species": [
+                      "Al2O3",
+                      "CaO",
+                      "FeO",
+                      "MgO",
+                      "Na2O",
+                      "NiO",
+                      "SiO2"
+                    ],
+                    "input_melt_mass_kg": 759.2312041414734,
+                    "retained_basis_melt_mass_kg": 759.2312041414734,
+                    "magemin_database": "ig",
+                    "magemin_bulk_order": [
+                      "SiO2",
+                      "Al2O3",
+                      "CaO",
+                      "MgO",
+                      "FeOt",
+                      "K2O",
+                      "Na2O",
+                      "TiO2",
+                      "O",
+                      "Cr2O3",
+                      "H2O"
+                    ],
+                    "magemin_bulk_projected_components": [
+                      "Al2O3",
+                      "CaO",
+                      "FeOt",
+                      "MgO",
+                      "Na2O",
+                      "O",
+                      "SiO2"
+                    ],
+                    "dropped_bulk_components": [
+                      "NiO"
+                    ],
+                    "dropped_mass_fraction": 0.02030167114152178,
+                    "dropped_component_mass_fractions": {
+                      "NiO": 0.020301671141521784
+                    },
+                    "magemin_projected_composition_wt_pct": {
+                      "SiO2": 36.543008054739204,
+                      "Al2O3": 2.537708892690223,
+                      "CaO": 2.917675151440357,
+                      "MgO": 24.81788821334582,
+                      "FeOt": 27.06175971260413,
+                      "Na2O": 0.7010458613495456,
+                      "O": 3.3907469996785435
+                    },
+                    "composition_projected": {
+                      "dropped_components": [
+                        "NiO"
+                      ],
+                      "dropped_mass_fraction": 0.02030167114152178,
+                      "dropped_component_mass_fractions": {
+                        "NiO": 0.020301671141521784
+                      }
+                    },
+                    "merged_bulk_components": [
+                      "FeO->FeOt+O"
+                    ],
+                    "bulk_source_sum_wt_pct": 100.0,
+                    "bulk_projected_sum_wt_pct": 97.96983288584782,
+                    "bulk_dropped_wt_pct": 2.030167114152178
+                  },
+                  "backend_status": "out_of_domain",
+                  "backend_status_reason": "composition_projected",
+                  "exception_class": "LiquidusSampleError",
+                  "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: NiO; MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                  "projected_liquidus_status": "not_converged",
+                  "projected_liquidus_diagnostics": {},
+                  "composition_projected_notice": {
+                    "kind": "composition_projected",
+                    "reason": "composition_projected",
+                    "authority": "extrapolated",
+                    "certified_band": {
+                      "engine": "magemin",
+                      "database": "ig",
+                      "bulk_components": [
+                        "SiO2",
+                        "Al2O3",
+                        "CaO",
+                        "MgO",
+                        "FeOt",
+                        "K2O",
+                        "Na2O",
+                        "TiO2",
+                        "O",
+                        "Cr2O3",
+                        "H2O"
+                      ]
+                    },
+                    "dropped_components": [
+                      {
+                        "component": "NiO",
+                        "mass_fraction": 0.020301671141521784
+                      }
+                    ]
+                  }
+                },
+                "backend_status_reason": "composition_projected",
+                "kernel_fallback_used": "magemin-shadow",
+                "kernel_fallback_requested_provider": "none",
+                "kernel_fallback_reason": "no_authoritative_provider"
+              },
+              "status": "out_of_domain",
+              "warnings": [
+                "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                "MAGEMin: database 'ig' dropped components outside documented bulk order: NiO",
+                "MAGEMin refused projected composition; dropped components have no documented ig endmember: NiO",
+                "non-monotone frac_M(T) would require smoothing: 700.000 C gives raw 0.184627 below 650.000 C value 0.208009",
+                "composition_projected bulk has no projected liquidus; status=not_converged"
+              ],
+              "qualification": "first_call_kress91_floor_prediction",
+              "authority": "extrapolated (lower-rung)",
+              "failure_hour": 11,
+              "failure_temperature_C": 145.0,
+              "detail": "Kress91 calibration-floor step; not a fresh solve or a melting measurement"
+            }
+          },
+          "evaporation": {},
+          "liquid_fraction": {
+            "status": "ok",
+            "source": "kress91_liquid_calibration_floor",
+            "liquid_fraction": 0.0,
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1200.000001
+          }
+        }
       },
       "fe_redox_split": {
         "authoritative": false,

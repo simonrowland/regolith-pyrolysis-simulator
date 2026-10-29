@@ -1,0 +1,102 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1ab6fdf47d081211f78673cefee4c6e4115651e53d8f1cea83cab987ab20b03b
+  citation: 'van Limpt, H., Beerkens, R., Cook, S., O''Connor, R., and Simon, J. (2011), "Modelling the evaporation of boron
+    species. Part 1. Alkali-free borosilicate glass melts", Glass Technology: European Journal of Glass Science and Technology
+    Part A, 52(3), 77–87.'
+  source_ids:
+  - vanlimpt-2011-boron-evaporation-part1
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:vanlimpt-2011-boron-evaporation-part1
+      role: pdf
+      path: raw/vanlimpt-2011-boron-evaporation-part1/vanlimpt-2011-boron-evaporation-part1.pdf
+      sha256:
+        tag: value
+        value: ba7244fb564d20a3192c67c47e0a9dcd172410f7a9ce9455464605abb2447b6c
+    - asset_id: pdftotext:vanlimpt-2011-boron-evaporation-part1
+      role: pdftotext
+      path: text/vanlimpt-2011-boron-evaporation-part1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:vanlimpt-2011-boron-evaporation-part1
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: vanlimpt_2011_experimental_range_and_species_scope_context
+  type: laboratory_conditions
+  locator:
+    page: 6
+    published_page: 82
+    pdf_page_index: 5
+    figure: '3'
+    section: 6. Results
+  units: as printed
+  values:
+    quantity: experimental_temperature_gas_range_and_species_scope_context
+    method_class: method_only
+    temperature_range: Experiments were performed at about 1400, 1450, and 1500 °C. The apparatus maximum is about 1500 °C.
+    gas_flow_and_composition: The paper states the partial water-vapour pressure was set between 0 and 0.35 bar. This is a
+      stated partial-pressure range, not a total pressure. Figure 3 reports 0.3 bar for the plotted tests.
+    sodium_data_scope: No measured Na(g) vapour pressure, Na(g) evaporation flux, or Na2O evaporation data are printed. The
+      experimental measurements in this paper concern boron evaporation; their figure-read values are not transcribed here.
+  context_id: vanlimpt-2011-boron-evaporation-part1::context::vanlimpt_2011_experimental_range_and_species_scope_context
+  work_id: 1ab6fdf47d081211f78673cefee4c6e4115651e53d8f1cea83cab987ab20b03b
+  source_id: vanlimpt-2011-boron-evaporation-part1
+  species: Na
+- observation_id: vanlimpt_2011_gas_film_relation_context
+  type: method
+  locator:
+    page: 2
+    published_page: 78
+    pdf_page_index: 1
+    section: 3. Modelling of evaporation rates
+  units: as printed
+  values:
+    quantity: gas_film_mass_transfer_relation_context
+    method_class: method_only
+    gas_film_relation_as_printed: 'Equation (6): Qg,i = Sh (Di/Lg) ((pi* - pi)/(RT)) = (Di/deltaN) ((pi* - pi)/(RT)). Sh is
+      the flat-plate Sherwood number, Sh = h Lg / D. Here h is the mass-transfer coefficient, D the interdiffusion coefficient,
+      Lg the distance from the leading edge, pi the vapour pressure, R the universal gas constant, T the temperature, and
+      deltaN the Nernst boundary-layer thickness. The relation assumes uniform temperature across that layer.'
+    industrial_gas_film_context: For an industrial furnace, Lg is the characteristic length of the gas stream flowing directly
+      over the melt, typically a few metres. CFD may be used to calculate local Nernst boundary-layer thickness and local
+      melt-surface temperature.
+  context_id: vanlimpt-2011-boron-evaporation-part1::context::vanlimpt_2011_gas_film_relation_context
+  work_id: 1ab6fdf47d081211f78673cefee4c6e4115651e53d8f1cea83cab987ab20b03b
+  source_id: vanlimpt-2011-boron-evaporation-part1
+  species: Na
+- observation_id: vanlimpt_2011_transpiration_gas_film_method_context
+  type: method
+  locator:
+    page: 5
+    published_page: 81
+    pdf_page_index: 4
+    figure: '2'
+    section: 5. Experimental procedure
+  units: as printed
+  values:
+    quantity: gas_film_mass_transfer_method_context
+    method_class: method_only
+    apparatus: Laboratory transpiration evaporation facility with a tube furnace, platinum/rhodium boat and sampling probe,
+      a 30 cm platinum/rhodium coating on the ceramic tube, gas inlet, and gas wash bottles. The boat contains about 25 g
+      glass. Temperature near the boat is measured with a calibrated Pt/Rh thermocouple type B.
+    gas_flow_and_composition: At the set-point temperature the tube is flushed with a controlled gas flow; gas velocity and
+      furnace atmosphere are controlled. During a test, pO2, pH2O, and pN2 are fixed. The laboratory gas-flow rate and velocity
+      are not numerically reported.
+    measurement_protocol: Volatile species are sampled through a platinum/rhodium probe and collected in gas wash bottles.
+      A 6 to 8 h experiment uses four samples, each with a duration of 1 h. Boat mass loss is measured gravimetrically after
+      each experiment.
+  context_id: vanlimpt-2011-boron-evaporation-part1::context::vanlimpt_2011_transpiration_gas_film_method_context
+  work_id: 1ab6fdf47d081211f78673cefee4c6e4115651e53d8f1cea83cab987ab20b03b
+  source_id: vanlimpt-2011-boron-evaporation-part1
+  species: Na

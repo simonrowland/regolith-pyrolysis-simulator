@@ -2494,7 +2494,7 @@ def test_provider_short_circuits_below_voltage(
 # Nightly (2026-08-02 CI tiering): retained full runs ×2 (~2367 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
     full_electrolysis_run,
 ):
@@ -2598,7 +2598,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
 # Nightly: assertion-only sibling of full_electrolysis_run (fixture co-tenant).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 def test_full_run_o2_yields_split_across_distinct_bins(
     full_electrolysis_run,
 ):

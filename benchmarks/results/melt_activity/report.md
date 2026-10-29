@@ -341,7 +341,7 @@ MAGMA is a model-reproduction anchor, not correctness evidence. The empirical-KE
 | Na | 36 | 1.18 | 0.143 | 0 | — |
 | O2 | 36 | 8.86e-05 | 8.95e-05 | 1 | 0.331 |
 
-Controller regression pool (all non-alkali rows, including the O2 fO2 pin): IMCC **0.274** vs VapoRock **0.503** dex; 0.274/0.503 anchor reproduced: **yes**.
+Controller regression pool (all non-alkali rows, including the O2 fO2 pin): IMCC **0.274** vs VapoRock **0.503** dex; alkali exclusion cost +0.6257 dex; in-domain alkali RMSE 1.7352 dex across **72** Na/K rows in the in-domain shared SF04 MAGMA model-model join on imcc-published (`imcc-sf04-v1.0.2.json`); 0.274/0.503 anchor reproduced: **yes**.
 
 Experimental KEMS snapshot: **7 scored / 9 retained** rows. These are independent KEMS compositions, not measurements on the four SF04 basalt sheets, and therefore do not turn the MAGMA table into empirical basalt evidence.
 

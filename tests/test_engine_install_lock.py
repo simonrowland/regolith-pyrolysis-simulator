@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib.util
 import os
+import sys
 from pathlib import Path
 
 import pytest
@@ -589,6 +591,25 @@ def test_check_reports_runtime_path_lookup_inside_repos(
         install_root,
         repos_root,
     )
+
+
+def test_installer_detects_importlib_visible_petthermotools(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.melt_backend import installer
+
+    site_packages = tmp_path / "site-packages"
+    package = site_packages / "petthermotools"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text("\n", encoding="utf-8")
+    monkeypatch.syspath_prepend(str(site_packages))
+    monkeypatch.delitem(sys.modules, "petthermotools", raising=False)
+    monkeypatch.setitem(sys.modules, "PetThermoTools", None)
+    importlib.invalidate_caches()
+
+    expected = importlib.util.find_spec("petthermotools") is not None
+    assert expected
+    assert installer.EngineInstaller().check_status()["PetThermoTools"] == expected
 
 
 def test_check_reports_thermoengine_library_checkout(

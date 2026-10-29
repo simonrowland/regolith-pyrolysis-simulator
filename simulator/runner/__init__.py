@@ -53,12 +53,18 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
-from simulator.config import ConfigBundle, _load_setpoints_file, load_config_bundle
+from simulator.config import (
+    ConfigBundle,
+    _load_setpoints_file,
+    load_config_bundle,
+)
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import (
     CampaignManager,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
 )
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
@@ -74,6 +80,7 @@ from simulator.accounting.yield_disposition import (
     ledger_snapshots_from_sim,
 )
 from simulator.chemistry.kernel import (
+    CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
@@ -94,6 +101,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     evaluate_vacuum_pyrolysis_comparison,
@@ -202,7 +210,7 @@ SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
     "no_suppress",
     "o2_1mbar",
 )
-_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
+_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = CHEMISTRY_KERNEL_RUN_INPUT_KEYS
 SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",
@@ -858,8 +866,8 @@ def _deep_merge_setpoints(
         )
         if extra_keys:
             raise RunnerError(
-                "setpoints_patch may only contain diagnostic "
-                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}; "
+                "setpoints_patch may only contain "
+                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider; "
                 "use fallback flags instead"
             )
         try:
@@ -1090,7 +1098,11 @@ class PyrolysisRun:
             session = SimSession()
             try:
                 session.start(self._session_config())
-            except CampaignPressureSetpointRefusal as exc:
+            except (
+                CampaignPressureSetpointRefusal,
+                CampaignSetpointMissingRefusal,
+                EvaporationFluxRefusal,
+            ) as exc:
                 execution = RunExecutor().execute_session(
                     session,
                     hours=int(self.hours),
@@ -1213,8 +1225,8 @@ class PyrolysisRun:
             )
             if extra_keys:
                 raise RunnerError(
-                    "PyrolysisRun.chemistry_kernel only accepts diagnostic "
-                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY}"
+                    "PyrolysisRun.chemistry_kernel only accepts "
+                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY} or liquid_fraction_provider"
                 )
             setpoints = _deep_merge_setpoints(
                 setpoints,
@@ -1403,6 +1415,7 @@ class PyrolysisRun:
             "backend": self.backend_name,
             "started_at_utc": started_at_utc,
             "engines_used": engines_used,
+            "liquid_fraction_provider": sim.record.liquid_fraction_provider,
             "kernel_commit_sha": kernel_commit_sha,
         }
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
@@ -1560,13 +1573,14 @@ class PyrolysisRun:
             lambda: _json_safe(
                 {
                     **build_cost_rollup_diagnostic(
+                        sim=sim,
                         cost_ledger=sim.cost_ledger,
                         per_hour=execution.per_hour,
                         products_kg=sim.product_ledger(),
                         pumping_context=pumping_context_from_sim(
                             sim, execution.snapshots
                         ),
-                        snapshots=execution.snapshots,
+                        snapshots=tuple(sim.record.snapshots),
                     ),
                     "price_basis": (
                         "legacy_placeholder_awaiting_owner_ratification"
@@ -1736,6 +1750,7 @@ class PyrolysisRun:
                     existing_by_segment_species_kg=(
                         _nested_species_kg_from_segment_species(existing_before)
                     ),
+                    authority=execution.trace.wall_deposit_sticking_authority,
                 )
                 summary = final_summary
                 if not (
@@ -2534,12 +2549,11 @@ def _oxygen_reservoir_exchange_observables(
     snapshot: HourSnapshot,
 ) -> dict[str, Any]:
     reservoir = getattr(snapshot, "oxygen_reservoir", {}) or {}
-    if (
-        not isinstance(reservoir, Mapping)
-        or not reservoir.get("exchange_clamped")
+    if not isinstance(reservoir, Mapping) or not (
+        reservoir.get("exchange_clamped")
+        or getattr(snapshot, "liquid_fraction_gate", None)
     ):
         return {}
-    # Unclamped exchanges need no warning row; keep existing normal rows stable.
     exchange = {
         "exchange_o2_mol": reservoir.get("exchange_o2_mol", 0.0),
         "exchange_unbacked_o2_mol": reservoir.get(
@@ -2548,6 +2562,8 @@ def _oxygen_reservoir_exchange_observables(
         "exchange_direction": reservoir.get("exchange_direction", ""),
         "exchange_clamped": reservoir.get("exchange_clamped", False),
     }
+    if snapshot.liquid_fraction_gate:
+        exchange['liquid_fraction_gate'] = snapshot.liquid_fraction_gate
     return {"oxygen_reservoir": _json_safe(exchange)}
 
 
@@ -3856,8 +3872,13 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("method") == "extrapolated_first_order_ln_gamma"
         for item in items
     )
-    bridged = any(
-        item.get("method") == "same_composition_T_bridge" for item in items
+    nearest_neighbor = any(
+        item.get("method") == "nearest_converged_temperature_neighbor"
+        for item in items
+    )
+    interpolated_neighbors = any(
+        item.get("method") == "interpolated_converged_temperature_neighbors"
+        for item in items
     )
     projected = any(
         item.get("method") == "projected_composition_solve" for item in items
@@ -3869,16 +3890,34 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("code") == "hold_last_certified_effective_gamma"
         for item in items
     )
+    far_anchor = next(
+        (
+            str(item.get("message"))
+            for item in items
+            if item.get("method") in {
+                "nearest_converged_temperature_neighbor",
+                "interpolated_converged_temperature_neighbors",
+            }
+            and "schedule-derived" in str(item.get("message", ""))
+        ),
+        None,
+    )
     if projected:
         prediction = "projected-composition extrapolated predictions"
-        if bridged:
-            prediction += ", with a temperature bridge on the projected composition"
-    elif bridged:
-        prediction = "same-composition temperature-bridge predictions"
+        if interpolated_neighbors:
+            prediction += ", using bracketed 1/T temperature neighbours"
+        elif nearest_neighbor:
+            prediction += ", using the nearest solved temperature neighbour"
+    elif interpolated_neighbors:
+        prediction = "bracketed same-composition temperature-neighbour predictions"
+        if nearest_neighbor:
+            prediction += ", with nearest-neighbour holds where only one side solved"
         if first_order or frozen:
-            prediction += (
-                ", with a capped ln-gamma continuation where the bridge had no points"
-            )
+            prediction += ", with certified-gamma continuation where no neighbour solved"
+    elif nearest_neighbor:
+        prediction = "nearest same-composition temperature-neighbour predictions"
+        if first_order or frozen:
+            prediction += ", with certified-gamma continuation where no neighbour solved"
     elif first_order or frozen:
         prediction = "first-order ln-gamma extrapolated predictions"
         if frozen:
@@ -3887,6 +3926,8 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         prediction = "held effective-gamma/table extrapolated predictions"
     else:
         prediction = "a constant-gamma extrapolated prediction"
+    if far_anchor:
+        prediction += f"; {far_anchor}"
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
         f"used {prediction} for "
@@ -4048,10 +4089,25 @@ def _wall_fouling_report(
         and threshold_kg > 0.0
     )
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    authority = wall_deposit_sticking_authority_status(
+        wall_deposit_kg,
+        alpha_notice or {},
+    )
+    authoritative = bool(authority.get("authoritative_for_resinter", True))
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_wall_load_kg > 0.0,
+        authority=authority,
+    )
+    wall_deposit_unavailable = availability.status == "refused"
     campaigns_by_segment: dict[str, float | str] = {}
-    aggregate_campaigns_to_resinter: float | str = "infinite"
-    if total_wall_load_kg <= 0.0:
-        campaigns_to_resinter: float | str = "infinite"
+    campaigns_to_resinter: float | str | None
+    aggregate_campaigns_to_resinter: float | str | None = "infinite"
+    if wall_deposit_unavailable:
+        campaigns_to_resinter = None
+        aggregate_campaigns_to_resinter = None
+        verdict = "non-authoritative"
+    elif total_wall_load_kg <= 0.0:
+        campaigns_to_resinter = "infinite"
         verdict = "slow-fouling"
     elif not threshold_is_qualified:
         controlling_segment_load_kg = max(
@@ -4088,19 +4144,22 @@ def _wall_fouling_report(
             if campaigns_to_resinter < fast_n
             else "slow-fouling"
         )
-    authority = wall_deposit_sticking_authority_status(
-        wall_deposit_kg,
-        alpha_notice or {},
-    )
-    authoritative = bool(authority.get("authoritative_for_resinter", True))
-    nominal_verdict = verdict
-    if not authoritative:
+    nominal_verdict = None if wall_deposit_unavailable else verdict
+    if not authoritative and not wall_deposit_unavailable:
         verdict = "non-authoritative"
-    return {
+    report = {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
-        "dominant_species_wall_deposit_kg": _clean_report_float(dominant_kg),
-        "wall_deposit_kg_per_campaign": _clean_report_float(total_wall_load_kg),
+        "dominant_species_wall_deposit_kg": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(dominant_kg)
+        ),
+        "wall_deposit_kg_per_campaign": (
+            None
+            if wall_deposit_unavailable
+            else _clean_report_float(total_wall_load_kg)
+        ),
         "wall_deposit_basis": "total_wall_load_by_species",
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
@@ -4118,12 +4177,41 @@ def _wall_fouling_report(
         "nominal_verdict": nominal_verdict,
         "verdict": verdict,
     }
+    if availability.refusal is not None:
+        refusal = availability.refusal
+        refusal_authority = refusal["authority"]
+        report["refusal"] = {
+            "reason": (
+                "Zero wall deposition cannot be certified from "
+                "non-authoritative wall-routing evidence."
+            ),
+            "code": refusal_authority["code"],
+            "authoritative": refusal_authority["authoritative"],
+            "authoritative_for_deposit_mass": (
+                refusal_authority["authoritative_for_deposit_mass"]
+            ),
+            "authoritative_for_coating": (
+                refusal_authority["authoritative_for_coating"]
+            ),
+            "authoritative_for_resinter": (
+                refusal_authority["authoritative_for_resinter"]
+            ),
+            "severity": refusal_authority["severity"],
+            "output_status": refusal_authority["output_status"],
+            "refusal_events": refusal["refusal_events"],
+            "affected_species": refusal_authority.get(
+                "wall_saturation_pressure_refused_species", []
+            ),
+            "authority_detail_path": "fouling_rate.sticking_alpha_authority",
+        }
+    return report
 
 
 def _wall_fouling_lifespan_report(
     *,
     per_campaign_by_segment_species_kg: Mapping[str, Mapping[str, float]],
     existing_by_segment_species_kg: Mapping[str, Mapping[str, float]],
+    authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return INFO-only remaining-life projection from execution-local rates."""
 
@@ -4138,6 +4226,11 @@ def _wall_fouling_lifespan_report(
         for segment, species_kg in existing_by_segment_species_kg.items()
     }
     total_per_campaign = sum(per_segment.values())
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=total_per_campaign > 0.0,
+        authority=authority,
+    )
+    refused = availability.status == "refused"
     controlling_segment: str | None = None
     threshold = cfg.get("resinter_threshold_kg")
     threshold_kg = None if threshold is None else float(threshold)
@@ -4147,7 +4240,10 @@ def _wall_fouling_lifespan_report(
         and threshold_kg > 0.0
     )
     campaigns_by_segment: dict[str, float | str] = {}
-    if total_per_campaign <= 0.0:
+    if refused:
+        campaigns_to_resinter = None
+        nominal_verdict = None
+    elif total_per_campaign <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         nominal_verdict = "slow-fouling"
     elif threshold_qualified:
@@ -4186,12 +4282,14 @@ def _wall_fouling_lifespan_report(
             f"< {cfg['fast_fouling_campaign_threshold']}, else slow-fouling"
         )
 
-    return {
+    report = {
         "input_basis": "execution_local_committed_rate_per_campaign",
         "liner_material": cfg["liner_material"],
         "controlling_segment": controlling_segment,
-        "wall_deposit_kg_per_campaign": _clean_report_float(
-            total_per_campaign
+        "wall_deposit_kg_per_campaign": (
+            None
+            if refused
+            else _clean_report_float(total_per_campaign)
         ),
         "existing_wall_load_kg_by_segment": {
             key: _clean_report_float(value)
@@ -4218,6 +4316,9 @@ def _wall_fouling_lifespan_report(
         "verdict_authoritative": False,
         "authoritative_for_selection": False,
     }
+    if availability.refusal is not None:
+        report["refusal"] = availability.refusal
+    return report
 
 
 def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],
@@ -6414,8 +6515,8 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
     if args.lab_oxygen_diagnostics_output:
         report, diagnostics = result
         diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
@@ -6529,27 +6630,34 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
+        t_low_grid_c = _parse_float_grid(
+            args.t_low_grid, label="--t-low-grid"
+        )
+        t_hold_grid_c = _parse_float_grid(
+            args.t_hold_grid, label="--t-hold-grid"
+        )
+        ramp_grid_c_per_hr = _parse_float_grid(
+            args.ramp_grid, label="--ramp-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_tsweep(
             feedstock_id=args.feedstock,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            t_low_grid_c=_parse_float_grid(
-                args.t_low_grid, label="--t-low-grid"
-            ),
-            t_hold_grid_c=_parse_float_grid(
-                args.t_hold_grid, label="--t-hold-grid"
-            ),
-            ramp_grid_c_per_hr=_parse_float_grid(
-                args.ramp_grid, label="--ramp-grid"
-            ),
+            t_low_grid_c=t_low_grid_c,
+            t_hold_grid_c=t_hold_grid_c,
+            ramp_grid_c_per_hr=ramp_grid_c_per_hr,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)
@@ -6662,22 +6770,27 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
         )
 
     try:
+        wall_t_grid_c = _parse_float_grid(
+            args.wall_t_grid, label="--wall-t-grid"
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    try:
         summary = run_sio_wall_sweep(
             feedstock_ids=feedstock_ids,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
-            wall_t_grid_c=_parse_float_grid(
-                args.wall_t_grid, label="--wall-t-grid"
-            ),
+            wall_t_grid_c=wall_t_grid_c,
             pO2_modes=pO2_modes,
             output_dir=Path(args.output_dir),
             allow_unmeasured_alpha_fallback=(
                 args.allow_unmeasured_alpha_fallback
             ),
         )
-    except RunnerError as exc:
-        parser.error(str(exc))
+    except RunnerError:
+        raise
 
     if args.report_output:
         report_path = Path(args.report_output)

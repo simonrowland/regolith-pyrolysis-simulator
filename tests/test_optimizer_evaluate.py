@@ -2652,9 +2652,10 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         profile=PROFILE,
         executor=FakeExecutor(refused_execution),
     )
-    assert refused.objectives.as_mapping()["pure_silica_glass_kg"] is None
+    assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     refused_evidence = refused.objectives.evidence["pure_silica_glass_kg"]
-    assert refused_evidence["value_status"] == "unavailable"
+    assert refused_evidence["value_status"] == "partial"
+    assert refused_evidence["total_basis"] == "lower_bound"
     assert "flag" not in refused_evidence
     assert refused_evidence["certification_flag"] == {
         "status": "unavailable",
@@ -2662,6 +2663,8 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
         "band": None,
         "reason": "missing SiO carrier input",
     }
+    assert refused_evidence["availability_flag"]["status"] == "partial"
+    assert {item["species"] for item in refused_evidence["excluded"]} == {"SiO"}
 
 
 def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
@@ -3936,6 +3939,38 @@ def test_real_backend_refused_is_physics_refused_not_unavailable() -> None:
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "refused"
     assert "fo2_requires_iron" in result.notes
+
+
+def test_environment_disposition_refusal_aborts_optimizer_evaluation() -> None:
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    status="refused",
+                    reason="liquid_fraction_provider_failed",
+                    error_message="MAGEMin worker could not be restarted",
+                    backend_status="refused",
+                    backend_authoritative=False,
+                    refusal_diagnostic={
+                        "reason": "liquid_fraction_provider_failed",
+                        "provider_diagnostic": {
+                            "backend_diagnostics": {
+                                "projected_liquidus_diagnostics": {
+                                    "backend_failure_disposition": "environment",
+                                },
+                            },
+                        },
+                    },
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert "environment" in str(raised.value)
 
 
 def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:

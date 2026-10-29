@@ -32,8 +32,7 @@
 .sec-p4-stage-purity .sec-p4-stage-card h3 { margin: 4px 0 0; font-size: 16px; }
 .sec-p4-stage-purity .sec-p4-verdict-line { justify-content: flex-end; }
 
-.sec-p4-stage-purity .sec-p4-verdict,
-.sec-p4-stage-purity .sec-p4-qualifier {
+.sec-p4-stage-purity .sec-p4-verdict {
   display: inline-flex;
   align-items: center;
   padding: 4px 7px;
@@ -42,8 +41,7 @@
 }
 
 .sec-p4-stage-purity .sec-p4-verdict-pure { background: #dcefe3; color: #23613d; }
-.sec-p4-stage-purity .sec-p4-verdict-mixed,
-.sec-p4-stage-purity .sec-p4-qualifier { background: var(--amber-soft); color: var(--warning-ink); }
+.sec-p4-stage-purity .sec-p4-verdict-mixed { background: var(--amber-soft); color: var(--warning-ink); }
 .sec-p4-stage-purity .sec-p4-verdict-contaminated { background: var(--red-soft); color: var(--red); }
 .sec-p4-stage-purity .sec-p4-verdict-unknown,
 .sec-p4-stage-purity .sec-p4-verdict-indeterminate { background: var(--rule); color: var(--ink-2); }

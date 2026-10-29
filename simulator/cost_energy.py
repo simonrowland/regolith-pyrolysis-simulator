@@ -1,4 +1,4 @@
-"""Cost-energy helper functions and owner-ratify placeholder coefficients."""
+"""Cost-energy helper functions and cost coefficient provenance."""
 
 from __future__ import annotations
 
@@ -14,6 +14,8 @@ from simulator.cost_parameters import (
 )
 
 UNAVAILABLE_STATUS = "unavailable"
+OWNER_RATIFY_PLACEHOLDER_STATUS = "owner-ratify-placeholder"
+OWNER_RATIFIED_STATUS = "owner-ratified"
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,7 @@ class OwnerRatifyCostParameter:
     units: str
     source_tag: str
     ticket: str
+    status: str = OWNER_RATIFY_PLACEHOLDER_STATUS
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -31,19 +34,19 @@ class OwnerRatifyCostParameter:
             "units": self.units,
             "source_tag": self.source_tag,
             "ticket": self.ticket,
-            "status": "owner-ratify-placeholder",
+            "status": self.status,
         }
 
 
-# Owner D35 (2026-09-05): one electricity quantity, using the YAML's EIA citation
-# verbatim. Supersedes 10.0 USD/kWh, tagged owner-ratify-placeholder /
-# owner-t7-two-price-energy-v1, with the cited 0.15 USD/kWh bootstrap rate.
+# Owner D35 (2026-09-05): ratified the YAML's EIA-cited 0.15 USD/kWh electricity
+# rate, superseding the 10.0 USD/kWh owner-ratify placeholder.
 ELECTRICAL_USD_PER_KWH = OwnerRatifyCostParameter(
     name="electrical_usd_per_kWh",
     value=DEFAULT_ELECTRICAL_COST_PER_KWH,
     units="USD/kWh",
     source_tag=load_cost_parameters()["parameters"]["electricity_cost_per_kWh"]["source_tag"],
     ticket="COST-PARAM-ELECTRICAL-KWH",
+    status=OWNER_RATIFIED_STATUS,
 )
 THERMAL_USD_PER_FLUX_H = OwnerRatifyCostParameter(
     name="thermal_usd_per_flux_h",
@@ -76,12 +79,16 @@ REAGENT_USD_PER_KG = OwnerRatifyCostParameter(
 
 
 def owner_ratify_cost_placeholders() -> tuple[OwnerRatifyCostParameter, ...]:
-    return (
-        ELECTRICAL_USD_PER_KWH,
-        THERMAL_USD_PER_FLUX_H,
-        FURNACE_USD_PER_H,
-        LAUNCH_USD_PER_KG,
-        REAGENT_USD_PER_KG,
+    return tuple(
+        parameter
+        for parameter in (
+            ELECTRICAL_USD_PER_KWH,
+            THERMAL_USD_PER_FLUX_H,
+            FURNACE_USD_PER_H,
+            LAUNCH_USD_PER_KG,
+            REAGENT_USD_PER_KG,
+        )
+        if parameter.status == OWNER_RATIFY_PLACEHOLDER_STATUS
     )
 
 

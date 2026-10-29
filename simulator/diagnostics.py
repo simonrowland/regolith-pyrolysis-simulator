@@ -11,6 +11,9 @@ from simulator.alpha_kinetics import (
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
 from simulator.scalar_boundary import finite_float
+from simulator.wall_deposit_availability import (
+    WALL_SATURATION_PRESSURE_REFUSED_CODE,
+)
 
 _EPS = 1e-12
 PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
@@ -35,9 +38,6 @@ WALL_STICKING_ALPHA_MISSING_CODE = (
 )
 WALL_SURFACE_GEOMETRY_PROVENANCE_CODE = (
     "wall_deposit_surface_geometry_provenance"
-)
-WALL_SATURATION_PRESSURE_REFUSED_CODE = (
-    "wall_deposit_saturation_pressure_refused"
 )
 WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE = (
     "wall_deposit_vapour_carrier_non_authoritative"

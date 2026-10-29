@@ -60,7 +60,10 @@ from simulator.battery.identity import (
     quantity_token,
     standard_pressure_delta_g_kJ_per_mol,
 )
-from simulator.battery.polymorph_dictionary import canonical_element_allotrope
+from simulator.battery.polymorph_dictionary import (
+    canonical_element_allotrope,
+    unrecognised_polymorph_spelling,
+)
 from simulator.battery.records import (
     DecisionBand,
     Notice,
@@ -1176,7 +1179,12 @@ def _pressure_effect_bound_J(*sources: object) -> tuple[Decimal, str]:
 
 def _poly_name(identity: Identity) -> str | None:
     poly = polymorph_token(identity.species)
-    return None if poly is None else poly.value
+    if poly is not None:
+        return poly.value
+    state = identity.species.polymorph
+    if state is not None and state.is_unknown:
+        return unrecognised_polymorph_spelling(state.reason)
+    return None
 
 
 def _same_mineral(engine_poly: str | None, identity_poly: str | None) -> bool:
@@ -3502,6 +3510,28 @@ def _nasa9_fit_phase_label(identity: Identity) -> str | None:
 
 
 def _nasa9_fit_comparisons(
+    context,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+    fit_records: Sequence[Mapping[str, object]] | None = None,
+) -> list[_Nasa9FitComparison]:
+    """Score NASA-9 cells with one lineage index for this store snapshot."""
+
+    from simulator.battery.validate import bound_work_inputs
+
+    with bound_work_inputs(
+        context.works, context.observations, context.experiments
+    ):
+        return _nasa9_fit_comparisons_with_bound_lineage(
+            context,
+            engines=engines,
+            invoke_pure_phase=invoke_pure_phase,
+            fit_records=fit_records,
+        )
+
+
+def _nasa9_fit_comparisons_with_bound_lineage(
     context,
     *,
     engines: Sequence[Engine],

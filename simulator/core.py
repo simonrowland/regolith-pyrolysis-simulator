@@ -584,6 +584,7 @@ from simulator.chemistry.kernel.dto import (
     BackendStatusRanked,
 )
 from simulator.chemistry.kernel import (
+    DEFAULT_LIQUID_FRACTION_PROVIDER,
     ChemistryIntent,
     ChemistryKernel,
     IntentRequest,
@@ -1233,6 +1234,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel_config = normalize_chemistry_kernel_config(
             setpoints.get('chemistry_kernel', {}) or {}
         )
+        self._liquid_fraction_provider = kernel_config.get(
+            'liquid_fraction_provider', DEFAULT_LIQUID_FRACTION_PROVIDER,
+        )
         self.oxygen_sink_channel_mode = normalize_oxygen_sink_channel_mode(
             kernel_config.get(OXYGEN_SINK_CHANNEL_MODE_KEY)
         )
@@ -1278,12 +1282,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
+        self._freeze_gate_last_good_curve = None
+        self._freeze_gate_held_curve_record = None
         self._freeze_gate_liquid_fraction_curve_memo: Dict[
             tuple,
             Dict[str, Any],
         ] = {}
         self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
+        self._last_melt_redox_liquidus_gate_diagnostic: Dict[str, Any] = {}
+        self._last_melt_redox_liquid_fraction_diagnostic: Dict[str, Any] = {}
         self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
             Dict[str, Any]
         ] = deque(maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN)
@@ -1625,6 +1633,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
+        self._freeze_gate_last_good_curve = None
+        self._freeze_gate_held_curve_record = None
         self._yield_disposition_ledger_snapshots = {}
         self._feedstock_recovered_reagent_kg_by_species = {}
         self._non_feedstock_reagent_element_kg_by_account = {}
@@ -1737,6 +1747,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Record
         self.record = BatchRecord(
+            liquid_fraction_provider=self._liquid_fraction_provider,
             feedstock_key=feedstock_key,
             feedstock_label=fs.get('label', feedstock_key),
             batch_mass_kg=mass_kg,
@@ -2397,21 +2408,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _register_freeze_gate_liquid_fraction_providers(self) -> None:
-        """Register providers for the freeze gate scalar intent on demand."""
-        backend = self._provider_registration_backend(self.backend)
-        if self._is_alphamelts_backend(backend):
-            from engines.alphamelts import AlphaMELTSProvider
-
-            # Intentional per-intent exception: the selected MELTS provider is
-            # the only liquid-fraction source for this narrow freeze dispatch.
-            # Its registry authority is dispatch-only; the diagnostic provider
-            # still has no ledger-transition authority. Runner provenance
-            # exposes this through run_metadata.diagnostic_gate_authority_notice
-            # and the operator product-classification notice channel.
-            self._chem_registry.register_idempotent(
-                AlphaMELTSProvider(backend=backend),
-                [ChemistryIntent.GATE_LIQUID_FRACTION],
-            )
+        """Register the declared gate engine independently of the main backend."""
+        if self._liquid_fraction_provider == 'analytical':
+            return
+        if self._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        ):
+            return
         from engines.magemin import MAGEMinShadowProvider
 
         provider = MAGEMinShadowProvider()
@@ -2420,6 +2423,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             [ChemistryIntent.GATE_LIQUID_FRACTION],
             fallback=True,
         )
+
+    def _resolve_liquid_fraction_provider(self) -> None:
+        """Refuse missing declared input before the first campaign hour."""
+        if self._liquid_fraction_provider == 'analytical':
+            return
+        store = self._pt0_store()
+        if store is not None and getattr(store, 'replay_enabled', False):
+            return
+        self._register_freeze_gate_liquid_fraction_providers()
+        provider = self._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        backend = provider._ensure_backend()
+        if backend is None or not backend.is_available():
+            raise EvaporationFluxRefusal(
+                'liquid_fraction_provider_missing_input',
+                {
+                    'reason': 'missing_input',
+                    'input': 'liquid_fraction_provider',
+                    'provider': self._liquid_fraction_provider,
+                    'status': 'unavailable',
+                },
+            )
 
     def _register_magemin_shadow_if_available(self) -> None:
         """Register MAGEMinShadowProvider as a kernel shadow when possible.
@@ -5007,6 +5033,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_origin_matches,
         )
         from simulator.reduced_real_determinism import (
+            GATE_CURVE_NOTICE_KEYS,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -5281,11 +5308,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
         }
-        projected_notice = normalized_curve.get('composition_projected_notice')
-        if isinstance(projected_notice, Mapping):
-            gate_diagnostic['composition_projected_notice'] = dict(
-                projected_notice
-            )
+        for notice_key in GATE_CURVE_NOTICE_KEYS:
+            notice = normalized_curve.get(notice_key)
+            if isinstance(notice, Mapping):
+                gate_diagnostic[notice_key] = dict(notice)
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_record
@@ -5651,8 +5677,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen reservoir redox source terms require finite positive T_K; '
                 f'got {temperature_K!r}'
             )
-        gate_authority = self._resolved_melt_redox_gate_authority(
-            gate_authority
+        # An exhausted melt has zero redox capacity and no liquidus to query.
+        has_cleaned_melt = self.atom_ledger.total_mol_by_account(
+            'process.cleaned_melt'
+        ) > 0.0
+        gate_authority = (
+            self._resolved_melt_redox_gate_authority(gate_authority)
+            if has_cleaned_melt else None
         )
         self._re_reference_melt_fO2_to_temperature(
             T_K,
@@ -5671,7 +5702,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=base_fO2_log,
             T_K=T_K,
             gate_authority=gate_authority,
-        )
+        ) if has_cleaned_melt else 0.0
         reservoir = self.melt.oxygen_reservoir
         existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
         reservoir.melt_intrinsic_fO2_log = base_fO2_log
@@ -13076,6 +13107,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def start_campaign(self, campaign: CampaignPhase):
         """Begin a campaign phase.  Sets atmosphere, temp targets, etc."""
+        if self.melt.hour == 0:
+            self._resolve_liquid_fraction_provider()
         overhead_headspace_config = self._resolve_overhead_headspace_config(
             campaign
         )
@@ -16454,6 +16487,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stamp_redox_source_context_for_current_state()
         redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         oxygen_reservoir_snapshot = dict(vars(self.melt.oxygen_reservoir))
+        liquid_fraction_gate = {
+            'provider': self._liquid_fraction_provider,
+            'redox': copy.deepcopy(
+                self._last_melt_redox_liquidus_gate_diagnostic
+            ),
+            'evaporation': copy.deepcopy(self._last_freeze_gate_diagnostic),
+            'liquid_fraction': copy.deepcopy(
+                self._last_melt_redox_liquid_fraction_diagnostic
+            ),
+        }
+        if self._liquid_fraction_provider == 'analytical':
+            liquid_fraction_gate['qualification'] = (
+                'analytical_kress91_floor_prediction'
+            )
         melt_redox_fallback_summary = (
             self._melt_redox_liquidus_gate_fallback_summary()
         )
@@ -16528,6 +16575,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             error_category = 'zero_input_basis_breach'
 
         snapshot = HourSnapshot(
+            liquid_fraction_gate=liquid_fraction_gate,
             hour=self.melt.hour,
             duration_h=1.0,
             campaign=self.melt.campaign,

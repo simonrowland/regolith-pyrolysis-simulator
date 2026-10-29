@@ -36,7 +36,6 @@ from simulator.melt_backend.openimcc_bridge import (
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.run_executor import RunExecutor
-from simulator.physical_constants import GAS_CONSTANT
 from simulator.runner import (
     PyrolysisRun,
     _high_t_melt_activity_fallback_sentence,
@@ -62,6 +61,138 @@ BASE_MELT_MOL = {
     "Al2O3": 1.00,
     "TiO2": 0.10,
 }
+# Exact cleaned-melt inputs from the R4 ordinary and quantized hour-132
+# vapor-pressure reads. Kept inline so tests do not depend on docs-private.
+_H133_T_K = 2378.15
+_H133_ORDINARY_MOL = {
+    "Ag": 0.00019044727877515409,
+    "Al2O3": 1347.4478962548742,
+    "As": 0.0010967841865285478,
+    "Au": 2.0859585726320976e-05,
+    "B": 0.19003890061400625,
+    "Ba": 0.8975600642134791,
+    "Bi": 2.457551659913331e-05,
+    "Br": 0.003213732284424759,
+    "CaO": 2012.0042177254709,
+    "Cd": 0.00027411895079403916,
+    "Ce2O3": 0.21300269917779982,
+    "Cr2O3": 3.2858891814505425e-10,
+    "Cs": 0.0011592755330998505,
+    "Cu": 0.16164042706365525,
+    "Dy2O3": 0.042053325622322495,
+    "Er2O3": 0.02477977297400363,
+    "Eu2O3": 0.003718412072063732,
+    "F": 4.325248807517177,
+    "Fe2O3": 1.730234222986687e-07,
+    "FeO": 7.223071870166733e-05,
+    "Ga": 0.0736600732770179,
+    "Gd2O3": 0.03822767923108917,
+    "Ge": 0.007071184481747926,
+    "HfO2": 0.031651027289974314,
+    "Ho2O3": 0.008951621435958164,
+    "I": 0.00040469821820252034,
+    "In": 4.472993162303401e-05,
+    "Ir": 4.2750027638292285e-05,
+    "K2O": 0.6032114743142483,
+    "La2O3": 0.08730964684295656,
+    "Li": 1.4800580083842994,
+    "Lu2O3": 0.003304006100581209,
+    "MgO": 76.33529920404698,
+    "MnO": 0.001875541491775934,
+    "Mo": 0.0016057742435935962,
+    "Na2O": 1.0516043821788383e-06,
+    "Nb": 0.1326703765718588,
+    "Nd2O3": 0.1323325750233767,
+    "Os": 3.7796992087109955e-05,
+    "P2O5": 7.236451972966535,
+    "Pb": 0.005948804581961605,
+    "Pr2O3": 0.026792994567377926,
+    "Pt": 6.318264488027949e-05,
+    "Rb": 0.030045240950940116,
+    "Sb": 0.0002530782501195886,
+    "Sc2O3": 0.43412808320737667,
+    "Se": 0.001951020484390543,
+    "SiO2": 961.8054661351188,
+    "Sm2O3": 0.03415649466376944,
+    "Sn": 0.002595805554255001,
+    "Sr": 1.6412056162362307,
+    "Tb2O3": 0.006701782013152592,
+    "Te": 0.00016099690561421692,
+    "TiO2": 192.59122511490912,
+    "Tm2O3": 0.003540413318432653,
+    "V": 2.4196231155000234,
+    "W": 0.001396812796206897,
+    "Y2O3": 0.25995526130272445,
+    "Yb2O3": 0.021818427195518682,
+    "Zn": 0.3142123762063946
+}
+_H133_QUANTIZED_MOL = {
+    "Ag": 0.0001904475081877867,
+    "Al2O3": 1347.4411362328551,
+    "As": 0.0010967758606925998,
+    "Au": 2.085926122946834e-05,
+    "B": 0.19003711066160783,
+    "Ba": 0.8975716682102776,
+    "Bi": 2.457543388505869e-05,
+    "Br": 0.00321373541455161,
+    "CaO": 2012.0084561530462,
+    "Cd": 0.0002741178802385213,
+    "Ce2O3": 0.21300092729498663,
+    "Cs": 0.001159257731251291,
+    "Cu": 0.1616412908165583,
+    "Dy2O3": 0.04205283505048687,
+    "Er2O3": 0.024779710406516258,
+    "Eu2O3": 0.003718386035506826,
+    "F": 4.325221029272418,
+    "Fe2O3": 1.7359815357365694e-07,
+    "FeO": 7.245591380728534e-05,
+    "Ga": 0.07365943913686604,
+    "Gd2O3": 0.0382273767615208,
+    "Ge": 0.007071287712306503,
+    "HfO2": 0.03165087168470858,
+    "Ho2O3": 0.008951738399674348,
+    "I": 0.0004046934616857878,
+    "In": 4.472964138696807e-05,
+    "Ir": 4.274958860335907e-05,
+    "K2O": 0.6039299326252252,
+    "La2O3": 0.08730861528843255,
+    "Li": 1.4800594828946974,
+    "Lu2O3": 0.003303976758229366,
+    "MgO": 76.38927436717935,
+    "MnO": 0.0018856152405062766,
+    "Mo": 0.00160576101731757,
+    "Na2O": 1.007133974075555e-06,
+    "Nb": 0.13266906995159466,
+    "Nd2O3": 0.13233245175596478,
+    "Os": 3.7796689919440956e-05,
+    "P2O5": 7.236368964409909,
+    "Pb": 0.005948919646329716,
+    "Pr2O3": 0.026792963888872326,
+    "Pt": 6.318277419890688e-05,
+    "Rb": 0.03004524900363579,
+    "Sb": 0.000253076937407576,
+    "Sc2O3": 0.4341268033666828,
+    "Se": 0.0019510021722053354,
+    "SiO2": 961.8980220326943,
+    "Sm2O3": 0.034156141077663335,
+    "Sn": 0.002595787409122074,
+    "Sr": 1.641175095981094,
+    "Tb2O3": 0.006701929938745531,
+    "Te": 0.00016099572167425447,
+    "TiO2": 192.59171998186724,
+    "Tm2O3": 0.0035403934005573436,
+    "V": 2.4195931453547233,
+    "W": 0.0013968271756190974,
+    "Y2O3": 0.2599522487731117,
+    "Yb2O3": 0.021818392526605446,
+    "Zn": 0.3142123351837479
+}
+_H133_WARM_SIO2_ACTIVITY = {
+    "ordinary": 0.020796595595499484,
+    "quantized": 0.02080166433881563,
+}
+
+
 ZHANG_KO0_5_COMPOSITION_WT_PCT = {
     "SiO2": 45.94,
     "Al2O3": 16.0,
@@ -796,7 +927,7 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
         pytest.approx([25.0, 25.0, 50.0, 50.0, 75.0, 75.0])
     )
     assert notice["bridge_fallback"] == "fewer_than_two_temperature_points"
-    assert notice["method"] != "same_composition_T_bridge"
+    assert notice["method"] != "nearest_converged_temperature_neighbor"
     sodium = vapor_pressure_module._high_t_activity_for_parent(
         "Na2O", _LUNAR_CALL_62, temperature_K=_LUNAR_SOLVED_T_K[62],
         authority=authority,
@@ -884,33 +1015,70 @@ def _call_record(engine: str, index: int) -> dict:
     return _BRIDGE_REFERENCE["records"][f"{engine}:{index}"]
 
 
-def _reference_regular_solution_gamma(
-    observations: list[tuple[float, float]], temperature_K: float,
-) -> float:
-    """RT ln γ = W + S T through another engine's solves.
+def test_h133_nonconvergence_uses_temperature_neighbors_without_activity_seam(
+    monkeypatch,
+) -> None:
+    """Both refused h133 targets use the pinned engine's two-sided bracket."""
 
-    This is the specified temperature line, evaluated on c2b7b4e gammas.
-    It is not the production function. Two points fix the line; the refused
-    temperature is where that line is read.
-    """
+    real_evaluate = openimcc_bridge_module.evaluate
+    refused_targets = []
+    solved_anchor_calls = []
 
-    (first_T, first_gamma), (second_T, second_gamma) = observations
-    first_y = GAS_CONSTANT * first_T * math.log(first_gamma)
-    second_y = GAS_CONSTANT * second_T * math.log(second_gamma)
-    entropy = (second_y - first_y) / (second_T - first_T)
-    enthalpy = first_y - entropy * first_T
-    return math.exp(
-        (enthalpy + entropy * temperature_K) / (GAS_CONSTANT * temperature_K)
+    def refuse_h133_targets(**kwargs):
+        temperature_K = float(kwargs["temperature_K"])
+        if math.isclose(temperature_K, _H133_T_K, abs_tol=1e-9):
+            refused_targets.append(temperature_K)
+            raise ImccNonconvergenceError("h133 target refusal", {})
+        result = real_evaluate(**kwargs)
+        if math.isclose(temperature_K, 2403.15, abs_tol=1e-9):
+            solved_anchor_calls.append(temperature_K)
+        return result
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", refuse_h133_targets)
+    cases = (
+        ("ordinary", _H133_ORDINARY_MOL),
+        ("quantized", _H133_QUANTIZED_MOL),
     )
+    activities = {}
+    for name, composition in cases:
+        result = _provider().dispatch(_request(
+            dict(composition), _H133_T_K, high_t_melt_activity="openimcc",
+        ))
+        authority = result.diagnostic["high_t_melt_activity"]
+        assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+        assert authority["temperature_bridge"]["call_count"] == 6
+        notice = authority["held_effective_gamma_by_parent"]["SiO2"]
+        assert notice["method"] == "interpolated_converged_temperature_neighbors"
+        assert notice["lower_anchor_temperature_K"] == 2353.15
+        assert notice["upper_anchor_temperature_K"] == 2403.15
+        assert notice["lower_anchor_gap_K"] == pytest.approx(25.0)
+        assert notice["upper_anchor_gap_K"] == pytest.approx(25.0)
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            "SiO2", composition, temperature_K=_H133_T_K, authority=authority,
+        )
+        lower = evaluate_cleaned_melt(composition, 2353.15)
+        upper = evaluate_cleaned_melt(composition, 2403.15)
+        assert lower.single_cation_activities["SiO2"] > 0.0
+        assert upper.single_cation_activities["SiO2"] > 0.0
+        assert activity.activity_model == notice["method"]
+        warm_activity = _H133_WARM_SIO2_ACTIVITY[name]
+        assert abs(activity.activity - warm_activity) / warm_activity < 0.01
+        activities[name] = activity.activity
+
+    assert len(refused_targets) == 2
+    assert all(math.isclose(t, _H133_T_K, abs_tol=1e-9) for t in refused_targets)
+    assert len(solved_anchor_calls) >= 4
+    assert abs(activities["ordinary"] - activities["quantized"]) <= 1e-5
 
 
-def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> None:
-    """Force historical e975edd refusals; the bridge is the primary gamma.
+def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
+    monkeypatch,
+) -> None:
+    """Forced target refusals use bracketing probes where both sides solve.
 
-    Call 62 has the same composition in the solved c2b7b4e log, so that
-    log is the truth. Call 65's trajectories have diverged, and c2b7b4e
-    also refuses that composition at 2430.65 K, so its truth is the
-    regular-solution line through c2b7b4e solves at the bridge temperatures.
+    Call 62 has a converged historical solve at the refused target. Call
+    65's independent bridge fixture records converged neighbours at -25 K
+    and +25 K.
     """
 
     provider = _provider()
@@ -944,6 +1112,7 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
     solved_activity = dict(zip(
         solved_62["parent_oxides"], solved_62["parent_activity"],
     ))
+    neighbor_results = {}
     for oxide in bridge_parents:
         activity = vapor_pressure_module._high_t_activity_for_parent(
             oxide, refused_62["composition"],
@@ -955,26 +1124,62 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
         truth = solved_cation_activity / fraction
         errors[oxide] = (activity.effective_gamma - truth) / truth
         notice = next(n for n in authority["notices"] if n.get("parent") == oxide)
-        assert notice["method"] == "same_composition_T_bridge"
-        assert notice["bridge_mode"] == "interpolation"
         assert notice["bridge_call_count"] <= 6
         assert notice["bridge_cap_K"] == 75.0
-        assert math.isfinite(notice["W_J_per_mol"])
-        assert math.isfinite(notice["S_J_per_mol_K"])
+        if notice["method"] == "interpolated_converged_temperature_neighbors":
+            lower_T = notice["lower_anchor_temperature_K"]
+            upper_T = notice["upper_anchor_temperature_K"]
+            assert lower_T < refused_62["T_K"] < upper_T
+            assert notice["lower_anchor_gap_K"] == pytest.approx(
+                refused_62["T_K"] - lower_T
+            )
+            assert notice["upper_anchor_gap_K"] == pytest.approx(
+                upper_T - refused_62["T_K"]
+            )
+            assert max(
+                notice["lower_anchor_gap_K"], notice["upper_anchor_gap_K"]
+            ) <= vapor_pressure_module._TEMPERATURE_BRIDGE_CAP_K
+            assert oxide in evaluate_cleaned_melt(
+                refused_62["composition"], lower_T,
+            ).single_cation_activities
+            assert oxide in evaluate_cleaned_melt(
+                refused_62["composition"], upper_T,
+            ).single_cation_activities
+        else:
+            assert notice["method"] == "nearest_converged_temperature_neighbor"
+            anchor_T = notice["anchor_temperature_K"]
+            assert notice["anchor_gap_K"] == pytest.approx(
+                abs(anchor_T - refused_62["T_K"])
+            )
+            assert notice["anchor_gap_K"] <= vapor_pressure_module._TEMPERATURE_BRIDGE_CAP_K
         for probe_T in notice["bridge_attempted_temperatures_K"]:
             offset = abs(probe_T - refused_62["T_K"])
             assert min(abs(offset - step) for step in (25.0, 50.0, 75.0)) < 1e-6
-        assert activity.activity_model == "same_composition_T_bridge"
+        assert activity.activity_model == notice["method"]
         assert activity.activity != melt_oxide_activity(
             oxide, refused_62["composition"],
         ).activity
+        if notice["method"] == "nearest_converged_temperature_neighbor":
+            anchor_T = notice["anchor_temperature_K"]
+            if anchor_T not in neighbor_results:
+                neighbor_results[anchor_T] = evaluate_cleaned_melt(
+                    refused_62["composition"], anchor_T,
+                )
+            # evaluate_cleaned_melt already returns single-cation activities.
+            assert activity.activity == pytest.approx(
+                neighbor_results[anchor_T].single_cation_activities[oxide],
+                rel=1e-12,
+            )
     assert all(abs(error) < 0.01 for error in errors.values()), errors
     assert "K2O" not in authority["held_effective_gamma_by_parent"]
-    assert (
-        result_62.diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
-            "melt_activity_authority"
-        ]
-        == "same_composition_T_bridge"
+    silica_method = authority["held_effective_gamma_by_parent"]["SiO2"]["method"]
+    assert result_62.diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
+        "melt_activity_authority"
+    ] == silica_method
+    assert all(
+        authority["held_effective_gamma_by_parent"][oxide]["method"]
+        == "interpolated_converged_temperature_neighbors"
+        for oxide in ("CaO", "Al2O3")
     )
 
     assert refused_65["ok"] is False
@@ -987,29 +1192,188 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
     silica = next(
         n for n in authority_65["notices"] if n.get("parent") == "SiO2"
     )
-    assert silica["method"] == "same_composition_T_bridge"
-    assert silica["bridge_mode"] == "interpolation"
-    assert silica["bridge_fit"] == "exact_line"
+    assert silica["method"] == "interpolated_converged_temperature_neighbors"
     assert silica["bridge_call_count"] <= 6
-    probe_temperatures = silica["bridge_temperatures_K"]
-    assert len(probe_temperatures) == 2
-    reference_observations = []
-    for probe_T in probe_temperatures:
-        gammas = _BRIDGE_REFERENCE["c2b7b4e_call_65_probe_gammas"][str(probe_T)]
-        reference_observations.append((probe_T, gammas["SiO2"]))
-    reference = _reference_regular_solution_gamma(
-        reference_observations, refused_65["T_K"],
-    )
+    assert silica["lower_anchor_temperature_K"] == 2405.65
+    assert silica["upper_anchor_temperature_K"] == 2455.65
+    assert silica["lower_anchor_gap_K"] == 25.0
+    assert silica["upper_anchor_gap_K"] == 25.0
+    fixture_gammas = _BRIDGE_REFERENCE["c2b7b4e_call_65_probe_gammas"]
+    lower_reference = fixture_gammas["2405.65"]["SiO2"]
+    upper_reference = fixture_gammas["2455.65"]["SiO2"]
     activity_65 = vapor_pressure_module._high_t_activity_for_parent(
         "SiO2", refused_65["composition"],
         temperature_K=refused_65["T_K"], authority=authority_65,
     )
-    assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
-        0.0, abs=0.01,
+    assert min(lower_reference, upper_reference) <= activity_65.effective_gamma <= max(
+        lower_reference, upper_reference
     )
+    assert activity_65.activity_model == "interpolated_converged_temperature_neighbors"
     assert activity_65.activity != melt_oxide_activity(
         "SiO2", refused_65["composition"],
     ).activity
+
+
+def test_one_sided_25k_hold_stays_within_measured_call62_bound(monkeypatch) -> None:
+    """A single +25 K solve holds within the measured worst call-62 error."""
+
+    refused = _call_record("e975edd", 62)
+    solved = _call_record("c2b7b4e", 62)
+    target_T = float(refused["T_K"])
+    allowed_anchor_T = target_T + 25.0
+    evaluate = openimcc_bridge_module.evaluate
+
+    def solve_only_one_side(**kwargs):
+        temperature_K = float(kwargs["temperature_K"])
+        if math.isclose(temperature_K, target_T, abs_tol=1e-9):
+            raise ImccNonconvergenceError("forced call-62 target refusal", {})
+        if math.isclose(temperature_K, allowed_anchor_T, abs_tol=1e-9):
+            return evaluate(**kwargs)
+        raise ImccNonconvergenceError("forced one-sided probe refusal", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", solve_only_one_side)
+    result = _provider().dispatch(_request(
+        dict(refused["composition"]), target_T, high_t_melt_activity="openimcc",
+    ))
+    authority = result.diagnostic["high_t_melt_activity"]
+    notice = authority["held_effective_gamma_by_parent"]["CaO"]
+    assert notice["method"] == "nearest_converged_temperature_neighbor"
+    assert notice["anchor_temperature_K"] == allowed_anchor_T
+    assert notice["anchor_gap_K"] == pytest.approx(25.0)
+
+    solved_activities = dict(zip(solved["parent_oxides"], solved["parent_activity"]))
+    solved_cation_activity, fraction = single_cation_activity_and_fraction(
+        "CaO", solved_activities["CaO"], refused["composition"],
+    )
+    target_gamma = solved_cation_activity / fraction
+    held = vapor_pressure_module._high_t_activity_for_parent(
+        "CaO", refused["composition"], temperature_K=target_T, authority=authority,
+    )
+    # Studio-2 receipt-r2-s2.log measured this CaO error on the prior 25 K
+    # nearest-neighbour path; retain that result as the one-sided hold bound.
+    measured_worst_error = 0.03348574976050027
+    relative_error = abs(held.effective_gamma - target_gamma) / target_gamma
+    assert relative_error <= measured_worst_error
+
+
+def _temperature_neighbor_test_result() -> OpenImccBridgeResult:
+    parents = openimcc_bridge_module.OPENIMCC_PARENT_OXIDES
+    activities = {parent: 1.0 for parent in parents}
+    activities["SiO2"] = 0.36
+    return OpenImccBridgeResult(
+        parent_oxide_activities=activities,
+        parent_oxides=parents,
+        flags=(),
+        notices=(),
+        acid_sink_ratio=None,
+        pack_model_id="temperature-neighbor-test",
+        pack_version="test",
+        pack_digest="test",
+        openimcc_version="test",
+        envelope_status="in_domain",
+        extrapolated=False,
+        labels=SimpleNamespace(),
+        coverage={},
+    )
+
+
+@pytest.mark.parametrize(
+    ("available_offset_K", "selected_offset_K"),
+    [(50.0, 50.0), (75.0, 75.0), (76.0, None)],
+    ids=("50-k-not-far", "75-k-far-anchor", "76-k-outside-schedule"),
+)
+def test_temperature_neighbor_probe_selection_and_notice_follow_schedule(
+    monkeypatch, available_offset_K, selected_offset_K,
+) -> None:
+    target_T = CAP_PLUS_T_K
+    only_success_temperature_K = target_T + available_offset_K
+    solver_temperatures_K = []
+    successful_temperatures_K = []
+
+    def solve_only_available_temperature(**kwargs):
+        temperature_K = float(kwargs["temperature_K"])
+        solver_temperatures_K.append(temperature_K)
+        if math.isclose(
+            temperature_K, only_success_temperature_K, abs_tol=1e-9,
+        ):
+            successful_temperatures_K.append(temperature_K)
+            return _temperature_neighbor_test_result()
+        raise ImccNonconvergenceError(
+            "forced temperature-specific solve refusal", {},
+        )
+
+    # Keep the production schedule, probe selector and cleaned-melt policy;
+    # fake only the low-level OpenIMCC solve outcome at each requested T.
+    monkeypatch.setattr(
+        openimcc_bridge_module, "evaluate", solve_only_available_temperature,
+    )
+    authority = vapor_pressure_module._build_high_t_melt_activity_authority(
+        composition_mol=BASE_MELT_MOL,
+        temperature_K=target_T,
+        controls={"high_t_melt_activity": "openimcc"},
+        below_cap_fe_activity=1.0,
+        below_cap_fe_activity_basis="test",
+    )
+    assert vapor_pressure_module._TEMPERATURE_BRIDGE_CAP_K == 75.0
+    assert vapor_pressure_module._TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K == 50.0
+    assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+
+    attempted_temperatures_K = authority["temperature_bridge"][
+        "attempted_temperatures_K"
+    ]
+    assert authority["temperature_bridge"]["call_count"] == 6
+    assert len(attempted_temperatures_K) == 6
+    assert solver_temperatures_K == [target_T, *attempted_temperatures_K]
+    assert all(
+        min(
+            abs(abs(probe_T - target_T) - schedule_offset_K)
+            for schedule_offset_K in (25.0, 50.0, 75.0)
+        ) < 1e-9
+        for probe_T in attempted_temperatures_K
+    )
+    assert {
+        round(probe_T - target_T, 6)
+        for probe_T in attempted_temperatures_K
+    } == {-75.0, -50.0, -25.0, 25.0, 50.0, 75.0}
+
+    if selected_offset_K is None:
+        assert successful_temperatures_K == []
+        assert only_success_temperature_K not in solver_temperatures_K
+        assert authority["provider"] == "constant_gamma"
+        assert authority["fallback"] is True
+        assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+        assert authority["held_effective_gamma_by_parent"] == {}
+        assert not any(
+            notice.get("method") in {
+                "nearest_converged_temperature_neighbor",
+                "interpolated_converged_temperature_neighbors",
+            }
+            for notice in authority["notices"]
+        )
+        return
+
+    assert successful_temperatures_K == [only_success_temperature_K]
+    held = authority["held_effective_gamma_by_parent"]["SiO2"]
+    assert held["method"] == "nearest_converged_temperature_neighbor"
+    assert held["anchor_temperature_K"] == target_T + selected_offset_K
+    assert held["anchor_gap_K"] == selected_offset_K
+    held_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", BASE_MELT_MOL, temperature_K=target_T, authority=authority,
+    )
+    assert held_activity.activity == pytest.approx(0.36)
+    if selected_offset_K == 50.0:
+        assert "schedule-derived" not in held["message"]
+    else:
+        assert "schedule-derived 50.0 K notice threshold" in held["message"]
+        sentence = _high_t_melt_activity_fallback_sentence({
+            "reason": "imcc_nonconvergence",
+            "notices": [held],
+            "affected_tick_count": 1,
+            "affected_parent_count": 1,
+            "first_hour": 1,
+            "last_hour": 1,
+        })
+        assert "schedule-derived 50.0 K notice threshold" in sentence
 
 
 @pytest.mark.parametrize("call_index", [62, 65])
@@ -1212,14 +1576,24 @@ def test_independent_battery_cells_match_in_either_order(monkeypatch) -> None:
     assert refused["temperature_bridge"]["call_count"] > 0
     silica = refused["held_effective_gamma_by_parent"]["SiO2"]
     assert silica["code"] == "hold_last_certified_effective_gamma"
-    assert silica["method"] == "same_composition_T_bridge"
+    assert silica["method"] in {
+        "nearest_converged_temperature_neighbor",
+        "interpolated_converged_temperature_neighbors",
+    }
+    if silica["method"] == "interpolated_converged_temperature_neighbors":
+        assert silica["lower_anchor_temperature_K"] < _INDEPENDENT_CELL_B_T_K
+        assert silica["upper_anchor_temperature_K"] > _INDEPENDENT_CELL_B_T_K
+        assert silica["lower_anchor_gap_K"] <= 75.0
+        assert silica["upper_anchor_gap_K"] <= 75.0
+    else:
+        assert silica["anchor_gap_K"] <= 75.0
     assert silica["authority"] == "extrapolated"
     assert "gamma_last" not in silica
     assert "hour_gap" not in silica
     assert "composition_distance_L1" not in silica
     assert any(
         notice.get("parent") == "SiO2"
-        and notice.get("method") == "same_composition_T_bridge"
+        and notice.get("method") == silica["method"]
         for notice in refused["notices"]
     )
 
@@ -1252,7 +1626,10 @@ def test_cell_without_same_composition_bridge_keeps_typed_fallback(
     assert authority["held_effective_gamma_by_parent"] == {}
     assert authority["temperature_bridge"]["call_count"] > 0
     assert not any(
-        notice.get("method") == "same_composition_T_bridge"
+        notice.get("method") in {
+            "nearest_converged_temperature_neighbor",
+            "interpolated_converged_temperature_neighbors",
+        }
         for notice in authority["notices"]
     )
 
@@ -2473,7 +2850,9 @@ def test_projected_solve_warns_above_five_percent_without_a_ceiling(
         assert tiers[0] in result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]["projected_composition_solve"]["warning_tiers"]
 
 
-def test_projected_nonconvergence_bridges_the_projected_composition(monkeypatch) -> None:
+def test_projected_nonconvergence_uses_projected_composition_temperature_neighbors(
+    monkeypatch,
+) -> None:
     composition = _moles_from_wt(_projected_weights(over_threshold=True))
     _, projected = openimcc_bridge_module._cleaned_melt_projection(composition)
     evaluate = openimcc_bridge_module.evaluate_cleaned_melt
@@ -2494,8 +2873,18 @@ def test_projected_nonconvergence_bridges_the_projected_composition(monkeypatch)
     assert high_t["fallback_reason"]["code"] == "imcc_nonconvergence"
     assert high_t["projected_composition_solve"]["original_refusal"]["code"] == "openimcc_projection_over_threshold"
     silica = high_t["held_effective_gamma_by_parent"]["SiO2"]
-    assert silica["method"] == "same_composition_T_bridge"
-    # The bridge's a(T) must be independent of the denominator used to
+    assert silica["method"] in {
+        "nearest_converged_temperature_neighbor",
+        "interpolated_converged_temperature_neighbors",
+    }
+    if silica["method"] == "interpolated_converged_temperature_neighbors":
+        assert silica["lower_anchor_temperature_K"] < CAP_PLUS_T_K
+        assert silica["upper_anchor_temperature_K"] > CAP_PLUS_T_K
+        assert silica["lower_anchor_gap_K"] <= 75.0
+        assert silica["upper_anchor_gap_K"] <= 75.0
+    else:
+        assert silica["anchor_gap_K"] <= 75.0
+    # The neighbour's a(T) must be independent of the denominator used to
     # report effective gamma; compare with its existing projected-bulk path.
     reference = _provider().dispatch(_history_request(projected, CAP_PLUS_T_K, 1))
     projected_activity = vapor_pressure_module._high_t_activity_for_parent(

@@ -546,8 +546,8 @@ def result_certification_allowed(
     already applies on admission, stated once here so callers stop
     re-deriving it inconsistently.
 
-    Not yet wired into canonicalisation: this lands as a pure helper so the
-    split is pinned by tests before any publisher changes meaning.
+    Canonical emission delegates its per-result certification decision here,
+    so every publisher uses both the evidence class and runtime disposition.
     """
     if not may_certify(evidence_class):
         return False
@@ -801,12 +801,19 @@ def canonicalize_fidelity_emission(
 
     emitted_evidence_class = data.get(CanonicalDimension.EVIDENCE_CLASS.value)
     if emitted_evidence_class is not None:
-        allowed = may_certify(str(emitted_evidence_class))
+        runtime_status = data.get(CanonicalDimension.RUNTIME_STATUS.value)
+        allowed = result_certification_allowed(
+            str(emitted_evidence_class),
+            runtime_status if isinstance(runtime_status, str) else None,
+        )
         data["certification_allowed"] = allowed
         if certification_shape and not allowed:
+            if not may_certify(str(emitted_evidence_class)):
+                reason = f"denylisted evidence_class={emitted_evidence_class!r}"
+            else:
+                reason = f"non-certifying runtime_status={runtime_status!r}"
             raise FidelityVocabularyTranslationError(
-                "certification emission refused for denylisted evidence_class="
-                f"{emitted_evidence_class!r}"
+                f"certification emission refused for {reason}"
             )
     elif certification_shape:
         raise FidelityVocabularyTranslationError(
