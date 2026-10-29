@@ -16874,6 +16874,24 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
+        condensed_form = obs.get("condensed_form")
+        if (
+            source_id == "kems-ms2000-044"
+            and q_token is Quantity.ACTIVITY
+            and formula in {"Na2O", "K2O"}
+            and phase_raw
+            in {
+                "Na2O-SiO2_binary_silicate_melt",
+                "K2O-SiO2_binary_silicate_melt",
+            }
+            and isinstance(condensed_form, Mapping)
+            and condensed_form.get("state") == "liquid_melt"
+            and condensed_form.get("basis") == "explicit_author"
+        ):
+            # This source explicitly labels these alkali activity samples as
+            # liquid melts. The K2O token also labels Plante partial-pressure
+            # reservoirs, so keep this identity reading scoped to MS2000.
+            phase, unmapped_phase = State.of(Phase.L), None
         if q_token in {Quantity.P_PARTIAL, Quantity.P_SAT}:
             source_standard_state = obs.get("standard_state") or values.get(
                 "standard_state"
