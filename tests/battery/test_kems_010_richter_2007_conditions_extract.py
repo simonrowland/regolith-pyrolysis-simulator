@@ -267,6 +267,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
         experiment = result.experiments[row.experiment_id]
-        assert experiment.thermal_schedule.total_duration_s.is_value
-        assert experiment.thermal_schedule.total_duration_s.value.point == Decimal(duration_s)
+        duration = experiment.thermal_schedule.total_duration_s
+        assert duration.state.is_value
+        assert duration.state.value.point == Decimal(duration_s)
 
