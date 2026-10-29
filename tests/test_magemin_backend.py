@@ -3348,7 +3348,7 @@ def test_magemin_live_smoke_runs_real_binary(request):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_native_activity_matches_direct_same_point_output(request):
+def test_magemin_live_native_activity_matches_runner_same_point_output(request):
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
     assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
@@ -3387,43 +3387,21 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    direct_args, _buffer_name, _buffer_n, _warnings, _reservoir = (
-        backend._build_magemin_subprocess_args(
-            bulk_projection=projection,
-            temperature_C=temperature_C,
-            pressure_kbar=pressure_kbar,
-            fO2_log=fO2_log,
-        )
+    runner_result = backend._call_magemin_subprocess(
+        bulk_projection=projection,
+        temperature_C=temperature_C,
+        pressure_kbar=pressure_kbar,
+        fO2_log=fO2_log,
+        call_timeout_s=20.0,
+        capture_native_activities=True,
     )
-    buffer_n = result.diagnostics['applied_fO2_buffer_n']
-    direct_args = [
-        '--Verb=1' if arg == '--Verb=0' else (
-            f'--buffer_n={buffer_n:.6f}'
-            if arg.startswith('--buffer_n=') else arg
-        )
-        for arg in direct_args
-    ]
-    direct_args.append('--out_matlab=1')
-    with tempfile.TemporaryDirectory() as tmpdir:
-        completed = subprocess.run(
-            direct_args,
-            cwd=tmpdir,
-            capture_output=True,
-            text=True,
-            timeout=20.0,
-            check=False,
-        )
-        assert completed.returncode == 0, completed.stderr
-        matlab_text = (Path(tmpdir) / "output" / "_matlab_output.txt").read_text()
-
-    direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
-        direct_activity = direct_fields[field]
+    for formula in ("MgO", "SiO2"):
+        direct_activity = runner_result['native_activities'][formula]
         adapted_activity = result.activity_coefficients[formula]
         assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
-    assert result.diagnostics["magemin_solver_status"] == 0
-    assert result.diagnostics["magemin_native_phase"]
-    assert result.diagnostics["magemin_iterations"] > 0
+    assert runner_result["solver_status"] == 0
+    assert runner_result["native_phase"]
+    assert runner_result["iterations"] > 0
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
