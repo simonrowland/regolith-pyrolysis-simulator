@@ -180,7 +180,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         assert experiment["conditions"]["fO2_Pa"]["state"]["tag"] == "unknown"
         assert experiment["conditions"]["fO2_Pa"]["locator"]["page"] == 5
         assert experiment["conditions"]["fO2_Pa"]["locator"]["published_page"] == 5548
-        sweep_gas = experiment["conditions"]["sweep_gas"]
+        sweep_gas = experiment["pressure_environment"]["sweep_gas"]
         assert sweep_gas["state"] == {"tag": "unknown", "reason": "not_published"}
         assert sweep_gas["locator"]["page"] == 5
         assert sweep_gas["locator"]["published_page"] == 5548
