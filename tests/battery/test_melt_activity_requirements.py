@@ -179,6 +179,55 @@ def test_standalone_activity_prediction_closes_its_engine_handle(monkeypatch) ->
     assert close_calls == [1]
 
 
+def test_predict_with_engine_forwards_intrinsic_fo2_mode_to_activity_contract(
+    monkeypatch,
+) -> None:
+    from simulator.battery.enums import Engine, Fo2Mode
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+
+    experiment = f.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = f.observation(
+        "activity-intrinsic-fo2-mode",
+        experiment.experiment_id,
+        f.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+    )
+    seen_modes: list[Fo2Mode] = []
+
+    def activity_request_for_engine(
+        _experiment, _observation, _engine, *, fo2_mode
+    ):
+        seen_modes.append(fo2_mode)
+        return None
+
+    monkeypatch.setattr(
+        bench_module, "activity_request_for_engine", activity_request_for_engine
+    )
+
+    for handles in ({}, None):
+        prediction = predict_with_engine(
+            Engine.THERMOENGINE,
+            observation,
+            experiment=experiment,
+            handles=handles,
+            fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+        )
+        assert prediction.refusal_reason is not None
+
+    assert seen_modes == [Fo2Mode.ENGINE_INTRINSIC, Fo2Mode.ENGINE_INTRINSIC]
+
+
 def _reference_state(
     formula: str = "Na2O",
     basis: str = "oxide",
