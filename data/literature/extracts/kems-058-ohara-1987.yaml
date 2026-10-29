@@ -1942,6 +1942,35 @@ species:
       uncertainty:
         note: no per-cell +/- on Table 1 ion ratios
     - observation_id: ohara_1987_interaction_parameters_1643k
+      derived_from: &ohara_interaction_fit_inputs
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+      - ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+      derivation: &ohara_interaction_fit_derivation
+        relation: The printed epsilon parameters are the least-squares fit of the first-order Taylor expansion of ln gamma_P2O5 against additive mole fractions in equation (10).
+        inputs: *ohara_interaction_fit_inputs
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: 'Least-squares fit of Table 2 activity coefficients using the first-order Taylor expansion in equation (10)'}
+          locator: {page: 2, published_page: 1337, pdf_page_index: 1, equation: '10'}
+        references:
+        - C. Wagner, Thermodynamics of Alloys (1952), p. 51, ref. 9
+        - Kambayashi, Awaka and Kato, Tetsu-to-Hagane 71 (1985), 1911, ref. 6
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
@@ -2113,6 +2142,20 @@ species:
       uncertainty:
         note: figure-only calculated L_P; not digitised
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1
+      derived_from: &ohara_table2_activity_inputs
+      - ohara_1987_table1_partial_pressures_1643k
+      - ohara_1987_p4o10_sat_janaf_1643k
+      derivation: &ohara_table2_activity_derivation
+        relation: Raoultian a_P2O5 from the printed PO and PO2 pressures and P4O10(g) saturation pressure using equations (1)-(3) and (6)-(8).
+        inputs:
+        - ohara_1987_table1_partial_pressures_1643k
+        - ohara_1987_p4o10_sat_janaf_1643k
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: 'P2O5 activity from the printed gas-phase equilibrium relations and JANAF P4O10 saturation pressure'}
+          locator: {page: 3, published_page: 1338, pdf_page_index: 2, equation: '1-3, 6-8', section: 2.2}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 8
       experiment: feto-p2o5-sample-1
       type: activity_coefficient
       locator:
@@ -2160,6 +2203,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-2
       type: activity_coefficient
       locator:
@@ -2205,6 +2250,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-3
       type: activity_coefficient
       locator:
@@ -2250,6 +2297,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-4
       type: activity_coefficient
       locator:
@@ -2295,6 +2344,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-5
       type: activity_coefficient
       locator:
@@ -2340,6 +2391,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-6
       type: activity_coefficient
       locator:
@@ -2385,6 +2438,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-7
       type: activity_coefficient
       locator:
@@ -2430,6 +2485,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-8
       type: activity_coefficient
       locator:
@@ -2475,6 +2532,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-9
       type: activity_coefficient
       locator:
@@ -2520,6 +2579,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-10
       type: activity_coefficient
       locator:
@@ -2565,6 +2626,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-11
       type: activity_coefficient
       locator:
@@ -2610,6 +2673,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-12
       type: activity_coefficient
       locator:
@@ -2655,6 +2720,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-13
       type: activity_coefficient
       locator:
@@ -2700,6 +2767,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-14
       type: activity_coefficient
       locator:
@@ -2745,6 +2814,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-15
       type: activity_coefficient
       locator:
@@ -2790,6 +2861,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-16
       type: activity_coefficient
       locator:
@@ -2835,6 +2908,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-17
       type: activity_coefficient
       locator:
@@ -2880,6 +2955,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-18
       type: activity_coefficient
       locator:
@@ -2926,6 +3003,8 @@ species:
           standard_state_as_printed: P2O5(s)
           composition_basis: mol_percent as printed
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+      derived_from: *ohara_table2_activity_inputs
+      derivation: *ohara_table2_activity_derivation
       experiment: feto-p2o5-sample-19
       type: activity_coefficient
       locator:
@@ -3028,6 +3107,8 @@ species:
   CaO:
     observations:
     - observation_id: ohara_1987_cao_epsilon_p2o5
+      derived_from: *ohara_interaction_fit_inputs
+      derivation: *ohara_interaction_fit_derivation
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
@@ -3053,6 +3134,8 @@ species:
   MgO:
     observations:
     - observation_id: ohara_1987_mgo_epsilon_p2o5
+      derived_from: *ohara_interaction_fit_inputs
+      derivation: *ohara_interaction_fit_derivation
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
@@ -3078,6 +3161,8 @@ species:
   MnO:
     observations:
     - observation_id: ohara_1987_mno_epsilon_p2o5
+      derived_from: *ohara_interaction_fit_inputs
+      derivation: *ohara_interaction_fit_derivation
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
@@ -3103,6 +3188,8 @@ species:
   SiO2:
     observations:
     - observation_id: ohara_1987_sio2_epsilon_p2o5
+      derived_from: *ohara_interaction_fit_inputs
+      derivation: *ohara_interaction_fit_derivation
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
@@ -3129,6 +3216,18 @@ species:
   PO:
     observations:
     - observation_id: ohara_1987_table1_partial_pressures_1643k
+      derived_from: &ohara_table1_pressure_lineage_inputs
+      - ohara_1987_table1_ion_current_ratios_1643k
+      derivation: &ohara_table1_pressure_lineage_derivation
+        relation: Table 1 partial pressures were reduced from the printed ion-current ratios using equation (4).
+        inputs:
+        - ohara_1987_table1_ion_current_ratios_1643k
+        output_unit: atm
+        method:
+          state: {tag: value, value: 'Partial-pressure reduction from ion-current ratios with the printed ionization, isotope-abundance and detector-sensitivity terms'}
+          locator: {page: 3, published_page: 1338, pdf_page_index: 2, equation: '4', section: 2.2}
+        references:
+        - Kambayashi, Awaka and Kato, Tetsu-to-Hagane 71 (1985), 1911, ref. 6
       experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
@@ -3161,7 +3260,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 2.47
-          P_P2_atm: 2.4700000000000003e-08
+          P_P2_atm: 2.47e-08
           P_PO_x1e7_atm_as_printed: 4.78
           p_atm: 4.78e-07
           P_PO2_x1e8_atm_as_printed: 7.58
@@ -3233,7 +3332,7 @@ species:
           P_PO_x1e7_atm_as_printed: 7.39
           p_atm: 7.39e-07
           P_PO2_x1e8_atm_as_printed: 10.88
-          P_PO2_atm: 1.0880000000000001e-07
+          P_PO2_atm: 1.088e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
           P2O5_mol_percent: 4.23
@@ -3267,7 +3366,7 @@ species:
           P_PO_x1e7_atm_as_printed: 7.88
           p_atm: 7.88e-07
           P_PO2_x1e8_atm_as_printed: 11.16
-          P_PO2_atm: 1.1160000000000001e-07
+          P_PO2_atm: 1.116e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
           P2O5_mol_percent: 7.26
@@ -3280,7 +3379,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 5.61
-          P_P2_atm: 5.6100000000000006e-08
+          P_P2_atm: 5.61e-08
           P_PO_x1e7_atm_as_printed: 8.28
           p_atm: 8.28e-07
           P_PO2_x1e8_atm_as_printed: 12.17
@@ -3348,7 +3447,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 3.66
-          P_P2_atm: 3.6600000000000003e-08
+          P_P2_atm: 3.66e-08
           P_PO_x1e7_atm_as_printed: 9.74
           p_atm: 9.74e-07
           P_PO2_x1e8_atm_as_printed: 13.46
@@ -3365,7 +3464,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 4.99
-          P_P2_atm: 4.9900000000000003e-08
+          P_P2_atm: 4.99e-08
           P_PO_x1e7_atm_as_printed: 9.78
           p_atm: 9.78e-07
           P_PO2_x1e8_atm_as_printed: 14.39
@@ -3382,7 +3481,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 8.46
-          P_P2_atm: 8.460000000000002e-08
+          P_P2_atm: 8.46e-08
           P_PO_x1e7_atm_as_printed: 11.93
           p_atm: 1.193e-06
           P_PO2_x1e8_atm_as_printed: 16.24
@@ -3420,7 +3519,7 @@ species:
           P_PO_x1e7_atm_as_printed: 9.97
           p_atm: 9.97e-07
           P_PO2_x1e8_atm_as_printed: 14.47
-          P_PO2_atm: 1.4470000000000002e-07
+          P_PO2_atm: 1.447e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
           P2O5_mol_percent: 4.75
@@ -3433,11 +3532,11 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 5.72
-          P_P2_atm: 5.7199999999999996e-08
+          P_P2_atm: 5.72e-08
           P_PO_x1e7_atm_as_printed: 11.04
           p_atm: 1.104e-06
           P_PO2_x1e8_atm_as_printed: 14.71
-          P_PO2_atm: 1.4710000000000001e-07
+          P_PO2_atm: 1.471e-07
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
           P2O5_mol_percent: 6.35
@@ -3450,7 +3549,7 @@ species:
           T_C: 1370
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 7.04
-          P_P2_atm: 7.040000000000001e-08
+          P_P2_atm: 7.04e-08
           P_PO_x1e7_atm_as_printed: 13.51
           p_atm: 1.351e-06
           P_PO2_x1e8_atm_as_printed: 17.65
@@ -3501,6 +3600,8 @@ species:
   PO2:
     observations:
     - observation_id: ohara_1987_po2_table1_partial_pressure
+      derived_from: *ohara_table1_pressure_lineage_inputs
+      derivation: *ohara_table1_pressure_lineage_derivation
       experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
@@ -3554,7 +3655,7 @@ species:
         - sample_no: 5
           T_K: 1643.0
           P_PO2_x1e8_atm_as_printed: 10.88
-          P_atm: 1.0880000000000001e-07
+          P_atm: 1.088e-07
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.04573135069', FeO: '0.867977597788', Fe2O3: '0.040559700831', MgO: '0.045731350691'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.04573135069'], [FeO, '0.867977597788'], [Fe2O3, '0.040559700831'], [MgO, '0.045731350691']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 5; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 6
@@ -3566,7 +3667,7 @@ species:
         - sample_no: 7
           T_K: 1643.0
           P_PO2_x1e8_atm_as_printed: 11.16
-          P_atm: 1.1160000000000001e-07
+          P_atm: 1.116e-07
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.078974471567', FeO: '0.825344803497', Fe2O3: '0.043901319335', MgO: '0.051779405601'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.078974471567'], [FeO, '0.825344803497'], [Fe2O3, '0.043901319335'], [MgO, '0.051779405601']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 7; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 8
@@ -3620,13 +3721,13 @@ species:
         - sample_no: 16
           T_K: 1643.0
           P_PO2_x1e8_atm_as_printed: 14.47
-          P_atm: 1.4470000000000002e-07
+          P_atm: 1.447e-07
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.05189878588', FeO: '0.851975370414', Fe2O3: '0.046303009262', SiO2: '0.049822834444'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.05189878588'], [FeO, '0.851975370414'], [Fe2O3, '0.046303009262'], [SiO2, '0.049822834444']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 16; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 17
           T_K: 1643.0
           P_PO2_x1e8_atm_as_printed: 14.71
-          P_atm: 1.4710000000000001e-07
+          P_atm: 1.471e-07
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.069562882612', FeO: '0.830662657072', Fe2O3: '0.047739233165', SiO2: '0.052035227151'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.069562882612'], [FeO, '0.830662657072'], [Fe2O3, '0.047739233165'], [SiO2, '0.052035227151']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 17; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 18
@@ -3652,6 +3753,8 @@ species:
   P2:
     observations:
     - observation_id: ohara_1987_p2_table1_partial_pressure
+      derived_from: *ohara_table1_pressure_lineage_inputs
+      derivation: *ohara_table1_pressure_lineage_derivation
       experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
@@ -3681,7 +3784,7 @@ species:
         - sample_no: 1
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 2.47
-          P_atm: 2.4700000000000003e-08
+          P_atm: 2.47e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.042898315936', FeO: '0.869985701925', Fe2O3: '0.047281831626', CaO: '0.039834150513'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.042898315936'], [FeO, '0.869985701925'], [Fe2O3, '0.047281831626'], [CaO, '0.039834150513']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 1; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 2
@@ -3723,7 +3826,7 @@ species:
         - sample_no: 8
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 5.61
-          P_atm: 5.6100000000000006e-08
+          P_atm: 5.61e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.088094154114', FeO: '0.823562745193', Fe2O3: '0.042451687897', MgO: '0.045891412796'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.088094154114'], [FeO, '0.823562745193'], [Fe2O3, '0.042451687897'], [MgO, '0.045891412796']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 8; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 9
@@ -3747,19 +3850,19 @@ species:
         - sample_no: 12
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 3.66
-          P_atm: 3.6600000000000003e-08
+          P_atm: 3.66e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.066126170226', FeO: '0.838956535928', Fe2O3: '0.045595463909', MnO: '0.049321829937'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.066126170226'], [FeO, '0.838956535928'], [Fe2O3, '0.045595463909'], [MnO, '0.049321829937']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 12; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 13
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 4.99
-          P_atm: 4.9900000000000003e-08
+          P_atm: 4.99e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.090348121492', FeO: '0.819677560554', Fe2O3: '0.042251420647', MnO: '0.047722897307'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.090348121492'], [FeO, '0.819677560554'], [Fe2O3, '0.042251420647'], [MnO, '0.047722897307']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 13; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 14
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 8.46
-          P_atm: 8.460000000000002e-08
+          P_atm: 8.46e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.020651354189', FeO: '0.875461307229', Fe2O3: '0.049183219507', SiO2: '0.054704119075'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.020651354189'], [FeO, '0.875461307229'], [Fe2O3, '0.049183219507'], [SiO2, '0.054704119075']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 14; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 15
@@ -3777,13 +3880,13 @@ species:
         - sample_no: 17
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 5.72
-          P_atm: 5.7199999999999996e-08
+          P_atm: 5.72e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.069562882612', FeO: '0.830662657072', Fe2O3: '0.047739233165', SiO2: '0.052035227151'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.069562882612'], [FeO, '0.830662657072'], [Fe2O3, '0.047739233165'], [SiO2, '0.052035227151']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 17; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 18
           T_K: 1643.0
           P_P2_x1e8_atm_as_printed: 7.04
-          P_atm: 7.040000000000001e-08
+          P_atm: 7.04e-08
           composition_mol: {basis: printed_mole_fraction, P2O5: '0.072801791597', FeO: '0.786885543575', Fe2O3: '0.036095667136', CaO: '0.047605295242', SiO2: '0.05661170245'}
           point_conditions: {composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.072801791597'], [FeO, '0.786885543575'], [Fe2O3, '0.036095667136'], [CaO, '0.047605295242'], [SiO2, '0.05661170245']]}}, locator: {published_page: 1339, pdf_page_index: 3, table: '2', note: "Table 2 sample 18; normalized printed mol% after FetO split using its printed Fe2+/Fe3+ ratio"}}}
         - sample_no: 19
