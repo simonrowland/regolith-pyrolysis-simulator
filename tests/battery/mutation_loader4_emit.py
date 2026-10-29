@@ -16,9 +16,11 @@ def _expect_red(
     needle: str,
     replacement: str,
     test_name: str,
+    test_path: str = "tests/battery/test_loader4_emit.py",
     additional_mutations: tuple[tuple[str, str], ...] = (),
+    target: object = migrate.Migrator,
 ) -> None:
-    original_method = getattr(migrate.Migrator, method_name)
+    original_method = getattr(target, method_name)
     source = textwrap.dedent(inspect.getsource(original_method))
     mutations = ((needle, replacement), *additional_mutations)
     for mutation_needle, _mutation_replacement in mutations:
@@ -35,7 +37,7 @@ def _expect_red(
         migrate.__dict__,
         namespace,
     )
-    setattr(migrate.Migrator, method_name, namespace[method_name])
+    setattr(target, method_name, namespace[method_name])
     try:
         result = pytest.main(
             [
@@ -44,11 +46,11 @@ def _expect_red(
                 "0",
                 "-p",
                 "no:cacheprovider",
-                f"tests/battery/test_loader4_emit.py::{test_name}",
+                f"{test_path}::{test_name}",
             ]
         )
     finally:
-        setattr(migrate.Migrator, method_name, original_method)
+        setattr(target, method_name, original_method)
     print(f"MUTATION_EXIT {test_name} {result}")
     assert result == pytest.ExitCode.TESTS_FAILED
 
@@ -67,9 +69,36 @@ _expect_red(
 )
 _expect_red(
     method_name="_migrate_extract_observation",
-    needle='and raw.get("omitted_reason") not in (None, "")',
-    replacement="and True",
-    test_name="test_real_nonyield_points_emit_unavailable_rows_with_conditions",
+    needle='item.get("units")',
+    replacement="None",
+    test_name="test_real_janaf_tabulated_delta_fg_points_use_the_exploded_buffer",
+)
+_expect_red(
+    method_name="_migrate_extract_observation",
+    needle='''if emitted_count and (
+            not is_tabulated_delta_fg
+            or (children_carry_values and all_children_emitted)
+        ):''',
+    replacement="if emitted_count:",
+    test_name="test_janaf_unit_refusal_keeps_the_printed_parent_series",
+)
+_expect_red(
+    method_name="_migrate_extract_observation",
+    needle='source_unavailable_reason not in (None, "")',
+    replacement="False",
+    test_name="test_real_nonyield_points_do_not_emit_generic_unavailable_rows",
+)
+_expect_red(
+    method_name="_selection_from_named_field",
+    needle='''            Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
+        }:
+            bound = _named_fraction_bound_selection(''',
+    replacement='''            Quantity.O2_YIELD,
+        }:
+            bound = _named_fraction_bound_selection(''',
+    test_name="test_real_leister_valence_limit_is_stored_as_a_bound",
+    target=migrate,
 )
 _expect_red(
     method_name="_migrate_extract_observation",
