@@ -4,7 +4,7 @@ rows in: 84429
 records out (observations): 172655
 works: 698
 experiments: 6588
-queue size: 112746
+queue size: 112698
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 697
@@ -225,7 +225,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | absent_admissions | 3511 | 13934 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2789 (mismatch) |
-| system_like_phases | 1065 | 4109 (mismatch) |
+| system_like_phases | 1065 | 4061 (mismatch) |
 | missing_phases | 237 | 1354 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18457,7 +18457,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml` | 15 | 15 | 16 |
 | `data/literature/extracts/kems-214-hastie-1980-nbsir-80-2178.yaml` | 4 | 43 | 0 |
 | `data/literature/extracts/kems-218-schneider-1981-nbsir-81-2306.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 283 |
+| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 235 |
 | `data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml` | 25 | 25 | 0 |
 | `data/literature/extracts/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml` | 0 | 0 | 1 |
