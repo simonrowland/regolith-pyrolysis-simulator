@@ -704,6 +704,7 @@ def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
     controls, _ = sim._evaporation_flux_control_inputs(
         equilibrium,
         overhead_partials_Pa={},
+        overhead_pressure_pa=sim._evaporation_overhead_total_pressure_Pa({}),
         vapour_batch_flux_pressures_Pa={},
     )
 
@@ -1323,21 +1324,40 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
     sim.start_campaign(CampaignPhase.C4)
     sim.melt.temperature_C = 1600.0
     provider_partials = []
+    provider_total_overrides = []
+    provider_dispatches = []
     solver_inputs = []
     calculate_evaporation = sim._calculate_evaporation
+    dispatch_only = sim._dispatch_only
     solve_overloaded = sim.overhead_model._solve_overloaded_evaporation_flux
 
     def observe_evaporation(equilibrium, **kwargs):
         partials = kwargs.get("overhead_partials_override_Pa")
         if partials is not None:
             provider_partials.append(dict(partials))
+            provider_total_overrides.append(
+                kwargs.get("overhead_total_pressure_override_Pa")
+            )
         return calculate_evaporation(equilibrium, **kwargs)
+
+    def observe_dispatch(intent, *, control_inputs, **kwargs):
+        result = dispatch_only(
+            intent,
+            control_inputs=control_inputs,
+            **kwargs,
+        )
+        if "overhead_partials_Pa" in control_inputs:
+            provider_dispatches.append(
+                (intent, dict(control_inputs), result)
+            )
+        return result
 
     def observe_solver(melt, **kwargs):
         solver_inputs.append(dict(kwargs))
         return solve_overloaded(melt, **kwargs)
 
     monkeypatch.setattr(sim, "_calculate_evaporation", observe_evaporation)
+    monkeypatch.setattr(sim, "_dispatch_only", observe_dispatch)
     monkeypatch.setattr(
         sim.overhead_model,
         "_solve_overloaded_evaporation_flux",
@@ -1392,6 +1412,42 @@ def test_hot_non_c0_campaign_uses_same_hour_resolved_backpressure(monkeypatch):
     assert provider_partials[-1]["Na"] == pytest.approx(
         expected_partials_Pa["Na"], rel=1.0e-9, abs=1.0e-9
     )
+    assert provider_total_overrides[-1] == pytest.approx(solved_pressure_Pa)
+    intent, final_controls, final_result = provider_dispatches[-1]
+    assert final_controls["overhead_pressure_pa"] == pytest.approx(
+        solved_pressure_Pa
+    )
+    final_series = final_result.diagnostic["evaporation_series_resistance"][
+        "Na"
+    ]
+    assert final_series["P_bulk_Pa"] == pytest.approx(
+        expected_partials_Pa["Na"], rel=1.0e-9, abs=1.0e-9
+    )
+
+    vapour_only_pressure_Pa = sum(
+        final_controls["overhead_partials_Pa"].values()
+    )
+    vapour_only_controls = dict(final_controls)
+    vapour_only_controls["overhead_pressure_pa"] = vapour_only_pressure_Pa
+    vapour_only_result = dispatch_only(
+        intent,
+        control_inputs=vapour_only_controls,
+    )
+    vapour_only_series = vapour_only_result.diagnostic[
+        "evaporation_series_resistance"
+    ]["Na"]
+    assert final_series["Kn"] / vapour_only_series["Kn"] == pytest.approx(
+        vapour_only_pressure_Pa / solved_pressure_Pa,
+        rel=1.0e-6,
+    )
+    assert final_series["r_gas"] / vapour_only_series["r_gas"] == pytest.approx(
+        solved_pressure_Pa / vapour_only_pressure_Pa,
+        rel=1.0e-4,
+    )
+    assert final_series["R_gas_fraction"] > vapour_only_series[
+        "R_gas_fraction"
+    ]
+    assert final_series["R_gas_fraction"] > 0.96
     transport = sim._effective_transport_capacity_this_tick
     assert transport.demand_flux_kg_hr == pytest.approx(
         snapshot.evap_flux.total_kg_hr
@@ -1572,12 +1628,24 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     sim._calculate_evaporation(
         equilibrium,
         overhead_partials_override_Pa=partials,
+        overhead_total_pressure_override_Pa=500.0,
     )
 
     assert captured == [expected]
     assert "vapour_batch_flux_pressures_Pa" in captured[0]
     assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
+
+
+def test_partial_pressure_override_requires_its_total_pressure():
+    with pytest.raises(EvaporationFluxRefusal) as exc_info:
+        PyrolysisSimulator._calculate_evaporation(
+            SimpleNamespace(),
+            SimpleNamespace(),
+            overhead_partials_override_Pa={"Na": 20.0},
+        )
+
+    assert exc_info.value.reason == "missing_overhead_total_pressure_override"
 
 
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():

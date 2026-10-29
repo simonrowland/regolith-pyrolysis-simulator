@@ -1046,7 +1046,9 @@ class OverheadGasModel:
         equilibrium_partials_Pa: Mapping[str, float],
         p_downstream_bar: float,
         fixed_inlet_species_kg_hr: Mapping[str, float] | None = None,
-        flux_at_partials: Callable[[Mapping[str, float]], EvaporationFlux],
+        flux_at_partials: Callable[
+            [Mapping[str, float], float], EvaporationFlux
+        ],
     ) -> tuple[EvaporationFlux, float]:
         """Solve evaporation back-pressure for an already overloaded pipe."""
         partials_by_species = {}
@@ -1133,7 +1135,7 @@ class OverheadGasModel:
             previous_trial_partials_Pa = None
             previous_resolved_partials_Pa = None
             for _ in range(50):
-                flux = flux_at_partials(trial_partials_Pa)
+                flux = flux_at_partials(trial_partials_Pa, pressure_Pa)
                 inflow_species_kg_hr = self._combine_gas_species_kg_hr(
                     fixed_species_kg_hr,
                     flux.species_kg_hr,

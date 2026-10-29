@@ -7164,6 +7164,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         controls, molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,
+            overhead_pressure_pa=(
+                self._evaporation_overhead_total_pressure_Pa(
+                    initial_partials
+                )
+            ),
             vapour_batch_flux_pressures_Pa=batch_flux_pressures,
         )
         for species in pre_holdup:
@@ -15600,6 +15605,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     overhead_partials_override_Pa=(
                         capacity_result.partial_pressures_Pa
                     ),
+                    overhead_total_pressure_override_Pa=(
+                        self._evaporation_overhead_total_pressure_Pa(
+                            capacity_result.partial_pressures_Pa
+                        )
+                    ),
                 )
                 live_effective_flux = (
                     self._apply_analytic_evaporation_depletion(live_raw_flux)
@@ -15712,11 +15722,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             degraded_before = copy.deepcopy(self._degraded_path_engagement)
 
-            def evaporation_flux_at_partials(partials_Pa):
+            def evaporation_flux_at_partials(
+                partials_Pa,
+                total_pressure_Pa,
+            ):
                 return self._apply_analytic_evaporation_depletion(
                     self._calculate_evaporation(
                         equilibrium,
                         overhead_partials_override_Pa=partials_Pa,
+                        overhead_total_pressure_override_Pa=(
+                            total_pressure_Pa
+                        ),
                     )
                 )
 

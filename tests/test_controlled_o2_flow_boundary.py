@@ -228,8 +228,10 @@ def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
     model = OverheadGasModel()
     melt = SimpleNamespace(p_total_mbar=0.2, temperature_C=1150.0)
     equilibrium_pressure_Pa = 1.0e7
+    callback_total_pressures_Pa = []
 
-    def provider_at_partials(partials_Pa):
+    def provider_at_partials(partials_Pa, total_pressure_Pa):
+        callback_total_pressures_Pa.append(total_pressure_Pa)
         remaining_fraction = max(
             0.0,
             1.0 - partials_Pa["Na"] / equilibrium_pressure_Pa,
@@ -242,6 +244,7 @@ def test_113_kg_hr_flash_solves_same_hour_pressure_to_pipe_flow():
         p_downstream_bar=0.0,
         flux_at_partials=provider_at_partials,
     )
+    assert callback_total_pressures_Pa[-1] == pytest.approx(pressure_Pa)
     outflow_kg_hr = model._pipe_conductance(
         pressure_Pa,
         melt.temperature_C,

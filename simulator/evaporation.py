@@ -822,6 +822,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        overhead_total_pressure_override_Pa: float | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -865,6 +866,23 @@ class EvaporationMixin:
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
+        if (
+            overhead_partials_override_Pa is not None
+            and overhead_total_pressure_override_Pa is None
+        ):
+            raise EvaporationFluxRefusal(
+                'missing_overhead_total_pressure_override',
+                {
+                    'reason': (
+                        'partial-pressure overrides require the solved '
+                        'total overhead pressure'
+                    ),
+                    'required_input': (
+                        'overhead_total_pressure_override_Pa'
+                    ),
+                },
+            )
+
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
         self._last_partial_melt_offgassing_diagnostic = {}
@@ -1226,13 +1244,23 @@ class EvaporationMixin:
         # The dispatch-only helper centralises melt-derived T/P plumbing
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
+        # Keep the solved total separate from the filtered vapour partials.
+        # Premise: Bird-Stewart-Lightfoot 17.3-10 gives D_AB ∝ 1/P at fixed
+        # gas temperature and composition (D_AB has units m²/s). In this
+        # configured continuum path R_gas ∝ 1/D_AB, so
+        # R_gas,total/R_gas,vapour = P_total/P_vapour; Pa cancels and the
+        # ratio is dimensionless. Mean free path and Kn also scale as 1/P.
+        # With no O2 or carrier, P_total is the vapour-partial sum, preserving
+        # the previous limit.
         control_inputs, molar_masses_kg_mol = (
             EvaporationMixin._evaporation_flux_control_inputs(
                 self,
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
                 overhead_pressure_pa=(
-                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+                    float(overhead_total_pressure_override_Pa)
+                    if overhead_total_pressure_override_Pa is not None
+                    else EvaporationMixin._evaporation_overhead_total_pressure_Pa(
                         self,
                         overhead_partials_Pa,
                     )
@@ -3639,6 +3667,18 @@ class EvaporationMixin:
         vapour_batch_report: Mapping[str, Any] | None = None,
         vapour_batch_flux_overlay: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], dict[str, float]]:
+        if overhead_pressure_pa is None:
+            raise EvaporationFluxRefusal(
+                'missing_overhead_total_pressure',
+                {
+                    'reason': (
+                        'evaporation controls require the total overhead '
+                        'pressure'
+                    ),
+                    'required_input': 'overhead_pressure_pa',
+                },
+            )
+
         # VR-11: this already-gated map comes from the typed effective-pressure
         # seam. The kernel never reads equilibrium.vapor_pressures_Pa for flux.
         if vapour_batch_flux_pressures_Pa is not None:
@@ -3708,11 +3748,7 @@ class EvaporationMixin:
             'pipe_diameter_m': float(
                 getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
             ),
-            'overhead_pressure_pa': (
-                sum(overhead_partials_Pa.values())
-                if overhead_pressure_pa is None
-                else float(overhead_pressure_pa)
-            ),
+            'overhead_pressure_pa': float(overhead_pressure_pa),
             'commanded_pressure_pa': max(
                 0.0,
                 float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,

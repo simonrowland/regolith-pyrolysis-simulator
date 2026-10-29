@@ -639,7 +639,11 @@ def test_joint_release_stays_within_pipe_capacity():
 
     sim._update_temperature = _hold_priced_temperature
 
-    def _evaporate(_equilibrium, overhead_partials_override_Pa=None):
+    def _evaporate(
+        _equilibrium,
+        overhead_partials_override_Pa=None,
+        overhead_total_pressure_override_Pa=None,
+    ):
         return EvaporationFlux(
             species_kg_hr={"Fe": admitted},
             total_kg_hr=admitted,
