@@ -801,9 +801,10 @@ species:
           digitisation: deferred to a figure pass
           numeric_points: none
   NaCl:
-    observations:
+    observations: []
+    context:
       - observation_id: beerkens_2001_text_extra_nacl_evaporated_fraction
-        type: mass_loss
+        type: printed_data_context
         locator:
           page: 11
           pdf_page_index: 10
@@ -812,11 +813,9 @@ species:
           figure: '10'
           note: The prose gives an approximate fraction for extra NaCl input, not a digitized figure point.
         units: '%'
-        per: initial_mass
         values:
-          quantity: mass_loss_fraction
+          quantity: fraction of extra NaCl added to the batch that evaporated
           method_class: quoted_attributed
-          admission_status: admitted
           mass_loss_pct: 50
           approximate: true
           value_as_published: about 50% of the extra NaCl added to the batch evaporates
@@ -861,7 +860,6 @@ species:
               pdf_page_index: 10
               published_page: 255
               section: Evaporation of other species from glass melts
-    context:
       - observation_id: beerkens_2001_figure10_emission_markers
         type: figure_record
         locator:
