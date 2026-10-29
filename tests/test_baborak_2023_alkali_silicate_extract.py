@@ -125,38 +125,45 @@ def test_baborak_page_pins_compound_identity_and_quench_conditions() -> None:
         observation = _migrated_observation(migrator, observation_id)
         assert observation.identity.species.formula == formula
 
-    expected_compositions = {
+    expected_inventory_compositions = {
         "baborak_2023_ls2_t_liquidus_table1": {
-            "Li2O": Decimal("1") / Decimal("3"),
-            "SiO2": Decimal("2") / Decimal("3"),
+            "Li2O": Decimal("1"),
+            "SiO2": Decimal("2"),
         },
         "baborak_2023_ns2_t_liquidus_table1": {
-            "Na2O": Decimal("1") / Decimal("3"),
-            "SiO2": Decimal("2") / Decimal("3"),
+            "Na2O": Decimal("1"),
+            "SiO2": Decimal("2"),
         },
         "baborak_2023_ks2_t_liquidus_table1": {
-            "K2O": Decimal("1") / Decimal("3"),
-            "SiO2": Decimal("2") / Decimal("3"),
+            "K2O": Decimal("1"),
+            "SiO2": Decimal("2"),
         },
+    }
+    expected_mole_fractions = {
+        observation_id: {oxide: amount / Decimal("3") for oxide, amount in amounts.items()}
+        for observation_id, amounts in expected_inventory_compositions.items()
     }
     printed_formulas = {
         "baborak_2023_ls2_t_liquidus_table1": "Li2O·2SiO2",
         "baborak_2023_ns2_t_liquidus_table1": "Na2O·2SiO2",
         "baborak_2023_ks2_t_liquidus_table1": "K2O·2SiO2",
     }
-    for observation_id, expected_composition in expected_compositions.items():
+    for observation_id, expected_composition in expected_inventory_compositions.items():
         composition = _migrated_observation(migrator, observation_id).identity.composition
         assert composition.is_value
+        assert composition.value.amount_basis.value == "mol_inventory"
+        assert composition.value.as_map() == expected_composition
         migrated = composition.value.as_map()
-        assert set(migrated) == set(expected_composition)
-        assert abs(sum(migrated.values()) - Decimal("1")) < Decimal("1e-15")
+        total = sum(migrated.values())
+        normalized = {oxide: amount / total for oxide, amount in migrated.items()}
+        assert set(normalized) == set(expected_mole_fractions[observation_id])
         assert all(
-            abs(migrated[oxide] - expected_ratio) < Decimal("1e-15")
-            for oxide, expected_ratio in expected_composition.items()
+            abs(normalized[oxide] - expected_ratio) < Decimal("1e-15")
+            for oxide, expected_ratio in expected_mole_fractions[observation_id].items()
         )
         source_row = _row(document, observation_id)
         assert source_row["values"]["composition_as_published"] == printed_formulas[observation_id]
-        assert source_row["values"]["composition_mol"]["basis"] == "printed_mole_fraction"
+        assert source_row["values"]["composition_mol"]["basis"] == "printed_formula_stoichiometry"
 
     for observation_id in (
         "baborak_2023_ls2_tg_table1",
