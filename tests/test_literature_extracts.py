@@ -2435,12 +2435,31 @@ def test_repo_extracts_validate_green():
 
 
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
+    from simulator.battery.enums import MethodToken, Quantity
+
     path = EXTRACTS / "kems-026-markova-1984.yaml"
+    source = yaml.safe_load(path.read_text(encoding="utf-8"))
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
     migrator.finalize()
     assert migrator.result.validation.hard_issues == ()
 
+    expected_starting_compositions = {
+        "VI_lherzolite": {
+            "SiO2": Decimal("44.02"),
+            "Al2O3": Decimal("4.56"),
+            "FeO": Decimal("8.04"),
+            "MgO": Decimal("36.44"),
+            "CaO": Decimal("6.95"),
+        },
+        "V_alumina_basalt": {
+            "SiO2": Decimal("52.32"),
+            "Al2O3": Decimal("19.13"),
+            "FeO": Decimal("9.37"),
+            "MgO": Decimal("6.25"),
+            "CaO": Decimal("12.93"),
+        },
+    }
     for panel, experiment_suffix in (
         ("VI_lherzolite", "VI"),
         ("V_alumina_basalt", "V"),
@@ -2455,6 +2474,11 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
         total_pressure = experiment.pressure_environment.total_pressure_Pa
         assert total_pressure.state.tag == "unknown"
         assert total_pressure.state.value is None
+        assert total_pressure.locator.published_page == 509
+        assert total_pressure.locator.pdf_page_index == 0
+        assert experiment.pressure_environment.sweep_gas.state.is_unknown
+        assert experiment.pressure_environment.sweep_gas.locator.published_page == 509
+        assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
@@ -2466,9 +2490,13 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
             item
             for item in migrator.result.observations.values()
             if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+            and item.identity.quantity is not None
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         ]
-        assert rows
+        assert len(rows) == 12
         assert all(item.experiment_id == experiment.experiment_id for item in rows)
+        assert sum(item.identity.temperature_K.is_unknown for item in rows) == 1
         for item in rows:
             for axis in ("sample_mass_kg", "total_pressure_Pa"):
                 state = getattr(item.identity, axis)
@@ -2483,6 +2511,158 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
                 assert len(matches) == 1
                 assert matches[0].reason.value == "identity_incomplete"
                 assert "unknown" in matches[0].detail
+
+            conditions = item.point_conditions or {}
+            temperature = conditions["temperature_K"]
+            assert temperature.locator.published_page == 510
+            assert temperature.locator.pdf_page_index == 1
+            assert temperature.locator.table == "2"
+            start = conditions["starting_composition"]
+            assert start.state.is_value
+            assert {
+                str(oxide): Decimal(str(amount))
+                for oxide, amount in start.state.value.items()
+            } == expected_starting_compositions[panel]
+            assert start.locator.published_page == 510
+            assert start.locator.pdf_page_index == 1
+            assert start.locator.table == "2"
+
+            pressure_kind = conditions["pressure_kind"]
+            oxygen = conditions["fO2_Pa"]
+            assert pressure_kind.state.is_unknown
+            assert pressure_kind.locator.published_page == 509
+            assert pressure_kind.locator.pdf_page_index == 0
+            assert oxygen.state.is_unknown
+            assert oxygen.locator.published_page == 509
+            assert oxygen.locator.pdf_page_index == 0
+            if item.identity.temperature_K.is_value:
+                duration = conditions["duration_h"]
+                assert duration.state.value == Decimal("0.25")
+                assert duration.locator.published_page == 509
+                assert duration.locator.pdf_page_index == 0
+                assert duration.locator.section == "experimental method"
+            else:
+                assert conditions["duration_h"].state.is_unknown
+
+    table2_rows = [
+        item
+        for item in migrator.result.observations.values()
+        if "markova_1984_table2_residual_melt_" in item.observation_id
+    ]
+    assert len(table2_rows) == 134
+    assert all(item.identity.quantity.is_value for item in table2_rows)
+    assert all(not item.identity.species.phase.is_unknown for item in table2_rows)
+    assert sum(item.identity.temperature_K.is_unknown for item in table2_rows) == 2
+    experiments = {item.experiment_id: item for item in migrator.result.experiments.values()}
+    for item in table2_rows:
+        conditions = item.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        assert temperature.locator.published_page == 510
+        assert temperature.locator.pdf_page_index == 1
+        assert temperature.locator.table == "2"
+        assert conditions["pressure_kind"].state.is_unknown
+        assert conditions["pressure_kind"].locator.published_page == 509
+        assert "No vacuum" in conditions["pressure_kind"].state.reason
+        assert conditions["fO2_Pa"].state.is_unknown
+        assert conditions["fO2_Pa"].locator.published_page == 509
+        assert "not an imposed condition" in conditions["fO2_Pa"].state.reason
+        assert conditions["composition"].state.is_value
+        assert conditions["composition"].locator.published_page == 510
+        assert conditions["composition"].locator.table == "2"
+        assert conditions["starting_composition"].state.is_value
+        panel = (
+            "VI_lherzolite"
+            if "VI_lherzolite" in item.observation_id
+            else "V_alumina_basalt"
+        )
+        assert {
+            str(oxide): Decimal(str(amount))
+            for oxide, amount in conditions["starting_composition"].state.value.items()
+        } == expected_starting_compositions[panel]
+        if temperature.state.is_value:
+            duration = conditions["duration_h"]
+            assert duration.state.value == Decimal("0.25")
+            assert duration.locator.published_page == 509
+            assert duration.locator.pdf_page_index == 0
+        else:
+            assert conditions["duration_h"].state.is_unknown
+        experiment = experiments[item.experiment_id]
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        assert (
+            experiment.pressure_environment.total_pressure_Pa.locator.published_page
+            == 509
+        )
+        assert (
+            "vapor total pressure as a result"
+            in experiment.pressure_environment.total_pressure_Pa.state.reason
+        )
+        assert experiment.pressure_environment.sweep_gas.state.is_unknown
+        assert item.identity.total_pressure_Pa.is_unknown
+        assert item.identity.fO2_Pa.is_unknown
+
+    expected_quantity_unknown = {
+        "kems-026-markova-1984::markova_1984_table1_initial_sample_compositions",
+        "kems-026-markova-1984::markova_1984_text_basalt_ANT_window",
+        "kems-026-markova-1984::markova_1984_fig1_ternary_residual_tracks_figure_only",
+        "kems-026-markova-1984::markova_1984_silica_partially_in_vapor_at_1500C",
+        "kems-026-markova-1984::markova_1984_Mg_completely_in_melt_at_1500C",
+        "kems-026-markova-1984::markova_1984_Fe_more_volatile_than_silica",
+        "kems-026-markova-1984::markova_1984_residual_enrichment_Ca_Ti_Al",
+    }
+    assert {
+        item.observation_id
+        for item in migrator.result.observations.values()
+        if not item.identity.quantity.is_value
+    } == expected_quantity_unknown
+    assert not any(
+        item.identity.species.phase.is_unknown
+        for item in migrator.result.observations.values()
+    )
+
+    source_panels = {
+        str(observation["observation_id"]): observation
+        for block in (source.get("species") or {}).values()
+        for observation in block.get("observations") or []
+    }
+    expected_render_values = (
+        ("VI_lherzolite", Decimal("1748.15"), Decimal("0.0146")),
+        ("VI_lherzolite", Decimal("1765.15"), Decimal("0.0416")),
+        ("V_alumina_basalt", Decimal("1913.15"), Decimal("0.1441")),
+        ("V_alumina_basalt", Decimal("2528.15"), Decimal("0.9799")),
+    )
+    for panel, temperature_k, mass_loss_fraction in expected_render_values:
+        rows = [
+            item
+            for item in migrator.result.observations.values()
+            if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+            and item.identity.quantity is not None
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        ]
+        row = next(
+            item
+            for item in rows
+            if item.identity.temperature_K.is_value
+            and item.identity.temperature_K.value == temperature_k
+        )
+        assert row.value.point == mass_loss_fraction
+        assert row.locator.published_page == 510
+        assert row.locator.pdf_page_index == 1
+        assert row.locator.table == "2"
+
+    raw_pressure = source_panels[
+        "markova_1984_table2_residual_melt_VI_lherzolite"
+    ]["values"]["series"][1]["point_conditions"]
+    for key in ("pressure_kind", "fO2_Pa"):
+        assert raw_pressure[key]["state"]["tag"] == "unknown"
+        assert raw_pressure[key]["locator"]["published_page"] == 509
+        assert raw_pressure[key]["locator"]["pdf_page_index"] == 0
+    for experiment in source["experiments"]:
+        pressure = experiment["pressure_environment"]["total_pressure_Pa"]
+        assert pressure["state"]["tag"] == "unknown"
+        assert "vapor total pressure as a result" in pressure["state"]["reason"]
+        assert pressure["locator"]["published_page"] == 509
+        assert pressure["locator"]["pdf_page_index"] == 0
 
 
 def test_richter_2007_table1_residues_link_to_their_runs() -> None:
