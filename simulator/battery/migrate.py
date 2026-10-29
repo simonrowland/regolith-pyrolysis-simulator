@@ -1328,9 +1328,14 @@ def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MOLE_PERCENT)
 
 
-def _mole_percent_closure_error(components: Mapping[str, Decimal]) -> str | None:
+def _percent_composition_closure_error(
+    components: Mapping[str, Decimal],
+    basis: str,
+    *,
+    tolerance: Decimal | None = None,
+) -> str | None:
     if any(not amount.is_finite() or amount < 0 for amount in components.values()):
-        return "mole-percent composition contains a negative or non-finite amount"
+        return f"{basis}-percent composition contains a negative or non-finite amount"
     total = sum(components.values(), Decimal("0"))
     rounding_bound = sum(
         (
@@ -1339,8 +1344,9 @@ def _mole_percent_closure_error(components: Mapping[str, Decimal]) -> str | None
         ),
         Decimal("0"),
     )
-    if abs(total - Decimal("100")) > rounding_bound:
-        return f"mole-percent composition does not close to 100 (sum={total})"
+    allowed_deviation = rounding_bound if tolerance is None else tolerance
+    if abs(total - Decimal("100")) > allowed_deviation:
+        return f"{basis}-percent composition does not close to 100 (sum={total})"
     return None
 
 
@@ -1678,7 +1684,7 @@ def _composition_from_plain(payload: object) -> Composition:
             raise ValueError(
                 "mole-percent composition contains unsupported or ambiguous components"
             )
-        closure_error = _mole_percent_closure_error(mole_percent)
+        closure_error = _percent_composition_closure_error(mole_percent, "mole")
         if closure_error is not None:
             raise ValueError(closure_error)
         return Composition(
