@@ -144,9 +144,9 @@ def _offending_vapour_phase_rows() -> list[str]:
     return findings
 
 
-def test_pressure_bearing_vapour_species_phase_is_gas() -> None:
+def test_vapour_species_quantity_phase_is_gas() -> None:
     offending = _offending_vapour_phase_rows()
     assert not offending, (
-        "vapour-species pressure rows must use phase: gas; offending extract:line:\n"
+        "vapour-species quantities must use phase: gas; offending extract:line:\n"
         + "\n".join(offending)
     )
