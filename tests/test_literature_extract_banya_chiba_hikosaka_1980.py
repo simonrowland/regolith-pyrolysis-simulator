@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery import factories as battery_factories
 from tools import validate_literature_extracts as vle
@@ -34,6 +34,17 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     ratio_rows = document["species"]["Fe"]["observations"]
     assert len(composition_rows) == len(activity_rows) == len(ratio_rows) == 69
     assert len(document["experiments"]) == 69
+    assert all(
+        row["values"]["method_class"] == "measured_tabulated"
+        for row in activity_rows + ratio_rows
+    )
+    assert all(
+        "derived_from" not in row
+        and "derivation" not in row
+        and "derived_from" not in row["values"]
+        and "derivation" not in row["values"]
+        for row in activity_rows + ratio_rows
+    )
 
     by_id = {
         row["observation_id"]: row
@@ -43,6 +54,13 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     # Independent reads from rendered PDF pages 1485–1487 (PDF pages 2–4).
     assert by_id["bch80_t1_c_b_1_activity"]["values"]["activity"] == 0.985
     assert by_id["bch80_t1_c_b_1_valence_ratio"]["values"]["value"] == 0.107
+    standard = by_id["bch80_t1_c_b_1_activity"]["standard_state"]
+    assert standard["inferred"] is False
+    assert standard["state"]["value"]["endmember"]["formula"] == "Fe_tO"
+    assert "pure liquid FetO" in standard["note"]
+    assert "in equilibrium with solid iron" in standard["note"]
+    assert standard["locator"]["page"] == 2
+    assert standard["locator"]["equation"] == "4"
     assert by_id["bch80_t2_c_a_1"]["values"]["PH2O_over_PH2_as_printed"] == 0.876
     assert by_id["bch80_t3_cc_1"]["values"]["composition_wt_pct"]["Fe2O3"] == 8.55
 
@@ -67,8 +85,11 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     result = migrator.result
     assert not result.validation.hard_issues
     assert len(result.observations) == 138
-    assert all(row.identity.quantity.state.is_value for row in result.observations.values())
-    assert all(row.phase.state.is_value for row in result.observations.values())
+    assert all(row.identity.quantity.is_value for row in result.observations.values())
+    assert all(
+        row.identity.species is not None and row.identity.species.phase.is_value
+        for row in result.observations.values()
+    )
     assert all(
         row.value.kind is not ValueKind.UNAVAILABLE
         for row in result.observations.values()
@@ -76,6 +97,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     assert all(
         row.point_conditions["temperature_K"].state.is_value
         and row.point_conditions["composition"].state.is_value
+        and row.point_conditions["gas_mix"].state.is_value
         for row in result.observations.values()
     )
     assert all(
@@ -84,7 +106,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     )
 
     migrated_t1 = result.observations[
-        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1"
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1_activity"
     ]
     expected_composition = wt_pct_to_mole_fraction(
         {"FeO": 85.66, "Fe2O3": 10.18, "CaO": 4.33}
@@ -95,18 +117,34 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
     )
 
     gas_ratio = result.experiments[
-        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t2_c_a_1_run"
+        migrated_t1.experiment_id
     ].fO2_control.gas_ratio.value.state.value
-    assert gas_ratio == Decimal("0.876")
+    assert gas_ratio.point == Decimal("0.862")
 
-    for source_id in (
+    t1_gas_mix = migrated_t1.point_conditions["gas_mix"]
+    assert t1_gas_mix.state.value == "H2-H2O gas mixture; P_H2O/P_H2 = 0.862"
+    assert t1_gas_mix.locator.page == 2
+    assert t1_gas_mix.locator.table == "1"
+
+    for source_id, page, table in (
         "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t1_c_b_1_activity",
+        2,
+        "1",
+    ), (
         "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t2_c_a_1_valence_ratio",
-        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t3_cc_1",
+        3,
+        "2",
+    ), (
+        "banya-chiba-hikosaka-1980-feto-binary-solid-iron::bch80_t3_cc_1_activity",
+        4,
+        "3",
     ):
         row = result.observations[source_id]
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["composition"].state.is_value
+        assert row.point_conditions["gas_mix"].state.is_value
+        assert row.point_conditions["gas_mix"].locator.page == page
+        assert row.point_conditions["gas_mix"].locator.table == table
         assert "total_pressure_Pa" not in row.point_conditions
         assert row.identity.composition is not None and row.identity.composition.is_value
         assert row.identity.temperature_K is not None and row.identity.temperature_K.is_value
@@ -115,10 +153,7 @@ def test_tables_1_to_4_render_pins_and_run_count_migrate_cleanly() -> None:
 
     assert all("pressure_environment" not in experiment for experiment in document["experiments"])
 
-    assert not any(
-        row.identity.quantity.state.value is Quantity.UNKNOWN
-        for row in result.observations.values()
-    )
+    assert all(row.identity.quantity.is_value for row in result.observations.values())
 
 
 def test_render_fidelity_samples_reject_mutated_values() -> None:
