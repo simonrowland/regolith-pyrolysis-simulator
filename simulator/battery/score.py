@@ -11242,7 +11242,9 @@ def compile_residual(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
             )
-        if not precomputed_prediction and predict is None:
+        if not precomputed_prediction and (
+            predict is None or predict is predict_with_engine
+        ):
             return _refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {
