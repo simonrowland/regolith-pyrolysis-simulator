@@ -4826,10 +4826,34 @@ def _converted_temperature(
 def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -> object:
     if not field_name:
         return None
-    raw = payload.get(field_name)
+    raw: object = payload
+    for part in field_name.split("."):
+        if not isinstance(raw, Mapping):
+            return None
+        raw = raw.get(part)
+    if isinstance(raw, Mapping) and isinstance(raw.get("state"), Mapping):
+        located = _point_condition_from_plain(raw, key=field_name.rsplit(".", 1)[-1])
+        if located.state.is_value:
+            return _temperature_number(located.state.value)
+        return located.state.reason
     if isinstance(raw, Mapping):
         return raw.get("value")
     return raw
+
+
+def _temperature_field_locator(
+    payload: Mapping[str, Any], field_name: str | None, fallback: Locator | None
+) -> Locator | None:
+    if not field_name:
+        return fallback
+    raw: object = payload
+    for part in field_name.split("."):
+        if not isinstance(raw, Mapping):
+            return fallback
+        raw = raw.get(part)
+    if isinstance(raw, Mapping):
+        return locator_from_mapping(raw.get("locator")) or fallback
+    return fallback
 
 
 # Extractor-written Kelvin sitting next to the printed Celsius. A field named
@@ -11255,6 +11279,8 @@ def select_declared_source(
             ("melting_temperature_K", "K"),
             ("Tmax_K", "K"),
             ("T_C", "C"),
+            ("temperature_C", "C"),
+            ("temp_C", "C"),
             ("Tmax_C", "C"),
         ):
             if key not in payload:
@@ -11273,9 +11299,52 @@ def select_declared_source(
                     unit_trail=trail or "identity",
                 )
             found_temperatures.append((key, raw, amount, trail or "identity:K"))
+        nested_temperature_unknown: tuple[str, str] | None = None
+        point_conditions = payload.get("point_conditions")
+        if isinstance(point_conditions, Mapping):
+            for key, unit in (
+                ("T_C", "C"),
+                ("temperature_C", "C"),
+                ("temp_C", "C"),
+            ):
+                if key not in point_conditions:
+                    continue
+                raw_condition = point_conditions[key]
+                located = _point_condition_from_plain(raw_condition, key=key)
+                if not located.state.is_value:
+                    nested_temperature_unknown = (
+                        f"point_conditions.{key}",
+                        located.state.reason or f"{key} is not numeric",
+                    )
+                    continue
+                raw = _temperature_number(located.state.value)
+                if raw is None:
+                    nested_temperature_unknown = (
+                        f"point_conditions.{key}",
+                        f"{key} is not a point temperature",
+                    )
+                    continue
+                amount, trail = convert_temperature_to_k(raw, unit)
+                if amount is None:
+                    nested_temperature_unknown = (
+                        f"point_conditions.{key}",
+                        trail or f"{key} is not numeric",
+                    )
+                    continue
+                found_temperatures.append(
+                    (f"point_conditions.{key}", raw, amount, trail or "identity:K")
+                )
         if found_temperatures:
             key, _raw, amount, trail = _prefer_printed_temperature(found_temperatures)
             return _point_selection(amount, key, trail, payload, condition_ranges)
+        if nested_temperature_unknown is not None:
+            key, reason = nested_temperature_unknown
+            return _unavailable_selection(
+                reason,
+                condition_ranges=condition_ranges,
+                field_name=key,
+                unit_trail="identity",
+            )
         if "temperature" in payload:
             raw = payload.get("temperature")
             unit = "K"
@@ -17111,12 +17180,31 @@ class Migrator:
             and t_payload.get("reference_temperature_K") is not None
         ):
             t_payload.setdefault("temperature_K", t_payload["reference_temperature_K"])
-        if obs.get("T_K") is not None:
-            t_payload.setdefault("T_K", obs.get("T_K"))
+        for temperature_key in (
+            "T_K",
+            "T_C",
+            "temperature_C",
+            "temp_C",
+        ):
+            if obs.get(temperature_key) is not None:
+                t_payload.setdefault(temperature_key, obs[temperature_key])
+        raw_point_conditions = obs.get("point_conditions")
+        if isinstance(raw_point_conditions, Mapping):
+            value_point_conditions = t_payload.get("point_conditions")
+            t_payload["point_conditions"] = {
+                **raw_point_conditions,
+                **(
+                    value_point_conditions
+                    if isinstance(value_point_conditions, Mapping)
+                    else {}
+                ),
+            }
         if obs.get("T_range_K") is not None:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
-        temperature_locator = locator
+        temperature_locator = _temperature_field_locator(
+            t_payload, t_sel.field_name, locator
+        )
         if (
             q_token in FUSION_QUANTITIES
             and t_sel.field_name is None
@@ -19694,6 +19782,9 @@ class Migrator:
             t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, raw_item)
             t_trail = t_sel.unit_trail
             t_original = _temperature_field_raw(raw_item, t_sel.field_name)
+            temperature_locator = _temperature_field_locator(
+                raw_item, t_sel.field_name, point_locator
+            )
             coord = t_sel.amount
             row_extra = series_row_extra(
                 raw_item, include_locator=content_stable_id
@@ -20112,7 +20203,7 @@ class Migrator:
         if coord is not None:
             point_conditions = {
                 "temperature_K": _converted_temperature(
-                    coord, t_trail, t_original, point_locator
+                    coord, t_trail, t_original, temperature_locator
                 )
             }
         if (

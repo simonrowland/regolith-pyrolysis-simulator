@@ -5887,3 +5887,137 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+def test_celsius_temperature_from_observation_point_conditions_reaches_identity(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "holzheid-lodders-2001-copper-solubility.yaml"
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_value
+    assert observation.identity.temperature_K.value == Decimal("1573.15")
+    condition = observation.point_conditions["temperature_K"]
+    assert condition.state.value == Decimal("1573.15")
+    assert condition.locator is not None
+    assert condition.locator.published_page == 1944
+    assert condition.locator.section == "3.5.1"
+
+
+def test_celsius_temperature_at_observation_level_reaches_identity(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    source = yaml.safe_load(
+        (EXTRACTS / "holzheid-lodders-2001-copper-solubility.yaml").read_text()
+    )
+    row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
+    )
+    condition = row["point_conditions"].pop("temperature_C")
+    row["T_C"] = condition["state"]["value"]
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-lodders-2001-copper-solubility.yaml",
+        extract_doc=source,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_value
+    assert observation.identity.temperature_K.value == Decimal("1573.15")
+
+
+def test_ambiguous_point_condition_temperature_stays_unknown(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    source = yaml.safe_load(
+        (EXTRACTS / "holzheid-lodders-2001-copper-solubility.yaml").read_text()
+    )
+    row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
+    )
+    condition = row["point_conditions"]["temperature_C"]
+    condition["state"] = {
+        "tag": "unknown",
+        "reason": "printed temperature is a range",
+    }
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-lodders-2001-copper-solubility.yaml",
+        extract_doc=source,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_unknown
+    assert observation.identity.temperature_K.reason == (
+        "printed temperature is a range"
+    )
+    assert observation.point_conditions["temperature_K"].state.is_unknown
+
+
+def test_celsius_point_conditions_reach_every_migrated_series_point(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    name = "kassis-frischat-1981-silicate-glass-vapour.yaml"
+    source = yaml.safe_load((EXTRACTS / name).read_text())
+    expected: dict[str, dict[Decimal, Decimal]] = {}
+    for block in source["species"].values():
+        for observation in block.get("observations", []):
+            observation_id = observation.get("observation_id")
+            if observation_id not in {
+                "kassis_1981_fig2_pna",
+            }:
+                continue
+            points = observation["values"]["points"]
+            expected[observation_id] = {}
+            for point in points:
+                celsius = Decimal(str(point.pop("T_C")))
+                kelvin, _trail = battery_migrate.convert_temperature_to_k(
+                    celsius, "C"
+                )
+                assert kelvin is not None
+                expected[observation_id][celsius] = kelvin
+
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source)
+    for parent_id, points in expected.items():
+        migrated = [
+            row
+            for row in result.observations.values()
+            if f"::{parent_id}::" in row.observation_id
+        ]
+        assert len(migrated) == len(points)
+        for row in migrated:
+            temperature = row.identity.temperature_K
+            assert temperature.is_value
+            assert temperature.value in points.values()
+            condition = row.point_conditions["temperature_K"]
+            assert condition.state.value == temperature.value
+            assert condition.locator is not None
+            assert row.evidence.class_.value is battery_migrate.EvidenceClass.FIGURE_ONLY
