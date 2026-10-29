@@ -460,3 +460,29 @@ def test_fegley_table4_hydroxide_pressures_migrate_with_conditions():
         assert temperature.state.is_value
         assert temperature.state.value == key[1]
         assert temperature.locator is not None
+
+
+def test_janaf_mixed_units_recover_298k_formation_gibbs_values():
+    expected = {
+        "janaf_PO_298_anchors": Decimal("-47139"),
+        "janaf_PO2_298_anchors": Decimal("-316748"),
+        "janaf_P4O6_298_anchors": Decimal("-2084877"),
+        "janaf_P2_298_anchors": Decimal("103112"),
+        "janaf_P4_298_anchors": Decimal("24416"),
+    }
+    observations = []
+    for observation_id in expected:
+        observations.extend(_observations("janaf-4th.yaml", observation_id))
+    assert len(observations) == len(expected)
+    for observation in observations:
+        assert observation.identity.quantity.value.value == Quantity.DELTA_FG.value
+        assert observation.identity.temperature_K.value == Decimal("298.15")
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == Decimal(
+            expected[observation.observation_id.split("::")[-1]]
+        ) / Decimal("1000")
+        condition = observation.point_conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value.kind is ValueKind.POINT
+        assert condition.state.value.point == Decimal("298.15")
+        assert condition.locator is not None
