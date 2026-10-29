@@ -160,7 +160,7 @@ def test_liquidus_finder_result_and_sample_count_ignore_wall_clock(monkeypatch):
     elapsed = {'seconds': 0.0}
 
     def loaded_monotonic():
-        elapsed['seconds'] += 3.0
+        elapsed['seconds'] += 30.0
         return elapsed['seconds']
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', loaded_monotonic)
