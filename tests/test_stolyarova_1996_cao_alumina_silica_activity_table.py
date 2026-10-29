@@ -98,6 +98,8 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
     assert all(row.identity.temperature_K.is_value for row in table3_rows)
     assert all(row.identity.temperature_K.value == 1933 for row in table3_rows)
     assert all(row.identity.composition.is_value for row in table3_rows)
+    assert all(row.value.kind.value == "point" for row in table3_rows)
+    assert sum(row.value.kind.value == "unavailable" for row in table3_rows) == 0
     assert all(row.point_conditions["temperature_K"].locator is not None for row in table3_rows)
     assert all(row.point_conditions["composition"].locator is not None for row in table3_rows)
     assert all("total_pressure_Pa" not in row.point_conditions for row in table3_rows)
