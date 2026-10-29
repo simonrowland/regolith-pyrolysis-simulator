@@ -57,26 +57,21 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         "temperature_K",
         "time_min",
         "total_pressure_Pa",
-        "atmosphere",
         "fO2_control",
-        "fO2_Pa",
     }
     experiment_by_id = {item["experiment_id"]: item for item in doc["experiments"]}
     for observation in source_rows:
         point = observation["values"]["series"][0]
         conditions = point["point_conditions"]
         assert required_conditions <= set(conditions)
+        assert "atmosphere" not in conditions
+        assert "fO2_Pa" not in conditions
         assert all(item["state"] and item["locator"] for item in conditions.values())
         _locator(conditions["temperature_K"], page=114, table="2", pdf_index=3)
         _locator(conditions["time_min"], page=114, table="2", pdf_index=3)
         _locator(conditions["total_pressure_Pa"], page=118, pdf_index=7)
-        _locator(conditions["atmosphere"], page=118, pdf_index=7)
         _locator(conditions["fO2_control"], page=127, pdf_index=16)
-        _locator(conditions["fO2_Pa"], page=127, pdf_index=16)
-        assert conditions["fO2_Pa"]["state"] == {
-            "tag": "unknown",
-            "reason": "unbuffered_no_numerical_run_fO2_or_pO2_printed",
-        }
+        assert conditions["fO2_control"]["state"] == {"tag": "value", "value": "none"}
         experiment = experiment_by_id[observation["experiment"]]
         assert experiment["bench_id"] == "graphite-vacuum-furnace"
         assert experiment["sample"]["initial_composition"]["locator"]["table"] == "1"
@@ -100,16 +95,18 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         for observation in observations
     )
     assert all(
-        {"temperature_K", "time_min", "total_pressure_Pa", "atmosphere", "fO2_Pa"}
+        {"temperature_K", "time_min", "total_pressure_Pa", "atmosphere"}
         <= set(observation.point_conditions or {})
         for observation in observations
     )
     assert all(
         observation.identity.fO2_Pa is not None
-        and observation.identity.fO2_Pa.is_unknown
-        and observation.point_conditions["fO2_Pa"].state.is_unknown
-        and observation.point_conditions["fO2_Pa"].state.reason
-        == "unbuffered_no_numerical_run_fO2_or_pO2_printed"
+        and observation.identity.fO2_Pa.is_not_applicable
+        and observation.identity.fO2_Pa.reason == "oxygen_unbuffered_vacuum"
+        and "fO2_Pa" not in observation.point_conditions
+        and observation.point_conditions["fO2_control"].state.value == "none"
+        and observation.point_conditions["atmosphere"].state.value
+        == "No buffer gas or gas mix during the vacuum runs. Graphite crucible; the paper states a high fO2 to keep iron ferric cannot be sustained."
         for observation in observations
     )
 
@@ -119,14 +116,23 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         if (
             "__run_17c3-2::" in observation.observation_id
             and ":row=c3-(2):" in observation.observation_id
+            and observation.admission.status.value == "admitted"
         ):
             by_formula[observation.identity.species.formula] = observation
-    expected = {"SiO2": Decimal("39.09"), "Al2O3": Decimal("3.57"), "FeO": Decimal("27.92")}
-    assert set(by_formula) >= set(expected)
+    expected = {
+        "SiO2": Decimal("39.09"),
+        "Al2O3": Decimal("3.57"),
+        "FeO": Decimal("27.92"),
+        "MgO": Decimal("26.32"),
+        "CaO": Decimal("3.09"),
+    }
+    assert set(by_formula) == set(expected)
     for formula, value in expected.items():
         observation = by_formula[formula]
+        assert observation.admission.status.value == "admitted"
         assert observation.value.point == value
         assert observation.locator.published_page == 116
+        assert observation.locator.pdf_page_index == 5
         assert observation.locator.table == "3"
         assert observation.identity.temperature_K.value == Decimal("1973.15")
         assert observation.identity.total_pressure_Pa.value == pressure
@@ -135,7 +141,6 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         assert observation.point_conditions["temperature_K"].locator.table == "2"
         assert observation.point_conditions["time_min"].state.value == Decimal("16.7")
         assert observation.point_conditions["total_pressure_Pa"].state.value.point == pressure
-        assert observation.point_conditions["fO2_Pa"].locator.published_page == 127
         experiment = migrated.experiments[observation.experiment_id]
         assert experiment.method.value.value == "langmuir_free_evaporation"
         assert experiment.pressure_environment.total_pressure_Pa.state.value.point == pressure
