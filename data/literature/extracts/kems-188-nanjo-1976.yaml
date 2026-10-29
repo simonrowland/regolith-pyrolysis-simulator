@@ -191,7 +191,7 @@ species:
       phase: pure_Se_and_Se-Te_vapor
       standard_state: second-law Delta-H_vap, kcal/mol species
       regime: kems_effusion
-      units: kcal/mol species as printed
+      units: kcal/mol
       values:
         quantity: second_law_enthalpy_of_vaporization
         method_class: measured
@@ -199,9 +199,23 @@ species:
         rows:
         - species: Se(g)
           present_work_kcal_mol: 19.8
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Se(g)'}
+              locator: {table: '1', published_page: 960, row: 'Se(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [500.0, 800.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature: dash
         - species: Se2(g)
           present_work_kcal_mol: 25.3
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Se2(g)'}
+              locator: {table: '1', published_page: 960, row: 'Se2(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [500.0, 800.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature_kcal_mol:
           - 25.6
           - 28.3
@@ -214,12 +228,33 @@ species:
           - '17'
         - species: Se3(g)
           present_work_kcal_mol: 17.6
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Se3(g)'}
+              locator: {table: '1', published_page: 960, row: 'Se3(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [500.0, 800.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature: dash
         - species: Se4(g)
           present_work_kcal_mol: 13.3
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Se4(g)'}
+              locator: {table: '1', published_page: 960, row: 'Se4(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [500.0, 800.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature: dash
         - species: Se5(g)
           present_work_kcal_mol: 13.8
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Se5(g)'}
+              locator: {table: '1', published_page: 960, row: 'Se5(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [500.0, 800.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature: dash
       uncertainty:
         note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
@@ -239,7 +274,7 @@ species:
       phase: pure_Te_and_Se-Te_vapor
       standard_state: second-law Delta-H_vap, kcal/mol species
       regime: kems_effusion
-      units: kcal/mol species as printed
+      units: kcal/mol
       values:
         quantity: second_law_enthalpy_of_vaporization
         method_class: measured
@@ -247,12 +282,26 @@ species:
         rows:
         - species: Te(g)
           present_work_kcal_mol: 28.8
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Te(g)'}
+              locator: {table: '1', published_page: 960, row: 'Te(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [726.0, 850.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature_kcal_mol:
           - 46.9
           literature_refs:
           - '8'
         - species: Te2(g)
           present_work_kcal_mol: 28.6
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Te2(g)'}
+              locator: {table: '1', published_page: 960, row: 'Te2(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [726.0, 850.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature_kcal_mol:
           - 40.2
           - 27.3
@@ -265,6 +314,13 @@ species:
           - '16'
         - species: Te3(g)
           present_work_kcal_mol: 13.8
+          point_conditions:
+            gas_species:
+              state: {tag: value, value: 'Te3(g)'}
+              locator: {table: '1', published_page: 960, row: 'Te3(g)'}
+            temperature_K:
+              state: {tag: unknown, reason: 'source T_range_K [726.0, 850.0]; no midpoint invented'}
+              locator: {table: '1', published_page: 960}
           literature: none_printed_authors_say_new
         Te3_isotopic_envelope_amu: 372-388
       uncertainty:

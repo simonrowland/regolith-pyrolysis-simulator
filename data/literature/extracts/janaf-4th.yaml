@@ -26,12 +26,19 @@ species:
       phase: ideal_gas
       standard_state: 1 bar (0.1 MPa)
       units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298.15'}}
+          locator: {table: 'O-004', record: 'JANAF O-004'}
       values:
         table_id: O-004
         formula_label: OP
         standard_pressure: 1 bar (0.1 MPa)
+        T_K: 298.15
         delta_fH_298_kJ_mol: -23.548
         delta_fG_298_kJ_mol: -47.139
+        units_as_published:
+          delta_fG_298_kJ_mol: kJ/mol
         S_298_J_molK: 222.776
     - observation_id: JANAF1998_PO_formation_tabulation
       type: gibbs_table
@@ -102,12 +109,19 @@ species:
       phase: ideal_gas
       standard_state: 1 bar (0.1 MPa)
       units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298.15'}}
+          locator: {table: 'O-032', record: 'JANAF O-032'}
       values:
         table_id: O-032
         formula_label: O2P
         standard_pressure: 1 bar (0.1 MPa)
+        T_K: 298.15
         delta_fH_298_kJ_mol: -314.524
         delta_fG_298_kJ_mol: -316.748
+        units_as_published:
+          delta_fG_298_kJ_mol: kJ/mol
         S_298_J_molK: 253.685
     - observation_id: JANAF1998_PO2_formation_tabulation
       type: gibbs_table
@@ -178,12 +192,19 @@ species:
       units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
       uncertainty:
         uncertainty_flag: Bains_et_al_2023_JANAF_likely_too_stable
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298.15'}}
+          locator: {table: 'O-087', record: 'JANAF O-087'}
       values:
         table_id: O-087
         formula_label: O6P4 / (P2O3)2
         standard_pressure: 1 bar (0.1 MPa)
+        T_K: 298.15
         delta_fH_298_kJ_mol: -2214.307
         delta_fG_298_kJ_mol: -2084.877
+        units_as_published:
+          delta_fG_298_kJ_mol: kJ/mol
         S_298_J_molK: 345.641
         uncertainty_flag: Bains_et_al_2023_JANAF_likely_too_stable
     - observation_id: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
@@ -302,11 +323,18 @@ species:
       units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
       uncertainty:
         CODATA_delta_fH_uncertainty_kJ_mol: 2.0
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298.15'}}
+          locator: {table: 'P-012', record: 'JANAF P-012'}
       values:
         table_id: P-012
         standard_pressure: 1 bar (0.1 MPa)
+        T_K: 298.15
         delta_fH_298_kJ_mol: 143.653
         delta_fG_298_kJ_mol: 103.112
+        units_as_published:
+          delta_fG_298_kJ_mol: kJ/mol
         CODATA_delta_fH_298_kJ_mol: 144.0
         CODATA_delta_fH_uncertainty_kJ_mol: 2.0
     - observation_id: JANAF1998_P2_formation_tabulation
@@ -383,11 +411,18 @@ species:
       units: kJ/mol (ΔfH, ΔfG); J/(mol·K) (S)
       uncertainty:
         CODATA_delta_fH_uncertainty_kJ_mol: 0.3
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298.15'}}
+          locator: {table: 'P-013', record: 'JANAF P-013'}
       values:
         table_id: P-013
         standard_pressure: 1 bar (0.1 MPa)
+        T_K: 298.15
         delta_fH_298_kJ_mol: 58.907
         delta_fG_298_kJ_mol: 24.416
+        units_as_published:
+          delta_fG_298_kJ_mol: kJ/mol
         CODATA_delta_fH_298_kJ_mol: 58.9
         CODATA_delta_fH_uncertainty_kJ_mol: 0.3
     - observation_id: JANAF1998_P4_formation_tabulation

@@ -33,10 +33,7 @@ fidelity_samples:
     published_page: 1917
     pdf_page_index: 7
     note: Table 7 sample 1, 1370 C, a_P2O5 x 10^17 = 1.2
-- species: P2O5
-  observable: activity_coefficient
-  observation_id: kambayashi_1985_gamma_p2o5_solid_std_henry
-  field: gamma_1370C
+- path: species.P2O5.observations[kambayashi_1985_gamma_p2o5_solid_std_henry].values.points[0].gamma
   value: 2.2e-15
   locator:
     published_page: 1911
@@ -1402,6 +1399,20 @@ species:
           Fe+ and PO2+ 2-5%, PO+ about 0.2%.'
       equipment: *id001
     - observation_id: kambayashi_1985_table7_raoultian_a_p2o5
+      derived_from:
+      - kambayashi_1985_table6_partial_pressures_and_dg
+      - kambayashi_1985_p4o10_sat_janaf_extrapolated
+      derivation:
+        relation: Raoultian a_P2O5 from the printed Table 6 PO and PO2 pressures and the JANAF P4O10(g) saturation pressure using equations (12)-(14).
+        inputs:
+        - kambayashi_1985_table6_partial_pressures_and_dg
+        - kambayashi_1985_p4o10_sat_janaf_extrapolated
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: P2O5 activity from P4O10(g) pressure and the JANAF P4O10(s) standard free energy}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: activity_coefficient
       locator:
         table: '7'
@@ -1430,7 +1441,7 @@ species:
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
           a_P2O5_times_1e17_as_printed: 1.2
-          a_P2O5: 1.2000000000000001e-17
+          activity: 1.2000000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 1
@@ -1441,7 +1452,7 @@ species:
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
           a_P2O5_times_1e17_as_printed: 1.4
-          a_P2O5: 1.4e-17
+          activity: 1.4e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 1
@@ -1452,7 +1463,7 @@ species:
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
           a_P2O5_times_1e17_as_printed: 1.5
-          a_P2O5: 1.5e-17
+          activity: 1.5e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
@@ -1463,7 +1474,7 @@ species:
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
           a_P2O5_times_1e17_as_printed: 3.8
-          a_P2O5: 3.8e-17
+          activity: 3.8e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
@@ -1474,7 +1485,7 @@ species:
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
           a_P2O5_times_1e17_as_printed: 4.5
-          a_P2O5: 4.5000000000000004e-17
+          activity: 4.5000000000000004e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
@@ -1485,7 +1496,7 @@ species:
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
           a_P2O5_times_1e17_as_printed: 5.4
-          a_P2O5: 5.400000000000001e-17
+          activity: 5.400000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
@@ -1496,7 +1507,7 @@ species:
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
           a_P2O5_times_1e17_as_printed: 7.2
-          a_P2O5: 7.200000000000001e-17
+          activity: 7.200000000000001e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
@@ -1507,7 +1518,7 @@ species:
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
           a_P2O5_times_1e17_as_printed: 8.7
-          a_P2O5: 8.7e-17
+          activity: 8.7e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
@@ -1518,7 +1529,7 @@ species:
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
           a_P2O5_times_1e17_as_printed: 9.2
-          a_P2O5: 9.2e-17
+          activity: 9.2e-17
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
@@ -1529,7 +1540,7 @@ species:
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 10.0
-          a_P2O5: 1.0000000000000001e-16
+          activity: 1.0000000000000001e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
@@ -1540,7 +1551,7 @@ species:
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 11.4
-          a_P2O5: 1.14e-16
+          activity: 1.14e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
@@ -1551,7 +1562,7 @@ species:
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 14.0
-          a_P2O5: 1.4e-16
+          activity: 1.4e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 5
@@ -1562,7 +1573,7 @@ species:
           P2O5_wt_percent: 9.77
           t_in_FetO: 0.955
           a_P2O5_times_1e17_as_printed: 12.4
-          a_P2O5: 1.2400000000000002e-16
+          activity: 1.2400000000000002e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
@@ -1573,7 +1584,7 @@ species:
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
           a_P2O5_times_1e17_as_printed: 14.8
-          a_P2O5: 1.4800000000000001e-16
+          activity: 1.4800000000000001e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
@@ -1584,7 +1595,7 @@ species:
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
           a_P2O5_times_1e17_as_printed: 18.1
-          a_P2O5: 1.8100000000000003e-16
+          activity: 1.8100000000000003e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
@@ -1595,7 +1606,7 @@ species:
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
           a_P2O5_times_1e17_as_printed: 20.8
-          a_P2O5: 2.0800000000000003e-16
+          activity: 2.0800000000000003e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
@@ -1606,7 +1617,7 @@ species:
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
           a_P2O5_times_1e17_as_printed: 15.6
-          a_P2O5: 1.56e-16
+          activity: 1.56e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
@@ -1617,7 +1628,7 @@ species:
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
           a_P2O5_times_1e17_as_printed: 18.0
-          a_P2O5: 1.8000000000000002e-16
+          activity: 1.8000000000000002e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
@@ -1628,7 +1639,7 @@ species:
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
           a_P2O5_times_1e17_as_printed: 20.0
-          a_P2O5: 2.0000000000000002e-16
+          activity: 2.0000000000000002e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
@@ -1639,7 +1650,7 @@ species:
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 26.3
-          a_P2O5: 2.6300000000000003e-16
+          activity: 2.6300000000000003e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
@@ -1650,7 +1661,7 @@ species:
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 32.3
-          a_P2O5: 3.2299999999999997e-16
+          activity: 3.2299999999999997e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
@@ -1661,7 +1672,7 @@ species:
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
           a_P2O5_times_1e17_as_printed: 47.6
-          a_P2O5: 4.76e-16
+          activity: 4.76e-16
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
       uncertainty:
@@ -1688,18 +1699,49 @@ species:
           a in Table 7 uses JANAF P4O10(s); gamma is the Henry slope a/X in X_P2O5 < 0.08. Error is twice
           the standard deviation of the per-temperature activity coefficients.'
         X_P2O5_henry_upper: 0.08
-        gamma_1370C: 2.2e-15
-        gamma_1370C_as_printed: (2.2 +/- 0.8) x 10^-15
-        gamma_1380C: 2.5e-15
-        gamma_1380C_as_printed: (2.5 +/- 0.8) x 10^-15
-        gamma_1390C: 2.8e-15
-        gamma_1390C_as_printed: (2.8 +/- 1) x 10^-15
+        points:
+        - T_C: 1370
+          gamma: 2.2e-15
+          gamma_as_printed: (2.2 +/- 0.8) x 10^-15
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1643.15'}
+              locator: {published_page: 1918, pdf_page_index: 7, note: "Conclusion, Henry coefficient at 1370 C"}
+          locator: {published_page: 1918, pdf_page_index: 7}
+        - T_C: 1380
+          gamma: 2.5e-15
+          gamma_as_printed: (2.5 +/- 0.8) x 10^-15
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1653.15'}
+              locator: {published_page: 1918, pdf_page_index: 7, note: "Conclusion, Henry coefficient at 1380 C"}
+          locator: {published_page: 1918, pdf_page_index: 7}
+        - T_C: 1390
+          gamma: 2.8e-15
+          gamma_as_printed: (2.8 +/- 1) x 10^-15
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1663.15'}
+              locator: {published_page: 1918, pdf_page_index: 7, note: "Conclusion, Henry coefficient at 1390 C"}
+          locator: {published_page: 1918, pdf_page_index: 7}
       uncertainty:
         gamma_1370C: 8.0e-16
         gamma_1380C: 8.0e-16
         gamma_1390C: 1.0e-15
         as_printed: twice the standard deviation of the activity coefficients obtained at each temperature
     - observation_id: kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+      derived_from:
+      - kambayashi_1985_gamma_p2o5_solid_std_henry
+      derivation:
+        relation: The printed liquid-standard gamma is the solid-standard Henry gamma converted using the reported P2O5(s)-to-P2O5(l) standard free-energy change.
+        inputs:
+        - kambayashi_1985_gamma_p2o5_solid_std_henry
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: Conversion from P2O5(s) to P2O5(l) standard state using the reported standard free-energy change}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: 'P2O5(s) = P2O5(l)', section: 4.3.3}
+        references:
+        - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
       type: activity_coefficient
       locator:
         published_page: 1917
@@ -1718,12 +1760,31 @@ species:
         method_class: model_derived
         model_or_data_source: Turkdogan and Pearson JISI 175 (1953) 398, P2O5(s)=P2O5(l) standard free-energy
           change applied to the solid-standard gamma
-        gamma_1370C: 3.4e-13
-        gamma_1370C_as_printed: (3.4 +/- 1.2) x 10^-13
-        gamma_1380C: 4.0e-13
-        gamma_1380C_as_printed: (4.0 +/- 1.3) x 10^-13
-        gamma_1390C: 4.7e-13
-        gamma_1390C_as_printed: (4.7 +/- 1.7) x 10^-13
+        points:
+        - T_C: 1370
+          gamma: 3.4e-13
+          gamma_as_printed: (3.4 +/- 1.2) x 10^-13
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1643.15'}
+              locator: {published_page: 1917, pdf_page_index: 6, note: P2O5(s)-to-P2O5(l) standard-state conversion}
+          locator: {published_page: 1917, pdf_page_index: 6}
+        - T_C: 1380
+          gamma: 4.0e-13
+          gamma_as_printed: (4.0 +/- 1.3) x 10^-13
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1653.15'}
+              locator: {published_page: 1917, pdf_page_index: 6, note: P2O5(s)-to-P2O5(l) standard-state conversion}
+          locator: {published_page: 1917, pdf_page_index: 6}
+        - T_C: 1390
+          gamma: 4.7e-13
+          gamma_as_printed: (4.7 +/- 1.7) x 10^-13
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1663.15'}
+              locator: {published_page: 1917, pdf_page_index: 6, note: P2O5(s)-to-P2O5(l) standard-state conversion}
+          locator: {published_page: 1917, pdf_page_index: 6}
       uncertainty:
         gamma_1370C: 1.2e-13
         gamma_1380C: 1.3e-13
@@ -1941,6 +2002,20 @@ species:
         as_printed: +/- 0.5 eV on each literature cell
         note: quoted from refs 6-8 as printed in Table 2
     - observation_id: kambayashi_1985_table6_partial_pressures_and_dg
+      derived_from: &kb85_table6_lineage_inputs
+      - kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+      derivation: &kb85_table6_lineage_derivation
+        relation: Table 6 partial pressures were reduced from the printed Table 5 ion-current ratios using equation (10); P_Fe is from JANAF. The reaction free-energy values use equation (11).
+        inputs:
+        - kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+        output_unit: atm
+        method:
+          state: {tag: value, value: 'Partial-pressure reduction of ion-current ratios with isotope, ionization-cross-section and SEM-gain corrections'}
+          locator: {page: 6, published_page: 1916, pdf_page_index: 6, equation: '10', section: 4.3.2}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+        - J. F. Mann, J. Chem. Phys. 46 (1967), 1646, ref. 12
+        - Stanton, Chupka and Inghram, Rev. Sci. Instrum. 27 (1956), 109, ref. 15
       type: psat_series
       locator:
         table: '6'
@@ -1953,7 +2028,7 @@ species:
       regime: kems_effusion
       units: atm as published (column scales 10^-8, 10^-7, 10^-8); Delta-G in kJ
       values:
-        quantity: partial_pressure_and_gas_reaction_delta_G
+        quantity: partial_pressure
         method_class: model_derived
         model_or_data_source: 'Eq. (10) from measured ion currents with Mann ionization cross-section
           ratios, isotope abundances, and SEM gain ~ sqrt(mass); P_Fe from JANAF. Reaction (11): P2(g)+2PO2(g)=4PO(g).'
@@ -1984,7 +2059,7 @@ species:
           X_P2O5: 0.0075
           P_P2_atm: 1.14e-08
           P_P2_x1e8_atm_as_printed: 1.14
-          P_PO_atm: 2.86e-07
+          p_atm: 2.86e-07
           P_PO_x1e7_atm_as_printed: 2.86
           P_PO2_atm: 3.78e-08
           P_PO2_x1e8_atm_as_printed: 3.78
@@ -1998,7 +2073,7 @@ species:
           X_P2O5: 0.0075
           P_P2_atm: 1.4e-08
           P_P2_x1e8_atm_as_printed: 1.4
-          P_PO_atm: 3.46e-07
+          p_atm: 3.46e-07
           P_PO_x1e7_atm_as_printed: 3.46
           P_PO2_atm: 4.53e-08
           P_PO2_x1e8_atm_as_printed: 4.53
@@ -2012,7 +2087,7 @@ species:
           X_P2O5: 0.0075
           P_P2_atm: 1.81e-08
           P_P2_x1e8_atm_as_printed: 1.81
-          P_PO_atm: 4.4800000000000004e-07
+          p_atm: 4.48e-07
           P_PO_x1e7_atm_as_printed: 4.48
           P_PO2_atm: 5.52e-08
           P_PO2_x1e8_atm_as_printed: 5.52
@@ -2026,7 +2101,7 @@ species:
           X_P2O5: 0.0202
           P_P2_atm: 3.03e-08
           P_P2_x1e8_atm_as_printed: 3.03
-          P_PO_atm: 5.69e-07
+          p_atm: 5.69e-07
           P_PO_x1e7_atm_as_printed: 5.69
           P_PO2_atm: 6.93e-08
           P_PO2_x1e8_atm_as_printed: 6.93
@@ -2040,9 +2115,9 @@ species:
           X_P2O5: 0.0202
           P_P2_atm: 3.77e-08
           P_P2_x1e8_atm_as_printed: 3.77
-          P_PO_atm: 6.98e-07
+          p_atm: 6.98e-07
           P_PO_x1e7_atm_as_printed: 6.98
-          P_PO2_atm: 8.470000000000001e-08
+          P_PO2_atm: 8.47e-08
           P_PO2_x1e8_atm_as_printed: 8.47
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 97
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2054,9 +2129,9 @@ species:
           X_P2O5: 0.0202
           P_P2_atm: 4.72e-08
           P_P2_x1e8_atm_as_printed: 4.72
-          P_PO_atm: 9.089999999999999e-07
+          p_atm: 9.09e-07
           P_PO_x1e7_atm_as_printed: 9.09
-          P_PO2_atm: 1.0640000000000001e-07
+          P_PO2_atm: 1.064e-07
           P_PO2_x1e8_atm_as_printed: 10.64
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2066,11 +2141,11 @@ species:
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
-          P_P2_atm: 1.5000000000000002e-08
+          P_P2_atm: 1.5e-08
           P_P2_x1e8_atm_as_printed: 1.5
-          P_PO_atm: 7.61e-07
+          p_atm: 7.61e-07
           P_PO_x1e7_atm_as_printed: 7.61
-          P_PO2_atm: 9.449999999999999e-08
+          P_PO2_atm: 9.45e-08
           P_PO2_x1e8_atm_as_printed: 9.45
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 82
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2082,7 +2157,7 @@ species:
           X_P2O5: 0.0271
           P_P2_atm: 1.93e-08
           P_P2_x1e8_atm_as_printed: 1.93
-          P_PO_atm: 9.75e-07
+          p_atm: 9.75e-07
           P_PO_x1e7_atm_as_printed: 9.75
           P_PO2_atm: 1.181e-07
           P_PO2_x1e8_atm_as_printed: 11.81
@@ -2096,9 +2171,9 @@ species:
           X_P2O5: 0.0271
           P_P2_atm: 2.32e-08
           P_P2_x1e8_atm_as_printed: 2.32
-          P_PO_atm: 1.2e-06
+          p_atm: 1.2e-06
           P_PO_x1e7_atm_as_printed: 12.0
-          P_PO2_atm: 1.3900000000000001e-07
+          P_PO2_atm: 1.39e-07
           P_PO2_x1e8_atm_as_printed: 13.9
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 74
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2108,9 +2183,9 @@ species:
           point_conditions: *kb85_sample_4_conditions
           T_C: 1370
           X_P2O5: 0.0427
-          P_P2_atm: 5.6399999999999995e-08
+          P_P2_atm: 5.64e-08
           P_P2_x1e8_atm_as_printed: 5.64
-          P_PO_atm: 8.439999999999999e-07
+          p_atm: 8.44e-07
           P_PO_x1e7_atm_as_printed: 8.44
           P_PO2_atm: 1.089e-07
           P_PO2_x1e8_atm_as_printed: 10.89
@@ -2124,7 +2199,7 @@ species:
           X_P2O5: 0.0427
           P_P2_atm: 7.0e-08
           P_P2_x1e8_atm_as_printed: 7.0
-          P_PO_atm: 1.072e-06
+          p_atm: 1.072e-06
           P_PO_x1e7_atm_as_printed: 10.72
           P_PO2_atm: 1.333e-07
           P_PO2_x1e8_atm_as_printed: 13.33
@@ -2138,9 +2213,9 @@ species:
           X_P2O5: 0.0427
           P_P2_atm: 8.68e-08
           P_P2_x1e8_atm_as_printed: 8.68
-          P_PO_atm: 1.332e-06
+          p_atm: 1.332e-06
           P_PO_x1e7_atm_as_printed: 13.32
-          P_PO2_atm: 1.6550000000000002e-07
+          P_PO2_atm: 1.655e-07
           P_PO2_x1e8_atm_as_printed: 16.55
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2150,11 +2225,11 @@ species:
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
-          P_P2_atm: 7.040000000000001e-08
+          P_P2_atm: 7.04e-08
           P_P2_x1e8_atm_as_printed: 7.04
-          P_PO_atm: 1.0779999999999999e-06
+          p_atm: 1.078e-06
           P_PO_x1e7_atm_as_printed: 10.78
-          P_PO2_atm: 1.2699999999999999e-07
+          P_PO2_atm: 1.27e-07
           P_PO2_x1e8_atm_as_printed: 12.7
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2166,7 +2241,7 @@ species:
           X_P2O5: 0.0691
           P_P2_atm: 6.85e-08
           P_P2_x1e8_atm_as_printed: 6.85
-          P_PO_atm: 1.1759999999999998e-06
+          p_atm: 1.176e-06
           P_PO_x1e7_atm_as_printed: 11.76
           P_PO2_atm: 1.389e-07
           P_PO2_x1e8_atm_as_printed: 13.89
@@ -2180,7 +2255,7 @@ species:
           X_P2O5: 0.0691
           P_P2_atm: 8.52e-08
           P_P2_x1e8_atm_as_printed: 8.52
-          P_PO_atm: 1.4749999999999999e-06
+          p_atm: 1.475e-06
           P_PO_x1e7_atm_as_printed: 14.75
           P_PO2_atm: 1.73e-07
           P_PO2_x1e8_atm_as_printed: 17.3
@@ -2192,11 +2267,11 @@ species:
           point_conditions: *kb85_sample_6_conditions
           T_C: 1390
           X_P2O5: 0.0691
-          P_P2_atm: 1.1150000000000001e-07
+          P_P2_atm: 1.115e-07
           P_P2_x1e8_atm_as_printed: 11.15
-          P_PO_atm: 1.853e-06
+          p_atm: 1.853e-06
           P_PO_x1e7_atm_as_printed: 18.53
-          P_PO2_atm: 2.1100000000000002e-07
+          P_PO2_atm: 2.11e-07
           P_PO2_x1e8_atm_as_printed: 21.1
           delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
@@ -2206,9 +2281,9 @@ species:
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
-          P_P2_atm: 8.660000000000001e-08
+          P_P2_atm: 8.66e-08
           P_P2_x1e8_atm_as_printed: 8.66
-          P_PO_atm: 1.2019999999999999e-06
+          p_atm: 1.202e-06
           P_PO_x1e7_atm_as_printed: 12.02
           P_PO2_atm: 1.423e-07
           P_PO2_x1e8_atm_as_printed: 14.23
@@ -2222,7 +2297,7 @@ species:
           X_P2O5: 0.0764
           P_P2_atm: 1.084e-07
           P_P2_x1e8_atm_as_printed: 10.84
-          P_PO_atm: 1.519e-06
+          p_atm: 1.519e-06
           P_PO_x1e7_atm_as_printed: 15.19
           P_PO2_atm: 1.745e-07
           P_PO2_x1e8_atm_as_printed: 17.45
@@ -2236,7 +2311,7 @@ species:
           X_P2O5: 0.0764
           P_P2_atm: 1.367e-07
           P_P2_x1e8_atm_as_printed: 13.67
-          P_PO_atm: 1.9399999999999996e-06
+          p_atm: 1.94e-06
           P_PO_x1e7_atm_as_printed: 19.4
           P_PO2_atm: 2.114e-07
           P_PO2_x1e8_atm_as_printed: 21.14
@@ -2250,7 +2325,7 @@ species:
           X_P2O5: 0.0991
           P_P2_atm: 7.16e-08
           P_P2_x1e8_atm_as_printed: 7.16
-          P_PO_atm: 1.522e-06
+          p_atm: 1.522e-06
           P_PO_x1e7_atm_as_printed: 15.22
           P_PO2_atm: 1.832e-07
           P_PO2_x1e8_atm_as_printed: 18.32
@@ -2264,7 +2339,7 @@ species:
           X_P2O5: 0.0991
           P_P2_atm: 8.93e-08
           P_P2_x1e8_atm_as_printed: 8.93
-          P_PO_atm: 1.912e-06
+          p_atm: 1.912e-06
           P_PO_x1e7_atm_as_printed: 19.12
           P_PO2_atm: 2.287e-07
           P_PO2_x1e8_atm_as_printed: 22.87
@@ -2278,7 +2353,7 @@ species:
           X_P2O5: 0.0991
           P_P2_atm: 1.14e-07
           P_P2_x1e8_atm_as_printed: 11.4
-          P_PO_atm: 2.3179999999999997e-06
+          p_atm: 2.318e-06
           P_PO_x1e7_atm_as_printed: 23.18
           P_PO2_atm: 2.997e-07
           P_PO2_x1e8_atm_as_printed: 29.97
@@ -2291,6 +2366,8 @@ species:
   PO2:
     observations:
     - observation_id: kambayashi_1985_po2_table6_partial_pressure
+      derived_from: *kb85_table6_lineage_inputs
+      derivation: *kb85_table6_lineage_derivation
       type: psat_series
       locator:
         table: '6'
@@ -2343,21 +2420,21 @@ species:
           T_C: 1380
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 8.47
-          P_atm: 8.470000000000001e-08
+          P_atm: 8.47e-08
         - sample_no: 2
           composition_mol: *kb85_sample_2_mol
           point_conditions: *kb85_sample_2_conditions
           T_C: 1390
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 10.64
-          P_atm: 1.0640000000000001e-07
+          P_atm: 1.064e-07
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
           T_C: 1370
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 9.45
-          P_atm: 9.449999999999999e-08
+          P_atm: 9.45e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
@@ -2371,7 +2448,7 @@ species:
           T_C: 1390
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 13.9
-          P_atm: 1.3900000000000001e-07
+          P_atm: 1.39e-07
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
@@ -2392,14 +2469,14 @@ species:
           T_C: 1390
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 16.55
-          P_atm: 1.6550000000000002e-07
+          P_atm: 1.655e-07
         - sample_no: 5
           composition_mol: *kb85_sample_5_mol
           point_conditions: *kb85_sample_5_conditions
           T_C: 1370
           X_P2O5: 0.0499
           P_PO2_x1e8_atm_as_printed: 12.7
-          P_atm: 1.2699999999999999e-07
+          P_atm: 1.27e-07
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
@@ -2420,7 +2497,7 @@ species:
           T_C: 1390
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 21.1
-          P_atm: 2.1100000000000002e-07
+          P_atm: 2.11e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
@@ -2468,6 +2545,8 @@ species:
   P2:
     observations:
     - observation_id: kambayashi_1985_p2_table6_partial_pressure
+      derived_from: *kb85_table6_lineage_inputs
+      derivation: *kb85_table6_lineage_derivation
       type: psat_series
       locator:
         table: '6'
@@ -2535,7 +2614,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.5
-          P_atm: 1.5000000000000002e-08
+          P_atm: 1.5e-08
         - sample_no: 3
           composition_mol: *kb85_sample_3_mol
           point_conditions: *kb85_sample_3_conditions
@@ -2556,7 +2635,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 5.64
-          P_atm: 5.6399999999999995e-08
+          P_atm: 5.64e-08
         - sample_no: 4
           composition_mol: *kb85_sample_4_mol
           point_conditions: *kb85_sample_4_conditions
@@ -2577,7 +2656,7 @@ species:
           T_C: 1370
           X_P2O5: 0.0499
           P_P2_x1e8_atm_as_printed: 7.04
-          P_atm: 7.040000000000001e-08
+          P_atm: 7.04e-08
         - sample_no: 6
           composition_mol: *kb85_sample_6_mol
           point_conditions: *kb85_sample_6_conditions
@@ -2598,14 +2677,14 @@ species:
           T_C: 1390
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 11.15
-          P_atm: 1.1150000000000001e-07
+          P_atm: 1.115e-07
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
           T_C: 1370
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 8.66
-          P_atm: 8.660000000000001e-08
+          P_atm: 8.66e-08
         - sample_no: 7
           composition_mol: *kb85_sample_7_mol
           point_conditions: *kb85_sample_7_conditions
@@ -2646,6 +2725,17 @@ species:
   P4O10:
     observations:
     - observation_id: kambayashi_1985_p4o10_sat_janaf_extrapolated
+      derivation:
+        relation: P4O10(g) saturation pressure from P4O10(s) standard free energies in JANAF, extrapolated from 1500 K to the printed measurement temperatures using equations (12)-(14).
+        output_unit: atm
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3, note: JANAF standard free-energy values above 1500 K are not printed in this paper.}
+        method:
+          state: {tag: value, value: Extrapolation of JANAF P4O10(s) standard free energy to the measurement temperatures and solution of equation (14)}
+          locator: {page: 7, published_page: 1917, pdf_page_index: 7, equation: '14', section: 4.3.3}
+        references:
+        - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
       type: psat_series
       locator:
         published_page: 1917
@@ -2660,20 +2750,35 @@ species:
       regime: janaf_extrapolation
       units: atm as published
       values:
-        quantity: saturation_pressure
+        quantity: vapor_pressure
         method_class: model_derived
         model_or_data_source: JANAF Thermochemical Tables NSRDS-NBS (1971), Suppl. (1974); P4O10(s) standard
           free energy tabulated to 1500 K, extrapolated to 1643-1663 K
         points:
         - T_C: 1370
           T_K: 1643.0
-          P_sat_atm: 700.0
+          pressure_atm: 700.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1643.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
         - T_C: 1380
           T_K: 1653.0
-          P_sat_atm: 709.0
+          pressure_atm: 709.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1653.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
         - T_C: 1390
           T_K: 1663.0
-          P_sat_atm: 719.0
+          pressure_atm: 719.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1663.0'}
+              locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
+          locator: {published_page: 1917, pdf_page_index: 7, section: 4.3.3}
       uncertainty:
         note: extrapolation of JANAF P4O10(s) beyond 1500 K; no numeric +/- printed
   Fe:
