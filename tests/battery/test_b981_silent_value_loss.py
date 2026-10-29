@@ -370,3 +370,28 @@ def test_ammin_76_904_quoted_fusion_enthalpies_migrate_with_temperature():
         assert located_temperature.state.is_value
         assert located_temperature.state.value == temperature
         assert located_temperature.locator is not None
+
+
+def test_shilov_table4_molecular_oxygen_pressures_use_printed_scale_and_conditions():
+    observations = _observations(
+        "shilov-1998-sno-zno-p2o5-vaporization.yaml",
+        "shilov_1998_table4_molecular_oxygen_partial_pressures",
+    )
+    expected = {
+        Decimal("40.0"): Decimal("8.79501e-11"),
+        Decimal("46.7"): Decimal("6.07950e-11"),
+        Decimal("53.3"): Decimal("7.031955e-11"),
+        Decimal("60.0"): Decimal("8.7443475e-11"),
+    }
+    assert len(observations) == len(expected)
+    for observation in observations:
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        assert observation.value.kind is ValueKind.POINT
+        conditions = observation.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        composition = conditions["xSnO_mol_pct"]
+        assert temperature.state.is_value
+        assert temperature.state.value == Decimal("1300.0")
+        assert temperature.locator is not None
+        assert composition.state.is_value and composition.locator is not None
+        assert observation.value.point == expected[composition.state.value]

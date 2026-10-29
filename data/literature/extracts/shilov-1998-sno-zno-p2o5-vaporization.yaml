@@ -657,10 +657,34 @@ species:
           method_class: calculated
           gas_species_as_printed: pO2
           points:
-            - {xSnO_mol_pct: 40.0, pO2_times_1e16_atm: 8.68, pO2_as_printed: '8.68'}
-            - {xSnO_mol_pct: 46.7, pO2_times_1e16_atm: 6.00, pO2_as_printed: '6.00'}
-            - {xSnO_mol_pct: 53.3, pO2_times_1e16_atm: 6.94, pO2_as_printed: '6.94'}
-            - {xSnO_mol_pct: 60.0, pO2_times_1e16_atm: 8.63, pO2_as_printed: '8.63'}
+            - xSnO_mol_pct: 40.0
+              p_atm: 8.68e-16
+              pO2_as_printed: '8.68'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '40.0'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 46.7
+              p_atm: 6.00e-16
+              pO2_as_printed: '6.00'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '46.7'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 53.3
+              p_atm: 6.94e-16
+              pO2_as_printed: '6.94'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '53.3'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 60.0
+              p_atm: 8.63e-16
+              pO2_as_printed: '8.63'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '60.0'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
   P2O5:
     observations:
       - observation_id: shilov_1998_table5_P2O5_activities
