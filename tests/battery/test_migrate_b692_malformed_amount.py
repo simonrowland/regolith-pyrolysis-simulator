@@ -79,6 +79,55 @@ def test_b692_migrate_emits_typed_hard_issue_not_partial_composition(
     assert matches[0].detail == "malformed declared amount: 'not-a-number'"
 
 
+def test_b744_malformed_amount_takes_precedence_over_point_oxide_map(
+    tmp_path: Path,
+) -> None:
+    values = {
+        "quantity": "p_partial",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "series": [
+            {
+                "T_K": 1933.0,
+                "pressure_atm": "1.0e-8",
+                **_MALFORMED,
+                "composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+            }
+        ],
+    }
+    extract = _scalar_extract(
+        quantity="p_partial", units="Pa", values=values, obs_type="rate_series"
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = (
+        "b744_malformed_p_partial"
+    )
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+    obs = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.startswith(
+            "fixture-source::b744_malformed_p_partial::"
+        )
+    )
+
+    assert obs.identity.composition is not None
+    assert obs.identity.composition.is_unknown
+    assert obs.identity.composition.reason == (
+        "malformed declared amount: 'not-a-number'"
+    )
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and "composition_mol" in (issue.path or "")
+        and issue.detail == "malformed declared amount: 'not-a-number'"
+    ]
+    assert len(matches) == 1
+
+
 @pytest.mark.parametrize(
     "bad_amount",
     ["not-a-number", True, None, "", {"nested": 1}, ["1"]],
