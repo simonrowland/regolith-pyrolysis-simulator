@@ -9089,6 +9089,23 @@ def test_endmember_projection_never_sums_multiple_activity_carriers():
     ) is None
 
 
+def test_t162_legacy_endmember_vapor_lookup_numeric_pin():
+    """Pin the pre-conversion values before changing the vapor bridge."""
+    backend = AlphaMELTSBackend()
+    activities = {'Mg2SiO4': 0.5}
+
+    # These are the exact current bridge outputs, not physical expectations.
+    assert backend._activity_for_vapor_species('Mg', activities).hex() == (
+        '0x1.0000000000000p+0'
+    )
+    assert backend._activity_for_vapor_species('Si', activities).hex() == (
+        '0x1.0000000000000p-1'
+    )
+    assert backend._activity_for_vapor_species('SiO', activities).hex() == (
+        '0x1.0000000000000p-1'
+    )
+
+
 def test_thermoengine_missing_activity_is_typed_vapor_refusal_not_raise():
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
