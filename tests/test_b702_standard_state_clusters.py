@@ -18,18 +18,45 @@ def test_b702_standard_state_clusters_migrate(tmp_path: Path) -> None:
     sossi = _migrate_real_extract(
         tmp_path / "sossi-fegley", "kems-041-sossi-fegley-2018.yaml"
     )
-    unresolved = [
+    table_rows = [
         observation
         for observation in sossi.observations.values()
         if "::sossi_fegley_2018_table2_gamma_" in observation.observation_id
     ]
-    assert len({item.observation_id for item in unresolved}) == 29
-    assert all(item.identity.reference_state is not None for item in unresolved)
+    assert len(table_rows) == 44
+    unresolved = [
+        item
+        for item in table_rows
+        if item.identity.reference_state is not None
+        and item.identity.reference_state.is_unknown
+    ]
+    assert len(unresolved) == 42
+    assert len(
+        {
+            item.observation_id.split("::", 1)[1].split("::", 1)[0]
+            for item in unresolved
+        }
+    ) == 29
     assert all(
-        item.identity.reference_state.is_unknown
-        and item.identity.reference_state.reason
+        item.identity.reference_state.reason
         == "compiled coefficients whose solid/liquid reference is set by each cited primary study"
         for item in unresolved
+    )
+    solid_rows = [
+        item
+        for item in table_rows
+        if item.identity.reference_state is not None
+        and item.identity.reference_state.is_value
+    ]
+    assert len(solid_rows) == 2
+    assert {
+        item.identity.reference_state.value.endmember.formula
+        for item in solid_rows
+    } == {"CaO", "MgO"}
+    assert all(
+        item.identity.reference_state.value.endmember.phase.is_value
+        and item.identity.reference_state.value.endmember.phase.value.value == "cr"
+        for item in solid_rows
     )
 
     ichise_doc = yaml.safe_load(
