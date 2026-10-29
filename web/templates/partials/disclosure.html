@@ -62,6 +62,10 @@
                     {% else %}
                         {{ info }}
                     {% endif %}
+                    {% if info is mapping and info.target_status is defined %}
+                    <br><strong>{{ info.target_status|replace('_', ' ')|upper }} ({{ info.decision }})</strong>
+                    <br><small>{{ info.reason }} Run ledger reports engine-predicted yields.</small>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

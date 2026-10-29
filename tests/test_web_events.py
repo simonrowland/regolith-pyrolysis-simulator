@@ -1943,6 +1943,39 @@ def test_c4_disclosure_option_lists_are_server_sourced_byte_identical():
     ]
 
 
+def test_c2a_product_targets_are_flagged_in_api_and_disclosure():
+    app = app_module.create_app()
+    client = app.test_client()
+
+    response = client.get("/api/setpoints")
+    assert response.status_code == 200
+    products = response.get_json()["campaigns"]["C2A_continuous"]["products"]
+    expected_masses = {
+        "Fe": [85, 130],
+        "SiO2_glass": [100, 160],
+        "O2": [48, 70],
+    }
+    for product, mass_kg in expected_masses.items():
+        assert products[product]["mass_kg"] == mass_kg
+        assert products[product]["target_status"] == "unverified_design_target"
+        assert products[product]["decision"] == "d-310"
+        assert products[product]["reason"]
+
+    response = client.get("/partials/disclosure/C2A_continuous")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert html.count("UNVERIFIED DESIGN TARGET (d-310)") == len(expected_masses)
+    assert html.count("Run ledger reports engine-predicted yields.") == len(
+        expected_masses
+    )
+    assert html.count("not verified against frozen-hour engine yields") == len(
+        expected_masses
+    )
+    assert "conflicts with oxygen implied by glass chemistry." in html
+    for mass_kg in expected_masses.values():
+        assert f"{mass_kg} kg" in html
+
+
 def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
     sid = "test-mre-partition-refusal"
     sim = SimpleNamespace(_poisoned_hour=None)
