@@ -1,0 +1,1372 @@
+schema_version: literature_extract.v1
+source_id: kushiro-1971-apollo12-phase-equilibria
+source:
+  citation: Kushiro, I., Nakamura, Y., Kitayama, K. & Akimoto, S. (1971). Petrology of some Apollo 12 crystalline rocks. Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 481–495. The M.I.T. Press.
+  year: 1971
+  corpus_asset: raw/kushiro-1971-apollo12-phase-equilibria/kushiro-1971-apollo12-phase-equilibria.pdf
+extraction:
+  method: Table 3 starting-mixture compositions and Table 4 run conditions and phase strings were transcribed from MinerU cell drafts and checked cell by cell against page renders. The page-level pdftotext file has no article text. Transition temperatures and narrative runs were transcribed from MinerU prose and checked against the page render. The natural Apollo 12 whole-rock oxide analyses are cited as published separately by Kushiro and Haramura (1971), not printed in this paper.
+  date: '2026-10-28'
+  worker: w1028naI-kushiro71
+review_status: draft
+experiments:
+- experiment_id: kushiro-1971-mixture-a
+  method: quench_equilibration
+  locator:
+    page: 10
+    published_page: 490
+    pdf_page_index: 9
+    table: '3'
+  sample:
+    form:
+      state:
+        tag: value
+        value: synthetic glass, Mixture A
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '47.1'
+          - - Al2O3
+            - '9.9'
+          - - TiO2
+            - '3.1'
+          - - Cr2O3
+            - '0.6'
+          - - FeO
+            - '20.5'
+          - - MnO
+            - '0.26'
+          - - MgO
+            - '8.0'
+          - - CaO
+            - '10.2'
+          - - Na2O
+            - '0.28'
+          - - K2O
+            - '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Table 3, column 1; Mixture A, described as close to olivine-poor rocks 12065 and 12052.
+- experiment_id: kushiro-1971-mixture-b
+  method: quench_equilibration
+  locator:
+    page: 10
+    published_page: 490
+    pdf_page_index: 9
+    table: '3'
+  sample:
+    form:
+      state:
+        tag: value
+        value: synthetic glass, Mixture B
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '46.0'
+          - - Al2O3
+            - '9.7'
+          - - TiO2
+            - '3.0'
+          - - Cr2O3
+            - '0.6'
+          - - FeO
+            - '20.0'
+          - - MnO
+            - '0.25'
+          - - MgO
+            - '10.2'
+          - - CaO
+            - '10.0'
+          - - Na2O
+            - '0.27'
+          - - K2O
+            - '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Table 3, column 2; Mixture B, described as a supposed original magma composition.
+- experiment_id: kushiro-1971-rock-12065-45
+  method: quench_equilibration
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+    note: Four additional runs are described in the prose.
+  sample:
+    form:
+      state:
+        tag: value
+        value: Apollo 12 rock 12065,45
+      locator: &id031
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+        note: The paper says major-element abundances of the nine rocks were published separately by Kushiro and Haramura (1971); no analysis for 12065,45 is printed here.
+species:
+  SiO2:
+    observations:
+    - observation_id: kushiro_1971_mixture_a_chromite_first_appearance_bracket
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-rock-12065-45
+      phase: l
+      locator: &id032
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance
+        phase_appearance_as_printed: chromite in rock 12065
+        temperature_as_printed: between 1200° and 1170°C
+        method_class: authors_estimate
+        sentence_as_printed: >-
+          The results of the 1 atm quenching experiments on mixture A indicate that chromite in rock 12065 would have begun to crystallize at temperatures between 1200° and 1170°C and pigeonite near 1170°C.
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+            note: Rock 12065,45 composition is not printed in this paper.
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source does not print oxygen fugacity for rock 12065.
+          locator: *id032
+    - observation_id: kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-rock-12065-45
+      phase: l
+      locator: *id032
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance
+        phase_appearance_as_printed: pigeonite in rock 12065
+        T_C: 1170
+        approximate: true
+        method_class: authors_estimate
+        sentence_as_printed: >-
+          The results of the 1 atm quenching experiments on mixture A indicate that chromite in rock 12065 would have begun to crystallize at temperatures between 1200° and 1170°C and pigeonite near 1170°C.
+      point_conditions:
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+            note: Rock 12065,45 composition is not printed in this paper.
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+          locator:
+            page: 13
+            published_page: 493
+            pdf_page_index: 12
+            section: Experiments and Their Application
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source does not print oxygen fugacity for rock 12065.
+          locator: *id032
+    - observation_id: kushiro_1971_mixture_b_augite_plagioclase_first_appearance
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: &id001
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance_augite_and_plagioclase
+        phase_appearance_as_printed: augite and plagioclase in
+        method_class: measured_direct
+        T_C: 1130
+        approximate: true
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: &id033
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    - observation_id: kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: *id001
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance_ca_poor_pyroxene
+        phase_appearance_as_printed: Ca-poor pyroxene in
+        method_class: measured_direct
+        T_C: 1210
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    - observation_id: kushiro_1971_mixture_b_chromite_liquidus
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: *id001
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: liquidus
+        phase_appearance_as_printed: chromite liquidus
+        method_class: measured_direct
+        T_C: 1330
+        composition_mass_percent:
+          SiO2: '46.0'
+          Al2O3: '9.7'
+          TiO2: '3.0'
+          Cr2O3: '0.6'
+          FeO: '20.0'
+          MnO: '0.25'
+          MgO: '10.2'
+          CaO: '10.0'
+          Na2O: '0.27'
+          K2O: '0.06'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    - observation_id: kushiro_1971_mixture_b_ilmenite_first_appearance
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: *id001
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance_ilmenite
+        phase_appearance_as_printed: ilmenite in
+        method_class: measured_direct
+        T_C: 1100
+        approximate: true
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    - observation_id: kushiro_1971_mixture_b_olivine_first_appearance
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: *id001
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: first_appearance_olivine
+        phase_appearance_as_printed: olivine in
+        method_class: measured_direct
+        T_C: 1280
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    - observation_id: kushiro_1971_mixture_b_solidus
+      type: transition_point
+      regime: quench_equilibration
+      experiment: kushiro-1971-mixture-b
+      phase: l
+      locator: *id001
+      units: °C
+      values:
+        quantity: transition_temperature
+        property_kind: solidus
+        phase_appearance_as_printed: solidus
+        method_class: measured_direct
+        T_C: 1070
+        approximate: true
+        composition_mass_percent:
+          SiO2: '46.0'
+          Al2O3: '9.7'
+          TiO2: '3.0'
+          Cr2O3: '0.6'
+          FeO: '20.0'
+          MnO: '0.25'
+          MgO: '10.2'
+          CaO: '10.0'
+          Na2O: '0.27'
+          K2O: '0.06'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              SiO2_wt_pct: '46.0'
+              Al2O3_wt_pct: '9.7'
+              TiO2_wt_pct: '3.0'
+              Cr2O3_wt_pct: '0.6'
+              FeO_wt_pct: '20.0'
+              MnO_wt_pct: '0.25'
+              MgO_wt_pct: '10.2'
+              CaO_wt_pct: '10.0'
+              Na2O_wt_pct: '0.27'
+              K2O_wt_pct: '0.06'
+          locator:
+            page: 10
+            published_page: 490
+            pdf_page_index: 9
+            table: '3'
+            note: Mixture B starting composition; Table 3 column 2.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator: *id033
+        oxygen_partial_pressure:
+          value: 10^-13
+          units: atm
+          state:
+            tag: value
+            value: 10^-13
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+          locator: *id033
+    context:
+    - observation_id: kushiro_1971_table3_starting_material_compositions
+      type: table_record
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+      units: wt% oxide
+      attribution: Kushiro et al. report Mixture A as close to olivine-poor rocks 12065 and 12052, and Mixture B as a supposed original magma composition.
+      values:
+        row_count: 2
+        rows:
+        - experiment: kushiro-1971-mixture-a
+          starting_material: Mixture A
+        - experiment: kushiro-1971-mixture-b
+          starting_material: Mixture B
+    - observation_id: kushiro_1971_table4_quenching_runs
+      type: table_record
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+      units: temperature °C; duration min; pressure as printed
+      attribution: Kushiro et al. report 35 quenching runs on synthetic Mixtures A and B across 1 atm and high-pressure conditions.
+      values:
+        row_count: 35
+        quantity_as_printed: experimental run conditions and phase assemblages
+        quantity_token: unavailable
+        schema_gap: No exact phase-assemblage observation type or quantity exists in tools/validate_literature_extracts.py::OBSERVATION_TYPES, simulator/battery/migrate.py::QUANTITY_ALIASES, or simulator/battery/migrate.py::TYPE_QUANTITY; the phase vocabulary in simulator/battery/enums.py::Phase and simulator/battery/enums.py::PhaseRole represents individual phase tokens and roles, not a multi-phase assemblage.
+        phase_abbreviations_as_printed: Cpx, clinopyroxene; Cpx*, clinopyroxene (pigeonite and augite); Gl, glass; Gar, garnet; Il, ilmenite; Ol, olivine; Pl, plagioclase; Sp, spinel (chromite solid solution); X, unidentified phase; Ru, rutile.
+        rows:
+        - run: 1
+          source_row: 3
+          locator: &id002
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 1
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1230'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id002
+        - run: 2
+          source_row: 4
+          locator: &id003
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 2
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1200'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Cpx(Ca5.6Mg72.2Fe22.2 and Ca5.0Mg73.0Fe22.0) + Ol?
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id003
+        - run: 3
+          source_row: 5
+          locator: &id004
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 3
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1170'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Cpx(Ca6.4Mg66.2Fe27.4)
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id004
+        - run: 4
+          source_row: 6
+          locator: &id005
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 4
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1140'
+          duration_min_as_printed: '90'
+          phase_assemblage_as_printed: Gl + Sp + Cpx + Pl?
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id005
+        - run: 5
+          source_row: 7
+          locator: &id006
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 5
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1100'
+          duration_min_as_printed: '120'
+          phase_assemblage_as_printed: Gl + Sp + Cpx* + Pl
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id006
+        - run: 6
+          source_row: 8
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 6
+          starting_material_as_printed: Mixture A
+          experiment: kushiro-1971-mixture-a
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 3
+          temperature_C_as_printed: '1050'
+          duration_min_as_printed: '150'
+          phase_assemblage_as_printed: Sp + Cpx* + Pl + Il
+          oxygen_condition_as_printed: 10^-13 atm PO2
+        - run: 7
+          source_row: 10
+          locator: &id007
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 7
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1340'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id007
+        - run: 8
+          source_row: 11
+          locator: &id008
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 8
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1320'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id008
+        - run: 9
+          source_row: 12
+          locator: &id009
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 9
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1300'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id009
+        - run: 10
+          source_row: 13
+          locator: &id010
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 10
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1260'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol(Fo77Fa23)
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id010
+        - run: 11
+          source_row: 14
+          locator: &id011
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 11
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1230'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol(Fo75Fa25)
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id011
+        - run: 12
+          source_row: 15
+          locator: &id012
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 12
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1200'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol(Fo73Fa27) + Cpx
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id012
+        - run: 13
+          source_row: 16
+          locator: &id013
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 13
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1185'
+          duration_min_as_printed: '300'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id013
+        - run: 14
+          source_row: 17
+          locator: &id014
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 14
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1170'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx(Ca6.8Mg71.5Fe21.6)
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id014
+        - run: 15
+          source_row: 18
+          locator: &id015
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 15
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1155'
+          duration_min_as_printed: '300'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id015
+        - run: 16
+          source_row: 19
+          locator: &id016
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 16
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1140'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx + Pl?
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id016
+        - run: 17
+          source_row: 20
+          locator: &id017
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 17
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1120'
+          duration_min_as_printed: '300'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx* + Pl
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id017
+        - run: 18
+          source_row: 21
+          locator: &id018
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 18
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1100'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Sp + Ol + Cpx* + Pl
+          oxygen_condition_as_printed: 10^-13 atm PO2
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id018
+        - run: 19
+          source_row: 22
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 19
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 1 atm
+          pressure_cell_origin_row: 10
+          temperature_C_as_printed: '1050'
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Sp + Ol + Cpx* + Pl + Il
+          oxygen_condition_as_printed: 10^-13 atm PO2
+        - run: 20
+          source_row: 24
+          locator: &id019
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 20
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1400 ± 10
+          duration_min_as_printed: '30'
+          phase_assemblage_as_printed: Gl
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id019
+        - run: 21
+          source_row: 25
+          locator: &id020
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 21
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1345 ± 10
+          duration_min_as_printed: '43'
+          phase_assemblage_as_printed: Gl + Sp?
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id020
+        - run: 22
+          source_row: 26
+          locator: &id021
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 22
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1290 ± 5
+          duration_min_as_printed: '45'
+          phase_assemblage_as_printed: Gl + Ol(Fo72Fa28) + Cpx(Ca7.1Mg68.2Fe24.7)
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id021
+        - run: 23
+          source_row: 27
+          locator: &id022
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 23
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1240 ± 10
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Cpx + Ol?
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id022
+        - run: 24
+          source_row: 28
+          locator: &id023
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 24
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1175 ± 15
+          duration_min_as_printed: '90'
+          phase_assemblage_as_printed: Gl + Cpx
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id023
+        - run: 25
+          source_row: 29
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 25
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 10 kb
+          pressure_cell_origin_row: 24
+          temperature_C_as_printed: 1100 ± 10
+          duration_min_as_printed: '110'
+          phase_assemblage_as_printed: Cpx + Pl + Il
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+        - run: 26
+          source_row: 30
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 26
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 16 kb
+          pressure_cell_origin_row: 30
+          temperature_C_as_printed: 1140 ± 20
+          duration_min_as_printed: '80'
+          phase_assemblage_as_printed: Gar + Cpx + X(Ru?)
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+        - run: 27
+          source_row: 31
+          locator: &id024
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 27
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 20 kb
+          pressure_cell_origin_row: 31
+          temperature_C_as_printed: 1475 ± 20
+          duration_min_as_printed: '30'
+          phase_assemblage_as_printed: Gl
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id024
+        - run: 28
+          source_row: 32
+          locator: &id025
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 28
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 20 kb
+          pressure_cell_origin_row: 31
+          temperature_C_as_printed: 1415 ± 10
+          duration_min_as_printed: '41'
+          phase_assemblage_as_printed: Gl
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id025
+        - run: 29
+          source_row: 33
+          locator: &id026
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 29
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 20 kb
+          pressure_cell_origin_row: 31
+          temperature_C_as_printed: 1365 ± 10
+          duration_min_as_printed: '45'
+          phase_assemblage_as_printed: Gl + Cpx
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id026
+        - run: 30
+          source_row: 34
+          locator: &id027
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 30
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 20 kb
+          pressure_cell_origin_row: 31
+          temperature_C_as_printed: 1310 ± 10
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Gl + Cpx
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id027
+        - run: 31
+          source_row: 35
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 31
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 20 kb
+          pressure_cell_origin_row: 31
+          temperature_C_as_printed: 1240 ± 15
+          duration_min_as_printed: '62'
+          phase_assemblage_as_printed: Gar + Cpx + Gl?
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+        - run: 32
+          source_row: 36
+          locator: &id028
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 32
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 30 kb
+          pressure_cell_origin_row: 36
+          temperature_C_as_printed: 1475 ± 20
+          duration_min_as_printed: '30'
+          phase_assemblage_as_printed: Gl
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id028
+        - run: 33
+          source_row: 37
+          locator: &id029
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 33
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 30 kb
+          pressure_cell_origin_row: 36
+          temperature_C_as_printed: 1415 ± 15
+          duration_min_as_printed: '45'
+          phase_assemblage_as_printed: Gl + Cpx
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id029
+        - run: 34
+          source_row: 38
+          locator: &id030
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 34
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 30 kb
+          pressure_cell_origin_row: 36
+          temperature_C_as_printed: 1355 ± 10
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Cpx + Gar + Gl
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+          quench_statement:
+            statement: Table 4 reports quenching experiments; the paper does not state whether the glass preserves the high-temperature liquid.
+            preservation: not_stated
+            locator: *id030
+        - run: 35
+          source_row: 39
+          locator:
+            page: 11
+            published_page: 491
+            pdf_page_index: 10
+            table: '4'
+            row: 35
+          starting_material_as_printed: Mixture B
+          experiment: kushiro-1971-mixture-b
+          pressure_as_printed: 30 kb
+          pressure_cell_origin_row: 36
+          temperature_C_as_printed: 1290 ± 15
+          duration_min_as_printed: '60'
+          phase_assemblage_as_printed: Cpx + Gar + X?
+          oxygen_condition_status: not stated for the high-pressure Table 4 run
+    - observation_id: kushiro_1971_rock_12065_45_narrative_runs
+      type: narrative_run
+      locator: *id031
+      units: °C
+      attribution: Kushiro et al. describe four additional runs on rock 12065,45; no durations or explicit pressure and oxygen conditions are repeated for these runs.
+      values:
+        row_count: 4
+        runs:
+        - run: 1
+          locator:
+            page: 12
+            published_page: 492
+            pdf_page_index: 11
+            section: Experiments and Their Application
+            row: 1
+          starting_material_as_printed: rock 12065,45
+          experiment: kushiro-1971-rock-12065-45
+          temperature_C_as_printed: 1200°
+          pressure_status: not stated for these rock-specific runs
+          duration_status: not stated
+          oxygen_condition_status: not stated for these rock-specific runs
+          phase_assemblage_as_printed: relict pigeonite and spinel persisted
+          interpretation_as_printed: runs not used for discussion because relict pigeonite and spinel persisted
+          additional_observation_as_printed: At 1200°C, relict pigeonite is overgrown by newly formed pigeonite; the crystals show monoclinic form as a whole.
+        - run: 2
+          locator:
+            page: 12
+            published_page: 492
+            pdf_page_index: 11
+            section: Experiments and Their Application
+            row: 2
+          starting_material_as_printed: rock 12065,45
+          experiment: kushiro-1971-rock-12065-45
+          temperature_C_as_printed: 1170°
+          pressure_status: not stated for these rock-specific runs
+          duration_status: not stated
+          oxygen_condition_status: not stated for these rock-specific runs
+          phase_assemblage_as_printed: relict pigeonite and spinel persisted
+          interpretation_as_printed: runs not used for discussion because relict pigeonite and spinel persisted
+        - run: 3
+          locator:
+            page: 12
+            published_page: 492
+            pdf_page_index: 11
+            section: Experiments and Their Application
+            row: 3
+          starting_material_as_printed: rock 12065,45
+          experiment: kushiro-1971-rock-12065-45
+          temperature_C_as_printed: 1140°
+          pressure_status: not stated for these rock-specific runs
+          duration_status: not stated
+          oxygen_condition_status: not stated for these rock-specific runs
+          phase_assemblage_as_printed: relict pigeonite and spinel persisted
+          interpretation_as_printed: runs not used for discussion because relict pigeonite and spinel persisted
+        - run: 4
+          locator:
+            page: 12
+            published_page: 492
+            pdf_page_index: 11
+            section: Experiments and Their Application
+            row: 4
+          starting_material_as_printed: rock 12065,45
+          experiment: kushiro-1971-rock-12065-45
+          temperature_C_as_printed: 1100°C
+          pressure_status: not stated for these rock-specific runs
+          duration_status: not stated
+          oxygen_condition_status: not stated for these rock-specific runs
+          phase_assemblage_as_printed: relict pigeonite and spinel persisted
+          interpretation_as_printed: runs not used for discussion because relict pigeonite and spinel persisted
+fidelity_samples:
+- path: species.SiO2.observations[kushiro_1971_mixture_b_chromite_liquidus].values.T_C
+  value: 1330
+  locator: *id001
+- path: species.SiO2.observations[kushiro_1971_mixture_b_solidus].values.T_C
+  value: 1070
+  note: The source marks this value approximate.
+  locator: *id001

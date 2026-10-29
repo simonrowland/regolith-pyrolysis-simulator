@@ -107,20 +107,6 @@ species:
       uncertainty: no model uncertainty reported
   O2:
     observations:
-    - observation_id: visscher_2013_o2_vapor_fraction
-      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
-      type: rate_series
-      locator: {published_page: 3, figure: '2', section: '3.1'}
-      phase: saturated_silicate_vapor
-      regime: MAGMA_IMCC_equilibrium
-      units: mole fraction
-      values:
-        quantity: evolved_gas_yield
-        method_class: quoted_attributed
-        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
-        mole_fraction_range_as_printed: '20-30%'
-        note: O2 mole fraction is described as relatively temperature-independent across all melt compositions.
-      uncertainty: no model uncertainty reported
     - observation_id: visscher_2013_saturated_vapor_oxygen_fugacity
       quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
       type: psat_series
@@ -135,6 +121,24 @@ species:
         expression: fO2 = gamma_O2 * P_O2 = gamma_O2 * X_O2 * P_T
         model_approximation: gamma_O2 approximately 1, therefore fO2 approximately P_O2 approximately X_O2 * P_T
         qualitative_result: saturated vapor is several orders of magnitude more oxidizing than solar-composition gas
+      uncertainty: no model uncertainty reported
+    context:
+    - observation_id: visscher_2013_o2_vapor_fraction
+      type: printed_data_context
+      quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      locator:
+        published_page: 3
+        figure: '2'
+        section: '3.1'
+      phase: saturated_silicate_vapor
+      regime: MAGMA_IMCC_equilibrium
+      units: mole fraction
+      values:
+        quantity: O2 mole fraction in saturated silicate vapor
+        method_class: quoted_attributed
+        generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+        mole_fraction_range_as_printed: '20-30%'
+        note: O2 mole fraction is described as relatively temperature-independent across all melt compositions.
       uncertainty: no model uncertainty reported
   SiO2_melt:
     observations:
