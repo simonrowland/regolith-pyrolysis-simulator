@@ -78,7 +78,7 @@ def optimizer_tier_label(
             reduced_real_cache_state=stored_state,
             evidence_class=canonical_evidence_class,
             backend_name=canonical_backend_name if canonical_evidence_class is None else None,
-            backend_status=backend_status if canonical_evidence_class is None else None,
+            backend_status=backend_status,
         )
     else:
         canonical = canonicalize_fidelity_emission(

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0156-aragonite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=aragonite:v=6e0755beb7
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=1000:col=H_minus_H298:name=aragonite:v=6e0755beb7:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -15,8 +15,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -110,7 +110,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=aragonite:v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=aragonite:v=900e6181ee:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -123,8 +123,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -218,7 +218,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=400:col=H_minus_H298:name=aragonite:v=1dd8eafa18
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=400:col=H_minus_H298:name=aragonite:v=1dd8eafa18:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -231,8 +231,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -326,7 +326,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=500:col=H_minus_H298:name=aragonite:v=09574cbe96
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=500:col=H_minus_H298:name=aragonite:v=09574cbe96:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -339,8 +339,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -434,7 +434,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=600:col=H_minus_H298:name=aragonite:v=34e28f6201
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=600:col=H_minus_H298:name=aragonite:v=34e28f6201:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -447,8 +447,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -542,7 +542,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=700:col=H_minus_H298:name=aragonite:v=6d48ef3ab3
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=700:col=H_minus_H298:name=aragonite:v=6d48ef3ab3:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -555,8 +555,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -650,7 +650,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=800:col=H_minus_H298:name=aragonite:v=207dfccad1
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=800:col=H_minus_H298:name=aragonite:v=207dfccad1:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -663,8 +663,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -758,7 +758,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=900:col=H_minus_H298:name=aragonite:v=5cca6fb9b1
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:H_minus_H298:shared:T=900:col=H_minus_H298:name=aragonite:v=5cca6fb9b1:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -771,8 +771,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -866,7 +866,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=1000:col=entropy:name=aragonite:v=e0665348d2
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=1000:col=entropy:name=aragonite:v=e0665348d2:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -879,8 +879,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -974,7 +974,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=298.15:col=entropy:name=aragonite:v=bae4975591
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=298.15:col=entropy:name=aragonite:v=bae4975591:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -987,8 +987,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1082,7 +1082,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=400:col=entropy:name=aragonite:v=701d6c9ba4
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=400:col=entropy:name=aragonite:v=701d6c9ba4:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1095,8 +1095,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1190,7 +1190,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=500:col=entropy:name=aragonite:v=6924e37812
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=500:col=entropy:name=aragonite:v=6924e37812:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1203,8 +1203,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1298,7 +1298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=600:col=entropy:name=aragonite:v=134691c6f7
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=600:col=entropy:name=aragonite:v=134691c6f7:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1311,8 +1311,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1406,7 +1406,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=700:col=entropy:name=aragonite:v=1d1d244d0e
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=700:col=entropy:name=aragonite:v=1d1d244d0e:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1419,8 +1419,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1514,7 +1514,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=800:col=entropy:name=aragonite:v=ad149b9cc6
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=800:col=entropy:name=aragonite:v=ad149b9cc6:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1527,8 +1527,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1622,7 +1622,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=900:col=entropy:name=aragonite:v=13abee99ea
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:S:shared:T=900:col=entropy:name=aragonite:v=13abee99ea:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1635,8 +1635,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1730,7 +1730,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fG:from_the_elements:T=700:col=delta_f_G:name=aragonite:v=cbeb597c30
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fG:from_the_elements:T=700:col=delta_f_G:name=aragonite:v=cbeb597c30:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1743,8 +1743,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1771,9 +1771,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -1903,7 +1902,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=aragonite:v=1757513de7
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=aragonite:v=1757513de7:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -1916,8 +1915,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -1944,9 +1943,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2076,7 +2074,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=aragonite:v=36b42550ca
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=aragonite:v=36b42550ca:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2089,8 +2087,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2117,9 +2115,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2249,7 +2246,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=aragonite:v=21a5f24544
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=400:col=delta_f_H:name=aragonite:v=21a5f24544:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2262,8 +2259,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2290,9 +2287,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2422,7 +2418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=aragonite:v=0528706022
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=500:col=delta_f_H:name=aragonite:v=0528706022:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2435,8 +2431,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2463,9 +2459,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2595,7 +2590,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=600:col=delta_f_H:name=aragonite:v=e66ce3481a
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=600:col=delta_f_H:name=aragonite:v=e66ce3481a:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2608,8 +2603,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2636,9 +2631,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2768,7 +2762,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=700:col=delta_f_H:name=aragonite:v=80cd53e119
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=700:col=delta_f_H:name=aragonite:v=80cd53e119:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2781,8 +2775,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2809,9 +2803,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0
@@ -2941,7 +2934,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=900:col=delta_f_H:name=aragonite:v=bda1171223
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:delta_fH:from_the_elements:T=900:col=delta_f_H:name=aragonite:v=bda1171223:poly=aragonite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0156-aragonite:tabulation
   identity:
     quantity:
@@ -2954,8 +2947,8 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        reason: polymorph aragonite does not denote formula CaC03
+        rejection_kind: contradicts_formula
       charge:
         tag: value
         value: 0
@@ -2982,9 +2975,8 @@ observations:
               value: cr
             polymorph:
               tag: unknown
-              reason: name_as_published/phase '*===*===*=== Crystals 298.15° to 1000°K. ARAGONITE' is not a closed Polymorph
-                token
-              rejection_kind: omitted
+              reason: polymorph aragonite does not denote formula CaC03
+              rejection_kind: contradicts_formula
             charge:
               tag: value
               value: 0

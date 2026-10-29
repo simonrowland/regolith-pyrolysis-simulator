@@ -142,6 +142,7 @@ def test_optimizer_tier_label_prefers_run_reference_cache_state() -> None:
     # actual target — run_reference cache_state winning over result_blob.
     run_reference = {
         "cache_state": "cached_exact",
+        "backend_status": "ok",
         "evidence_class": EvidenceClass.MELTS.value,
         "backend_authoritative": True,
     }

@@ -80,7 +80,10 @@ IMPORTED_BADGE = {
 _SAFE_STUDY_ID_CHARS = frozenset(
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-"
 )
-SUPPORTED_SAVE_SCHEMA_VERSIONS = frozenset({SAVE_SCHEMA_VERSION})
+_LEGACY_SAVE_SCHEMA_VERSION = 1
+SUPPORTED_SAVE_SCHEMA_VERSIONS = frozenset(
+    {_LEGACY_SAVE_SCHEMA_VERSION, SAVE_SCHEMA_VERSION}
+)
 SUPPORTED_MEMBER_SCHEMA_VERSIONS = frozenset({MEMBER_SCHEMA_VERSION})
 # Affirmative success tokens for job_status.json (uppercased). A bundle is accepted only
 # when success is True AND status is one of these; any other status (RUNNING/ERROR/ABORTED/
@@ -392,7 +395,8 @@ def imported_study_model(
     runs_root: Path | str | None = None,
 ) -> dict[str, Any]:
     root = Path(import_dir)
-    summary = _load_json_object(root / "study.summary.json")
+    raw_summary = _load_json_object(root / "study.summary.json")
+    summary = _study_summary_for_model(raw_summary)
     overlay = _load_overlay(root)
     leaderboard = _read_leaderboard(root / "leaderboard.csv")
     pareto = _load_json_object(root / "pareto.json")
@@ -417,6 +421,40 @@ def imported_study_model(
         "relative_path": _relative_to(root, runs),
         "artifacts": _imported_artifacts(root, runs),
     }
+
+
+def _study_summary_for_model(summary: dict[str, Any]) -> dict[str, Any]:
+    if summary.get("save_schema_version") != _LEGACY_SAVE_SCHEMA_VERSION:
+        return summary
+
+    raw_products = summary.get("products")
+    if raw_products is not None and not isinstance(raw_products, Mapping):
+        raise ImportBundleError("study.summary.json products must be an object")
+    products = dict(raw_products or {})
+    glass_kg = products.get("glass_kg")
+    qualified_glass = (
+        isinstance(glass_kg, Mapping)
+        and bool(glass_kg)
+        and all(
+            not isinstance(value, bool)
+            and isinstance(value, (int, float))
+            and (isinstance(value, int) or math.isfinite(value))
+            and value >= 0
+            for value in glass_kg.values()
+        )
+    )
+    if qualified_glass:
+        products["glass_kg"] = dict(glass_kg)
+        products["glass_status"] = "available"
+        products["glass_status_reason"] = ""
+    else:
+        products["glass_kg"] = None
+        products["glass_status"] = "unavailable"
+        products["glass_status_reason"] = "legacy_v1_unqualified"
+
+    normalized = dict(summary)
+    normalized["products"] = products
+    return normalized
 
 
 def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import ctypes
 import json
+import os
 import sqlite3
+import subprocess
+import sys
 import warnings
 from pathlib import Path
 
@@ -17,6 +21,7 @@ from simulator.engine_local_config import (
     is_legacy_cache_version,
     load_engine_lock,
     load_config,
+    _load_thermoengine_phaseobjc_library,
     render_toml,
     setup_thermoengine_dylib_path,
     thermoengine_artifact_names,
@@ -146,9 +151,20 @@ def test_thermoengine_dylib_dir_fail_loud_when_missing(
         "simulator.engine_local_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
+    empty_home = tmp_path / "empty-home"
+    empty_home.mkdir()
+    monkeypatch.setenv("HOME", str(empty_home))
+    monkeypatch.delenv("DYLD_LIBRARY_PATH", raising=False)
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "")
     write_config(config)
 
-    with pytest.raises(ImportError, match="ThermoEngine dylibs missing"):
+    with pytest.raises(
+        ImportError,
+        match=(
+            r"ThermoEngine dylibs missing.*thermoengine_dylib_dir.*"
+            r"DYLD_LIBRARY_PATH.*DYLD_FALLBACK_LIBRARY_PATH"
+        ),
+    ):
         setup_thermoengine_dylib_path()
 
 
@@ -170,11 +186,146 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
-    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+    monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", "")
 
     resolved = setup_thermoengine_dylib_path()
     assert resolved == dylib_dir
     assert str(dylib_dir) in __import__("os").environ["DYLD_FALLBACK_LIBRARY_PATH"]
+
+
+@pytest.mark.parametrize(
+    "variable",
+    ["DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH"],
+)
+def test_thermoengine_dylib_dir_resolves_from_dyld_variables(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    variable: str,
+) -> None:
+    dylib_dir = tmp_path / "environment-lib"
+    dylib_dir.mkdir()
+    for name in thermoengine_artifact_names(load_engine_lock()):
+        (dylib_dir / name).write_bytes(b"locked dylib placeholder")
+    empty_home = tmp_path / "empty-home"
+    empty_home.mkdir()
+    monkeypatch.setattr(
+        "simulator.engine_local_config.config_path",
+        lambda: tmp_path / "absent.toml",
+    )
+    monkeypatch.setenv("HOME", str(empty_home))
+    monkeypatch.setenv(variable, str(dylib_dir))
+    other_variable = (
+        "DYLD_FALLBACK_LIBRARY_PATH"
+        if variable == "DYLD_LIBRARY_PATH"
+        else "DYLD_LIBRARY_PATH"
+    )
+    monkeypatch.setenv(other_variable, "")
+
+    assert setup_thermoengine_dylib_path() == dylib_dir
+
+
+def test_vaporock_objc_load_uses_dyld_path_without_local_config(
+    tmp_path: Path,
+) -> None:
+    """Exercise the real upstream import with and without its library path."""
+    config = load_config()
+    candidates = [
+        config.paths.thermoengine_dylib_dir
+        if config is not None
+        else None,
+        Path.home() / "lib",
+    ]
+    for variable in ("DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH"):
+        candidates.extend(
+            Path(entry).expanduser()
+            for entry in os.environ.get(variable, "").split(os.pathsep)
+            if entry
+        )
+    artifact_names = thermoengine_artifact_names(load_engine_lock())
+    phaseobjc_name = next(
+        Path(name).name
+        for name in artifact_names
+        if Path(name).name.startswith("libphaseobjc.")
+    )
+    native_dir = None
+    for candidate in candidates:
+        if candidate is None or not all(
+            (candidate / name).is_file() for name in artifact_names
+        ):
+            continue
+        native_dir = candidate
+        break
+
+    empty_home = tmp_path / "empty-home"
+    empty_home.mkdir()
+    missing_config = tmp_path / "absent" / "engines.local.toml"
+    script = """
+import sys
+from pathlib import Path
+import ctypes
+loaded_native_paths = []
+real_cdll = ctypes.CDLL
+def recording_cdll(path, *args, **kwargs):
+    loaded_native_paths.append(str(path))
+    return real_cdll(path, *args, **kwargs)
+ctypes.CDLL = recording_cdll
+import simulator.engine_local_config as local_config
+local_config.config_path = lambda: Path(sys.argv[1])
+from simulator.melt_backend.vaporock import VapoRockBackend
+mode = sys.argv[2]
+backend = VapoRockBackend()
+module = backend._import_vaporock()
+if mode == 'missing':
+    assert module is None
+    assert backend._last_error is not None
+    for token in ('thermoengine_dylib_dir', 'DYLD_LIBRARY_PATH',
+                  'DYLD_FALLBACK_LIBRARY_PATH'):
+        assert token in backend._last_error, backend._last_error
+    print('TYPED_IMPORT_ERROR ImportError', backend._last_error)
+else:
+    assert module is not None, backend._last_error
+    from rubicon.objc import ObjCClass
+    ObjCClass('LiquidMelts')
+    assert sys.argv[3] in loaded_native_paths, loaded_native_paths
+    print('CLASS_OK LiquidMelts')
+"""
+
+    def run(mode: str, *, fallback: bool) -> subprocess.CompletedProcess[str]:
+        env = os.environ.copy()
+        env["HOME"] = str(empty_home)
+        env.pop("DYLD_LIBRARY_PATH", None)
+        env.pop("DYLD_FALLBACK_LIBRARY_PATH", None)
+        if fallback:
+            env["DYLD_FALLBACK_LIBRARY_PATH"] = str(native_dir)
+        return subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                script,
+                str(missing_config),
+                mode,
+                (
+                    str(native_dir / phaseobjc_name)
+                    if native_dir is not None
+                    else ""
+                ),
+            ],
+            cwd=Path(__file__).resolve().parents[1],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            check=False,
+        )
+
+    missing = run("missing", fallback=False)
+    assert missing.returncode == 0, missing.stdout + missing.stderr
+    assert "TYPED_IMPORT_ERROR ImportError" in missing.stdout
+
+    assert native_dir is not None, "no loadable ThermoEngine dylib directory found"
+    loaded = run("loaded", fallback=True)
+    assert loaded.returncode == 0, loaded.stdout + loaded.stderr
+    assert "CLASS_OK LiquidMelts" in loaded.stdout
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:

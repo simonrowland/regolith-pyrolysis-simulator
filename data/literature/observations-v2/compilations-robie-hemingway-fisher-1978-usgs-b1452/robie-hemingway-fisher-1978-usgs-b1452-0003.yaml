@@ -2614,11 +2614,10 @@ observations:
       formula: CaAl2Si2O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2680,8 +2679,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='237.30'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -7482,11 +7492,10 @@ observations:
       formula: KAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7548,8 +7557,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='261.60'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -9519,11 +9539,10 @@ observations:
       formula: NaAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9585,8 +9604,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='251.90'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -19903,7 +19933,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=aragonite:v=ba316020b9
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=aragonite:v=ba316020b9:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -19915,9 +19945,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -19979,8 +20008,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='87.99'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -34210,11 +34250,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'GERMANIUM DIOXIDE GLASS $GeO_2$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34277,8 +34316,20 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='64.500.30'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); reconstructed=64.50 method_class=split_merged_value_uncertainty_by_column_grain;
+          evidence=merged value+uncertainty '64.500.30' splits uniquely at column printed grain 0.01 into 64.50 ± 0.30
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -39777,7 +39828,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=kaliophillite-$kalsio_{4}$:v=f07a9c73ad
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=kaliophillite-$kalsio_{4}$:v=f07a9c73ad:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -39789,9 +39840,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -39853,8 +39903,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='133.26'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -54679,11 +54740,10 @@ observations:
       formula: SiO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -54745,8 +54805,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='47.40'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -66348,11 +66419,10 @@ observations:
       formula: CaAl2Si2O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -66376,11 +66446,10 @@ observations:
             formula: CaAl2Si2O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -66520,8 +66589,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3942856'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -69828,11 +69908,10 @@ observations:
       formula: KAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -69856,11 +69935,10 @@ observations:
             formula: KAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -70000,8 +70078,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3703513'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -70041,11 +70130,10 @@ observations:
       formula: NaAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -70069,11 +70157,10 @@ observations:
             formula: NaAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -70213,8 +70300,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3665330'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -76095,7 +76193,7 @@ observations:
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=aragonite:v=ae7e82e7cb
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=aragonite:v=ae7e82e7cb:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -76107,9 +76205,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -76135,9 +76232,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -76254,8 +76350,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-1127793'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -97568,11 +97675,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'GERMANIUM DIOXIDE GLASS $GeO_2$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97596,11 +97702,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'GERMANIUM DIOXIDE GLASS $GeO_2$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -97695,8 +97800,21 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-475180710'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements;
+          reconstructed=-475180 method_class=split_merged_value_uncertainty_by_column_grain; evidence=merged value+uncertainty
+          '-475180710' has several grain-1 cuts; log10_Kf identity uniquely selects -475180 ± 710
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -105897,7 +106015,7 @@ observations:
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=kaliophillite-$kalsio_{4}$:v=f02355e7d7
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=kaliophillite-$kalsio_{4}$:v=f02355e7d7:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -105909,9 +106027,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -105937,9 +106054,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -106079,8 +106195,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-2005975'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -126188,11 +126315,10 @@ observations:
       formula: SiO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -126216,11 +126342,10 @@ observations:
             formula: SiO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -126314,8 +126439,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-850559'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -141447,11 +141583,10 @@ observations:
       formula: CaAl2Si2O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -141475,11 +141610,10 @@ observations:
             formula: CaAl2Si2O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -141619,8 +141753,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-4157300'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -144501,11 +144646,10 @@ observations:
       formula: KAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -144529,11 +144673,10 @@ observations:
             formula: KAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -144673,8 +144816,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3914740'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -144950,11 +145104,10 @@ observations:
       formula: NaAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -144978,11 +145131,10 @@ observations:
             formula: NaAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -145122,8 +145274,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3875460'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -149290,7 +149453,7 @@ observations:
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=aragonite:v=184a55c9be
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=aragonite:v=184a55c9be:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -149302,9 +149465,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -149330,9 +149492,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -149449,8 +149610,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-1207430'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -169765,7 +169937,7 @@ observations:
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=kaliophillite-$kalsio_{4}$:v=1efd14a4d4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=kaliophillite-$kalsio_{4}$:v=1efd14a4d4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -169777,9 +169949,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -169805,9 +169976,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -169947,8 +170117,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-2121920'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -186937,11 +187118,10 @@ observations:
       formula: SiO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -186965,11 +187145,10 @@ observations:
             formula: SiO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -187063,8 +187242,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-903200'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -201371,11 +201561,10 @@ observations:
       formula: CaAl2Si2O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -201399,11 +201588,10 @@ observations:
             formula: CaAl2Si2O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$CaAl_{2}Si_{2}O_{8}$ GLASS $CaAl_{2}Si_{2}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -201543,8 +201731,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='690.777'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -204888,11 +205087,10 @@ observations:
       formula: KAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -204916,11 +205114,10 @@ observations:
             formula: KAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$KAlSi_{3}O_{8}$ GLASS $KAlSi_{3}O_{8}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -205060,8 +205257,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='648.843'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -205093,11 +205301,10 @@ observations:
       formula: NaAlSi3O8
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -205121,11 +205328,10 @@ observations:
             formula: NaAlSi3O8
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published '$NaAlSi_{3}O_{8}$ GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -205265,8 +205471,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='642.153'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -210875,7 +211092,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=aragonite:v=6f5d8fe18e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=aragonite:v=6f5d8fe18e:poly=aragonite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -210887,9 +211104,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: aragonite
       charge:
         tag: value
         value: 0
@@ -210915,9 +211131,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'ARAGONITE' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: aragonite
             charge:
               tag: value
               value: 0
@@ -211034,8 +211249,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='197.586'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -231380,11 +231606,10 @@ observations:
       formula: GeO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'GERMANIUM DIOXIDE GLASS $GeO_2$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -231408,11 +231633,10 @@ observations:
             formula: GeO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'GERMANIUM DIOXIDE GLASS $GeO_2$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -231507,8 +231731,21 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='83.2500.124'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements;
+          reconstructed=83.250 method_class=split_merged_value_uncertainty_by_column_grain; evidence=merged value+uncertainty
+          '83.2500.124' splits uniquely at column printed grain 0.001 into 83.250 ± 0.124
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -239338,7 +239575,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=kaliophillite-$kalsio_{4}$:v=7041c35147
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=kaliophillite-$kalsio_{4}$:v=7041c35147:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -239350,9 +239587,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -239378,9 +239614,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'KALIOPHILLITE $KAlSiO_{4}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -239520,8 +239755,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='351.440'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -258709,11 +258955,10 @@ observations:
       formula: SiO2
       phase:
         tag: value
-        value: cr
+        value: glass
       polymorph:
-        tag: unknown
-        reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -258737,11 +258982,10 @@ observations:
             formula: SiO2
             phase:
               tag: value
-              value: cr
+              value: glass
             polymorph:
-              tag: unknown
-              reason: name_as_published 'SILICON DIOXIDE GLASS' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: not_applicable
+              reason: not crystal
             charge:
               tag: value
               value: 0
@@ -258835,8 +259079,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='149.015'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:

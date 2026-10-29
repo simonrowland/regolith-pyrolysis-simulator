@@ -1,0 +1,62 @@
+source_id: li-2005-na-al-phosphate-fe-activities
+extraction_mode: manual_render_checked
+transcription_method: hand transcription checked against the PDF page render; table tool convert and compare run on hybrid-high and pipeline-ocr OCR-redo variants, with pdftotext as authoritative character layer
+table_tool: tools/mineru_table_draft.py convert ran on both OCR-redo content lists; row/column assignments and every cell were checked against the PDF page 3 render.
+input_order: MinerU OCR-redo variants were compared first; pdftotext-layout has no body cells for Tables 1 and 2, so its absence was supplemented by full transcription from the variants and render resolution.
+mappings:
+  - table: '1'
+    page: 3
+    published_page: 14
+    printed_rows: 11
+    columns:
+      - No.
+      - Na2O (mass%)
+      - MgO (mass%)
+      - CaO (mass%)
+      - SiO2 (mass%)
+      - Al2O3 (mass%)
+      - FeO (mass%)
+      - Fe2O3 (mass%)
+      - P2O5 (mass%)
+      - metal P (mass%)
+      - metal O (mass%)
+      - LP
+      - Fe3+/Fe2+
+      - log C_PO4^3-
+      - gamma FeO
+      - gamma FeO1.5
+    typed_as:
+      - all eight slag oxide amounts in printed mass percent, one equilibrium_phase_composition row per numeric cell
+      - measured equilibrium metal P and O as equilibrium_phase_composition rows
+      - LP as measured_reduced distribution_ratio from printed slag P and metal P
+      - Fe3+/Fe2+ as measured_reduced valence_ratio from the authors' reported total Fe and Fe2+ analyses
+      - gamma FeO and gamma FeO1.5 as measured_reduced activity_coefficient values calculated using Eqs. 21 and 22
+      - phosphate capacity retained as typed_refusal because the schema has no phosphate-capacity quantity token
+    row_column_assignment: checked against the 200 dpi render of PDF page 3
+  - table: '2'
+    page: 3
+    published_page: 14
+    printed_rows: 14
+    columns: same printed columns as Table 1
+    row_column_assignment: checked against the 200 dpi render of PDF page 3
+full_cell_audit:
+  file: li-2005-na-al-phosphate-fe-activities.cells.tsv
+  printed_rows: 25
+  printed_columns: 16
+  cells_including_row_number: 400
+  verification: every cell was checked against the rendered PDF page 3; the hybrid-high variant agrees with all 400 cell readings, while pipeline-ocr mismatches were resolved to the render; each row is marked render_checked_each_cell
+  variants: hybrid-high 400/400 exact cell matches; pipeline-ocr 148/400 exact cell matches (252 disagreements)
+  variant_cell_audit: li-2005-na-al-phosphate-fe-activities.mineru-cell-comparison.tsv
+  table_row_counts:
+    '1': 11
+    '2': 14
+  numeric_composition_observations: 245
+  excluded_dash_cells: 5
+locator_checks:
+  - {page: 3, table: '1', checked: rendered; first and last rows pinned in focused test}
+  - {page: 3, table: '2', checked: rendered; first and last rows pinned in focused test}
+  - {page: 2, section: Experimental, checked: rendered; argon quench, gas ratios, calculated oxygen pressures, and flow rates}
+  - {page: 5, published_page: 16, checked: rendered; Eqs. 21-22 and FeO/FeO1.5 standard states}
+table_tool_compare: 'run against both OCR-redo table drafts; hybrid-high numeric compare matched 370/370 with no mismatch, pipeline-ocr matched 123/370 with 247 mismatches. Full compare outputs and per-cell reconciliation are committed beside this mapping.'
+figure_digitization: none
+schema_gap: phosphate capacity has no quantity token; 25 printed values remain typed-refused with their definition and row conditions.

@@ -15,6 +15,7 @@ from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
 )
 from simulator.condensation import KnudsenRegimeRefusal, Stage3SilicaExposureRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -53,6 +54,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     EvaporationFluxRefusal,
     MREElectrolysisRefusal,
     *_TYPED_PHYSICS_REFUSALS,
@@ -213,7 +215,11 @@ class RunExecutor:
                 config,
                 backend=_backend_from_worker_runtime(config, worker_runtime),
             )
-        except (CampaignPressureSetpointRefusal, EvaporationFluxRefusal) as exc:
+        except (
+            CampaignPressureSetpointRefusal,
+            CampaignSetpointMissingRefusal,
+            EvaporationFluxRefusal,
+        ) as exc:
             return self.execute_session(
                 session,
                 hours=hours,
@@ -231,7 +237,10 @@ class RunExecutor:
         hours: int,
         stop_at_stage0_exit: bool | None = None,
         initial_refusal: (
-            CampaignPressureSetpointRefusal | EvaporationFluxRefusal | None
+            CampaignPressureSetpointRefusal
+            | CampaignSetpointMissingRefusal
+            | EvaporationFluxRefusal
+            | None
         ) = None,
     ) -> RunExecution:
         sim = session.simulator
@@ -405,6 +414,7 @@ class RunExecutor:
             KnudsenRegimeRefusal,
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
+            CampaignSetpointMissingRefusal,
             EvaporationFluxRefusal,
             MREElectrolysisRefusal,
         ) as exc:

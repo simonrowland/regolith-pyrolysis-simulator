@@ -613,7 +613,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
 
 # Nightly (2026-08-02 CI tiering): serial web full path (~327 s junit).
 @pytest.mark.nightly
-@pytest.mark.timeout(1200)
+@pytest.mark.cpu_budget(1200)
 # Hang-backstop, not a perf bar: measured 268s serial on Studio 1 pre-train and
 # slower with the disposition machinery; the 300s global default was always
 # marginal there. 1200s ~= 3x measured per the contention-robust ceiling policy.

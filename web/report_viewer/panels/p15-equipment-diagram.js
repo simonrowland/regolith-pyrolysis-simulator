@@ -7,6 +7,8 @@
     prettySpecies,
     accountLabel,
     speciesColor,
+    exactValue,
+    stageMassQualifier,
     esc,
   } = root.ReportLabels;
 
@@ -147,6 +149,16 @@
     const silicaClassTotal = silica && hasNumber(silica.class_total_kg) ? silica.class_total_kg : null;
     const silicaCapture = silica && hasNumber(silica.stage_3_capture_kg) ? silica.stage_3_capture_kg : null;
     const silicaFlag = silica ? asMap(silica.flag) : null;
+    const silicaUnavailable = isSilicaStage && silica !== null && (
+      silica.class_total_kg === null
+      || silica.stage_3_capture_kg === null
+      || (typeof silicaFlag?.status === "string"
+        && silicaFlag.status.toLowerCase() === "unavailable")
+    );
+    const silicaUnavailableReason = silicaFlag
+      && typeof silicaFlag.reason === "string"
+      ? silicaFlag.reason
+      : "";
     const silicaProduct = silicaClassTotal !== null && silicaClassTotal > 0;
     const silicaFlaggedProduct = silicaProduct && silicaFlag !== null;
     const silicaQualified = silicaProduct && !silicaFlaggedProduct;
@@ -165,7 +177,9 @@
       ? ` style="--sec-p15-product:${esc(speciesColor(emittedProductSpecies))}"`
       : "";
     let routeStatus = "collection not implied";
-    if (stage && isSilicaStage && silicaFlaggedProduct) {
+    if (isSilicaStage && silicaUnavailable) {
+      routeStatus = "silica capture unavailable";
+    } else if (stage && isSilicaStage && silicaFlaggedProduct) {
       routeStatus = "flagged silica product";
     } else if (stage && isSilicaStage && silicaQualified) {
       routeStatus = "qualified silica product";
@@ -181,12 +195,23 @@
       : "";
     const activeText = active ? " · designed campaign-route focus; activity not emitted" : "";
     if (!stage) {
+      const pendingMessage = silicaUnavailable
+        ? `Silica capture unavailable${silicaUnavailableReason
+          ? ` · reason: ${silicaUnavailableReason}`
+          : ""}`
+        : "Terminal product-destination classification pending — not emitted";
       return `<article class="sec-p15-stage${productClass}${activeClass}" data-stage="${stageDefinition.key}"${productStyle} aria-label="${esc(`${label} · terminal product-destination classification; includes stage-routed tap metal; not condenser inventory${activeText}`)}">` +
         `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
-        `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc("Terminal product-destination classification pending — not emitted")}</div>` +
+        `<h4>${esc(label)}</h4>${routeNote}<div class="sec-p15-inline-pending">${esc(pendingMessage)}</div>` +
         `</article>`;
     }
 
+    const stageMass = stageMassQualifier(stage.total_kg);
+    const stageMassValue = stageMass === null
+      ? hasNumber(stage.total_kg) && stage.total_kg >= 0
+        ? exactValue(stage.total_kg, "kg")
+        : null
+      : esc(stageMass);
     const hasVerdict = typeof stage.verdict === "string" && stage.verdict.trim();
     const verdictToken = hasVerdict ? stage.verdict.trim() : "PENDING";
     const isIndeterminate = verdictToken === "INDETERMINATE";
@@ -196,6 +221,9 @@
       : isIndeterminate
         ? " sec-p15-verdict--indeterminate"
         : " sec-p15-verdict--pending";
+    const stageMassMetric = stageMassValue === null
+      ? ""
+      : `<div class="sec-p15-metric"><span>Total classified product mass</span><strong>${stageMassValue}</strong></div>`;
     const warning = typeof stage.warning === "string" && stage.warning.trim()
       ? `<p class="sec-p15-stage-warning">${esc(stage.warning.trim())}</p>`
       : "";
@@ -203,7 +231,7 @@
       ? `<p class="sec-p15-stage-flag">${esc("flagged capture · not a product")}</p>`
       : "";
     let flaggedProduct = "";
-    if (silicaFlaggedProduct) {
+    if (silicaFlaggedProduct || (silicaUnavailable && silicaFlag !== null)) {
       const parts = [];
       if (typeof silicaFlag.status === "string" && silicaFlag.status.trim()) {
         parts.push(`status: ${silicaFlag.status.trim()}`);
@@ -226,7 +254,7 @@
     // verdict; inventing "backend's empty-stage classification" for a missing
     // verdict contradicts the PENDING badge and the artifact.
     let emptyStage = "";
-    if (hasNumber(stage.total_kg) && stage.total_kg === 0) {
+    if (stageMass === "empty") {
       emptyStage = hasVerdict
         ? `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict is the backend's empty-stage classification")}</p>`
         : `<p class="sec-p15-stage-empty">${esc("No classified product mass emitted; verdict pending — not emitted")}</p>`;
@@ -238,6 +266,7 @@
       `<div class="sec-p15-stage-number">${esc(String(STAGES.indexOf(stageDefinition)))}</div>` +
       `<h4>${esc(label)}</h4>${routeNote}` +
       `<span class="sec-p15-verdict${verdictClass}">${esc(verdict)}</span>${emptyStage}${flaggedCapture}${flaggedProduct}${warning}` +
+      `${stageMassMetric}` +
       metric("Designated + coproduct mass", stage.designated_kg, "kg", { min: 0 }) +
       metric("Impurity mass", stage.impurity_kg, "kg", { min: 0 }) +
       purityMetric +

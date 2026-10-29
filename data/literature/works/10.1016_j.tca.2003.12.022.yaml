@@ -1,0 +1,1410 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.tca.2003.12.022
+  citation: Kim, Woo-Sung; Cho, Do-Hyung; Lim, Sung-Ki (2004). The activity of sodium oxide in molten float glass by EMF measurements.
+    Thermochimica Acta 414(2), 191–195.
+  source_ids:
+  - kim-2004-na2o-float-glass-emf
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:kim-2004-na2o-float-glass-emf
+      role: pdf
+      path: raw/kim-2004-na2o-float-glass-emf/kim-2004-na2o-float-glass-emf.pdf
+      sha256:
+        tag: value
+        value: 2d53e47361d998028bebd8d0a70f5319b64854f5360501cb8bd570d595bd9700
+    - asset_id: pdftotext:kim-2004-na2o-float-glass-emf
+      role: pdftotext
+      path: text/kim-2004-na2o-float-glass-emf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kim-2004-na2o-float-glass-emf
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.tca.2003.12.022
+experiments:
+- experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: Printed Cl component has no composition component token; full composition retained in table context.
+      locator:
+        page: 2
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value: Table 1 float-glass composition, m/o
+      locator:
+        page: 2
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Multiple point temperatures
+      locator:
+        page: 4
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm was maintained over both electrodes.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: Flow rate not stated
+          partial_pressure_Pa:
+            tag: value
+            value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm was maintained over both electrodes.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime not stated
+  work_id: 10.1016/j.tca.2003.12.022
+  locator:
+    page: 4
+    table: '3'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        section: Experimental
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 2
+              section: Experimental
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              section: Experimental
+        output_unit: Pa
+        references: []
+- experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    printed_composition:
+      state:
+        tag: value
+        value: 65.7 m/o SiO2–34.3 m/o Na2O
+      locator:
+        page: 2
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Multiple point temperatures
+      locator:
+        page: 3
+        table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm was maintained over both electrodes.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: Flow rate not stated
+          partial_pressure_Pa:
+            tag: value
+            value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm was maintained over both electrodes.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Flow regime not stated
+  work_id: 10.1016/j.tca.2003.12.022
+  locator:
+    page: 3
+    table: '2'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        section: Experimental
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 2
+              section: Experimental
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              section: Experimental
+        output_unit: Pa
+        references: []
+context:
+- observation_id: kim_2004_table1_float_glass_composition
+  type: table_context
+  locator:
+    page: 2
+    table: '1'
+  units: m/o (mole percent)
+  values:
+    typed_quantity_as_printed: float-glass composition
+    method_class: measured_direct
+    row_count: 9
+    rows_as_printed:
+    - component: SiO2
+      content_m_o: '70.175'
+    - component: Na2O
+      content_m_o: '13.190'
+    - component: CaO
+      content_m_o: '10.046'
+    - component: MgO
+      content_m_o: '5.852'
+    - component: Al2O3
+      content_m_o: '0.319'
+    - component: SO2
+      content_m_o: '0.242'
+    - component: Fe2O3
+      content_m_o: '0.035'
+    - component: Cl
+      content_m_o: '0.106'
+    - component: TiO2
+      content_m_o: '0.035'
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table1_float_glass_composition
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1268_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-344.5'
+    T_K: '1268'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1268'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1268_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1272_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-356.1'
+    T_K: '1272'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1272'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1272_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1300_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-346.4'
+    T_K: '1300'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1300_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1307_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-339.5'
+    T_K: '1307'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1307'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1307_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1325_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-342.7'
+    T_K: '1325'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1325_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1341_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-336.5'
+    T_K: '1341'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1341'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1341_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1348_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-338.5'
+    T_K: '1348'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1348_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1373_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-335.5'
+    T_K: '1373'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1373_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table2_silicate_1375_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_sodium_silicate_check
+  locator:
+    page: 3
+    table: '2'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-331.2'
+    T_K: '1375'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1375'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          amount_basis: mole_percent
+          components:
+          - - SiO2
+            - '65.7'
+          - - Na2O
+            - '34.3'
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table2_silicate_1375_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1296_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-121.9'
+    T_K: '1296'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1296'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1296_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1296_lowering_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-123.4'
+    T_K: '1296'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1296'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1296_lowering_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1302_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-118.5'
+    T_K: '1302'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1302'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1302_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1325_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-110.8'
+    T_K: '1325'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1325_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1325_lowering_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-112.3'
+    T_K: '1325'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1325_lowering_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1333_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-108.4'
+    T_K: '1333'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1333'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1333_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1348_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-103.2'
+    T_K: '1348'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1348_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1348_lowering_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-106.7'
+    T_K: '1348'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1348_lowering_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1354_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-100.6'
+    T_K: '1354'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1354'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1354_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1365_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-97.4'
+    T_K: '1365'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1365'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1365_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1365_lowering_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-98.4'
+    T_K: '1365'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1365'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1365_lowering_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O
+- observation_id: kim_2004_table3_glass_1370_emf_input
+  type: electrochemical_measurement_input
+  experiment: kim_2004_float_glass
+  locator:
+    page: 4
+    table: '3'
+  phase: l
+  units: mV
+  values:
+    quantity: electromotive_force
+    method_class: measured_direct
+    admission_status: typed_refusal
+    reason: No electromotive-force quantity token exists in the current schema; retained as the printed input to the activity
+      reduction.
+    EMF_mV_as_printed: '-95.2'
+    T_K: '1370'
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1370'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+  context_id: kim-2004-na2o-float-glass-emf::context::kim_2004_table3_glass_1370_emf_input
+  work_id: 10.1016/j.tca.2003.12.022
+  source_id: kim-2004-na2o-float-glass-emf
+  species: Na2O

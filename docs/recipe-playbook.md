@@ -214,7 +214,7 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 
 **Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but ignored by the post-V1c shuttle gate, which refuses K→FeO at any practical melt T.)
 
-**pN₂ setpoint** (5–15 mbar band): controls viscous-flow regime and transport capacity. The transport limit for the hot-wall pipe at 8–12 mbar is 7–16 g/s SiO. Reducing pN₂ below ~5 mbar risks transitioning into the molecular-flow regime where directional sweep fails and cold-wall fouling increases sharply.
+**pN₂ setpoint** (5–15 mbar band): provides engineering margin above the viscous-flow boundary and controls transport capacity. For the hot-wall pipe, the boundary is about 0.318 mbar at 1500 °C; the transport limit at 8–12 mbar is 7–16 g/s SiO. Pressures below 5 mbar reduce the margin but do not by themselves imply molecular flow. See [the pN₂ boundary derivation](concepts.md#pn₂-sweep-gas).
 
 ## Diagnostic patterns
 

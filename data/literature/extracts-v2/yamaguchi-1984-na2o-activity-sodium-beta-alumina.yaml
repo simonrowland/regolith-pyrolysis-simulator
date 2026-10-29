@@ -1,0 +1,154 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+observations:
+- observation_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina::yamaguchi_1984_abstract_na2o_activity_1573k::T=1573:h=745a905fc749
+  experiment_id: 0158f807f233f326df2e217dc9130e7ad86c1f467d915014afc21831a975c06a::experiment::yamaguchi-1984-na2o-p2o5-emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.5'
+        - - P2O5
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000001'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The abstract says about 10^-13; no numeric uncertainty or confidence level is stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Present work; abstract summary of the authors' EMF measurements.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027naA2-yamaguchi-1984-na2o-activity-sod
+      date: '2026-10-27'
+      evidence:
+        page: 1
+        published_page: 43
+        section: Abstract
+        note: The abstract reports about 10^-13 for the binary Na2O-P2O5 melt at XNa2O=0.5 and 1573 K.
+  notices: []
+  source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
+  locator:
+    page: 1
+    published_page: 43
+    section: Abstract
+  read_from: pdf:yamaguchi-1984-na2o-activity-sodium-beta-alumina
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 1
+        published_page: 43
+        section: Abstract
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction_with_binary_complement
+          components:
+          - - Na2O
+            - '0.5'
+          - - P2O5
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        published_page: 43
+        section: Abstract
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published_for_this_point
+      locator:
+        page: 1
+        published_page: 43
+        section: Abstract
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:yamaguchi-1984-na2o-activity-sodium-beta-alumina
+    parameters: []
+    output_unit: dimensionless activity
+    references: []

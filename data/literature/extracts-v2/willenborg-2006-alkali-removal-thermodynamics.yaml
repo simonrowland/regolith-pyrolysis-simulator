@@ -1,0 +1,529 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml
+observations:
+- observation_id: willenborg-2006-alkali-removal-thermodynamics::willenborg_2006_alsi8mg8na1_na2o_activity_1400::T=1673.15:h=85e5a6e4120b
+  experiment_id: 10.1021/ef060305k::willenborg-2006-alkali-removal-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.7698406683728200688200463962'
+        - - Al2O3
+          - '0.1047453390839398408630788731'
+        - - MgO
+          - '0.1151355433924902382080556251'
+        - - Na2O
+          - '0.01027844915074985210881910494'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000002'
+    approximate: true
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-run uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Willenborg et al. (2006), present work.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na4-will06
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+  notices: []
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  locator:
+    page: 5
+    published_page: 2597
+    pdf_page_index: 4
+    section: Results and Discussion
+  read_from: pdf:willenborg-2006-alkali-removal-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.7698406683728200688200463962'
+          - - Al2O3
+            - '0.1047453390839398408630788731'
+          - - MgO
+            - '0.1151355433924902382080556251'
+          - - Na2O
+            - '0.01027844915074985210881910494'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2594
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, AlSi8Mg8Na1 row; mass percent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.06'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.43'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '1.02'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Mg8Na1 row; mass percent.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '17.1'
+          MgO: '7.43'
+          Na2O: '1.02'
+          SiO2: '74.06'
+      locator:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: Printed 1400 °C; converted to kelvin.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 5
+              published_page: 2597
+              pdf_page_index: 4
+              section: Results and Discussion
+              note: Printed 1400 °C; converted to kelvin.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 2597
+              pdf_page_index: 4
+              section: Results and Discussion
+              note: Printed 1400 °C; converted to kelvin.
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:willenborg-2006-alkali-removal-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+- observation_id: willenborg-2006-alkali-removal-thermodynamics::willenborg_2006_alsi8na1_na2o_activity_1400::T=1673.15:h=885c70dc26e3
+  experiment_id: 10.1021/ef060305k::willenborg-2006-alkali-removal-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.8750283733676129442082945075'
+        - - Al2O3
+          - '0.1123187334502675436047402854'
+        - - Na2O
+          - '0.01265289318211951218696520721'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000000005'
+    approximate: true
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-run uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Willenborg et al. (2006), present work.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na4-will06
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+  notices: []
+  source_id: willenborg-2006-alkali-removal-thermodynamics
+  locator:
+    page: 5
+    published_page: 2597
+    pdf_page_index: 4
+    section: Results and Discussion
+  read_from: pdf:willenborg-2006-alkali-removal-thermodynamics
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.8750283733676129442082945075'
+          - - Al2O3
+            - '0.1123187334502675436047402854'
+          - - Na2O
+            - '0.01265289318211951218696520721'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2594
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, AlSi8Na1 row; mass percent.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '81.12'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.67'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '1.21'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              published_page: 2594
+              pdf_page_index: 1
+              table: '2'
+              note: Table 2, AlSi8Na1 row; mass percent.
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '17.67'
+          Na2O: '1.21'
+          SiO2: '81.12'
+      locator:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 5
+        published_page: 2597
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: Printed 1400 °C; converted to kelvin.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 5
+              published_page: 2597
+              pdf_page_index: 4
+              section: Results and Discussion
+              note: Printed 1400 °C; converted to kelvin.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 2597
+              pdf_page_index: 4
+              section: Results and Discussion
+              note: Printed 1400 °C; converted to kelvin.
+        output_unit: K
+        references: []
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:willenborg-2006-alkali-removal-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []

@@ -5574,6 +5574,17 @@ def _summary_products_payload(record: StudyRecord | None) -> Mapping[str, Any] |
         rump_oxides = _oxide_wt_pct_from_kg(
             _species_kg_from_classes(classes, "refractory_ceramic_rump")
         )
+    silica = _mapping_or_empty(classes.get("pure_silica_glass"))
+    silica_flag = _mapping_or_empty(silica.get("flag"))
+    glass_unavailable = (
+        silica_flag.get("status") == "unavailable"
+        or _optional_float(silica.get("class_total_kg")) is None
+    )
+    glass_status = "unavailable" if glass_unavailable else "available"
+    glass_status_reason = str(
+        silica_flag.get("reason")
+        or ("glass_quantity_unavailable" if glass_unavailable else "")
+    )
     return {
         "oxygen_kg": _first_float(
             _nested_value(classes, ("metals_plus_O2", "O2_kg")),
@@ -5587,7 +5598,13 @@ def _summary_products_payload(record: StudyRecord | None) -> Mapping[str, Any] |
             "metals_plus_O2",
             species_keys=("kg_by_species", "metals_kg_by_species"),
         ),
-        "glass_kg": _species_kg_from_classes(classes, "glass", "pure_silica_glass"),
+        "glass_kg": (
+            None
+            if glass_unavailable
+            else _species_kg_from_classes(classes, "glass", "pure_silica_glass")
+        ),
+        "glass_status": glass_status,
+        "glass_status_reason": glass_status_reason,
         "volatiles_captured_kg": _species_kg_from_classes(
             classes,
             "captured_volatiles",

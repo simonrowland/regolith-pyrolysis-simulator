@@ -70,7 +70,7 @@ NEW_RUN_TICK_JS = r"""
 """
 
 
-@pytest.mark.timeout(CONTROL_JOURNEY_TIMEOUT_S)
+@pytest.mark.cpu_budget(CONTROL_JOURNEY_TIMEOUT_S)
 def test_pause_resume_cancel_restart_journey(page, evidence, artifacts_dir):
     step_results: list[tuple[str, bool, str]] = []
     first_run_id: str | None = None

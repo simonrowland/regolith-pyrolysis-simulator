@@ -1,0 +1,66 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150
+  citation: Asai, K., Yokokawa, T. & Maekawa, T. (1982). Na2O activity in Na2O–B2O3–Al2O3 melts. Nippon Kagaku Kaishi 1982(6),
+    1005–1009.
+  source_ids:
+  - asai-yokokawa-maekawa-1982-na-borate-activity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:asai-yokokawa-maekawa-1982-na-borate-activity
+      role: pdf
+      path: raw/asai-yokokawa-maekawa-1982-na-borate-activity/asai-yokokawa-maekawa-1982-na-borate-activity.pdf
+      sha256:
+        tag: value
+        value: ec6f5f79d587c75eb8db64f5163135f3786a0cb00cb8ed485910bf2646fa3ad3
+    - asset_id: pdftotext:asai-yokokawa-maekawa-1982-na-borate-activity
+      role: pdftotext
+      path: text/asai-yokokawa-maekawa-1982-na-borate-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:asai-yokokawa-maekawa-1982-na-borate-activity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'emf_concentration_cell' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150
+  locator:
+    page: 4
+    published_page: 1008
+    pdf_page_index: 3
+    table: '2'
+    note: row_label=Na2O + 2 B2O3 + 0.4 Al2O3

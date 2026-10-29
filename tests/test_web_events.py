@@ -2740,13 +2740,28 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
         state, _ = _current_simulation_state(new_sids.pop())
         assert state is not None
         sim = state["session"].simulator
-        assert sim.campaign_mgr.furnace_max_T_C == pytest.approx(1200)
+        from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+        assert sim.campaign_mgr.furnace_max_T_C == FURNACE_MAX_T_BOUNDS_C[0]
         assert state["recipe_inputs"]["furnace_material_id"] == "fused_silica"
-        assert state["recipe_inputs"]["furnace_max_T_C"] == pytest.approx(1200)
+        assert (
+            state["recipe_inputs"]["furnace_max_T_C"]
+            == FURNACE_MAX_T_BOUNDS_C[0]
+        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_fused_silica_clamp_regression_uses_exact_material_floor():
+    import inspect
+
+    source = inspect.getsource(
+        test_web_start_event_applies_furnace_material_after_recipe_patch
+    )
+    assert "pytest.approx(1200)" not in source
+    assert source.count("== FURNACE_MAX_T_BOUNDS_C[0]") == 2
 
 
 @pytest.mark.parametrize(
@@ -4651,9 +4666,10 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
 
 
 @pytest.mark.parametrize("pressure_mbar", [0.0004, 0.0])
-def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
+def test_tick_payload_preserves_pressure_values(pressure_mbar):
     sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
     snapshot.overhead.pressure_mbar = pressure_mbar
+    sim.melt.p_total_mbar = pressure_mbar
 
     payload = _tick_payload(
         sim=sim,
@@ -4662,12 +4678,19 @@ def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
         backend_status="internal-analytical",
         backend_authoritative=False,
     )
-    serialized = json.loads(json.dumps({"pressure_mbar": payload["pressure_mbar"]}))
+    serialized = json.loads(json.dumps({
+        "pressure_mbar": payload["pressure_mbar"],
+        "p_total_mbar": payload["p_total_mbar"],
+    }))
 
     assert type(payload["pressure_mbar"]) is float
     assert payload["pressure_mbar"] == pressure_mbar
     assert type(serialized["pressure_mbar"]) is float
     assert serialized["pressure_mbar"] == pressure_mbar
+    assert type(payload["p_total_mbar"]) is float
+    assert payload["p_total_mbar"] == pressure_mbar
+    assert type(serialized["p_total_mbar"]) is float
+    assert serialized["p_total_mbar"] == pressure_mbar
 
 
 def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
