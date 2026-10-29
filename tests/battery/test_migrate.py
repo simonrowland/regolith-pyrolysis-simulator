@@ -3830,73 +3830,116 @@ def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
 
 
 def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
-    report_path = REPO_ROOT / "data" / "battery" / "migration-report.md"
-    works_dir = REPO_ROOT / "data" / "literature" / "works"
-    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
-    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
-    if not report_path.is_file() or not any(works_dir.glob("*.yaml")):
-        pytest.skip("migrated store not generated yet")
-    works, experiments, observations = load_migrated_store(REPO_ROOT)
-    assert works
-    assert observations
-    figure_only = observations[
+    report_path = REPO_ROOT / "data" / "battery" / "store-validation.json"
+    refresh = "run scripts/battery_validate_store.py after a scratch migrate"
+    assert report_path.is_file(), f"missing store validation record; {refresh}"
+    record = json.loads(report_path.read_text(encoding="utf-8"))
+    from simulator.battery.score import derive_store_stamp
+
+    assert record.get("store_stamp") == derive_store_stamp(REPO_ROOT), (
+        f"stale store validation record; {refresh}"
+    )
+    assert record.get("forbidden_shape_count") == 0, record
+
+
+def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_shape(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True)
+    store_path = next((root / "data" / "literature" / "extracts-v2").glob("*.yaml"))
+    store = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+    observations = store["observations"]
+    observations[0]["observation_id"] = (
         "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
+    )
+    observations[0]["admission"] = {"status": "pending", "reason": "fixture pending"}
+    observations[0]["notices"] = []
+    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
+
+    git = ["git", "-C", str(root)]
+    subprocess.run([*git, "init"], check=True, capture_output=True, text=True)
+    subprocess.run(
+        [*git, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.org", "add", "-A"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [
+            *git,
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.org",
+            "commit",
+            "-m",
+            "fixture store",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    command = [
+        sys.executable,
+        str(REPO_ROOT / "scripts" / "battery_validate_store.py"),
+        "--root",
+        str(root),
     ]
-    assert figure_only.admission.status is AdmissionStatus.PENDING
-    assert not any(
-        notice.kind is NoticeKind.ADMISSION_DEFAULTED
-        for notice in figure_only.notices
-    )
-    referenced_context_ids = set()
-    for observation in observations.values():
-        referenced_context_ids.update(
-            parent
-            for parent in observation.derived_from or ()
-            if "::context::" in parent
+
+    def run_script() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
         )
-        if observation.derivation is not None:
-            referenced_context_ids.update(
-                parent
-                for parent in observation.derivation.inputs
-                if "::context::" in parent
-            )
-    referenced_context_ids.update(
-        experiment.equipment_context_id
-        for experiment in experiments.values()
-        if experiment.equipment_context_id is not None
+
+    first = run_script()
+    assert first.returncode == 0, first.stderr
+    output_path = root / "data" / "battery" / "store-validation.json"
+    first_bytes = output_path.read_bytes()
+    assert first_bytes.endswith(b"\n")
+    first_record = json.loads(first_bytes)
+    assert set(first_record) == {
+        "store_stamp",
+        "hard_issue_counts_by_shape",
+        "forbidden_shape_count",
+    }
+    assert list(first_record["hard_issue_counts_by_shape"]) == sorted(
+        first_record["hard_issue_counts_by_shape"]
     )
-    context_rows = {}
-    for work_path in works_dir.glob("*.yaml"):
-        source = work_path.read_text(encoding="utf-8")
-        if not any(context_id in source for context_id in referenced_context_ids):
-            continue
-        payload = yaml.safe_load(source) or {}
-        for row in payload.get("context") or ():
-            context_id = str(row["context_id"])
-            if context_id in referenced_context_ids:
-                context_rows[context_id] = row
-    report = validate_corpus(
-        works,
-        experiments,
-        observations,
-        residuals=None,
-        context_rows=context_rows,
+    assert first_bytes == (
+        json.dumps(
+            first_record,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode("utf-8")
+    assert "HEAD sha:" in first.stdout
+    assert "wall seconds:" in first.stdout
+    assert "process CPU seconds:" in first.stdout
+
+    second = run_script()
+    assert second.returncode == 0, second.stderr
+    assert output_path.read_bytes() == first_bytes
+
+    observations[1]["experiment_id"] = "missing-fixture-experiment"
+    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
+    mutated = run_script()
+    assert mutated.returncode == 1, mutated.stderr
+    mutated_record = json.loads(output_path.read_text(encoding="utf-8"))
+    assert mutated_record["forbidden_shape_count"] > 0
+    assert list(mutated_record["hard_issue_counts_by_shape"]) == sorted(
+        mutated_record["hard_issue_counts_by_shape"]
     )
-    # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
-    # hard conditional_field, not a silent pass. The same holds for a row that
-    # declares quoted_attributed but states no attribution: the canonical
-    # token now maps to its class, so the missing field is reported instead of
-    # the row falling to unknown. Invalid raw_inputs declarations and every
-    # other unlisted conditional field remain hard failures.
-    expected_conditional_fields = (
-        ".derived_from",
-        ".derivation",
-        ".attribution",
-    )
-    for issue in report.hard_issues:
-        assert issue.reason.value == "conditional_field", issue
-        assert issue.path.endswith(expected_conditional_fields), issue
-    assert extracts_v2.is_dir() or obs_dir.is_dir()
 
 
 def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None:
