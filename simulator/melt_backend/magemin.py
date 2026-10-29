@@ -111,7 +111,12 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
+from simulator.chemistry.qfm_oneill import (
+    _ONEILL_QFM_REFERENCE_BAND_K,
+    oneill_qfm_log10_fO2_bar,
+    _magemin_corrected_buffer_offset,
+    _oneill_qfm_outside_reference_band,
+)
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -151,11 +156,19 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseUnsupportedDatabaseError,
 )
 from simulator.state import OXIDE_SPECIES
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import finite_float, is_declared_real_scalar
 from simulator.feedstock_composition import (
     iron_oxide_feot_oxygen_wt_pct,
     iron_oxide_values,
 )
+
+
+# dump_function.c:1514 prints log10(fO2) with %e (six fractional digits).
+# For a 10-99-dex log that rounds at 5e-6 dex; two readouts in the correction
+# plus six-decimal n serialization (s=1.0000202 dex/n) bound roundoff at
+# 1.05e-5 dex. Round that bound up to one significant digit: 2e-5 dex.
+# This is a text-resolution tolerance, not a fit to an equilibrium result.
+_MAGEMIN_FO2_TOL_DEX = 2.0e-5
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -354,9 +367,16 @@ class _MAGEMinModeVectorMassDeficit(RuntimeError):
 class _MAGEMinEngineCallError(RuntimeError):
     """An exception raised by a MAGEMin engine call, with its source type."""
 
-    def __init__(self, exception_type: str, message: str) -> None:
+    def __init__(
+        self,
+        exception_type: str,
+        message: str,
+        *,
+        failure_disposition: Optional[str] = None,
+    ) -> None:
         self.exception_type = exception_type
         self.engine_message = message
+        self.failure_disposition = failure_disposition
         super().__init__(f'{exception_type}: {message}')
 
 
@@ -1674,6 +1694,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if exc.failure_disposition is not None:
+                failure_diagnostics['backend_failure_disposition'] = (
+                    exc.failure_disposition
+                )
             if isinstance(exc, _MAGEMinDeclaredInputError):
                 failure_diagnostics['reason'] = 'invalid_input'
             return EquilibriumResult(
@@ -1721,40 +1745,48 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 warnings=[*all_warnings, message],
                 diagnostics=result_diagnostics,
             )
+        if not (isinstance(raw, Mapping) and 'operating_point_diagnostics' in raw):
+            # MAGEMin_C's stable-system fO2 is already log10(fO2/bar),
+            # dump_function.c:127; ph is its stable phase-name list.
+            read = (
+                raw.get if isinstance(raw, Mapping)
+                else lambda key: getattr(raw, key, None)
+            )
+            phase_names = read('ph')
+            operating_point = self._fo2_operating_point(
+                fO2_log, read('fO2'),
+                phase_names is not None and any(
+                    name in self._BUFFER_CHOICES for name in phase_names
+                ),
+            )
+        else:
+            operating_point = raw['operating_point_diagnostics']
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
                 if line not in all_warnings:
                     all_warnings.append(line)
-            operating_point = raw.get('operating_point_diagnostics') or {}
-            if isinstance(operating_point, Mapping):
-                result_diagnostics.update(dict(operating_point))
-                solved_fO2_log = operating_point.get('solved_fO2_log')
-                if solved_fO2_log is not None:
-                    result_fO2_log = float(solved_fO2_log)
-                requested_point_non_authoritative = (
-                    bool(operating_point.get('operating_point_clamped'))
-                    or operating_point.get(
-                        'authoritative_for_requested_conditions'
-                    ) is False
-                )
-                if requested_point_non_authoritative:
-                    result_status = 'out_of_domain'
-                    result_diagnostics['backend_status'] = 'out_of_domain'
-                    result_diagnostics.setdefault(
-                        'backend_status_reason',
-                        'clamped_operating_point',
-                    )
+        result_diagnostics.update(operating_point)
+        result_fO2_log = operating_point['solved_fO2_log']
+        if operating_point['authoritative_for_requested_conditions'] is False:
+            result_status = operating_point['backend_status']
+            all_warnings.append(str(operating_point['fO2_control_notice']))
         if isinstance(raw, Mapping):
             mode_deficit = raw.get('mode_vector_mass_deficit')
             if isinstance(mode_deficit, Mapping):
                 mode_sum = float(mode_deficit['mode_sum'])
                 deficit = float(mode_deficit['deficit'])
+                # Native control failure takes precedence over incomplete Mode
+                # evidence: preserve its numerical reason for gate hold/floor.
+                # A deficit alone remains out_of_domain; record it in both cases.
+                if result_status == 'ok':
+                    result_status = 'out_of_domain'
+                    result_diagnostics.update({
+                        'backend_status': result_status,
+                        'backend_status_reason': MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
+                    })
                 result_diagnostics.update({
-                    'backend_status': 'out_of_domain',
-                    'backend_status_reason': (
-                        MAGEMIN_MODE_VECTOR_MASS_DEFICIT
-                    ),
+                    MAGEMIN_MODE_VECTOR_MASS_DEFICIT: True,
                     'magemin_mode_vector_raw_sum': mode_sum,
                     'magemin_mode_vector_deficit': deficit,
                     'magemin_mode_vector_input_components': {
@@ -1783,7 +1815,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     temperature_C=temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=result_fO2_log,
-                    status='out_of_domain',
+                    status=result_status,
                     warnings=[*all_warnings, message],
                     diagnostics=result_diagnostics,
                 )
@@ -1846,6 +1878,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     continue
                 if math.isfinite(value) and value > 0.0:
                     native_activities[formula] = value
+        if result_status == 'not_converged':
+            return EquilibriumResult(
+                temperature_C=temperature_C, pressure_bar=pressure_bar,
+                fO2_log=result_fO2_log, status=result_status,
+                warnings=all_warnings, diagnostics=result_diagnostics,
+            )
         (
             phases_present,
             phase_masses_kg,
@@ -2040,6 +2078,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 ),
             )
             diagnostics['projected_liquidus_status'] = projected.status
+            diagnostics['projected_liquidus_diagnostics'] = dict(
+                projected.diagnostics or {}
+            )
             diagnostics['composition_projected_notice'] = notice
             if (
                 projected.status == 'ok'
@@ -2067,6 +2108,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
             warnings_out = [
                 *warnings_out,
+                *projected.warnings,
                 (
                     'composition_projected bulk has no projected liquidus; '
                     f'status={projected.status}'
@@ -2820,6 +2862,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             diagnostic_detail,
                         )
                         raise timeout from exc
+                    except (
+                        OSError,
+                        subprocess.SubprocessError,
+                        MemoryError,
+                    ) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin warm worker could not be started: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
@@ -2847,7 +2899,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             == _MAGEMinEngineLifecycleError.__name__
                             else _MAGEMinEngineCallError
                         )
-                        raise error_type(exception_type, engine_message) from exc
+                        raise error_type(
+                            exception_type,
+                            engine_message,
+                            failure_disposition=exc.failure_disposition,
+                        ) from exc
 
                     remote_exception = getattr(builtins, exc.exc_name, None)
                     remote_message = (
@@ -2929,6 +2985,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 subprocess_exc.exception_type,
                 f'{message}; subprocess retry failed: '
                 f'{subprocess_exc.engine_message}',
+                failure_disposition=subprocess_exc.failure_disposition,
             ) from subprocess_exc
         warnings_out = tuple(raw.get('buffer_warnings') or ())
         return {**raw, 'buffer_warnings': (message, *warnings_out)}
@@ -2984,12 +3041,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         binary echoes back is dropped — it is a control row, not a
         material phase.
 
-        The caller's absolute ``fO2_log`` is honoured by translating it
-        into MAGEMin's ``--buffer + --buffer_n`` form via
-        ``_resolve_buffer`` (O'Neill 1987 QFM calibration); the
-        substitution warning is returned alongside the parsed phase
-        block so ``equilibrate`` can surface it on the
-        ``EquilibriumResult``.
+        ``_resolve_buffer`` supplies an initial QFM offset. Native solved
+        oxygen potential determines the honour verdict; one correction of
+        an active QFM buffer removes the external-reference zero-point gap.
 
         Returns a typed mode-deficit marker when a finite mode row omits mass.
         Raises ``RuntimeError`` on a non-zero exit, a timeout, or other
@@ -3004,44 +3058,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fO2_log=fO2_log,
             )
         )
-        solved_fO2_log: Optional[float]
-        if buffer_name == 'qfm':
-            solved_fO2_log = self._qfm_logfo2_oneill(temperature_C) + buffer_n
-        else:
-            solved_fO2_log = None
-        if solved_fO2_log is None:
-            fO2_clamped = True
-        else:
-            fO2_clamped = not math.isclose(
-                float(solved_fO2_log),
-                float(fO2_log),
-                rel_tol=0.0,
-                abs_tol=1.0e-9,
-            )
-        operating_point_diagnostics: Dict[str, Any] = {
-            'requested_fO2_log': float(fO2_log),
-            'applied_fO2_buffer': buffer_name,
-            'applied_fO2_buffer_n': float(buffer_n),
-            'solved_fO2_log': solved_fO2_log,
-            'fO2_clamped': fO2_clamped,
-            'authoritative_for_requested_conditions': not fO2_clamped,
-            'authoritative_for_solved_conditions': solved_fO2_log is not None,
-        }
-        if fO2_clamped:
-            operating_point_diagnostics.update({
-                'operating_point_clamped': True,
-                'backend_status': 'out_of_domain',
-                'backend_status_reason': 'clamped_operating_point',
-            })
-
+        # The native dump is required even for compact calls: argv algebra
+        # cannot establish the oxygen potential that the minimizer solved.
+        args.append('--out_matlab=1')
         if capture_native_activities:
-            # Same argv owner as the Verb=0 golden. Native activities only
-            # raise verbosity and request the matlab dump the parser reads.
-            args = [
-                '--Verb=1' if item == '--Verb=0' else item
-                for item in args
-            ]
-            args.append('--out_matlab=1')
+            args = ['--Verb=1' if item == '--Verb=0' else item for item in args]
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -3067,32 +3088,81 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin call cancelled while waiting for subprocess slot',
                 )
             with tempfile.TemporaryDirectory() as tmpdir:
-                try:
-                    completed = subprocess.run(  # noqa: S603 - adapter-built
-                        args,
-                        cwd=tmpdir,
-                        capture_output=True,
-                        text=True,
-                        timeout=remaining_timeout_s,
-                        check=False,
+                for attempt in range(2):
+                    remaining_timeout_s = self._residual_call_timeout_s(
+                        timeout_s, call_started,
                     )
-                    if capture_native_activities:
-                        matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
-                        matlab_text = (
-                            matlab_path.read_text()
-                            if matlab_path.exists()
-                            else ''
+                    try:
+                        completed = subprocess.run(  # noqa: S603 - adapter-built
+                            args,
+                            cwd=tmpdir,
+                            capture_output=True,
+                            text=True,
+                            timeout=remaining_timeout_s,
+                            check=False,
                         )
-                except subprocess.TimeoutExpired as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__, f'MAGEMin binary timed out after '
-                        f'{timeout_s:g}s'
-                    ) from exc
-                except OSError as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__,
-                        f'MAGEMin binary could not be executed: {exc}',
-                    ) from exc
+                    except subprocess.TimeoutExpired as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__, f'MAGEMin binary timed out after '
+                            f'{timeout_s:g}s',
+                            failure_disposition='environment',
+                        ) from exc
+                    except (subprocess.SubprocessError, MemoryError) as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin binary launch failed: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
+                    except OSError as exc:
+                        raise _MAGEMinEngineCallError(
+                            type(exc).__name__,
+                            f'MAGEMin binary could not be executed: {exc}',
+                            failure_disposition='environment',
+                        ) from exc
+                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    matlab_text = matlab_path.read_text() if matlab_path.exists() else ''
+                    native_log, buffer_present = self._read_subprocess_fo2(
+                        completed.stdout or '', matlab_text, buffer_name,
+                    )
+                    if (completed.returncode != 0 or attempt == 1
+                            or buffer_name != 'qfm' or not buffer_present
+                            or native_log is None
+                            or abs(native_log - fO2_log) <= _MAGEMIN_FO2_TOL_DEX):
+                        break
+                    buffer_n = _magemin_corrected_buffer_offset(
+                        float(f'{buffer_n:.6f}'), fO2_log, native_log,
+                    )
+                    buffer_warnings = (*buffer_warnings, (
+                        f'MAGEMin: native fO2_log={native_log:.7g} differs from '
+                        f'requested {fO2_log:.7g}; one QFM correction to '
+                        f'--buffer_n={buffer_n:.6f}'
+                    ))
+                    args = [
+                        f'--buffer_n={buffer_n:.6f}'
+                        if item.startswith('--buffer_n=') else item for item in args
+                    ]
+                    # Never accept a stale first-attempt dump as a readback.
+                    if matlab_path.exists():
+                        matlab_path.unlink()
+
+        operating_point_diagnostics = self._fo2_operating_point(
+            fO2_log, native_log, buffer_present,
+        )
+        operating_point_diagnostics.update({
+            'applied_fO2_buffer': buffer_name,
+            'applied_fO2_buffer_n': float(f'{buffer_n:.6f}'),
+        })
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + 273.15):
+            operating_point_diagnostics['qfm_reference_notice'] = {
+                'kind': 'out_of_certified_band', 'authority': 'extrapolated',
+                'reference': 'PySulfSat Oneill linearisation; initial offset only',
+                'temperature_K': temperature_C + 273.15,
+                'certified_temperature_K': list(_ONEILL_QFM_REFERENCE_BAND_K),
+            }
+            buffer_warnings = (*buffer_warnings, (
+                'MAGEMin QFM initial-offset reference: out_of_certified_band '
+                f'at {temperature_C + 273.15:g} K (extrapolated)'
+            ))
 
         if completed.returncode != 0:
             stderr = (completed.stderr or '').strip()
@@ -3293,18 +3363,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         ΔQFM idiom used elsewhere in this codebase) — see MAGEMin's
         ``examples/MAGEMin_C_single_point_with_buffer.jl`` and the
         ``pp_min_function.c`` Gibbs-energy correction
-        ``z_b.T * 0.019145 * gv.buffer_n``.  The substitution must
-        honour the caller's absolute value: this method computes
-        ``delta = fO2_log - QFM(T)`` and returns it as the buffer
-        offset so the subprocess receives the requested fO2 instead of
-        silently snapping to the named buffer.
+        ``z_b.T * 0.019145 * gv.buffer_n``. This method computes only an
+        initial offset, ``delta = fO2_log - QFM(T)``. The subprocess path
+        corrects against native readback and verifies buffer participation;
+        this external-reference estimate cannot establish an honour verdict.
 
         An explicit ``fO2_buffer`` config (one of the legacy named
         buffers ``qfm``, ``mw``, ``qif``, ``nno``, ``hm``, ``cco``)
         overrides the offset-translation path and is passed through
         with ``buffer_n=0.0`` for backwards compatibility — the
         substitution warning still names the buffer so callers can
-        spot mismatches.  Today only ``qfm`` has a calibration table
+        spot mismatches. Today only ``qfm`` has an initial-reference estimate
         here; configuring any other buffer keeps the legacy "named
         buffer only" behaviour but is flagged as a warning so the
         caller knows their absolute fO2 was NOT honoured.
@@ -3335,14 +3404,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
                     f'{temperature_C:.2f} C to --buffer=qfm '
                     f'--buffer_n={buffer_n:.4f} '
-                    "(O'Neill 1987 QFM calibration)"
+                    '(PySulfSat Oneill linearisation; initial offset)'
                 )
                 return 'qfm', buffer_n, warnings_out
             warnings_out.append(
                 f'MAGEMin: configured fO2_buffer={name!r} has no offset '
                 f'calibration in this adapter; passing --buffer={name} '
                 f'with --buffer_n=0 so the absolute fO2_log={fO2_log:.4f} '
-                'is NOT honoured'
+                'requires native readback to establish honour'
             )
             return name, 0.0, warnings_out
 
@@ -3352,9 +3421,52 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
             f'{temperature_C:.2f} C to --buffer=qfm '
             f'--buffer_n={buffer_n:.4f} '
-            "(O'Neill 1987 QFM calibration)"
+            '(PySulfSat Oneill linearisation; initial offset)'
         )
         return 'qfm', buffer_n, warnings_out
+
+    @staticmethod
+    def _fo2_operating_point(
+        requested: float, native: Any, buffer_present: bool,
+    ) -> Dict[str, Any]:
+        solved = finite_float(native)
+        delta = None if solved is None else solved - requested
+        honoured = (
+            buffer_present and delta is not None
+            and abs(delta) <= _MAGEMIN_FO2_TOL_DEX
+        )
+        diagnostics = {
+            'requested_fO2_log': requested, 'solved_fO2_log': solved,
+            'buffer_phase_present': buffer_present, 'fO2_clamped': not honoured,
+            'authoritative_for_requested_conditions': honoured,
+            'authoritative_for_solved_conditions': solved is not None and buffer_present,
+        }
+        if not honoured:
+            diagnostics.update({
+                'operating_point_clamped': True,
+                'backend_status': ('not_converged' if solved is None or not buffer_present
+                                   else 'out_of_domain'),
+                'backend_status_reason': 'engine_not_converged',
+                'backend_failure_disposition': 'numerical',
+                'fO2_control_notice': {
+                    'requested_fO2_log': requested, 'native_fO2_log': solved,
+                    'delta_log10': delta, 'buffer_phase_present': buffer_present,
+                    'reason': 'native fO2 or buffer does not honour requested controls',
+                },
+            })
+        return diagnostics
+
+    @staticmethod
+    def _read_subprocess_fo2(
+        stdout: str, matlab_text: str, buffer_name: str,
+    ) -> Tuple[Optional[float], bool]:
+        # Native solved chemical potential, never the commanded buffer offset:
+        # MAGEMin src/dump_function.c:1514, output/_matlab_output.txt.
+        match = re.search(r'^\s*log10\(fO2\)\s+(\S+)', matlab_text, re.MULTILINE)
+        native = finite_float(match[1]) if match else None
+        phase_rows = re.findall(r'^\s*Phase\s*:\s*(.*)$', stdout, re.MULTILINE)
+        present = bool(phase_rows and buffer_name in phase_rows[-1].split())
+        return native, present
 
     @staticmethod
     def _parse_subprocess_stdout(
@@ -3466,7 +3578,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # ------------------------------------------------------------------
     #
     # This path never touches equilibrate(): it runs the binary with
-    # --Verb=1 --out_matlab=1.  The matlab dump is the bulk-echo guard only.
+    # --Verb=1 --out_matlab=1. The dump guards bulk echo and reports native fO2.
     #
     # G, S, Cp and H are one object: the pure endmember.  G is the Verb=1
     # pre-minimisation gbase (kJ per mol of the printed formula; Holland-
@@ -3675,6 +3787,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise PurePhaseAccessError(
                 'MAGEMin produced no output/_matlab_output.txt '
                 '(out_matlab=1); cannot verify the bulk echo'
+            )
+        native_log, buffer_present = self._read_subprocess_fo2(
+            completed.stdout or '', matlab_text, buffer_name,
+        )
+        # This accessor reads pre-minimisation standard-state endmember G,
+        # not an equilibrium at -9. Preserve the native control failure as
+        # a notice rather than certifying the probe's arbitrary redox input.
+        control = self._fo2_operating_point(-9.0, native_log, buffer_present)
+        buffer_warnings.append(f'MAGEMin pure-phase native fO2 readback: {control}')
+        if buffer_name == 'qfm' and _oneill_qfm_outside_reference_band(temperature_C + 273.15):
+            buffer_warnings.append(
+                'out_of_certified_band: QFM initial-offset reference is '
+                f'extrapolated at {temperature_C + 273.15:g} K; '
+                'the native endmember temperature was not clamped'
             )
         return completed.stdout or '', matlab_text, buffer_warnings
 
