@@ -2251,38 +2251,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2367,38 +2400,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2483,38 +2549,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2599,38 +2698,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2645,7 +2777,15 @@ species:
         basis_as_published: CaO mol% in Monoxide#1 as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 5.9
         value_as_published: '5.9'
       phase_as_published: Monoxide#1
@@ -2715,38 +2855,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2761,7 +2934,15 @@ species:
         basis_as_published: CaO mol% in Monoxide#2 as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 67.6
         value_as_published: '67.6'
       phase_as_published: Monoxide#2
@@ -2831,38 +3012,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -2877,7 +3091,15 @@ species:
         basis_as_published: CaO mol% in Zincite as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 3.8
         value_as_published: '3.8'
       phase_as_published: Zincite
@@ -2947,18 +3169,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -2971,14 +3205,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3063,18 +3312,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -3087,14 +3348,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3179,18 +3455,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -3203,14 +3491,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3295,18 +3598,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -3315,18 +3630,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3341,7 +3677,15 @@ species:
         basis_as_published: CaO mol% in Monoxide#1 as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 7.5
         value_as_published: '7.5'
       phase_as_published: Monoxide#1
@@ -3411,18 +3755,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -3431,18 +3787,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3457,7 +3834,15 @@ species:
         basis_as_published: CaO mol% in Monoxide#2 as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 64.4
         value_as_published: '64.4'
       phase_as_published: Monoxide#2
@@ -3527,18 +3912,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -3547,18 +3944,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -3573,7 +3991,15 @@ species:
         basis_as_published: CaO mol% in Slag as printed
         component_as_published: CaO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 36.0
         value_as_published: '36.0'
       phase_as_published: Slag
@@ -6714,38 +7140,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -6830,38 +7289,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -6946,38 +7438,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7062,38 +7587,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7108,7 +7666,15 @@ species:
         basis_as_published: MgO mol% in Monoxide#1 as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 45.6
         value_as_published: '45.6'
       phase_as_published: Monoxide#1
@@ -7178,38 +7744,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7224,7 +7823,15 @@ species:
         basis_as_published: MgO mol% in Monoxide#2 as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 5.6
         value_as_published: '5.6'
       phase_as_published: Monoxide#2
@@ -7294,38 +7901,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7340,7 +7980,15 @@ species:
         basis_as_published: MgO mol% in Zincite as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 15.1
         value_as_published: '15.1'
       phase_as_published: Zincite
@@ -7410,18 +8058,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -7434,14 +8094,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7526,18 +8201,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -7550,14 +8237,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7642,18 +8344,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -7666,14 +8380,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7758,18 +8487,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -7778,18 +8519,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7804,7 +8566,15 @@ species:
         basis_as_published: MgO mol% in Monoxide#1 as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 44.6
         value_as_published: '44.6'
       phase_as_published: Monoxide#1
@@ -7874,18 +8644,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -7894,18 +8676,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -7920,7 +8723,15 @@ species:
         basis_as_published: MgO mol% in Monoxide#2 as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 8.0
         value_as_published: '8.0'
       phase_as_published: Monoxide#2
@@ -7990,18 +8801,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -8010,18 +8833,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -8036,7 +8880,15 @@ species:
         basis_as_published: MgO mol% in Slag as printed
         component_as_published: MgO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 5.1
         value_as_published: '5.1'
       phase_as_published: Slag
@@ -11290,38 +12142,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11406,38 +12291,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11522,38 +12440,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '13'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '13'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11638,38 +12589,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11684,7 +12668,15 @@ species:
         basis_as_published: ZnO mol% in Monoxide#1 as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 48.5
         value_as_published: '48.5'
       phase_as_published: Monoxide#1
@@ -11754,38 +12746,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11800,7 +12825,15 @@ species:
         basis_as_published: ZnO mol% in Monoxide#2 as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 26.8
         value_as_published: '26.8'
       phase_as_published: Monoxide#2
@@ -11870,38 +12903,71 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
-            tag: unknown
-            reason: Table 1 leaves the equilibration-time cell blank for the 1550 °C group.
+            tag: value
+            value: 10
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '14'
+            row: '11'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 11'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '14'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -11916,7 +12982,15 @@ species:
         basis_as_published: ZnO mol% in Zincite as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1550
+        T_C:
+          value: 1550
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 13'
+            output_unit: C
         value: 81.1
         value_as_published: '81.1'
       phase_as_published: Zincite
@@ -11986,18 +13060,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12010,14 +13096,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12102,18 +13203,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12126,14 +13239,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12218,18 +13346,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '15'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12242,14 +13382,29 @@ species:
             published_page: 12738
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '15'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12334,18 +13489,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12354,18 +13521,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12380,7 +13568,15 @@ species:
         basis_as_published: ZnO mol% in Monoxide#1 as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 47.9
         value_as_published: '47.9'
       phase_as_published: Monoxide#1
@@ -12450,18 +13646,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12470,18 +13678,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12496,7 +13725,15 @@ species:
         basis_as_published: ZnO mol% in Monoxide#2 as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 27.6
         value_as_published: '27.6'
       phase_as_published: Monoxide#2
@@ -12566,18 +13803,30 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '7'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 7'
+            output_unit: as_published
         initial_composition_as_published:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value: 0.1CaO-0.2MgO-0.7ZnO
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '12'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: as_published
         equilibration_time_hours:
           state:
             tag: value
@@ -12586,18 +13835,39 @@ species:
             page: 4
             pdf_page_index: 3
             table: '1'
-            row: '16'
+            row: '15'
             published_page: 12738
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: h
         composition:
           state:
-            tag: unknown
-            reason: Table 1 leaves the initial-composition cell blank for this sample group.
+            tag: value
+            value:
+              basis: printed mole ratio
+              amount_basis: mole_fraction
+              components:
+              - - CaO
+                - '0.1'
+              - - MgO
+                - '0.2'
+              - - ZnO
+                - '0.7'
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 12738
             table: '1'
-            row: '16'
+            row: '12'
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 12'
+            output_unit: mole_fraction
         quench_provenance:
           state:
             tag: value
@@ -12612,7 +13882,15 @@ species:
         basis_as_published: ZnO mol% in Slag as printed
         component_as_published: ZnO
         method_class: measured_direct
-        T_C: 1600
+        T_C:
+          value: 1600
+          units: C
+          inference:
+            relation: extract_inference
+            inputs:
+              - 'table blank = same as above'
+              - 'source locator: Table 1 row 15'
+            output_unit: C
         value: 58.9
         value_as_published: '58.9'
       phase_as_published: Slag
@@ -13064,10 +14342,31 @@ experiments:
             - '0.2'
           - - ZnO
             - '0.7'
-      locator: *id013
+      locator: *id012
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 12'
+        output_unit: mole_fraction
     temperature_C: 1550
-    time_hours: 10
-    atmosphere: Air
+    time_hours:
+      value: 10
+      units: h
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 11'
+        output_unit: h
+    atmosphere:
+      value: Air
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 7'
+        output_unit: as_published
 - experiment_id: jeon23_sample_14
   series: Table 2 phase-equilibria sample 14
   method: quench_equilibration
@@ -13091,10 +14390,39 @@ experiments:
             - '0.2'
           - - ZnO
             - '0.7'
-      locator: *id014
-    temperature_C: 1550
-    time_hours: 10
-    atmosphere: Air
+      locator: *id012
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 12'
+        output_unit: mole_fraction
+    temperature_C:
+      value: 1550
+      units: C
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 13'
+        output_unit: C
+    time_hours:
+      value: 10
+      units: h
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 11'
+        output_unit: h
+    atmosphere:
+      value: Air
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 7'
+        output_unit: as_published
 - experiment_id: jeon23_sample_15
   series: Table 2 phase-equilibria sample 15
   method: quench_equilibration
@@ -13118,10 +14446,23 @@ experiments:
             - '0.2'
           - - ZnO
             - '0.7'
-      locator: *id015
+      locator: *id012
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 12'
+        output_unit: mole_fraction
     temperature_C: 1600
     time_hours: 6
-    atmosphere: Air
+    atmosphere:
+      value: Air
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 7'
+        output_unit: as_published
 - experiment_id: jeon23_sample_16
   series: Table 2 phase-equilibria sample 16
   method: quench_equilibration
@@ -13145,7 +14486,36 @@ experiments:
             - '0.2'
           - - ZnO
             - '0.7'
-      locator: *id016
-    temperature_C: 1600
-    time_hours: 6
-    atmosphere: Air
+      locator: *id012
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 12'
+        output_unit: mole_fraction
+    temperature_C:
+      value: 1600
+      units: C
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 15'
+        output_unit: C
+    time_hours:
+      value: 6
+      units: h
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 15'
+        output_unit: h
+    atmosphere:
+      value: Air
+      inference:
+        relation: extract_inference
+        inputs:
+          - 'table blank = same as above'
+          - 'source locator: Table 1 row 7'
+        output_unit: as_published

@@ -4582,6 +4582,254 @@ def _has_printed_initial_series_start(role: str | None, values: object) -> bool:
     )
 
 
+# A closed-system equilibrium experiment's printed starting bulk is the
+# system composition the engines equilibrate. These methods, and the printed
+# phrases below, are the experiment's own statement that the charge was not
+# closed. The analysed phase (glass, liquid, residue) is never this input.
+_OPEN_SYSTEM_METHOD_TOKENS = frozenset(
+    {
+        MethodToken.LANGMUIR_FREE_EVAPORATION,
+        MethodToken.KNUDSEN_EFFUSION,
+        MethodToken.VACUUM_CHAMBER_PYROLYSIS,
+        MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    }
+)
+_OPEN_SYSTEM_STARTING_BULK_BAND = "open_system_starting_bulk"
+# The printed locator note, not the source id. "normalized to 100% anhydrous"
+# means the charge was hydrous and the stored vector has no H2O.
+_ANHYDROUS_NORMALIZATION_NOTE = "normalized to 100% anhydrous"
+_ANHYDROUS_STARTING_BULK_BAND = "anhydrous_starting_bulk_omits_h2o"
+_OPEN_SYSTEM_PRINTED_CAUSES = (
+    ("volatile loss", "volatile loss"),
+    ("open crucible", "open crucible"),
+    ("evaporat", "evaporation"),
+)
+_PRINTED_PHASE_STAMP_BASIS = "printed_phase_composition"
+
+
+def _sample_fact_text(sample: Sample) -> str:
+    """Text the experiment record itself prints about the charge."""
+
+    parts: list[str] = []
+    for located in (
+        sample.container,
+        sample.form,
+        sample.pretreatment,
+        sample.characterization,
+    ):
+        if (
+            isinstance(located, Located)
+            and located.state.is_value
+            and isinstance(located.state.value, str)
+        ):
+            parts.append(located.state.value)
+    return " ".join(parts).casefold()
+
+
+def _open_system_starting_bulk_causes(experiment: Experiment) -> tuple[str, ...]:
+    """Why this starting bulk is not a closed-system composition.
+
+    Empty means the printed starting bulk is the system composition. The
+    scan is the experiment record (method and sample facts), not the paper's
+    introduction.
+    """
+
+    causes: list[str] = []
+    method = experiment.method
+    if method.is_value and method.value in _OPEN_SYSTEM_METHOD_TOKENS:
+        causes.append(str(method.value.value))
+    text = _sample_fact_text(experiment.sample)
+    for needle, label in _OPEN_SYSTEM_PRINTED_CAUSES:
+        if needle in text:
+            causes.append(label)
+    if re.search(r"\bflux\b", text):
+        causes.append("flux")
+    initial = experiment.sample.initial_composition
+    if (
+        initial is not None
+        and initial.state.is_value
+        and isinstance(initial.state.value, Composition)
+        and initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ):
+        causes.append(INITIAL_CHARGE_ONLY_PROXY_FLAG)
+    return tuple(dict.fromkeys(causes))
+
+
+def _printed_anhydrous_normalization(locator: Locator | None) -> bool:
+    """The printed note says this vector was scaled to an anhydrous 100%.
+
+    The signal is that note. H2O is not inserted: it is not an engine oxide
+    in ``_COMPOSITION_COMPONENTS``, and ``wt_pct_to_mole_fraction`` would
+    raise and drop the bulk.
+    """
+
+    note = locator.note if locator is not None else None
+    return (
+        isinstance(note, str)
+        and _ANHYDROUS_NORMALIZATION_NOTE in note.casefold()
+    )
+
+
+def _is_printed_phase_mass_stamp(state: object) -> bool:
+    """The mass-percent copy of a printed map. Engines do not read it as moles."""
+
+    return (
+        isinstance(state, State)
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.basis == _PRINTED_PHASE_STAMP_BASIS
+        and state.value.amount_basis is AmountBasis.MASS_PERCENT
+    )
+
+
+def _keeps_existing_composition(state: object) -> bool:
+    """A composition already usable as itself is not replaced.
+
+    Missing, unknown, and the mass-percent printed-phase stamp are not
+    usable engine inputs. Any other value stays as the row stated it.
+    A printed unknown on the row is refused earlier, by
+    ``_row_printed_composition_unknown``.
+    """
+
+    if not isinstance(state, State) or not state.is_value:
+        return False
+    if _is_printed_phase_mass_stamp(state):
+        return False
+    return True
+
+
+def _row_printed_composition_unknown(
+    point_conditions: Mapping[str, Located[Any]] | None,
+) -> bool:
+    """The row prints its composition cell as unknown.
+
+    That is a printed blank, with a reason. It is this row's statement.
+    An experiment-level, group-level, or neighbouring starting bulk must
+    not fill it. A missing key is not this refusal: the starting bulk may
+    still be this row's printed start.
+    """
+
+    conditions = point_conditions or {}
+    for key in ("composition", "initial_composition_as_published"):
+        located = conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and isinstance(located.state, State)
+            and located.state.is_unknown
+        ):
+            return True
+    return False
+
+
+def _apply_equilibrium_starting_bulk(
+    experiment: Experiment | None,
+    ident_kwargs: dict[str, Any],
+    point_conditions: Mapping[str, Located[Any]] | None,
+    *,
+    origin: str,
+) -> tuple[Mapping[str, Located[Any]] | None, list[Notice]]:
+    """Hand the printed starting bulk to an equilibrium phase row.
+
+    Closed system, so the starting bulk is the system composition. The
+    observation's component amount is the analysed phase and is not read
+    here. An open system (printed volatile loss, an open crucible,
+    evaporation, or a flux) still carries that bulk, with a typed notice:
+    predict and flag, never a silent use and never a refusal. A printed
+    anhydrous normalization still carries the oxide bulk and says that
+    identity.composition omits H2O. A missing or
+    unusable start, including a dash or blank the loader did not accept as
+    a component, stays missing. A row that already prints ``composition``
+    or ``initial_composition_as_published`` as unknown keeps that blank:
+    the experiment bulk is not this row's printed start. Residue quantities
+    do not call this.
+    """
+
+    if experiment is None:
+        return point_conditions, []
+    initial = experiment.sample.initial_composition
+    if (
+        initial is None
+        or not initial.state.is_value
+        or not isinstance(initial.state.value, Composition)
+    ):
+        return point_conditions, []
+    composition = initial.state.value
+    if composition.amount_basis not in {
+        AmountBasis.MOLE_FRACTION,
+        AmountBasis.MOL_INVENTORY,
+    }:
+        return point_conditions, []
+    if _row_printed_composition_unknown(point_conditions):
+        return point_conditions, []
+    if _keeps_existing_composition(ident_kwargs.get("composition")):
+        return point_conditions, []
+    located = Located(
+        initial.state,
+        locator=initial.locator,
+        inference=initial.inference,
+    )
+    ident_kwargs["composition"] = located.state
+    existing_point = (point_conditions or {}).get("composition")
+    if not (
+        isinstance(existing_point, Located)
+        and _keeps_existing_composition(existing_point.state)
+    ):
+        point_conditions = {
+            **(point_conditions or {}),
+            "composition": located,
+        }
+    notices: list[Notice] = []
+    causes = _open_system_starting_bulk_causes(experiment)
+    if causes:
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                reason=(
+                    "open_system_starting_bulk: " + "; ".join(causes)
+                ),
+                origin=origin,
+                band=_OPEN_SYSTEM_STARTING_BULK_BAND,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    if _printed_anhydrous_normalization(initial.locator):
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                reason=(
+                    "anhydrous_starting_bulk_omits_h2o: "
+                    "identity.composition omits H2O; the printed starting "
+                    "vector is normalized to 100% anhydrous"
+                ),
+                origin=origin,
+                band=_ANHYDROUS_STARTING_BULK_BAND,
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+    printed = experiment.sample.printed_composition
+    if (
+        printed is not None
+        and printed.state.is_value
+        and isinstance(printed.state.value, Mapping)
+        and any(str(key) == "FeOT" for key in printed.state.value)
+    ):
+        weights = {
+            str(key): amount
+            for key, raw in printed.state.value.items()
+            if (amount := _as_dec_or_none(raw)) is not None
+        }
+        iron = _total_iron_reported_as_feo_notice(
+            weights,
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            origin,
+        )
+        if iron is not None:
+            notices.append(iron)
+    return point_conditions, notices
+
+
 def _initial_charge_only_missing_composition(
     identity: Identity,
     point_conditions: Mapping[str, Located[Any]] | None,
@@ -4818,13 +5066,27 @@ def _converted_temperature(
     trail: str | None,
     original: object,
     locator: Locator | None,
+    *,
+    source_inference: Derivation | None = None,
+    read_from: str = "",
 ) -> Located[Decimal]:
-    """Kelvin point condition. A unit conversion keeps its printed original."""
+    """Kelvin point condition. A unit conversion keeps its printed original.
 
+    An inference on the selected field stays beside that conversion. A field
+    with no inference stays the conversion alone, so a printed Celsius value
+    does not change.
+    """
+
+    conversion = conversion_derivation(trail, original, locator)
+    inference = conversion
+    if source_inference is not None:
+        inference = _merge_source_conversion_derivation(
+            source_inference, conversion, read_from
+        )
     return Located(
         State.of(amount),
         locator=locator,
-        inference=conversion_derivation(trail, original, locator),
+        inference=inference,
     )
 
 
@@ -4835,6 +5097,22 @@ def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -
     if isinstance(raw, Mapping):
         return raw.get("value")
     return raw
+
+
+def _temperature_field_inference(
+    payload: Mapping[str, Any], field_name: str | None
+) -> Derivation | None:
+    """Inference declared on the selected temperature field. Absent means none."""
+
+    if not field_name:
+        return None
+    raw = payload.get(field_name)
+    if not isinstance(raw, Mapping):
+        return None
+    inference = raw.get("inference")
+    if not isinstance(inference, Mapping):
+        return None
+    return _derivation_from_plain(inference, allow_mapping_inputs=True)
 
 
 # Extractor-written Kelvin sitting next to the printed Celsius. A field named
@@ -18180,6 +18458,10 @@ class Migrator:
                     t_sel.unit_trail,
                     _temperature_field_raw(t_payload, t_sel.field_name),
                     temperature_locator,
+                    source_inference=_temperature_field_inference(
+                        t_payload, t_sel.field_name
+                    ),
+                    read_from=choose_read_from(work, temperature_locator),
                 )
             }
         raw_point_conditions = obs.get("point_conditions")
@@ -18526,6 +18808,7 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+        starting_bulk_notices: list[Notice] = []
         if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             experiment = self.result.experiments.get(experiment_id)
             printed = (
@@ -18563,6 +18846,14 @@ class Migrator:
                         "composition": located_composition,
                     }
                     ident_kwargs["composition"] = State.of(composition)
+            point_conditions, starting_bulk_notices = (
+                _apply_equilibrium_starting_bulk(
+                    experiment,
+                    ident_kwargs,
+                    point_conditions,
+                    origin=obs_id,
+                )
+            )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -19272,6 +19563,7 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
+        observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
@@ -20354,7 +20646,16 @@ class Migrator:
         if coord is not None:
             point_conditions = {
                 "temperature_K": _converted_temperature(
-                    coord, t_trail, t_original, point_locator
+                    coord,
+                    t_trail,
+                    t_original,
+                    point_locator,
+                    source_inference=(
+                        _temperature_field_inference(raw_item, t_sel.field_name)
+                        if isinstance(raw_item, Mapping)
+                        else None
+                    ),
+                    read_from=read_from,
                 )
             }
         if (

@@ -4108,8 +4108,9 @@ def equilibrate_cell(
         kwargs["call_timeout_s"] = timeout
     if "native_activity_formula" in parameters:
         kwargs["native_activity_formula"] = native_activity_formula
-    if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:
-        kwargs["subprocess_run_mode"] = "isothermal"
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+
+    kwargs.update(isothermal_run_kwargs(handle.name, parameters))
 
     try:
         result = _call_with_hard_timeout(
