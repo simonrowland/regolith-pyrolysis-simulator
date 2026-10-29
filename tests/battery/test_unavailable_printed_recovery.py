@@ -10,7 +10,15 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
+from simulator.battery.enums import (
+    AmountBasis,
+    EvidenceClass,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.migrate import select_declared_source
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.battery.test_migrate import _write_min_tree
@@ -102,6 +110,133 @@ def test_ichise_table2_activities_are_points_at_printed_values(tmp_path: Path) -
             "no total_pressure_Pa mapped from source"
         )
         assert row.value.approximate is False
+
+
+_ICHISE_TABLE4_X_MO = tuple(
+    Decimal(value)
+    for value in ("0.0", "0.1", "0.2", "0.3", "0.35", "0.484", "0.5", "0.554", "0.81", "0.9", "1.0")
+)
+_ICHISE_TABLE4 = {
+    ("Fe", Quantity.ACTIVITY): tuple(
+        Decimal(value)
+        for value in ("1.0", "0.887", "0.774", "0.685", "0.645", "0.645", "0.624", "0.551", "0.551", "0.403", "0.0")
+    ),
+    ("Mo", Quantity.ACTIVITY): tuple(
+        Decimal(value)
+        for value in ("0.0", "0.209", "0.472", "0.689", "0.757", "0.757", "0.784", "0.875", "0.875", "0.919", "1.0")
+    ),
+    ("Fe", Quantity.ACTIVITY_COEFFICIENT): tuple(
+        Decimal(value)
+        for value in ("1.0", "0.986", "0.967", "0.979", "0.993", "1.25", "1.247", "1.236", "2.9", "4.03", "6.0")
+    ),
+    ("Mo", Quantity.ACTIVITY_COEFFICIENT): tuple(
+        Decimal(value)
+        for value in ("1.54", "2.09", "2.36", "2.296", "2.163", "1.564", "1.568", "1.579", "1.08", "1.022", "1.0")
+    ),
+}
+
+
+def test_ichise_table4_quantities_keep_values_and_located_conditions(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-111-ichise-1982")
+    table4 = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-111-ichise-1982"
+        and observation.locator is not None
+        and observation.locator.table == "4"
+    ]
+    assert len(table4) == 88
+
+    for (formula, quantity), expected_values in _ICHISE_TABLE4.items():
+        matching = [
+            observation
+            for observation in table4
+            if observation.identity.species.formula == formula
+            and observation.identity.quantity.is_value
+            and observation.identity.quantity.value is quantity
+        ]
+        assert len(matching) == len(_ICHISE_TABLE4_X_MO)
+        assert all(observation.value.kind is ValueKind.POINT for observation in matching)
+        actual = sorted(
+            (
+                dict(observation.point_conditions["composition"].state.value.components)["Mo"],
+                observation.value.point,
+            )
+            for observation in matching
+        )
+        expected = sorted(zip(_ICHISE_TABLE4_X_MO, expected_values))
+        assert actual == expected
+
+        reference_phase = Phase.L if formula == "Fe" else Phase.CR
+        for observation in matching:
+            assert observation.identity.temperature_K.is_value
+            assert observation.identity.temperature_K.value == Decimal("1823")
+            reference_state = observation.identity.reference_state
+            assert reference_state is not None and reference_state.is_value
+            assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            assert reference_state.value.endmember.formula == formula
+            assert reference_state.value.endmember.phase.is_value
+            assert reference_state.value.endmember.phase.value is reference_phase
+
+    sigma_activity = [
+        observation
+        for observation in table4
+        if observation.identity.species.formula == "Fe"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+        and dict(observation.point_conditions["composition"].state.value.components)["Mo"]
+        in {Decimal("0.484"), Decimal("0.5"), Decimal("0.554")}
+    ]
+    assert len(sigma_activity) == 3
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and observation.derived_from
+        and observation.derivation is not None
+        for observation in sigma_activity
+    )
+
+    gibbs_parents = (
+        "ichise_1982_table4_GmixFe_1823K",
+        "ichise_1982_table4_GexFe_1823K",
+        "ichise_1982_table4_GmixMo_1823K",
+        "ichise_1982_table4_GexMo_1823K",
+    )
+    for parent in gibbs_parents:
+        unavailable = [
+            observation
+            for observation in table4
+            if f"::{parent}::" in observation.observation_id
+        ]
+        assert len(unavailable) == len(_ICHISE_TABLE4_X_MO)
+        assert all(observation.value.kind is ValueKind.UNAVAILABLE for observation in unavailable)
+
+    for observation in table4:
+        conditions = observation.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        composition = conditions["composition"]
+        assert temperature.state.is_value and temperature.state.value == Decimal("1823")
+        assert temperature.locator is not None and temperature.locator.table == "4"
+        assert composition.state.is_value
+        assert composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert composition.locator is not None and composition.locator.table == "4"
+
+    table4_ids = {observation.observation_id for observation in table4}
+    assert result.validation is not None
+    assert not any(
+        any(observation_id in issue.path for observation_id in table4_ids)
+        for issue in result.validation.hard_issues
+    )
+
+    table7 = [
+        observation
+        for observation in result.observations.values()
+        if "::ichise_1982_interaction_parameters_liquid" in observation.observation_id
+    ]
+    assert len(table7) == 1
+    assert table7[0].value.kind is ValueKind.UNAVAILABLE
 
 
 def test_ichise_bare_a_fe_column_stays_unavailable_and_activity_is_the_point() -> None:
