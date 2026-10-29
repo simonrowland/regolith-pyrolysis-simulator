@@ -164,7 +164,10 @@ def _offending_vapour_phase_rows() -> list[str]:
                     and _has_vapour_species(row, values)
                     and (
                         (
-                            phase_name not in {"gas", "g", "highT_compiled"}
+                            # casefold() makes the source tag highT_compiled
+                            # read as hight_compiled; it is a range tag, not a
+                            # sample, apparatus, or condensed-phase context.
+                            phase_name not in {"gas", "g", "hight_compiled"}
                             and _is_vapour_measurement(row, values)
                         )
                         or (
