@@ -3062,6 +3062,66 @@ def test_nonclosing_phase_sample_composition_round_trips_as_unknown(
         composition.reason or ""
     )
 
+    for case, initial_row in (
+        (
+            "flagged-initial-charge",
+            {
+                "T_C": 0,
+                "T_C_is_initial_composition": True,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+        (
+            "zero-loss-initial-charge",
+            {
+                "T_C": 0,
+                "mass_loss_pct": 0,
+                "SiO2_wt_pct": 70,
+                "MgO_wt_pct": 27.55,
+                "component_amount": 70,
+            },
+        ),
+    ):
+        initial_extract = _scalar_extract(
+            quantity="equilibrium_phase_composition",
+            units="wt percent",
+            obs_type="composition_series",
+            values={
+                "quantity": "equilibrium_phase_composition",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "phase_label": "melt",
+                "basis": "wt_percent",
+                "points": [initial_row, {"T_C": 1300, "component_amount": 70}],
+            },
+        )
+        initial_extract["species"]["Na"]["observations"][0]["observation_id"] = case
+        initial_root = _write_min_tree(tmp_path / case, initial_extract)
+        migrate(initial_root, write=True)
+        _works, initial_experiments, initial_observations = load_migrated_store(
+            initial_root
+        )
+
+        migrated_rows = [
+            observation
+            for observation_id, observation in initial_observations.items()
+            if observation_id.startswith(f"fixture-source::{case}")
+        ]
+        assert migrated_rows
+        assert any(
+            observation.identity.composition is not None
+            and observation.identity.composition.is_unknown
+            for observation in migrated_rows
+        )
+        experiment = initial_experiments[migrated_rows[0].experiment_id]
+        assert experiment.sample.initial_composition is not None
+        assert experiment.sample.initial_composition.state.is_unknown
+        assert "mass-percent composition does not close to 100 (sum=97.55)" in (
+            experiment.sample.initial_composition.state.reason or ""
+        )
+
 
 def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
