@@ -2812,7 +2812,7 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     setpoints_data,
     request,
 ):
-    """Exercise C6 when reachable, or the measured C4 acquisition refusal."""
+    """Exercise C6 with a physical collection throat sized for the melt load."""
     readiness_timeout_s = 10.0
     magemin = MAGEMinBackend()
     request.addfinalizer(magemin.close)
@@ -2840,6 +2840,11 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
 
     patched_setpoints = copy.deepcopy(setpoints_data)
     patched_setpoints = _hkl_only_setpoints(patched_setpoints)
+    # Set the user-exposed throat to 18 cm: A=pi*(0.09 m)^2. This physical
+    # line fixture leaves the campaign and acquisition-time limits unchanged.
+    patched_setpoints["condenser_geometry"]["initial_throat_area_m2"] = (
+        math.pi * 0.09**2
+    )
     c6_cfg = patched_setpoints["campaigns"]["C6"]
     # Pin the selected recipe mechanism: within-noise yield ties choose the
     # colder hold for greater Mg/Al2O3 margin and lower heating energy.
@@ -2855,6 +2860,7 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
         additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
     )
     sim.start_campaign(CampaignPhase.C0)
+    assert sim.overhead_model.throat_diameter_m >= 0.18
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
         DecisionType.PATH_AB: "A_staged",
@@ -2874,32 +2880,26 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
         steps += 1
 
     assert sim.is_complete()
-    c4_refused = sim.campaign_endpoint_refused()
-    if c4_refused:
-        # The cleaned-melt trajectory can exhaust the configured C4 preheat
-        # budget under partial transport throttling before C6 is offered.
-        _assert_transport_bound_c4_acquisition_refusal(sim)
-    else:
-        assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
-        assert any(
-            transition.name == "c6_mg_thermite_primary"
-            for transition in sim.atom_ledger.transitions
-        )
-        assert any(
-            transition.name == "c6_al_product_tap"
-            for transition in sim.atom_ledger.transitions
-        )
-        assert sim.atom_ledger.mol_by_account(
-            "terminal.drain_tap_material"
-        ).get("Al", 0.0) > 0.0
+    assert not sim.campaign_endpoint_refused()
+    assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
+    assert any(
+        transition.name == "c6_mg_thermite_primary"
+        for transition in sim.atom_ledger.transitions
+    )
+    assert any(
+        transition.name == "c6_al_product_tap"
+        for transition in sim.atom_ledger.transitions
+    )
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.drain_tap_material"
+    ).get("Al", 0.0) > 0.0
     drain_tap_kg = sim.atom_ledger.project_account_kg(
         "terminal.drain_tap_material"
     )
     assert sim.inventory.metal_alloy_kg.get("Al", 0.0) == pytest.approx(
         drain_tap_kg.get("Al", 0.0)
     )
-    if not c4_refused:
-        assert sim.melt.temperature_C == pytest.approx(1400.0)
+    assert sim.melt.temperature_C == pytest.approx(1400.0)
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
 
 
